@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Literal
 
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 
 class Bar(BaseModel):
@@ -150,14 +150,36 @@ class TradeEventResult(BaseModel):
     realized_pnl_total: float
     qualifying_trading_days: int
 
+class ExecutionEvidence(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    evidence_id: str = Field(min_length=8, max_length=128)
+    source: Literal["tradingview_mcp_direct_quote", "owner_platform_confirmation", "broker_session_status"]
+    competition_id: str | None = None
+    symbol: str
+    provider: str
+    observed_at_utc: datetime
+    quote_price: float | None = Field(default=None, gt=0)
+    update_mode: str | None = None
+    market_status: Literal["open", "closed", "unknown"] = "unknown"
+    details: dict = Field(default_factory=dict)
+
+    @model_validator(mode="after")
+    def validate_observed_at_timezone(self):
+        if self.observed_at_utc.tzinfo is None:
+            raise ValueError("observed_at_utc must include timezone information")
+        return self
+
+
 class ApprovalRevalidationRequest(BaseModel):
-    current_price: float = Field(gt=0)
+    model_config = ConfigDict(extra="forbid")
+
     current_signal_score: float = Field(ge=-1.0, le=1.0)
     current_market_state_hash: str
     current_rule_version: str = "stc-rule-v1"
     news_block: bool = False
     volatility_ratio: float = Field(default=1.0, gt=0)
-    quote_freshness_verified: bool = False
-    market_open_verified: bool = False
+    quote_evidence_id: str = Field(min_length=8, max_length=128)
+    market_evidence_id: str = Field(min_length=8, max_length=128)
     kill_switch: bool = False
     safe_mode: bool = False
