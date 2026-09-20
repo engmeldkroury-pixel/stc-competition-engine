@@ -153,3 +153,123 @@ def test_webhook_duplicate_is_idempotent():
     assert first.json()["duplicate"] is False
     assert second.json()["duplicate"] is True
     assert second.json()["execution"] == "no_duplicate_processing"
+
+
+def test_approval_request_rejects_caller_verification_booleans():
+    r = client.post(
+        "/signals/missing-signal/approve",
+        json={
+            "current_signal_score": 0.5,
+            "current_market_state_hash": "hash",
+            "quote_evidence_id": "quote-evidence-123",
+            "market_evidence_id": "market-evidence-123",
+            "quote_freshness_verified": True,
+            "market_open_verified": True,
+        },
+    )
+    assert r.status_code == 422
+    detail = r.json()["detail"]
+    assert any(x["type"] == "extra_forbidden" for x in detail)
+
+
+def test_approval_derives_context_from_persisted_evidence():
+    from datetime import datetime, timezone
+    from app import storage
+    from app.approval import build_approval_envelope
+
+    signal_id = "sig-evidence-ok"
+    payload = {
+        "competition_id":"capital-africa-sep-2026",
+        "symbol":"CAPITALCOM:EURUSD",
+        "timeframe":"15m",
+        "close":1.15,
+        "atr14":0.002,
+        "ema20":1.149,
+        "ema50":1.148,
+        "rsi14":60,
+        "macd":0.001,
+        "macd_signal":0.0005,
+    }
+    envelope = build_approval_envelope(payload, 0.5)
+    storage.save_approval_envelope(signal_id, envelope)
+    now = datetime.now(timezone.utc)
+    storage.save_execution_evidence({
+        "evidence_id":"quote-evidence-api-001",
+        "source":"tradingview_mcp_direct_quote",
+        "competition_id":"capital-africa-sep-2026",
+        "symbol":"CAPITALCOM:EURUSD",
+        "provider":"CAPITALCOM",
+        "observed_at_utc":now,
+        "quote_price":1.1502,
+        "update_mode":"streaming",
+        "market_status":"unknown",
+    })
+    storage.save_execution_evidence({
+        "evidence_id":"market-evidence-api-001",
+        "source":"broker_session_status",
+        "competition_id":"capital-africa-sep-2026",
+        "symbol":"CAPITALCOM:EURUSD",
+        "provider":"CAPITALCOM",
+        "observed_at_utc":now,
+        "quote_price":None,
+        "update_mode":None,
+        "market_status":"open",
+    })
+    r = client.post(
+        f"/signals/{signal_id}/approve",
+        json={
+            "current_signal_score":0.5,
+            "current_market_state_hash":envelope["market_state_hash"],
+            "current_rule_version":"stc-rule-v1",
+            "news_block":False,
+            "volatility_ratio":1.0,
+            "quote_evidence_id":"quote-evidence-api-001",
+            "market_evidence_id":"market-evidence-api-001",
+            "kill_switch":False,
+            "safe_mode":False,
+        },
+    )
+    assert r.status_code == 200
+    body = r.json()
+    assert body["approved"] is True
+    assert body["revalidation"]["execution_context"]["quote_freshness_verified"] is True
+    assert body["revalidation"]["execution_context"]["market_open_verified"] is True
+
+
+def test_approval_missing_evidence_fails_closed():
+    from app import storage
+    from app.approval import build_approval_envelope
+
+    signal_id = "sig-evidence-missing"
+    payload = {
+        "competition_id":"capital-africa-sep-2026",
+        "symbol":"CAPITALCOM:EURUSD",
+        "timeframe":"15m",
+        "close":1.15,
+        "atr14":0.002,
+        "ema20":1.149,
+        "ema50":1.148,
+        "rsi14":60,
+        "macd":0.001,
+        "macd_signal":0.0005,
+    }
+    envelope = build_approval_envelope(payload, 0.5)
+    storage.save_approval_envelope(signal_id, envelope)
+    r = client.post(
+        f"/signals/{signal_id}/approve",
+        json={
+            "current_signal_score":0.5,
+            "current_market_state_hash":envelope["market_state_hash"],
+            "quote_evidence_id":"quote-missing-0001",
+            "market_evidence_id":"market-missing-001",
+        },
+    )
+    assert r.status_code == 200
+    body = r.json()
+    assert body["approved"] is False
+    reasons = body["revalidation"]["reasons"]
+    assert "quote_freshness_unverified" in reasons
+    assert "market_closed_or_unverified" in reasons
+    evidence_reasons = body["revalidation"]["execution_context"]["evidence_reasons"]
+    assert "quote_evidence_missing" in evidence_reasons
+    assert "market_evidence_missing" in evidence_reasons

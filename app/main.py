@@ -9,6 +9,7 @@ from fastapi.responses import HTMLResponse
 
 from .analysis import analyze
 from .approval import revalidate_envelope
+from .execution_context import derive_execution_context
 from .data_capabilities import get_capability, validate_provider_mapping
 from .competition_profiles import PROFILES, get_profile
 from .models import (
@@ -39,6 +40,7 @@ from .storage import (
     record_revalidation,
     get_runtime_control,
     set_runtime_control,
+    get_execution_evidence,
 )
 
 @asynccontextmanager
@@ -47,15 +49,15 @@ async def lifespan(app: FastAPI):
     yield
 
 
-app = FastAPI(title="STC Competition Engine", version="0.7.0", lifespan=lifespan)
+app = FastAPI(title="STC Competition Engine", version="0.8.0", lifespan=lifespan)
 
 
 @app.get("/", response_class=HTMLResponse)
 def home():
     return """
-    <html><head><title>STC v0.7</title></head>
+    <html><head><title>STC v0.8</title></head>
     <body style='font-family:Arial;max-width:900px;margin:40px auto;line-height:1.5'>
-    <h1>STC Competition Engine v0.7</h1>
+    <h1>STC Competition Engine v0.8</h1>
     <p>Rule-aware paper-trading competition assistant. Recommendations require human approval.</p>
     <ul>
       <li><a href='/docs'>Interactive API</a></li>
@@ -69,7 +71,7 @@ def home():
 
 @app.get("/health")
 def health():
-    return {"status": "ok", "version": "0.7.0", "human_approval_required": True}
+    return {"status": "ok", "version": "0.8.0", "human_approval_required": True}
 
 
 @app.get("/competitions")
@@ -155,10 +157,15 @@ def approve(signal_id: str, req: ApprovalRevalidationRequest):
     if card is None:
         raise HTTPException(status_code=404, detail="Approval envelope not found")
     control = get_runtime_control()
-    current = req.model_dump()
+    quote_evidence = get_execution_evidence(req.quote_evidence_id)
+    market_evidence = get_execution_evidence(req.market_evidence_id)
+    derived = derive_execution_context(card["envelope"], quote_evidence, market_evidence)
+    current = req.model_dump(exclude={"quote_evidence_id", "market_evidence_id"})
+    current.update(derived)
     current["safe_mode"] = current["safe_mode"] or control["safe_mode"]
     current["kill_switch"] = current["kill_switch"] or control["kill_switch"]
     result = revalidate_envelope(card["envelope"], current)
+    result["execution_context"] = derived
     record_revalidation(signal_id, result)
     log_event("signal_approval_revalidation", {"signal_id": signal_id, "result": result})
     return {"signal_id": signal_id, "approved": bool(result["valid"]), "revalidation": result, "execution": "manual_only"}
@@ -304,7 +311,7 @@ def dashboard():
 <style>
 body{font-family:Arial,sans-serif;margin:0;background:#f5f6f8;color:#111827}.wrap{max-width:1100px;margin:0 auto;padding:24px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}.card{background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:18px}h1,h2{margin-top:0}.muted{color:#6b7280}.pill{display:inline-block;padding:4px 9px;border-radius:999px;background:#eef2ff}input,select,button{font:inherit;padding:10px;border:1px solid #d1d5db;border-radius:8px;margin:4px 0;width:100%;box-sizing:border-box}button{cursor:pointer;background:#111827;color:white}.ok{color:#047857}.bad{color:#b91c1c}pre{white-space:pre-wrap;word-break:break-word;background:#f9fafb;padding:10px;border-radius:8px}</style>
 </head><body><div class='wrap'>
-<h1>STC Competition Dashboard <span class='pill'>v0.7</span></h1>
+<h1>STC Competition Dashboard <span class='pill'>v0.8</span></h1>
 <p class='muted'>Competition-rule engine, signals, audit trail, and human approval. No real-money execution.</p>
 <div class='grid'><div class='card'><h2>Competitions</h2><div id='competitions'>Loading...</div></div>
 <div class='card'><h2>Order rule check</h2>
