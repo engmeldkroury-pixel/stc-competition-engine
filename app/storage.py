@@ -6,6 +6,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from threading import Lock
 
+from .models import ExecutionEvidence
+
 DB_PATH = Path(__file__).resolve().parent.parent / "data" / "stc.db"
 _LOCK = Lock()
 
@@ -472,7 +474,8 @@ def _ensure_execution_evidence_tables(conn: sqlite3.Connection) -> None:
 def save_execution_evidence(evidence: dict) -> None:
     init_db()
     now = datetime.now(timezone.utc).isoformat()
-    payload = dict(evidence)
+    validated = ExecutionEvidence.model_validate(evidence)
+    payload = validated.model_dump()
     observed = payload.get("observed_at_utc")
     if hasattr(observed, "isoformat"):
         observed = observed.isoformat()
