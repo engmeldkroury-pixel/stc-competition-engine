@@ -33,6 +33,8 @@ def build_approval_envelope(payload: dict, composite_score: float, rule_version:
         "issued_at": now.isoformat(),
         "valid_until": (now + timedelta(minutes=minutes)).isoformat(),
         "validity_minutes": minutes,
+        "competition_id": payload.get("competition_id"),
+        "symbol": payload.get("symbol"),
         "reference_price": ref,
         "entry_min": ref * (1 - pct) if ref else 0.0,
         "entry_max": ref * (1 + pct) if ref else 0.0,
