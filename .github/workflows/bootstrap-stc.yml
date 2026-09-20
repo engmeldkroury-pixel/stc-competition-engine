@@ -1,0 +1,40 @@
+name: Bootstrap STC v0.5
+
+on:
+  push:
+    paths:
+      - ".github/workflows/bootstrap-stc.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  bootstrap:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Decode and unpack STC v0.5
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p .bootstrap_unpack
+          base64 -d bootstrap/STC_APP_v0_5.zip.b64 > .bootstrap_unpack/stc.zip
+          unzip -q .bootstrap_unpack/stc.zip -d .bootstrap_unpack/unpacked
+          shopt -s dotglob nullglob
+          cp -a .bootstrap_unpack/unpacked/STC_APP_v0_5/. ./
+          rm -rf .bootstrap_unpack bootstrap
+          rm -f .github/workflows/bootstrap-stc.yml
+
+      - name: Commit installed source tree
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Install STC Competition Engine v0.5"
+          git push
