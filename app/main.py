@@ -58,7 +58,7 @@ def home():
     return """
     <html><head><title>STC v0.9</title></head>
     <body style='font-family:Arial;max-width:900px;margin:40px auto;line-height:1.5'>
-    <h1>STC Competition Engine v0.8</h1>
+    <h1>STC Competition Engine v0.9</h1>
     <p>Rule-aware paper-trading competition assistant. Recommendations require human approval.</p>
     <ul>
       <li><a href='/docs'>Interactive API</a></li>
@@ -72,7 +72,7 @@ def home():
 
 @app.get("/health")
 def health():
-    return {"status": "ok", "version": "0.8.0", "human_approval_required": True}
+    return {"status": "ok", "version": "0.9.0", "human_approval_required": True}
 
 
 @app.get("/competitions")
