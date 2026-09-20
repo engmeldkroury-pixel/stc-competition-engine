@@ -446,3 +446,58 @@ def set_runtime_control(safe_mode: bool | None = None, kill_switch: bool | None 
         conn.execute("UPDATE runtime_control SET safe_mode=?,kill_switch=?,reason=?,updated_utc=? WHERE id=1",
                      (int(new_safe), int(new_kill), reason, now))
     return get_runtime_control()
+
+
+def _ensure_execution_evidence_tables(conn: sqlite3.Connection) -> None:
+    conn.executescript(
+        """
+        CREATE TABLE IF NOT EXISTS execution_evidence (
+            evidence_id TEXT PRIMARY KEY,
+            source TEXT NOT NULL,
+            competition_id TEXT,
+            symbol TEXT NOT NULL,
+            provider TEXT NOT NULL,
+            observed_at_utc TEXT NOT NULL,
+            quote_price REAL,
+            update_mode TEXT,
+            market_status TEXT NOT NULL,
+            payload_json TEXT NOT NULL,
+            stored_at_utc TEXT NOT NULL
+        );
+        CREATE INDEX IF NOT EXISTS idx_execution_evidence_symbol ON execution_evidence(symbol, observed_at_utc);
+        """
+    )
+
+
+def save_execution_evidence(evidence: dict) -> None:
+    init_db()
+    now = datetime.now(timezone.utc).isoformat()
+    payload = dict(evidence)
+    observed = payload.get("observed_at_utc")
+    if hasattr(observed, "isoformat"):
+        observed = observed.isoformat()
+        payload["observed_at_utc"] = observed
+    with _LOCK, sqlite3.connect(DB_PATH) as conn:
+        _ensure_execution_evidence_tables(conn)
+        conn.execute(
+            """INSERT OR REPLACE INTO execution_evidence
+               (evidence_id,source,competition_id,symbol,provider,observed_at_utc,quote_price,update_mode,market_status,payload_json,stored_at_utc)
+               VALUES (?,?,?,?,?,?,?,?,?,?,?)""",
+            (
+                payload["evidence_id"], payload["source"], payload.get("competition_id"),
+                payload["symbol"], payload["provider"], observed, payload.get("quote_price"),
+                payload.get("update_mode"), payload.get("market_status", "unknown"),
+                json.dumps(payload, separators=(",", ":"), default=str), now,
+            ),
+        )
+
+
+def get_execution_evidence(evidence_id: str) -> dict | None:
+    init_db()
+    with _LOCK, sqlite3.connect(DB_PATH) as conn:
+        _ensure_execution_evidence_tables(conn)
+        row = conn.execute(
+            "SELECT payload_json FROM execution_evidence WHERE evidence_id=?",
+            (evidence_id,),
+        ).fetchone()
+    return json.loads(row[0]) if row else None
