@@ -1,0 +1,74 @@
+name: STC v0.9 One-Time E2E Proof
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/stc-e2e-once.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      STC_WORKER_TOKEN: ${{ secrets.STC_WORKER_TOKEN }}
+      EVENT_ID: stc-v09-e2e-gha-20260921-001
+      BRIDGE_URL: https://stc.feama.site
+    steps:
+      - name: Submit safe STC test event
+        run: |
+          set -euo pipefail
+          body='{"event_id":"stc-v09-e2e-gha-20260921-001","competition_id":"STC-TEST","symbol":"BITSTAMP:BTCUSD","time":"2026-09-20T21:30:00Z","source":"STC-v0.9-GitHub-E2E"}'
+          curl --fail-with-body -sS -X POST "$BRIDGE_URL/webhook.php"             -H "Content-Type: application/json"             --data "$body"
+
+      - name: Reconcile event from bridge inbox
+        run: |
+          set -euo pipefail
+          found=0
+          for i in 1 2 3 4 5 6 7 8 9 10; do
+            for status in ingested received claimed failed rejected; do
+              curl --fail-with-body -sS                 -H "Authorization: Bearer $STC_WORKER_TOKEN"                 "$BRIDGE_URL/inbox.php?status=$status&limit=100" > "inbox-$status.json"
+              if python - "$EVENT_ID" "$status" "inbox-$status.json" <<'PY'
+import json
+import sys
+
+event_id, status, path = sys.argv[1:4]
+with open(path, "r", encoding="utf-8") as f:
+    body = json.load(f)
+events = body.get("events") or body.get("items") or body.get("data") or []
+if isinstance(events, dict):
+    events = events.get("events") or events.get("items") or []
+for item in events:
+    if str(item.get("event_id")) == event_id:
+        safe = {
+            "event_id": item.get("event_id"),
+            "status": item.get("status", status),
+            "process_attempts": item.get("process_attempts"),
+            "has_result": bool(item.get("result")),
+        }
+        result = item.get("result")
+        if isinstance(result, dict):
+            receipt = result.get("receipt")
+            if isinstance(receipt, dict):
+                safe["receipt_id"] = receipt.get("receipt_id")
+                safe["receipt_status"] = receipt.get("status")
+                safe["receipt_action"] = receipt.get("action")
+                safe["payload_sha256"] = receipt.get("payload_sha256")
+        print(json.dumps(safe, sort_keys=True))
+        sys.exit(0)
+sys.exit(1)
+PY
+              then
+                found=1
+                break 2
+              fi
+            done
+            sleep 5
+          done
+          if [ "$found" -ne 1 ]; then
+            echo "E2E event was not found in bridge inbox" >&2
+            exit 1
+          fi
