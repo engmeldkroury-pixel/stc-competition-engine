@@ -153,3 +153,20 @@ def test_webhook_duplicate_is_idempotent():
     assert first.json()["duplicate"] is False
     assert second.json()["duplicate"] is True
     assert second.json()["execution"] == "no_duplicate_processing"
+
+
+def test_approval_request_rejects_caller_verification_booleans():
+    r = client.post(
+        "/signals/missing-signal/approve",
+        json={
+            "current_signal_score": 0.5,
+            "current_market_state_hash": "hash",
+            "quote_evidence_id": "quote-evidence-123",
+            "market_evidence_id": "market-evidence-123",
+            "quote_freshness_verified": True,
+            "market_open_verified": True,
+        },
+    )
+    assert r.status_code == 422
+    detail = r.json()["detail"]
+    assert any(x["type"] == "extra_forbidden" for x in detail)
