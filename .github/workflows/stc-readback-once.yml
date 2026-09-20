@@ -1,0 +1,47 @@
+name: STC v0.9 Readback Proof
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/stc-readback-once.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  readback:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      STC_WORKER_TOKEN: ${{ secrets.STC_WORKER_TOKEN }}
+      BRIDGE_URL: https://stc.feama.site
+      EVENT_ID: stc-v09-e2e-manual-20260921-001
+    steps:
+      - name: Read back processed E2E event
+        run: |
+          set -euo pipefail
+          found=0
+          for status in ingested received claimed failed rejected; do
+            curl --fail-with-body -sS               -H "Authorization: Bearer $STC_WORKER_TOKEN"               "$BRIDGE_URL/inbox.php?status=$status&limit=100" > "inbox-$status.json"
+            if jq -e --arg id "$EVENT_ID" '.. | objects | select(.event_id? == $id)' "inbox-$status.json" >/dev/null; then
+              jq --arg id "$EVENT_ID" '
+                [.. | objects | select(.event_id? == $id)]
+                | map({
+                    event_id,
+                    status,
+                    process_attempts,
+                    result: (
+                      if (.result|type)=="object" then {
+                        status: .result.status,
+                        note: .result.note,
+                        receipt: .result.receipt
+                      } else .result end
+                    )
+                  })
+              ' "inbox-$status.json"
+              found=1
+              break
+            fi
+          done
+          test "$found" -eq 1
