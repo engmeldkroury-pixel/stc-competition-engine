@@ -55,7 +55,7 @@ def home():
     return """
     <html><head><title>STC v0.7</title></head>
     <body style='font-family:Arial;max-width:900px;margin:40px auto;line-height:1.5'>
-    <h1>STC Competition Engine v0.6</h1>
+    <h1>STC Competition Engine v0.7</h1>
     <p>Rule-aware paper-trading competition assistant. Recommendations require human approval.</p>
     <ul>
       <li><a href='/docs'>Interactive API</a></li>
