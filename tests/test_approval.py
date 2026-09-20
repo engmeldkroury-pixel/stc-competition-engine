@@ -16,7 +16,7 @@ def test_dynamic_validity_depends_on_timeframe():
 def test_revalidation_accepts_fresh_unchanged_state():
     p={"competition_id":"c","symbol":"s","timeframe":"5","close":100,"atr14":2,"ema20":101,"ema50":99,"rsi14":55,"macd":1,"macd_signal":0.5}
     e=build_approval_envelope(p,0.6)
-    cur={"current_price":100.2,"current_signal_score":0.55,"current_market_state_hash":e["market_state_hash"],"current_rule_version":"stc-rule-v1","news_block":False,"volatility_ratio":1.0,"kill_switch":False,"safe_mode":False}
+    cur={"current_price":100.2,"current_signal_score":0.55,"current_market_state_hash":e["market_state_hash"],"current_rule_version":"stc-rule-v1","news_block":False,"volatility_ratio":1.0,"quote_freshness_verified":True,"market_open_verified":True,"kill_switch":False,"safe_mode":False}
     r=revalidate_envelope(e,cur)
     assert r["valid"] is True
 
@@ -40,3 +40,21 @@ def test_runtime_control_round_trip(tmp_path: Path):
     x=storage.set_runtime_control(safe_mode=True, kill_switch=False, reason='test')
     assert x["safe_mode"] is True
     assert x["kill_switch"] is False
+
+
+def test_revalidation_blocks_unverified_quote_freshness():
+    p={"competition_id":"c","symbol":"s","timeframe":"15m","close":100,"atr14":1,"ema20":101,"ema50":99,"rsi14":55,"macd":1,"macd_signal":0.5}
+    e=build_approval_envelope(p,0.6)
+    cur={"current_price":100,"current_signal_score":0.6,"current_market_state_hash":e["market_state_hash"],"current_rule_version":"stc-rule-v1","news_block":False,"volatility_ratio":1.0,"quote_freshness_verified":False,"market_open_verified":True,"kill_switch":False,"safe_mode":False}
+    r=revalidate_envelope(e,cur)
+    assert r["valid"] is False
+    assert "quote_freshness_unverified" in r["reasons"]
+
+
+def test_revalidation_blocks_closed_or_unverified_market():
+    p={"competition_id":"c","symbol":"s","timeframe":"15m","close":100,"atr14":1,"ema20":101,"ema50":99,"rsi14":55,"macd":1,"macd_signal":0.5}
+    e=build_approval_envelope(p,0.6)
+    cur={"current_price":100,"current_signal_score":0.6,"current_market_state_hash":e["market_state_hash"],"current_rule_version":"stc-rule-v1","news_block":False,"volatility_ratio":1.0,"quote_freshness_verified":True,"market_open_verified":False,"kill_switch":False,"safe_mode":False}
+    r=revalidate_envelope(e,cur)
+    assert r["valid"] is False
+    assert "market_closed_or_unverified" in r["reasons"]

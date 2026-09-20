@@ -42,6 +42,8 @@ def build_approval_envelope(payload: dict, composite_score: float, rule_version:
         "market_state_hash": market_state_hash(payload),
         "rule_version": rule_version,
         "max_volatility_ratio": 1.5,
+        "requires_quote_freshness_verified": True,
+        "requires_market_open_verified": True,
     }
 
 
@@ -73,6 +75,10 @@ def revalidate_envelope(envelope: dict, current: dict, now: datetime | None = No
         reasons.append("news_block")
     if float(current.get("volatility_ratio", 1.0)) > float(envelope.get("max_volatility_ratio", 1.5)):
         reasons.append("volatility_spike")
+    if bool(envelope.get("requires_quote_freshness_verified", True)) and not bool(current.get("quote_freshness_verified", False)):
+        reasons.append("quote_freshness_unverified")
+    if bool(envelope.get("requires_market_open_verified", True)) and not bool(current.get("market_open_verified", False)):
+        reasons.append("market_closed_or_unverified")
     if bool(current.get("kill_switch", False)):
         reasons.append("kill_switch_active")
     if bool(current.get("safe_mode", False)):
