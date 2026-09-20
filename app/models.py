@@ -157,5 +157,7 @@ class ApprovalRevalidationRequest(BaseModel):
     current_rule_version: str = "stc-rule-v1"
     news_block: bool = False
     volatility_ratio: float = Field(default=1.0, gt=0)
+    quote_freshness_verified: bool = False
+    market_open_verified: bool = False
     kill_switch: bool = False
     safe_mode: bool = False
