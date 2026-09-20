@@ -8,6 +8,8 @@ def test_pure_test_event_archives_without_side_effects():
     )
     assert result["status"] == "ingested_context"
     assert result["decision"]["execution"] == "none"
+    assert result["receipt"]["event_id"] == "evt-test-pure"
+    assert result["receipt"]["status"] == "ingested_context"
 
 
 def test_pure_full_event_builds_deterministic_signal_and_envelope():
@@ -38,3 +40,22 @@ def test_pure_full_event_builds_deterministic_signal_and_envelope():
     assert decision["signal"]["signal_id"] == deterministic_signal_id("evt-full-pure")
     assert decision["approval_envelope"]["validity_minutes"] == 30
     assert decision["execution"] == "manual_approval_required"
+    receipt = result["receipt"]
+    assert receipt["event_id"] == "evt-full-pure"
+    assert receipt["signal_id"] == deterministic_signal_id("evt-full-pure")
+    assert receipt["action"] == "signal_created"
+    assert receipt["status"] == "analyzed"
+
+
+def test_pipeline_receipt_is_deterministic_for_same_event_and_payload():
+    payload = {
+        "competition_id": "STC-TEST",
+        "symbol": "BITSTAMP:BTCUSD",
+        "time": "2026-09-20T07:00:00Z",
+        "source": "TradingView-Manual-Test",
+    }
+    a = decide_bridge_event("evt-receipt-deterministic", payload)
+    b = decide_bridge_event("evt-receipt-deterministic", payload)
+    assert a["receipt"] == b["receipt"]
+    assert a["receipt"]["receipt_id"].startswith("stc-receipt-")
+    assert len(a["receipt"]["payload_sha256"]) == 64
