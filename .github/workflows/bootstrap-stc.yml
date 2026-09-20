@@ -35,7 +35,7 @@ jobs:
           shopt -s dotglob nullglob
           cp -a .bootstrap_unpack/unpacked/STC_APP_v0_5/. ./
           rm -rf .bootstrap_unpack bootstrap
-          rm -f .github/workflows/bootstrap-stc.yml
+          git checkout -- .github/workflows/bootstrap-stc.yml
 
       - name: Commit installed source tree
         shell: bash
