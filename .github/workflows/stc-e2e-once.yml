@@ -15,13 +15,13 @@ jobs:
     timeout-minutes: 5
     env:
       STC_WORKER_TOKEN: ${{ secrets.STC_WORKER_TOKEN }}
-      EVENT_ID: stc-v09-e2e-gha-20260921-002
+      EVENT_ID: stc-v09-e2e-gha-20260921-003
       BRIDGE_URL: https://stc.feama.site
     steps:
       - name: Submit safe STC test event
         run: |
           set -euo pipefail
-          body='{"event_id":"stc-v09-e2e-gha-20260921-002","competition_id":"STC-TEST","symbol":"BITSTAMP:BTCUSD","time":"2026-09-20T21:32:00Z","source":"STC-v0.9-GitHub-E2E"}'
+          body='{"event_id":"stc-v09-e2e-gha-20260921-003","competition_id":"STC-TEST","symbol":"BITSTAMP:BTCUSD","time":"2026-09-20T21:34:00Z","source":"TradingView-Manual-Test"}'
           curl --fail-with-body -sS -X POST "$BRIDGE_URL/webhook.php" -H "Content-Type: application/json" --data "$body"
 
       - name: Reconcile event from bridge inbox
