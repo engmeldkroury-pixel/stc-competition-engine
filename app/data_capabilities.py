@@ -33,28 +33,83 @@ class SymbolCapability:
         return data
 
 
-CAPABILITIES: dict[str, SymbolCapability] = {
-    "CAPITALCOM:XAUUSD": SymbolCapability(
-        symbol="CAPITALCOM:XAUUSD",
+def _capital(
+    symbol: str,
+    *,
+    symbol_search: bool,
+    native_technicals: bool,
+    direct_quote: bool,
+    news: bool = False,
+    extra_notes: tuple[str, ...] = (),
+) -> SymbolCapability:
+    notes = [
+        "Exact-provider CAPITALCOM OHLCV was live-verified on 2026-09-20 for both 15m and 1h intervals.",
+        "TradingView MCP OHLCV carries an explicit delayed-data notice; never use the latest OHLCV close as an execution-time quote.",
+        "Execution account read/write is not provided by the verified TradingView MCP path; human approval and manual execution remain mandatory.",
+        "Do not silently substitute another provider for Capital.com execution context.",
+    ]
+    if native_technicals:
+        notes.append("Native TradingView technical rating was verified on both 15m and 1h for this exact provider/symbol.")
+    else:
+        notes.append("Native TradingView technical rating returned no technicals; use local indicators from exact-provider OHLCV for research/context.")
+    if direct_quote:
+        notes.append("Streaming direct quote was verified through get_symbol_data with update_mode=streaming.")
+    else:
+        notes.append("Direct quote via get_symbol_data was unavailable in the verified smoke test; approval must fail closed until an execution-time quote is independently verified.")
+    notes.extend(extra_notes)
+    return SymbolCapability(
+        symbol=symbol,
         provider="CAPITALCOM",
         verified=True,
-        symbol_search=True,
+        symbol_search=symbol_search,
         ohlcv=True,
-        native_technicals=False,
+        native_technicals=native_technicals,
         local_technicals_from_ohlcv=True,
-        news=True,
+        news=news,
         economic_calendar_context=True,
-        direct_quote=False,
+        direct_quote=direct_quote,
         alerts_read=True,
         alert_log_read=True,
         execution_account_read=False,
         execution_write=False,
-        notes=(
+        notes=tuple(notes),
+    )
+
+
+CAPABILITIES: dict[str, SymbolCapability] = {
+    "CAPITALCOM:BTCUSD": _capital(
+        "CAPITALCOM:BTCUSD", symbol_search=False, native_technicals=False, direct_quote=False
+    ),
+    "CAPITALCOM:ETHUSD": _capital(
+        "CAPITALCOM:ETHUSD", symbol_search=False, native_technicals=False, direct_quote=False
+    ),
+    "CAPITALCOM:DOGEUSD": _capital(
+        "CAPITALCOM:DOGEUSD", symbol_search=True, native_technicals=False, direct_quote=False
+    ),
+    "CAPITALCOM:EURUSD": _capital(
+        "CAPITALCOM:EURUSD", symbol_search=True, native_technicals=True, direct_quote=True, news=True,
+        extra_notes=("News retrieval was live-verified for the exact Capital.com EURUSD symbol on 2026-09-20.",),
+    ),
+    "CAPITALCOM:AUDUSD": _capital(
+        "CAPITALCOM:AUDUSD", symbol_search=True, native_technicals=True, direct_quote=True
+    ),
+    "CAPITALCOM:USDZAR": _capital(
+        "CAPITALCOM:USDZAR", symbol_search=True, native_technicals=True, direct_quote=True
+    ),
+    "CAPITALCOM:XAUUSD": _capital(
+        "CAPITALCOM:XAUUSD", symbol_search=True, native_technicals=False, direct_quote=False, news=True,
+        extra_notes=(
             "Owner-run TradingView MCP smoke test on 2026-09-19 verified symbol search, OHLCV, news, economic calendar, alerts list, and alert log.",
-            "TradingView MCP technical-rating/screener technical fields returned no technicals/no data for this Capital.com CFD symbol.",
-            "OHLCV may be delayed; do not treat the latest OHLCV close as an execution-time live quote without a freshness check.",
-            "Do not silently substitute OANDA or another provider for Capital.com execution context.",
         ),
+    ),
+    "CAPITALCOM:XAGUSD": _capital(
+        "CAPITALCOM:XAGUSD", symbol_search=True, native_technicals=False, direct_quote=False
+    ),
+    "CAPITALCOM:SPX500": _capital(
+        "CAPITALCOM:SPX500", symbol_search=False, native_technicals=False, direct_quote=False
+    ),
+    "CAPITALCOM:NAS100": _capital(
+        "CAPITALCOM:NAS100", symbol_search=False, native_technicals=False, direct_quote=False
     ),
 }
 
