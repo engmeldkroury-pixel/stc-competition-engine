@@ -88,3 +88,52 @@ def test_wrong_provider_or_symbol_fails_closed():
     assert result["market_open_verified"] is False
     assert "quote_evidence_target_mismatch" in result["evidence_reasons"]
     assert "market_evidence_target_mismatch" in result["evidence_reasons"]
+
+
+def test_future_dated_evidence_fails_closed():
+    now = datetime.now(timezone.utc)
+    future = now + timedelta(minutes=5)
+    q = {
+        "evidence_id":"quote-evidence-future",
+        "source":"tradingview_mcp_direct_quote",
+        "competition_id":"capital-africa-sep-2026",
+        "symbol":"CAPITALCOM:EURUSD",
+        "provider":"CAPITALCOM",
+        "observed_at_utc":future,
+        "quote_price":1.1502,
+        "update_mode":"streaming",
+        "market_status":"unknown",
+    }
+    m = {
+        "evidence_id":"market-evidence-future",
+        "source":"broker_session_status",
+        "competition_id":"capital-africa-sep-2026",
+        "symbol":"CAPITALCOM:EURUSD",
+        "provider":"CAPITALCOM",
+        "observed_at_utc":future,
+        "quote_price":None,
+        "update_mode":None,
+        "market_status":"open",
+    }
+    result = derive_execution_context(_envelope(), q, m, now=now)
+    assert result["quote_freshness_verified"] is False
+    assert result["market_open_verified"] is False
+    assert "quote_evidence_from_future" in result["evidence_reasons"]
+    assert "market_evidence_from_future" in result["evidence_reasons"]
+
+
+def test_malformed_evidence_timestamp_fails_closed_without_exception():
+    q = {
+        "evidence_id":"quote-evidence-badtime",
+        "source":"tradingview_mcp_direct_quote",
+        "competition_id":"capital-africa-sep-2026",
+        "symbol":"CAPITALCOM:EURUSD",
+        "provider":"CAPITALCOM",
+        "observed_at_utc":"not-a-time",
+        "quote_price":1.1502,
+        "update_mode":"streaming",
+        "market_status":"unknown",
+    }
+    result = derive_execution_context(_envelope(), q, None)
+    assert result["quote_freshness_verified"] is False
+    assert "quote_evidence_stale" in result["evidence_reasons"]
