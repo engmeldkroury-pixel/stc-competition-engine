@@ -4,6 +4,9 @@ on:
   repository_dispatch:
     types: [stc_event]
   workflow_dispatch:
+  push:
+    paths:
+      - ".stc-smoke-trigger"
 
 permissions:
   contents: read
