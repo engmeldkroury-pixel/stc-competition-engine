@@ -8,7 +8,7 @@ from fastapi import FastAPI, Header, HTTPException
 from app.bridge_client import BridgeClient
 from app.serverless_worker import run_serverless_once
 
-app = FastAPI(title="STC Serverless Processor", version="0.5.0")
+app = FastAPI(title="STC Serverless Processor", version="0.9.0")
 
 
 def _require_trigger(auth: str | None) -> None:
@@ -26,7 +26,7 @@ def _require_trigger(auth: str | None) -> None:
 def health():
     return {
         "status": "ok",
-        "version": "0.5.0",
+        "version": "0.9.0",
         "runtime": "serverless",
         "execution": "manual_only",
     }
