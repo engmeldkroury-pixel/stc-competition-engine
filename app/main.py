@@ -25,6 +25,7 @@ from .models import (
     ApprovalRevalidationRequest,
 )
 from .risk import competition_eligibility, validate_order
+from .readiness import build_readiness
 from .signals import evaluate, factors_from_tradingview
 from .storage import (
     competition_trade_summary,
@@ -169,6 +170,11 @@ def approve(signal_id: str, req: ApprovalRevalidationRequest):
     record_revalidation(signal_id, result)
     log_event("signal_approval_revalidation", {"signal_id": signal_id, "result": result})
     return {"signal_id": signal_id, "approved": bool(result["valid"]), "revalidation": result, "execution": "manual_only"}
+
+
+@app.get("/readiness")
+def readiness():
+    return build_readiness(get_runtime_control())
 
 
 @app.get("/runtime-control")
