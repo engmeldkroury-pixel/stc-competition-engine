@@ -15,7 +15,7 @@ def test_serverless_health():
     client = TestClient(module.app)
     r = client.get("/health")
     assert r.status_code == 200
-    assert r.json()["version"] == "0.5.0"
+    assert r.json()["version"] == "0.9.0"
     assert r.json()["execution"] == "manual_only"
 
 
