@@ -1,0 +1,40 @@
+from app.event_decision import decide_bridge_event, deterministic_signal_id
+
+
+def test_pure_test_event_archives_without_side_effects():
+    result = decide_bridge_event(
+        "evt-test-pure",
+        {"competition_id": "STC-TEST", "symbol": "BITSTAMP:BTCUSD", "time": "2026-09-20T07:00:00Z"},
+    )
+    assert result["status"] == "ingested_context"
+    assert result["decision"]["execution"] == "none"
+
+
+def test_pure_full_event_builds_deterministic_signal_and_envelope():
+    payload = {
+        "event_id": "evt-full-pure",
+        "event": "bar_close",
+        "competition_id": "capital-africa-sep-2026",
+        "symbol": "CAPITALCOM:XAUUSD",
+        "timeframe": "15",
+        "time": "2026-09-20T07:00:00Z",
+        "open": 3600,
+        "high": 3615,
+        "low": 3595,
+        "close": 3610,
+        "volume": 1000,
+        "ema20": 3605,
+        "ema50": 3590,
+        "rsi14": 62,
+        "atr14": 10,
+        "macd": 5,
+        "macd_signal": 2,
+        "volume_ratio": 1.7,
+    }
+    result = decide_bridge_event("evt-full-pure", payload)
+    assert result["status"] == "analyzed"
+    decision = result["decision"]
+    assert decision["action"] == "signal_created"
+    assert decision["signal"]["signal_id"] == deterministic_signal_id("evt-full-pure")
+    assert decision["approval_envelope"]["validity_minutes"] == 30
+    assert decision["execution"] == "manual_approval_required"

@@ -1,0 +1,54 @@
+import json
+
+import httpx
+
+from app.bridge_client import BridgeClient
+
+
+def test_claim_and_ack_contract():
+    seen = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        assert request.headers.get("authorization") == "Bearer secret"
+        if request.url.path.endswith("/claim.php"):
+            body = json.loads(request.content)
+            assert body["worker_id"] == "worker-1"
+            return httpx.Response(
+                200,
+                json={
+                    "ok": True,
+                    "claim_token": "abc",
+                    "count": 1,
+                    "events": [
+                        {
+                            "event_id": "evt-1",
+                            "payload": {"competition_id": "STC-TEST", "symbol": "BITSTAMP:BTCUSD", "time": "2026-09-20T07:00:00Z"},
+                            "status": "claimed",
+                            "process_attempts": 1,
+                        }
+                    ],
+                },
+            )
+        if request.url.path.endswith("/ack.php"):
+            seen.append(json.loads(request.content))
+            return httpx.Response(200, json={"ok": True, "event_id": "evt-1", "status": "ingested"})
+        return httpx.Response(404)
+
+    client = BridgeClient("https://bridge.test", "secret", transport=httpx.MockTransport(handler))
+    batch = client.claim("worker-1", 10)
+    assert batch.claim_token == "abc"
+    assert batch.events[0].event_id == "evt-1"
+    ack = client.ack("evt-1", "abc", "ingested", "ok", result={"status": "analyzed"})
+    assert ack["status"] == "ingested"
+    assert seen[0]["claim_token"] == "abc"
+    assert seen[0]["result"]["status"] == "analyzed"
+
+
+def test_inbox_uses_bearer_auth():
+    def handler(request: httpx.Request) -> httpx.Response:
+        assert request.headers.get("authorization") == "Bearer secret"
+        assert request.url.params["status"] == "received"
+        return httpx.Response(200, json={"ok": True, "count": 0, "events": []})
+
+    client = BridgeClient("https://bridge.test", "secret", transport=httpx.MockTransport(handler))
+    assert client.inbox()["count"] == 0
