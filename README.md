@@ -1,4 +1,4 @@
-# STC Competition Engine v0.5
+# STC Competition Engine v0.9
 
 This is the first executable STC build for TradingView The Leap paper-trading competitions.
 
@@ -84,3 +84,12 @@ The repository includes `.github/workflows/stc-process.yml`.
 - Concurrency is serialized so overlapping dispatches do not create simultaneous workers.
 - No artifact upload is required; results are acknowledged back to Hostinger/MySQL.
 - No automatic trade execution is implemented.
+
+
+## v0.9 reconciliation and readiness
+- Adds deterministic pipeline receipts for every bridge decision so TradingView events can be reconciled through Hostinger/MySQL results.
+- Each receipt carries event id, canonical payload SHA-256, competition/symbol, event time, status/action, and signal id when generated.
+- Adds `/readiness` to report static analysis readiness, runtime Safe Mode/Kill Switch state, quote-evidence requirements, and manual-only execution mode.
+- Adds `.github/workflows/stc-ci.yml` as the automated pytest gate on pushes and pull requests to `main`.
+- Adds `PROJECT_STATE.md` as the persistent project/evidence ledger.
+- TradingView MCP remains read/context transport only; execution-time approval fails closed without fresh trusted evidence.
