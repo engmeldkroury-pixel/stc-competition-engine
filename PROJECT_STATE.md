@@ -104,8 +104,8 @@ Interpretation: historical/context market data and alert plumbing are available;
 - Safe/fail-closed approval logic.
 
 ### Not yet evidence-complete
-- A confirmed green CI run for the latest v0.9 commit is not yet visible through the current GitHub connector.
-- End-to-end reconciliation of one new v0.9 TradingView event through Hostinger/MySQL with the new receipt still requires one real incoming event after deployment/current code pull.
+- CI is confirmed green for the v0.9 release contract. GitHub Actions run 35538557690 on main completed successfully after the release-smoke fixes.
+- End-to-end reconciliation of one new v0.9 TradingView-origin event through Hostinger/MySQL with the new receipt still requires one real incoming TradingView event.
 - Execution-time direct quote availability is dynamic and was unavailable/rate-limited during the latest read-only MCP check.
 - No broker/execution account read/write API is available in the verified TradingView MCP path. Manual execution remains required.
 
@@ -115,9 +115,21 @@ The system may analyze, rank signals, validate competition rules, generate appro
 
 The system must NOT place a competition or real-money order automatically. The owner remains the final approval and execution authority.
 
+## E2E verification findings on 2026-09-21
+
+- A one-time GitHub Actions E2E client was created only for testing and then removed.
+- Direct POST attempts from GitHub Actions reached Hostinger but were rejected with HTTP 403 `source_not_allowed`.
+- This is expected because the bridge intentionally enforces a TradingView source/IP allowlist.
+- Therefore a non-TradingView client cannot be used to fake final transport acceptance.
+- TradingView MCP can restart an existing webhook alert, but modifying/creating webhook alerts currently returns `webhook_requires_2fa`.
+- Existing old test alerts carry already-used event IDs and are not suitable to prove a new v0.9 receipt because bridge idempotency intentionally rejects/absorbs duplicates.
+
 ## Next bounded action
 
-1. Confirm the latest GitHub CI run is green.
-2. Process one new TradingView test/competition event through the deployed bridge.
-3. Confirm Hostinger/MySQL stores the Ack result containing the v0.9 pipeline receipt.
-4. Only then mark the transport + analysis + reconciliation MVP as end-to-end verified.
+1. Owner enables TradingView two-factor authentication (2FA) so webhook alert creation/modification is permitted.
+2. Create one new auto-deactivating `STC-TEST` TradingView alert with a fresh event_id.
+3. Confirm TradingView alert log shows webhook HTTP 200.
+4. Confirm Hostinger/MySQL stores the new event and Ack result containing the v0.9 pipeline receipt.
+5. Mark transport + analysis + reconciliation MVP as end-to-end verified.
+
+No trade execution is required for this proof.
