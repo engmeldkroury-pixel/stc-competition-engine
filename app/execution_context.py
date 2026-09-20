@@ -10,12 +10,15 @@ MARKET_STATUS_SOURCES = {"broker_session_status", "owner_platform_confirmation"}
 
 
 def _age_seconds(observed_at, now: datetime) -> float:
-    ts = observed_at
-    if isinstance(ts, str):
-        ts = datetime.fromisoformat(ts.replace("Z", "+00:00"))
-    if ts.tzinfo is None:
+    try:
+        ts = observed_at
+        if isinstance(ts, str):
+            ts = datetime.fromisoformat(ts.replace("Z", "+00:00"))
+        if ts is None or ts.tzinfo is None:
+            return float("inf")
+        return (now - ts.astimezone(timezone.utc)).total_seconds()
+    except (TypeError, ValueError, AttributeError):
         return float("inf")
-    return max(0.0, (now - ts.astimezone(timezone.utc)).total_seconds())
 
 
 def _matches_target(evidence: dict, envelope: dict) -> bool:
@@ -65,7 +68,9 @@ def derive_execution_context(
         source = quote_evidence.get("source")
         max_age = direct_quote_max_age_seconds if source == "tradingview_mcp_direct_quote" else owner_quote_max_age_seconds
         age = _age_seconds(quote_evidence.get("observed_at_utc"), now)
-        if age > max_age:
+        if age < -5:
+            reasons.append("quote_evidence_from_future")
+        elif age > max_age:
             reasons.append("quote_evidence_stale")
         elif source == "tradingview_mcp_direct_quote" and str(quote_evidence.get("update_mode") or "").lower() != "streaming":
             reasons.append("quote_evidence_not_streaming")
@@ -82,7 +87,9 @@ def derive_execution_context(
         reasons.append("market_evidence_untrusted_source")
     else:
         age = _age_seconds(market_evidence.get("observed_at_utc"), now)
-        if age > market_status_max_age_seconds:
+        if age < -5:
+            reasons.append("market_evidence_from_future")
+        elif age > market_status_max_age_seconds:
             reasons.append("market_evidence_stale")
         elif market_evidence.get("market_status") != "open":
             reasons.append("market_not_open")
