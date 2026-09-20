@@ -47,15 +47,15 @@ async def lifespan(app: FastAPI):
     yield
 
 
-app = FastAPI(title="STC Competition Engine", version="0.6.0", lifespan=lifespan)
+app = FastAPI(title="STC Competition Engine", version="0.7.0", lifespan=lifespan)
 
 
 @app.get("/", response_class=HTMLResponse)
 def home():
     return """
-    <html><head><title>STC v0.6</title></head>
+    <html><head><title>STC v0.7</title></head>
     <body style='font-family:Arial;max-width:900px;margin:40px auto;line-height:1.5'>
-    <h1>STC Competition Engine v0.6</h1>
+    <h1>STC Competition Engine v0.7</h1>
     <p>Rule-aware paper-trading competition assistant. Recommendations require human approval.</p>
     <ul>
       <li><a href='/docs'>Interactive API</a></li>
@@ -69,7 +69,7 @@ def home():
 
 @app.get("/health")
 def health():
-    return {"status": "ok", "version": "0.6.0", "human_approval_required": True}
+    return {"status": "ok", "version": "0.7.0", "human_approval_required": True}
 
 
 @app.get("/competitions")
@@ -304,7 +304,7 @@ def dashboard():
 <style>
 body{font-family:Arial,sans-serif;margin:0;background:#f5f6f8;color:#111827}.wrap{max-width:1100px;margin:0 auto;padding:24px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}.card{background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:18px}h1,h2{margin-top:0}.muted{color:#6b7280}.pill{display:inline-block;padding:4px 9px;border-radius:999px;background:#eef2ff}input,select,button{font:inherit;padding:10px;border:1px solid #d1d5db;border-radius:8px;margin:4px 0;width:100%;box-sizing:border-box}button{cursor:pointer;background:#111827;color:white}.ok{color:#047857}.bad{color:#b91c1c}pre{white-space:pre-wrap;word-break:break-word;background:#f9fafb;padding:10px;border-radius:8px}</style>
 </head><body><div class='wrap'>
-<h1>STC Competition Dashboard <span class='pill'>v0.6</span></h1>
+<h1>STC Competition Dashboard <span class='pill'>v0.7</span></h1>
 <p class='muted'>Competition-rule engine, signals, audit trail, and human approval. No real-money execution.</p>
 <div class='grid'><div class='card'><h2>Competitions</h2><div id='competitions'>Loading...</div></div>
 <div class='card'><h2>Order rule check</h2>
