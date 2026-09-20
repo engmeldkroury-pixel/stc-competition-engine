@@ -124,12 +124,40 @@ The system must NOT place a competition or real-money order automatically. The o
 - TradingView MCP can restart an existing webhook alert, but modifying/creating webhook alerts currently returns `webhook_requires_2fa`.
 - Existing old test alerts carry already-used event IDs and are not suitable to prove a new v0.9 receipt because bridge idempotency intentionally rejects/absorbs duplicates.
 
-## Next bounded action
+## End-to-end acceptance evidence — 2026-09-20 21:39 UTC
 
-1. Owner enables TradingView two-factor authentication (2FA) so webhook alert creation/modification is permitted.
-2. Create one new auto-deactivating `STC-TEST` TradingView alert with a fresh event_id.
-3. Confirm TradingView alert log shows webhook HTTP 200.
-4. Confirm Hostinger/MySQL stores the new event and Ack result containing the v0.9 pipeline receipt.
-5. Mark transport + analysis + reconciliation MVP as end-to-end verified.
+The v0.9 transport + processing + reconciliation path is now independently verified end to end with a safe STC-TEST event.
 
-No trade execution is required for this proof.
+- TradingView alert id: 5655506323
+- Event id: stc-v09-e2e-manual-20260921-001
+- Symbol: BITSTAMP:BTCUSD
+- TradingView fired at: 2026-09-20T21:39:00Z
+- TradingView webhook delivery: HTTP 200
+- GitHub repository_dispatch worker run: 35539353831
+- Worker conclusion: success
+- Worker processing result: claimed=1, ingested=1, rejected=0, failed=0
+- Hostinger readback status: ingested
+- Hostinger process_attempts: 1
+- STC result status: ingested_context
+- STC action: archive_test_event
+- Receipt id: stc-receipt-eb06cf422ad3a79bdbfd38c80ae0b398
+- Payload SHA-256: af2b843b6a3b0c41e04cf815033b98a4d425d2a6d71121934a30c62540b56db4
+- Receipt execution mode: manual_only
+- Signal id: null, as expected for STC-TEST
+- No trade analysis or order execution occurred.
+
+Acceptance conclusion:
+- TradingView -> Hostinger webhook transport: VERIFIED
+- TradingView source/IP allowlist: VERIFIED
+- Hostinger -> GitHub repository_dispatch: VERIFIED
+- GitHub bridge worker: VERIFIED
+- Hostinger/MySQL Ack/result persistence: VERIFIED
+- v0.9 deterministic receipt persistence: VERIFIED
+- Safe STC-TEST no-execution behavior: VERIFIED
+- Automated CI on main: VERIFIED GREEN
+
+The temporary readback workflow used to obtain the final evidence was removed after verification. The assistant-created diagnostic TradingView alert was also deleted after use.
+
+## Current next action
+
+Proceed to pre-market operational validation for the Capital.com competition path: verify current competition profile/rules, exact Capital.com symbols, runtime market-data availability, Safe Mode/Kill Switch state, and approval evidence requirements. Human approval remains mandatory before any competition order entry; automatic execution remains unavailable/disabled.
