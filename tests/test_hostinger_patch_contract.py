@@ -288,3 +288,66 @@ def test_hostinger_php_patch_files_are_syntax_valid_when_php_is_available():
             check=False,
         )
         assert result.returncode == 0, f"{name}: {result.stdout}\n{result.stderr}"
+
+
+
+def test_snapshot_exposes_only_explicit_opportunity_lifecycle_and_order_instruction_fields():
+    snapshot = (PATCH / "operator_snapshot.php").read_text(encoding="utf-8")
+    control = (PATCH / "portfolio_control.php").read_text(encoding="utf-8")
+    assert "'opportunity_active' => $opportunityActive" in snapshot
+    assert "'expires_in_seconds' => $expiresInSeconds" in snapshot
+    assert "'order_instruction' => $orderInstruction" in snapshot
+    assert "'source_close_time' =>" in snapshot
+    assert "stc_entry_order_instruction" in control
+    for order_type in ("BUY_LIMIT", "BUY_STOP_LIMIT", "SELL_LIMIT", "SELL_STOP_LIMIT", "MARKET"):
+        assert order_type in control
+
+
+def test_owner_console_hides_expired_opportunities_and_formats_readable_local_time():
+    ui = (PATCH / "operator.php").read_text(encoding="utf-8")
+    assert "function isOpportunityActive(c)" in ui
+    assert "function formatLocalTime(value)" in ui
+    assert "function formatCountdown(seconds)" in ui
+    assert "data-valid-until" in ui
+    assert "ACTIVE NOW" in ui
+    assert "Expired opportunities are removed automatically" in ui
+    assert "const actionable=cards.filter(c=>isOpportunityActive(c));" in ui
+    assert "c.recommendation==='WAIT'||isOpportunityActive(c)" in ui
+    assert "updateLiveCountdowns()" in ui
+    assert "source_close_time||c.source_time" in ui
+
+
+def test_owner_console_recalculates_manual_order_type_from_live_price_entry():
+    ui = (PATCH / "operator.php").read_text(encoding="utf-8")
+    assert "function deriveOrderInstruction(c,price)" in ui
+    assert "BUY LIMIT" in ui
+    assert "BUY STOP-LIMIT" in ui
+    assert "SELL LIMIT" in ui
+    assert "SELL STOP-LIMIT" in ui
+    assert "LIVE PRICE CHECK" in ui
+    assert 'oninput="updateOrderHint(' in ui
+
+
+def test_browser_notifications_do_not_suppress_active_plan_on_first_load():
+    ui = (PATCH / "operator.php").read_text(encoding="utf-8")
+    assert "stc_seen_signal_plans" in ui
+    assert "persistSeenSet('stc_seen_signal_plans'" in ui
+    assert "STC NEW ACTIVE TRADE PLAN" in ui
+    assert "if(!initializedSignals)" not in ui
+    assert "if(snapshot)maybeNotify(snapshot.cards||[])" in ui
+
+
+def test_server_notification_skips_expired_plan_and_includes_order_type_and_time_left():
+    control = (PATCH / "notification_control.php").read_text(encoding="utf-8")
+    assert "'reason' => 'expired_plan'" in control
+    assert "stc_entry_order_instruction(" in control
+    assert "'STATUS: ACTIVE • ' . $minutesLeft . ' min left'" in control
+    assert "'Order: ' . $orderText" in control
+    assert "'Reconfirm the live price before approval.'" in control
+
+
+def test_php_derives_confirmed_bar_close_from_feed_timeframe():
+    control = (PATCH / "portfolio_control.php").read_text(encoding="utf-8")
+    assert "function stc_feed_bar_close_utc" in control
+    assert "preg_match('/^\\d+$/'" in control
+    assert "$opened->modify('+' . $seconds . ' seconds')" in control
