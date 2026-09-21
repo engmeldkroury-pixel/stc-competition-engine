@@ -1,5 +1,5 @@
 //@version=6
-indicator("STC Capital Multi Feed v0.3", overlay=false, dynamic_requests=true)
+indicator("STC Capital Multi Feed v0.3", overlay=false)
 
 competitionId = input.string("capital-africa-sep-2026", "Competition ID", options=["capital-africa-sep-2026"])
 feedTf = input.timeframe("15", "Feed timeframe")
