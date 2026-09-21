@@ -10,6 +10,7 @@ from app.portfolio import (
     choose_rotation_candidate,
     price_value_usd_per_price_unit,
     propose_position_size,
+    risk_cluster,
     supervise_position,
 )
 
@@ -252,3 +253,73 @@ def test_aggregate_open_risk_is_separate_by_competition():
     result = aggregate_open_risk([p1, p2])
     assert result["amp-futures-sep-2026"]["initial_risk_usd"] == 200
     assert result["capital-africa-sep-2026"]["initial_risk_usd"] == 50
+
+
+
+def test_risk_cluster_groups_known_correlated_exposures():
+    assert risk_cluster("CME_MINI:MES1!") == "equity_indices"
+    assert risk_cluster("CAPITALCOM:NAS100") == "equity_indices"
+    assert risk_cluster("CME:MBT1!") == "crypto"
+    assert risk_cluster("CAPITALCOM:BTCUSD") == "crypto"
+    assert risk_cluster("COMEX_MINI:MGC1!") == "metals"
+    assert risk_cluster("CAPITALCOM:XAUUSD") == "metals"
+
+
+def test_position_sizing_is_reduced_by_cluster_capacity_before_new_trade():
+    result = propose_position_size(
+        competition_id="amp-futures-sep-2026",
+        symbol="CME_MINI:MES1!",
+        equity=250_000,
+        risk_fraction=0.005,
+        entry_price=7800,
+        stop_price=7780,
+        portfolio_open_risk_usd=1000,
+        cluster_open_risk_usd=3600,
+    )
+    # Base trade budget is $1,250, but cluster cap is 3 x 0.5% = $3,750.
+    # Only $150 remains in the equity-index cluster, allowing one MES contract
+    # at $100 stop risk.
+    assert result.cluster_risk_cap_usd == 3750
+    assert result.risk_budget_usd == 150
+    assert result.proposed_quantity == 1
+    assert result.cluster_risk_after_usd == 3700
+    assert "correlation_cluster_capacity" in result.risk_budget_limited_by
+
+
+def test_position_sizing_blocks_when_portfolio_risk_capacity_is_exhausted():
+    result = propose_position_size(
+        competition_id="amp-futures-sep-2026",
+        symbol="CME_MINI:MES1!",
+        equity=250_000,
+        risk_fraction=0.005,
+        entry_price=7800,
+        stop_price=7780,
+        portfolio_open_risk_usd=7500,
+        cluster_open_risk_usd=0,
+    )
+    assert result.portfolio_risk_cap_usd == 7500
+    assert result.risk_budget_usd == 0
+    assert result.proposed_quantity == 0
+    assert result.allowed_by_position_limit is False
+    assert "portfolio_risk_capacity" in result.risk_budget_limited_by
+
+
+def test_aggregate_open_risk_includes_cluster_breakdown():
+    positions = [
+        pos(position_id="mes", quantity=2),
+        pos(
+            position_id="mnq",
+            symbol="CME_MINI:MNQ1!",
+            quantity=1,
+            entry_price=30000,
+            initial_stop=29950,
+            current_stop=29950,
+            target1=30100,
+            target2=30200,
+        ),
+    ]
+    result = aggregate_open_risk(positions)["amp-futures-sep-2026"]
+    assert result["open_positions"] == 2
+    assert result["clusters"]["equity_indices"]["open_positions"] == 2
+    # MES: 20 points * $5 * 2 = $200; MNQ: 50 * $2 = $100.
+    assert result["clusters"]["equity_indices"]["initial_risk_usd"] == 300
