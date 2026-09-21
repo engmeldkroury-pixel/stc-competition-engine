@@ -72,6 +72,33 @@ try {
             stc_json(['ok' => false, 'error' => 'invalid_origin'], 400);
         }
 
+        $geometryValid = $side === 'LONG'
+            ? ($initialStop < $entryPrice && $target1 > $entryPrice && $target2 > $target1)
+            : ($initialStop > $entryPrice && $target1 < $entryPrice && $target2 < $target1);
+        if (!$geometryValid) {
+            stc_json(['ok' => false, 'error' => 'invalid_position_geometry'], 409);
+        }
+
+        $maxPosition = stc_max_open_position($competitionId, $symbol);
+        if ($maxPosition === null) {
+            stc_json(['ok' => false, 'error' => 'symbol_not_allowed'], 409);
+        }
+        $qtyStmt = $pdo->prepare(
+            "SELECT COALESCE(SUM(quantity), 0) AS qty FROM stc_positions "
+            . "WHERE status = 'OPEN' AND competition_id = ? AND symbol = ?"
+        );
+        $qtyStmt->execute([$competitionId, $symbol]);
+        $existingQty = (float)($qtyStmt->fetch()['qty'] ?? 0.0);
+        if ($existingQty + $quantity > $maxPosition + 1e-12) {
+            stc_json([
+                'ok' => false,
+                'error' => 'competition_position_limit_exceeded',
+                'current_open_quantity' => $existingQty,
+                'requested_quantity' => $quantity,
+                'max_position' => $maxPosition,
+            ], 409);
+        }
+
         $openedRaw = trim((string)($body['opened_at_utc'] ?? ''));
         $opened = stc_parse_utc($openedRaw);
         if ($opened === null) {
