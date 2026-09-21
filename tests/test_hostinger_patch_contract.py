@@ -65,3 +65,14 @@ def test_owner_console_requires_fresh_manual_confirmation_for_approval():
     assert "observed_at_utc:new Date().toISOString()" in ui
     assert "quote_price:price" in ui
     assert "market_status:'open'" in ui
+
+
+def test_owner_console_auto_refresh_and_actionable_browser_notifications():
+    ui = (PATCH / "operator.php").read_text(encoding="utf-8")
+    assert "setInterval(()=>{secondsToRefresh=30;refresh()},30000)" in ui
+    assert "Notification.requestPermission()" in ui
+    assert "STC NEW LOCKED TRADE PLAN" in ui
+    assert "LONG" in ui and "SHORT" in ui
+    assert "WAIT" in ui
+    assert "Decision timeframe" in ui
+    assert "Historical context" in ui
