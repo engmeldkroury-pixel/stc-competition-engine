@@ -59,3 +59,33 @@ def test_pipeline_receipt_is_deterministic_for_same_event_and_payload():
     assert a["receipt"] == b["receipt"]
     assert a["receipt"]["receipt_id"].startswith("stc-receipt-")
     assert len(a["receipt"]["payload_sha256"]) == 64
+
+
+
+def test_event_decision_marks_live_quality_and_unavailable_news_macro_honestly():
+    payload = {
+        "event_id": "evt-quality-reasons",
+        "event": "bar_close",
+        "competition_id": "capital-africa-sep-2026",
+        "symbol": "CAPITALCOM:XAUUSD",
+        "timeframe": "15",
+        "time": "2026-09-21T18:00:00Z",
+        "open": 4300,
+        "high": 4310,
+        "low": 4300,
+        "close": 4308,
+        "volume": 1800,
+        "ema20": 4305,
+        "ema50": 4290,
+        "rsi14": 60,
+        "atr14": 10,
+        "macd": 4,
+        "macd_signal": 2,
+        "volume_ratio": 1.8,
+    }
+    result = decide_bridge_event("evt-quality-reasons", payload)
+    reasons = result["decision"]["signal"]["reasons"]
+    assert any(x.startswith("volatility_quality_live=") for x in reasons)
+    assert any(x.startswith("liquidity_quality_live=") for x in reasons)
+    assert "news_factor=unavailable_live_source" in reasons
+    assert "macro_factor=unavailable_live_source" in reasons
