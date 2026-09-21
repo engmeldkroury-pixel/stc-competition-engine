@@ -759,3 +759,23 @@ Mandatory before declaring competition-ready:
 
 Critical competition identity check:
 Recent TradingView screenshots have shown a bottom trading account labelled The Leap / AMP FUTURES with a 250,000 balance while the active STC production feed/profile is capital-africa-sep-2026 using CAPITALCOM symbols and a 100,000 profile. Before any competition trade is approved, confirm which competition account is actually being used. Position sizing, allowed instruments, and rule validation must match the real active competition.
+
+
+## Dual-competition owner-console UI validation — 2026-09-21 18:41 UTC
+
+Owner deployed and visually validated the tabbed console:
+- Overview tab works.
+- Capital.com Africa tab renders 10 current cards.
+- AMP Futures tab renders and is currently empty because its TradingView feed/alert has not yet been provisioned.
+- General Lab tab renders isolated research-capital/currency/watch-symbol settings.
+- Notifications tab renders browser/mobile/email channel status.
+- Auto refresh is active in the browser.
+- Safe Mode=true and Kill Switch=true remain unchanged.
+- Current Capital cards are WAIT; locked opportunities=0 and manual-ready=0, which is expected.
+
+UI polish merged in PR #20 after CI success:
+- top control row now supports token + Refresh + browser alerts + Clear token without wrapping oddly;
+- Overview empty state now says no actionable locked opportunities rather than misleadingly saying no analyzed signals.
+
+Next owner-required step:
+Provision the AMP Futures TradingView Pine feed from tradingview/STC_AMP_CORE_FEED.pine and create its indicator alert to the existing STC webhook. Do not disable Safe Mode/Kill Switch.
