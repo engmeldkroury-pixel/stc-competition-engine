@@ -166,7 +166,7 @@ function cardHtml(c,i){
  const cls=c.recommendation==='LONG'?'long':c.recommendation==='SHORT'?'short':'wait';
  const a=c.approval||{};
  const reasons=(c.reasons||[]).slice(0,12).map(x=>'<span class="pill">'+esc(x)+'</span>').join('');
- const sizingAllowed=!c.position_sizing || c.position_sizing.allowed_by_position_limit!==false;
+ const sizingAllowed=!c.position_sizing || (c.position_sizing.allowed_by_position_limit!==false && c.position_sizing.allowed_by_risk_policy!==false);
  const canApprove=(c.recommendation==='LONG'||c.recommendation==='SHORT')&&!!c.locked_trade_plan&&sizingAllowed;
  const competitionLabel=c.competition_id==='amp-futures-sep-2026'?'AMP Futures':'Capital.com Africa';
  return '<div class="card">'
@@ -382,7 +382,7 @@ async function updateAccountState(competitionId){
 async function recordFilledPosition(i){
  const c=snapshot.cards[i];
  if(!c||!c.locked_trade_plan||!c.approval||c.approval.decision!=='approved'){alert('An approved locked plan is required.');return;}
- if(c.position_sizing && c.position_sizing.allowed_by_position_limit===false){alert('STC risk capacity currently blocks a new entry.');return;}
+ if(c.position_sizing && (c.position_sizing.allowed_by_position_limit===false || c.position_sizing.allowed_by_risk_policy===false)){alert('STC position limit or portfolio risk capacity currently blocks a new entry.');return;}
  const suggested=c.position_sizing?c.position_sizing.proposed_quantity:'';
  const qty=Number(prompt('Quantity actually filled manually in the competition platform',suggested));
  if(!Number.isFinite(qty)||qty<=0)return;
@@ -425,7 +425,7 @@ async function setControls(safe,kill){
 async function approveCard(i,decision){
  const c=snapshot.cards[i];
  if(!c)return;
- if(decision==='approve' && c.position_sizing && c.position_sizing.allowed_by_position_limit===false){alert('Approval blocked by STC portfolio/cluster risk capacity.');return;}
+ if(decision==='approve' && c.position_sizing && (c.position_sizing.allowed_by_position_limit===false || c.position_sizing.allowed_by_risk_policy===false)){alert('Approval blocked by competition position limit or STC portfolio/cluster risk capacity.');return;}
  if(decision==='approve'&&!confirm('Approve this signal for MANUAL order entry only? No order will be sent.'))return;
  const price=Number($('price-'+i)?.value);
  const body={signal_id:c.signal_id,decision,note:'STC owner console'};
