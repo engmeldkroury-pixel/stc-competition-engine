@@ -1,5 +1,5 @@
 //@version=6
-indicator("STC AMP Core Feed v0.2 Stateful Visual", overlay=true, max_labels_count=20)
+indicator("STC AMP Core Feed A v0.3 Stateful Visual", overlay=true, max_labels_count=20)
 
 competitionId = input.string("amp-futures-sep-2026", "Competition ID", options=["amp-futures-sep-2026"], group="Production feed")
 feedTf = input.timeframe("15", "Production feed timeframe", group="Production feed")
@@ -127,23 +127,6 @@ mgc = feedBar("COMEX_MINI:MGC1!")
 mgcH = historyBar("COMEX_MINI:MGC1!")
 sil = feedBar("COMEX_MINI:SIL1!")
 silH = historyBar("COMEX_MINI:SIL1!")
-m6e = feedBar("CME_MINI:M6E1!")
-m6eH = historyBar("CME_MINI:M6E1!")
-m6b = feedBar("CME_MINI:M6B1!")
-m6bH = historyBar("CME_MINI:M6B1!")
-mjy = feedBar("CME_MINI:MJY1!")
-mjyH = historyBar("CME_MINI:MJY1!")
-m6a = feedBar("CME_MINI:M6A1!")
-m6aH = historyBar("CME_MINI:M6A1!")
-mbt = feedBar("CME:MBT1!")
-mbtH = historyBar("CME:MBT1!")
-met = feedBar("CME:MET1!")
-metH = historyBar("CME:MET1!")
-zn = feedBar("CBOT:ZN1!")
-znH = historyBar("CBOT:ZN1!")
-zb = feedBar("CBOT:ZB1!")
-zbH = historyBar("CBOT:ZB1!")
-
 varip int lastMES = na
 varip int lastMNQ = na
 varip int lastMYM = na
@@ -152,14 +135,7 @@ varip int lastMCL = na
 varip int lastMNG = na
 varip int lastMGC = na
 varip int lastSIL = na
-varip int lastM6E = na
-varip int lastM6B = na
-varip int lastMJY = na
-varip int lastM6A = na
-varip int lastMBT = na
-varip int lastMET = na
-varip int lastZN = na
-varip int lastZB = na
+
 
 if feedEnabled and barstate.isconfirmed and barstate.isrealtime
     if not na(mes.t) and not na(mes.c) and (na(lastMES) or mes.t != lastMES)
@@ -186,30 +162,7 @@ if feedEnabled and barstate.isconfirmed and barstate.isrealtime
     if not na(sil.t) and not na(sil.c) and (na(lastSIL) or sil.t != lastSIL)
         lastSIL := sil.t
         alert(buildMessage("COMEX_MINI:SIL1!", sil, silH), alert.freq_all)
-    if not na(m6e.t) and not na(m6e.c) and (na(lastM6E) or m6e.t != lastM6E)
-        lastM6E := m6e.t
-        alert(buildMessage("CME_MINI:M6E1!", m6e, m6eH), alert.freq_all)
-    if not na(m6b.t) and not na(m6b.c) and (na(lastM6B) or m6b.t != lastM6B)
-        lastM6B := m6b.t
-        alert(buildMessage("CME_MINI:M6B1!", m6b, m6bH), alert.freq_all)
-    if not na(mjy.t) and not na(mjy.c) and (na(lastMJY) or mjy.t != lastMJY)
-        lastMJY := mjy.t
-        alert(buildMessage("CME_MINI:MJY1!", mjy, mjyH), alert.freq_all)
-    if not na(m6a.t) and not na(m6a.c) and (na(lastM6A) or m6a.t != lastM6A)
-        lastM6A := m6a.t
-        alert(buildMessage("CME_MINI:M6A1!", m6a, m6aH), alert.freq_all)
-    if not na(mbt.t) and not na(mbt.c) and (na(lastMBT) or mbt.t != lastMBT)
-        lastMBT := mbt.t
-        alert(buildMessage("CME:MBT1!", mbt, mbtH), alert.freq_all)
-    if not na(met.t) and not na(met.c) and (na(lastMET) or met.t != lastMET)
-        lastMET := met.t
-        alert(buildMessage("CME:MET1!", met, metH), alert.freq_all)
-    if not na(zn.t) and not na(zn.c) and (na(lastZN) or zn.t != lastZN)
-        lastZN := zn.t
-        alert(buildMessage("CBOT:ZN1!", zn, znH), alert.freq_all)
-    if not na(zb.t) and not na(zb.c) and (na(lastZB) or zb.t != lastZB)
-        lastZB := zb.t
-        alert(buildMessage("CBOT:ZB1!", zb, zbH), alert.freq_all)
+
 
 
 // Current-chart technical engine
@@ -389,6 +342,6 @@ if barstate.islast
         table.cell(dashboard, 0, 10, "VOLUME x", text_color=color.white)
         table.cell(dashboard, 1, 10, str.tostring(volumeRatioV, "#.00"), text_color=color.white)
         table.cell(dashboard, 0, 11, "FEED", text_color=color.white)
-        table.cell(dashboard, 1, 11, feedEnabled ? "AMP ON " + feedTf : "AMP OFF", text_color=color.white)
+        table.cell(dashboard, 1, 11, feedEnabled ? "AMP A ON " + feedTf : "AMP A OFF", text_color=color.white)
     else
         table.clear(dashboard, 0, 0, 1, 11)
