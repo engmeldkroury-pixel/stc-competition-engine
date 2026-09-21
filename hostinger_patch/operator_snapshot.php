@@ -159,6 +159,16 @@ try {
             }
         }
 
+        if ($manualReady && is_array($sizing)) {
+            $manualReady = ($sizing['allowed_by_position_limit'] ?? false) === true
+                && ($sizing['allowed_by_risk_policy'] ?? false) === true;
+        }
+
+        $pendingPlanAction = null;
+        if ($planValid && $validUntil !== null && $now >= $validUntil) {
+            $pendingPlanAction = 'CANCEL_PENDING_PLAN';
+        }
+
         $cards[] = [
             'event_id' => (string)$row['event_id'],
             'signal_id' => $signalId,
@@ -175,6 +185,7 @@ try {
             'position_sizing' => $sizing,
             'approval' => $approval,
             'manual_execution_ready' => $manualReady,
+            'pending_plan_action' => $pendingPlanAction,
             'execution' => 'manual_only',
         ];
         if (count($cards) >= 80) {
