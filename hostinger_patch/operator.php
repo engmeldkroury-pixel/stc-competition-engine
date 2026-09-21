@@ -12,8 +12,8 @@ header('Content-Type: text/html; charset=utf-8');
 <style>
 :root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;background:#070b14;color:#e5e7eb;font-family:Arial,sans-serif}
 .wrap{max-width:1320px;margin:auto;padding:18px}.bar,.card{background:#101827;border:1px solid #263247;border-radius:14px}
-.bar{padding:14px;margin-bottom:14px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:14px}.card{padding:15px}
-h1{margin:0 0 4px}.muted,.small{color:#94a3b8}.small{font-size:12px}.row{display:flex;justify-content:space-between;gap:10px;margin:7px 0}.value{font-weight:700;text-align:right}
+.bar{padding:14px;margin-bottom:14px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(350px,1fr));gap:14px}.card{padding:15px}
+h1{margin:0 0 4px}.muted,.small{color:#94a3b8}.small{font-size:12px}.row{display:grid;grid-template-columns:minmax(105px,0.72fr) minmax(0,1.28fr);gap:12px;align-items:start;margin:7px 0}.value{font-weight:700;text-align:left;overflow-wrap:anywhere}.statusline{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:8px 0}.badge{display:inline-block;border:1px solid #334155;border-radius:999px;padding:5px 9px;font-size:12px;font-weight:700}.badge.active{border-color:#166534;background:#052e16;color:#86efac}.badge.expired{border-color:#991b1b;background:#450a0a;color:#fca5a5}.badge.blocked{border-color:#854d0e;background:#422006;color:#fde047}.orderbox{background:#0b1220;border:1px solid #334155;border-radius:10px;padding:10px;margin:10px 0}.orderbox .ordername{font-size:16px;font-weight:800}.countdown{font-variant-numeric:tabular-nums}
 .tabs{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}.tab{background:#0b1220;border:1px solid #334155;border-radius:10px;padding:10px 14px;color:#cbd5e1;cursor:pointer}.tab.active{background:#1d4ed8;border-color:#1d4ed8;color:#fff}.tabcount{font-size:11px;opacity:.8;margin-left:5px}
 .hidden{display:none!important}.summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px}.summary .card{min-height:90px}.big{font-size:24px;font-weight:800}.sectiontitle{font-weight:800;margin:0 0 8px}.generalbox{display:grid;grid-template-columns:1fr 1fr;gap:10px}.generalbox textarea{width:100%;min-height:90px;background:#0b1220;color:#e5e7eb;border:1px solid #334155;border-radius:9px;padding:9px;font:inherit}
 @media(max-width:700px){.generalbox{grid-template-columns:1fr}}
@@ -21,7 +21,7 @@ input,button,select{font:inherit;border:1px solid #334155;border-radius:9px;padd
 input{width:100%}button{cursor:pointer}.primary{background:#1d4ed8}.danger{background:#991b1b}.safe{background:#166534}
 .long,.ok{color:#22c55e}.short,.bad{color:#f87171}.wait{color:#facc15}.pill{display:inline-block;border:1px solid #334155;border-radius:999px;padding:3px 7px;margin:2px;font-size:11px}
 .controls{display:grid;grid-template-columns:1fr auto auto auto;gap:8px}.approve{display:grid;grid-template-columns:1fr auto auto;gap:8px;margin-top:10px}
-@media(max-width:700px){.controls,.approve{grid-template-columns:1fr}}
+@media(max-width:700px){.controls,.approve{grid-template-columns:1fr}.row{grid-template-columns:1fr;gap:3px}.grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body><div class="wrap">
@@ -137,17 +137,82 @@ function runtimeHtml(r){
   +'<div class="small" style="margin-top:8px">Changing controls does not execute any trade.</div>';
 }
 
+function formatLocalTime(value){
+ if(!value)return '-';
+ const d=new Date(value);
+ if(Number.isNaN(d.getTime()))return String(value);
+ return new Intl.DateTimeFormat(undefined,{day:'2-digit',month:'short',hour:'numeric',minute:'2-digit'}).format(d);
+}
+function formatAgeSeconds(seconds){
+ const s=Math.max(0,Math.floor(Number(seconds)||0));
+ if(s<60)return s+'s ago';
+ const m=Math.floor(s/60);
+ if(m<60)return m+'m ago';
+ const h=Math.floor(m/60);
+ return h+'h '+(m%60)+'m ago';
+}
+function secondsUntil(value){
+ const t=Date.parse(value||'');
+ if(!Number.isFinite(t))return null;
+ return Math.floor((t-Date.now())/1000);
+}
+function formatCountdown(seconds){
+ if(seconds==null)return '-';
+ if(seconds<=0)return 'expired';
+ const m=Math.floor(seconds/60), s=seconds%60;
+ if(m>=60){const h=Math.floor(m/60);return h+'h '+(m%60)+'m';}
+ return m+'m '+String(s).padStart(2,'0')+'s';
+}
+function isOpportunityActive(c){
+ if(!c||!c.locked_trade_plan||!(c.recommendation==='LONG'||c.recommendation==='SHORT'))return false;
+ const left=secondsUntil(c.locked_trade_plan.valid_until);
+ return left!==null && left>0;
+}
+function deriveOrderInstruction(c,price){
+ const p=c&&c.locked_trade_plan;
+ const direction=c&&c.recommendation;
+ const current=Number(price);
+ if(!p||!(direction==='LONG'||direction==='SHORT')||!Number.isFinite(current)||current<=0)return null;
+ const low=Number(p.entry_min), high=Number(p.entry_max), mid=(low+high)/2;
+ if(current>=low&&current<=high)return {order_type:'MARKET',side:direction==='LONG'?'BUY':'SELL',status:'inside_entry_zone',trigger_price:null,limit_price:null,explanation:'Live price is inside the locked entry zone.'};
+ if(direction==='LONG'&&current>high)return {order_type:'BUY LIMIT',side:'BUY',status:'wait_pullback',trigger_price:null,limit_price:mid,explanation:'Price is above the zone. Wait for a pullback; use a BUY LIMIT inside the zone.'};
+ if(direction==='LONG')return {order_type:'BUY STOP-LIMIT',side:'BUY',status:'wait_breakout_into_zone',trigger_price:low,limit_price:high,explanation:'Price is below the zone. Enter only if price rises into it.'};
+ if(current<low)return {order_type:'SELL LIMIT',side:'SELL',status:'wait_rebound',trigger_price:null,limit_price:mid,explanation:'Price is below the zone. Wait for a rebound; use a SELL LIMIT inside the zone.'};
+ return {order_type:'SELL STOP-LIMIT',side:'SELL',status:'wait_breakdown_into_zone',trigger_price:high,limit_price:low,explanation:'Price is above the zone. Enter only if price falls into it.'};
+}
+function orderHtml(c,i){
+ const live=(c.order_instruction||deriveOrderInstruction(c,c.current_price));
+ if(!live)return '';
+ const trigger=live.trigger_price==null?'':' • trigger '+num(live.trigger_price);
+ const limit=live.limit_price==null?'':' • limit '+num(live.limit_price);
+ return '<div class="orderbox"><div class="small">Planned order type • based on latest confirmed 15m close</div>'
+  +'<div class="ordername">'+esc((live.side?live.side+' ':'')+(live.order_type||'UNKNOWN'))+'</div>'
+  +'<div class="small">'+esc(live.explanation||'')+esc(trigger)+esc(limit)+'</div>'
+  +'<div id="order-hint-'+i+'" class="small" style="margin-top:6px">Enter the current TradingView price below to recalculate the order type before approval.</div></div>';
+}
+function updateOrderHint(i){
+ const c=snapshot&&snapshot.cards?snapshot.cards[i]:null;
+ const price=Number($('price-'+i)?.value);
+ const h=$('order-hint-'+i);
+ if(!h||!c)return;
+ if(!Number.isFinite(price)||price<=0){h.textContent='Enter the current TradingView price to recalculate the order type before approval.';return;}
+ const o=deriveOrderInstruction(c,price);
+ if(!o){h.textContent='Order type unavailable.';return;}
+ const parts=[(o.side?o.side+' ':'')+o.order_type,o.explanation];
+ if(o.trigger_price!=null)parts.push('Trigger '+num(o.trigger_price));
+ if(o.limit_price!=null)parts.push('Limit '+num(o.limit_price));
+ h.textContent='LIVE PRICE CHECK: '+parts.join(' • ');
+}
 function planHtml(p){
  if(!p)return '<div class="row"><span>Locked plan</span><span class="value">None</span></div>';
+ const left=secondsUntil(p.valid_until);
  return '<div class="row"><span>Direction</span><span class="value">'+esc(p.direction||'-')+'</span></div>'
-  +'<div class="row"><span>Decision TF</span><span class="value">'+esc(p.decision_timeframe||'15')+'</span></div>'
-  +'<div class="row"><span>Entry</span><span class="value">'+num(p.entry_min)+' - '+num(p.entry_max)+'</span></div>'
-  +'<div class="row"><span>Stop</span><span class="value">'+num(p.initial_stop)+'</span></div>'
-  +'<div class="row"><span>TP1</span><span class="value">'+num(p.target1)+'</span></div>'
-  +'<div class="row"><span>TP2</span><span class="value">'+num(p.target2)+'</span></div>'
-  +'<div class="row"><span>Risk / unit</span><span class="value">'+num(p.risk_per_unit)+'</span></div>'
-  +'<div class="row"><span>Valid until</span><span class="value">'+esc(p.valid_until||'-')+'</span></div>'
-  +'<div class="small">Plan: '+esc(p.plan_id)+'</div>';
+  +'<div class="row"><span>Decision timeframe</span><span class="value">'+esc(p.decision_timeframe||'15')+' min</span></div>'
+  +'<div class="row"><span>Entry zone</span><span class="value">'+num(p.entry_min)+' → '+num(p.entry_max)+'</span></div>'
+  +'<div class="row"><span>Stop loss</span><span class="value">'+num(p.initial_stop)+'</span></div>'
+  +'<div class="row"><span>Take profit 1</span><span class="value">'+num(p.target1)+'</span></div>'
+  +'<div class="row"><span>Take profit 2</span><span class="value">'+num(p.target2)+'</span></div>'
+  +'<div class="row"><span>Expires</span><span class="value">'+formatLocalTime(p.valid_until)+' • <span class="countdown" data-valid-until="'+esc(p.valid_until)+'">'+formatCountdown(left)+'</span></span></div>';
 }
 
 function sizingHtml(s){
@@ -157,8 +222,6 @@ function sizingHtml(s){
   +'<div class="row"><span>Risk cluster</span><span class="value">'+esc(s.risk_cluster||'-')+'</span></div>'
   +'<div class="row"><span>Risk budget now</span><span class="value">$'+num(s.risk_budget_usd,2)+'</span></div>'
   +'<div class="row"><span>Estimated trade risk</span><span class="value">$'+num(s.risk_amount_usd,2)+'</span></div>'
-  +'<div class="row"><span>Portfolio risk after</span><span class="value">$'+num(s.portfolio_risk_after_usd,2)+' / $'+num(s.portfolio_risk_cap_usd,2)+'</span></div>'
-  +'<div class="row"><span>Cluster risk after</span><span class="value">$'+num(s.cluster_risk_after_usd,2)+' / $'+num(s.cluster_risk_cap_usd,2)+'</span></div>'
   +(limited?'<div class="small">Sizing limited by: '+esc(limited)+'</div>':'');
 }
 
@@ -180,28 +243,41 @@ function macroHtml(m){
 }
 
 function cardHtml(c,i){
+ const active=isOpportunityActive(c);
  const cls=c.recommendation==='LONG'?'long':c.recommendation==='SHORT'?'short':'wait';
  const a=c.approval||{};
  const reasons=(c.reasons||[]).slice(0,12).map(x=>'<span class="pill">'+esc(x)+'</span>').join('');
  const sizingAllowed=!c.position_sizing || (c.position_sizing.allowed_by_position_limit!==false && c.position_sizing.allowed_by_risk_policy!==false);
- const canApprove=(c.recommendation==='LONG'||c.recommendation==='SHORT')&&!!c.locked_trade_plan&&sizingAllowed;
+ const macroAllowed=!(c.macro_context&&c.macro_context.block_new_approval);
+ const controlOpen=!!(snapshot&&snapshot.runtime_control&&!snapshot.runtime_control.safe_mode&&!snapshot.runtime_control.kill_switch);
+ const canApprove=active&&(c.recommendation==='LONG'||c.recommendation==='SHORT')&&!!c.locked_trade_plan&&sizingAllowed&&macroAllowed&&controlOpen;
  const competitionLabel=c.competition_id==='amp-futures-sep-2026'?'AMP Futures':'Capital.com Africa';
- return '<div class="card">'
-  +'<div class="row"><span>'+esc(competitionLabel)+'</span><span class="pill">'+esc(c.competition_id||'-')+'</span></div>'
-  +'<div class="row"><span>'+esc(c.symbol)+'</span><span class="value '+cls+'">'+esc(c.recommendation)+' '+num(c.composite_score,2)+'</span></div>'
-  +'<div class="row"><span>Source</span><span class="value">'+esc(c.source_time)+'</span></div>'
+ const statusBadge=c.recommendation==='WAIT'
+   ?'<span class="badge blocked">WAIT</span>'
+   :(active?'<span class="badge active">ACTIVE NOW</span>':'<span class="badge expired">EXPIRED</span>');
+ let blockReason='';
+ if(!active&&c.recommendation!=='WAIT')blockReason='Expired opportunities are removed automatically from opportunity lists.';
+ else if(!controlOpen)blockReason='SAFE MODE / KILL SWITCH is ON. Enable manual approval mode before approving.';
+ else if(!sizingAllowed)blockReason='New entry blocked by sizing / risk capacity.';
+ else if(!macroAllowed)blockReason='New entry blocked by macro-risk gate.';
+ return '<div class="card" data-card-index="'+i+'">'
+  +'<div class="statusline">'+statusBadge+'<span class="pill">'+esc(competitionLabel)+'</span></div>'
+  +'<div class="row"><span>Symbol</span><span class="value">'+esc(c.symbol)+'</span></div>'
+  +'<div class="row"><span>Signal</span><span class="value '+cls+'">'+esc(c.recommendation)+' '+num(c.composite_score,2)+'</span></div>'
+  +'<div class="row"><span>Latest confirmed bar</span><span class="value">'+formatLocalTime(c.source_time)+' • '+formatAgeSeconds(c.source_age_seconds)+'</span></div>'
   +planHtml(c.locked_trade_plan)
+  +orderHtml(c,i)
   +sizingHtml(c.position_sizing)
   +macroHtml(c.macro_context)
-  +'<div class="row"><span>Approval</span><span class="value">'+esc(a.decision||'none')+'</span></div>'
-  +'<div class="row"><span>Manual ready</span><span class="value '+(c.manual_execution_ready?'ok':'bad')+'">'+esc(c.manual_execution_ready)+'</span></div>'
-  +(c.pending_plan_action?'<div class="row"><span>Plan supervisor</span><span class="value wait">'+esc(c.pending_plan_action)+'</span></div>':'')
+  +'<div class="row"><span>Approval</span><span class="value">'+esc(a.decision||'not approved yet')+'</span></div>'
+  +'<div class="row"><span>Ready to execute</span><span class="value '+(c.manual_execution_ready?'ok':'wait')+'">'+(c.manual_execution_ready?'YES':'NO')+'</span></div>'
+  +(blockReason?'<div class="small wait" style="margin:8px 0">'+esc(blockReason)+'</div>':'')
   +'<div class="small" style="margin:8px 0">'+reasons+'</div>'
-  +(canApprove?'<div class="approve"><input id="price-'+i+'" type="number" step="any" placeholder="Current price from TradingView">'
+  +(canApprove?'<div class="approve"><input id="price-'+i+'" type="number" step="any" placeholder="Current TradingView price" oninput="updateOrderHint('+i+')">'
     +'<button class="safe" onclick="approveCard('+i+',\'approve\')">Approve</button>'
     +'<button class="danger" onclick="approveCard('+i+',\'reject\')">Reject</button></div>'
-    :(c.recommendation==='WAIT'?'<div class="small">WAIT signals cannot be approved as orders.</div>':'<div class="small bad">New entry blocked by sizing / risk capacity.</div>'))
-  +(c.locked_trade_plan && a.decision==='approved'?'<button style="margin-top:8px" onclick="recordFilledPosition('+i+')">After manual fill: record open position</button>':'')
+    :'')
+  +(active && c.locked_trade_plan && a.decision==='approved'?'<button style="margin-top:8px" onclick="recordFilledPosition('+i+')">After manual fill: record open position</button>':'')
   +'</div>';
 }
 
