@@ -201,9 +201,13 @@ try {
         }
 
         $sourceTime = stc_parse_utc((string)($payload['time'] ?? ''));
-        $sourceAgeSeconds = $sourceTime === null
+        $sourceCloseTime = stc_feed_bar_close_utc(
+            (string)($payload['time'] ?? ''),
+            (string)($payload['timeframe'] ?? '')
+        );
+        $sourceAgeSeconds = $sourceCloseTime === null
             ? null
-            : max(0, $now->getTimestamp() - $sourceTime->getTimestamp());
+            : max(0, $now->getTimestamp() - $sourceCloseTime->getTimestamp());
 
         $cards[] = [
             'event_id' => (string)$row['event_id'],
@@ -211,6 +215,7 @@ try {
             'competition_id' => $competitionId,
             'symbol' => $symbol,
             'source_time' => (string)($payload['time'] ?? ''),
+            'source_close_time' => $sourceCloseTime === null ? null : $sourceCloseTime->format(DateTimeInterface::ATOM),
             'current_price' => (float)($payload['close'] ?? 0.0),
             'recommendation' => $recommendation,
             'composite_score' => (float)($signal['composite_score'] ?? 0.0),
