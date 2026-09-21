@@ -1,0 +1,99 @@
+//@version=6
+indicator("STC Capital Multi Feed v0.3", overlay=false)
+
+competitionId = input.string("capital-africa-sep-2026", "Competition ID", options=["capital-africa-sep-2026"])
+feedTf = input.timeframe("15", "Feed timeframe")
+feedEnabled = input.bool(true, "Enable webhook feed")
+
+type FeedBar
+    int t
+    float o
+    float h
+    float l
+    float c
+    float v
+    float ema20
+    float ema50
+    float rsi14
+    float atr14
+    float macd
+    float macdSignal
+    float volumeRatio
+
+makeFeedBar() =>
+    [macdLine, signalLine, _] = ta.macd(close, 12, 26, 9)
+    volSma = ta.sma(volume, 20)
+    FeedBar.new(
+        time,
+        open,
+        high,
+        low,
+        close,
+        volume,
+        ta.ema(close, 20),
+        ta.ema(close, 50),
+        ta.rsi(close, 14),
+        ta.atr(14),
+        macdLine,
+        signalLine,
+        volSma > 0 ? volume / volSma : 1.0
+    )
+
+feedBar(string symbol) =>
+    request.security(
+        symbol,
+        feedTf,
+        makeFeedBar(),
+        gaps=barmerge.gaps_off,
+        lookahead=barmerge.lookahead_off,
+        ignore_invalid_symbol=false
+    )
+
+buildMessage(string symbol, FeedBar d) =>
+    eventId = competitionId + "|" + symbol + "|" + feedTf + "|" + str.tostring(d.t)
+    '{' +
+      '"event_id":"' + eventId + '",' +
+      '"event":"bar_close",' +
+      '"competition_id":"' + competitionId + '",' +
+      '"symbol":"' + symbol + '",' +
+      '"timeframe":"' + feedTf + '",' +
+      '"time":"' + str.format_time(d.t, "yyyy-MM-dd'T'HH:mm:ss'Z'", "UTC") + '",' +
+      '"open":' + str.tostring(d.o) + ',' +
+      '"high":' + str.tostring(d.h) + ',' +
+      '"low":' + str.tostring(d.l) + ',' +
+      '"close":' + str.tostring(d.c) + ',' +
+      '"volume":' + str.tostring(d.v) + ',' +
+      '"ema20":' + str.tostring(d.ema20) + ',' +
+      '"ema50":' + str.tostring(d.ema50) + ',' +
+      '"rsi14":' + str.tostring(d.rsi14) + ',' +
+      '"atr14":' + str.tostring(d.atr14) + ',' +
+      '"macd":' + str.tostring(d.macd) + ',' +
+      '"macd_signal":' + str.tostring(d.macdSignal) + ',' +
+      '"volume_ratio":' + str.tostring(d.volumeRatio) +
+      '}'
+
+var array<string> symbols = array.from(
+    "CAPITALCOM:BTCUSD",
+    "CAPITALCOM:ETHUSD",
+    "CAPITALCOM:DOGEUSD",
+    "CAPITALCOM:EURUSD",
+    "CAPITALCOM:AUDUSD",
+    "CAPITALCOM:USDZAR",
+    "CAPITALCOM:XAUUSD",
+    "CAPITALCOM:XAGUSD",
+    "CAPITALCOM:SPX500",
+    "CAPITALCOM:NAS100"
+)
+var array<int> lastSentTimes = array.new_int(array.size(symbols), na)
+
+if feedEnabled and barstate.isconfirmed
+    for i = 0 to array.size(symbols) - 1
+        symbol = array.get(symbols, i)
+        d = feedBar(symbol)
+        previousTime = array.get(lastSentTimes, i)
+        if not na(d.t) and not na(d.c) and (na(previousTime) or d.t != previousTime)
+            array.set(lastSentTimes, i, d.t)
+            if barstate.isrealtime
+                alert(buildMessage(symbol, d), alert.freq_all)
+
+plot(array.size(symbols), "Monitored symbols", display=display.data_window)
