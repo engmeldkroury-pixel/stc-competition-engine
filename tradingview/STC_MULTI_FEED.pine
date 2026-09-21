@@ -1,5 +1,5 @@
 //@version=6
-indicator("STC Capital Multi Feed v0.6.4 Clear Visual", overlay=true, max_labels_count=20)
+indicator("STC Capital Multi Feed v0.7 Historical Context", overlay=true, max_labels_count=20)
 
 // Production feed
 competitionId = input.string("capital-africa-sep-2026", "Competition ID", options=["capital-africa-sep-2026"], group="Production feed")
@@ -38,6 +38,21 @@ type FeedBar
     float macdSignal
     float volumeRatio
 
+type HistoryBar
+    int t
+    float c
+    float ema50
+    float ema200
+    float rsi14
+    float atr14
+    float high252
+    float low252
+    float momentum20
+    float momentum63
+    float momentum126
+    float momentum252
+    float volatility20
+
 makeFeedBar() =>
     [macdLine, signalLine, _] = ta.macd(close, 12, 26, 9)
     volSma = ta.sma(volume, 20)
@@ -46,7 +61,18 @@ makeFeedBar() =>
 feedBar(string symbol) =>
     request.security(symbol, feedTf, makeFeedBar(), gaps=barmerge.gaps_off, lookahead=barmerge.lookahead_off, ignore_invalid_symbol=false)
 
-buildMessage(string symbol, FeedBar d) =>
+makeHistoryBar() =>
+    m20 = close[21] != 0 ? close[1] / close[21] - 1.0 : 0.0
+    m63 = close[64] != 0 ? close[1] / close[64] - 1.0 : 0.0
+    m126 = close[127] != 0 ? close[1] / close[127] - 1.0 : 0.0
+    m252 = close[253] != 0 ? close[1] / close[253] - 1.0 : 0.0
+    vol20 = close[1] != 0 ? ta.atr(20)[1] / close[1] : 0.0
+    HistoryBar.new(time[1], close[1], ta.ema(close, 50)[1], ta.ema(close, 200)[1], ta.rsi(close, 14)[1], ta.atr(14)[1], ta.highest(high, 252)[1], ta.lowest(low, 252)[1], m20, m63, m126, m252, vol20)
+
+historyBar(string symbol) =>
+    request.security(symbol, "1D", makeHistoryBar(), gaps=barmerge.gaps_off, lookahead=barmerge.lookahead_on, ignore_invalid_symbol=false)
+
+buildMessage(string symbol, FeedBar d, HistoryBar h) =>
     eventId = competitionId + "|" + symbol + "|" + feedTf + "|" + str.tostring(d.t)
     msg = (
         '{"event_id":"' + eventId + '",' +
@@ -66,7 +92,21 @@ buildMessage(string symbol, FeedBar d) =>
         '"atr14":' + str.tostring(d.atr14) + ',' +
         '"macd":' + str.tostring(d.macd) + ',' +
         '"macd_signal":' + str.tostring(d.macdSignal) + ',' +
-        '"volume_ratio":' + str.tostring(d.volumeRatio) +
+        '"volume_ratio":' + str.tostring(d.volumeRatio) + ',' +
+        '"history_timeframe":"1D",' +
+        '"history_time":"' + str.format_time(h.t, "yyyy-MM-dd'T'HH:mm:ss'Z'", "UTC") + '",' +
+        '"history_close":' + str.tostring(h.c) + ',' +
+        '"history_ema50":' + str.tostring(h.ema50) + ',' +
+        '"history_ema200":' + str.tostring(h.ema200) + ',' +
+        '"history_rsi14":' + str.tostring(h.rsi14) + ',' +
+        '"history_atr14":' + str.tostring(h.atr14) + ',' +
+        '"history_high_365":' + str.tostring(h.high252) + ',' +
+        '"history_low_365":' + str.tostring(h.low252) + ',' +
+        '"history_momentum_20":' + str.tostring(h.momentum20) + ',' +
+        '"history_momentum_63":' + str.tostring(h.momentum63) + ',' +
+        '"history_momentum_126":' + str.tostring(h.momentum126) + ',' +
+        '"history_momentum_252":' + str.tostring(h.momentum252) + ',' +
+        '"history_volatility_20":' + str.tostring(h.volatility20) +
         '}'
     )
     msg
@@ -83,6 +123,17 @@ xag = feedBar("CAPITALCOM:XAGUSD")
 spx = feedBar("CAPITALCOM:SPX500")
 nas = feedBar("CAPITALCOM:NAS100")
 
+btcH = historyBar("CAPITALCOM:BTCUSD")
+ethH = historyBar("CAPITALCOM:ETHUSD")
+dogeH = historyBar("CAPITALCOM:DOGEUSD")
+eurH = historyBar("CAPITALCOM:EURUSD")
+audH = historyBar("CAPITALCOM:AUDUSD")
+zarH = historyBar("CAPITALCOM:USDZAR")
+xauH = historyBar("CAPITALCOM:XAUUSD")
+xagH = historyBar("CAPITALCOM:XAGUSD")
+spxH = historyBar("CAPITALCOM:SPX500")
+nasH = historyBar("CAPITALCOM:NAS100")
+
 // Intrabar duplicate protection
 varip int lastBTC = na
 varip int lastETH = na
@@ -98,34 +149,34 @@ varip int lastNAS = na
 if feedEnabled and barstate.isconfirmed and barstate.isrealtime
     if not na(btc.t) and not na(btc.c) and (na(lastBTC) or btc.t != lastBTC)
         lastBTC := btc.t
-        alert(buildMessage("CAPITALCOM:BTCUSD", btc), alert.freq_all)
+        alert(buildMessage("CAPITALCOM:BTCUSD", btc, btcH), alert.freq_all)
     if not na(eth.t) and not na(eth.c) and (na(lastETH) or eth.t != lastETH)
         lastETH := eth.t
-        alert(buildMessage("CAPITALCOM:ETHUSD", eth), alert.freq_all)
+        alert(buildMessage("CAPITALCOM:ETHUSD", eth, ethH), alert.freq_all)
     if not na(doge.t) and not na(doge.c) and (na(lastDOGE) or doge.t != lastDOGE)
         lastDOGE := doge.t
-        alert(buildMessage("CAPITALCOM:DOGEUSD", doge), alert.freq_all)
+        alert(buildMessage("CAPITALCOM:DOGEUSD", doge, dogeH), alert.freq_all)
     if not na(eur.t) and not na(eur.c) and (na(lastEUR) or eur.t != lastEUR)
         lastEUR := eur.t
-        alert(buildMessage("CAPITALCOM:EURUSD", eur), alert.freq_all)
+        alert(buildMessage("CAPITALCOM:EURUSD", eur, eurH), alert.freq_all)
     if not na(aud.t) and not na(aud.c) and (na(lastAUD) or aud.t != lastAUD)
         lastAUD := aud.t
-        alert(buildMessage("CAPITALCOM:AUDUSD", aud), alert.freq_all)
+        alert(buildMessage("CAPITALCOM:AUDUSD", aud, audH), alert.freq_all)
     if not na(zar.t) and not na(zar.c) and (na(lastZAR) or zar.t != lastZAR)
         lastZAR := zar.t
-        alert(buildMessage("CAPITALCOM:USDZAR", zar), alert.freq_all)
+        alert(buildMessage("CAPITALCOM:USDZAR", zar, zarH), alert.freq_all)
     if not na(xau.t) and not na(xau.c) and (na(lastXAU) or xau.t != lastXAU)
         lastXAU := xau.t
-        alert(buildMessage("CAPITALCOM:XAUUSD", xau), alert.freq_all)
+        alert(buildMessage("CAPITALCOM:XAUUSD", xau, xauH), alert.freq_all)
     if not na(xag.t) and not na(xag.c) and (na(lastXAG) or xag.t != lastXAG)
         lastXAG := xag.t
-        alert(buildMessage("CAPITALCOM:XAGUSD", xag), alert.freq_all)
+        alert(buildMessage("CAPITALCOM:XAGUSD", xag, xagH), alert.freq_all)
     if not na(spx.t) and not na(spx.c) and (na(lastSPX) or spx.t != lastSPX)
         lastSPX := spx.t
-        alert(buildMessage("CAPITALCOM:SPX500", spx), alert.freq_all)
+        alert(buildMessage("CAPITALCOM:SPX500", spx, spxH), alert.freq_all)
     if not na(nas.t) and not na(nas.c) and (na(lastNAS) or nas.t != lastNAS)
         lastNAS := nas.t
-        alert(buildMessage("CAPITALCOM:NAS100", nas), alert.freq_all)
+        alert(buildMessage("CAPITALCOM:NAS100", nas, nasH), alert.freq_all)
 
 // Current-chart technical engine
 ema20v = ta.ema(close, 20)
