@@ -162,6 +162,41 @@ class TradingViewWebhook(BaseModel):
     history_momentum_252: float | None = None
     history_volatility_20: float | None = None
 
+    @model_validator(mode="after")
+    def validate_history_context(self):
+        names = (
+            "history_timeframe",
+            "history_time",
+            "history_close",
+            "history_ema50",
+            "history_ema200",
+            "history_rsi14",
+            "history_atr14",
+            "history_high_252",
+            "history_low_252",
+            "history_momentum_20",
+            "history_momentum_63",
+            "history_momentum_126",
+            "history_momentum_252",
+            "history_volatility_20",
+        )
+        values = [getattr(self, name) for name in names]
+        present = [value is not None for value in values]
+        if any(present) and not all(present):
+            raise ValueError("historical context must be complete or absent")
+        if all(present):
+            if self.history_timeframe != "1D":
+                raise ValueError("historical context timeframe must be 1D")
+            if self.history_high_252 < self.history_low_252:
+                raise ValueError("history_high_252 must be >= history_low_252")
+            if not self.history_low_252 <= self.history_close <= self.history_high_252:
+                raise ValueError("history_close must be within the 252-day range")
+            if not 0 <= self.history_rsi14 <= 100:
+                raise ValueError("history_rsi14 must be between 0 and 100")
+            if self.history_atr14 < 0 or self.history_volatility_20 < 0:
+                raise ValueError("historical volatility values must be non-negative")
+        return self
+
 
 class TradeEvent(BaseModel):
     competition_id: str
