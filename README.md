@@ -93,3 +93,17 @@ The repository includes `.github/workflows/stc-process.yml`.
 - Adds `.github/workflows/stc-ci.yml` as the automated pytest gate on pushes and pull requests to `main`.
 - Adds `PROJECT_STATE.md` as the persistent project/evidence ledger.
 - TradingView MCP remains read/context transport only; execution-time approval fails closed without fresh trusted evidence.
+
+
+## Production operator path
+
+The production Capital.com feed is handled by TradingView Pine `STC Capital Multi Feed v0.7.1 Historical Context`, Hostinger/MySQL persistence, and the GitHub bridge worker.
+
+The repository now also contains an additive Hostinger owner console:
+
+- `hostinger_patch/operator_snapshot.php`
+- `hostinger_patch/operator.php`
+
+The console is owner-authenticated and supports readback of authoritative locked plans, durable approval state, and Safe Mode / Kill Switch controls. Approval remains a human action and order entry remains manual.
+
+See `GO_LIVE.md` for the final deployment/activation checklist.

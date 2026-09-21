@@ -674,3 +674,36 @@ Fallback retirement:
 Operational conclusion:
 The 10-symbol TradingView -> webhook -> Hostinger -> GitHub worker -> historical regime -> blended signal -> immutable trade-plan pipeline is production-verified.
 Safe Mode / Kill Switch / human approval boundaries remain unchanged; no automatic trade execution has been enabled.
+
+
+## Final software completion checkpoint — 2026-09-21 14:47 UTC
+
+Repository implementation is complete for the agreed manual-execution competition architecture.
+
+New production operator layer:
+- PR #14 merged and CI-green: durable read-only operator API/dashboard for serverless deployments.
+- PR #15 merged and CI-green: additive Hostinger owner console.
+- Hostinger console files:
+  - hostinger_patch/operator_snapshot.php
+  - hostinger_patch/operator.php
+- Owner console reads the latest authoritative analyzed signal per Capital.com symbol.
+- It displays immutable backend locked plans and durable approval/runtime state.
+- It permits explicit human approve/reject through the existing approval.php contract.
+- It permits explicit owner Safe Mode / Kill Switch changes through runtime_control.php.
+- It contains no order-placement endpoint and cannot execute, modify, or close a competition order.
+- Owner token is entered only for the current browser session and is not stored by the console.
+
+Production feed health at the final software checkpoint:
+- Alert 5662088915 remained ACTIVE.
+- Last observed fire: 2026-09-21T14:45:00Z.
+- The 14:45 cycle emitted the expected 10 symbols once each.
+- Observed webhook responses were HTTP 200.
+
+Cleanup:
+- The one-time GitHub live-acceptance readback workflow was removed after acceptance evidence was captured.
+- Permanent CI and bridge-processing workflows remain.
+
+Final external owner action required:
+Upload operator_snapshot.php and operator.php to the existing Hostinger public_html STC location, then perform the first owner-console read-only check with Safe Mode and Kill Switch still ON.
+
+After that validation, any decision to disable Safe Mode / Kill Switch and make manual approvals available is an explicit owner operational decision. STC never performs automatic order execution.
