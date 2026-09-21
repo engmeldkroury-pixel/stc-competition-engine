@@ -375,3 +375,58 @@ def test_owner_console_can_backfill_existing_manual_positions_for_supervision():
     assert "Latest market check" in ui
     assert "What to do now" in ui
 
+def test_single_take_profit_mode_is_owner_visible_and_no_partial_tp_is_suggested():
+    control = (PATCH / "portfolio_control.php").read_text(encoding="utf-8")
+    ui = (PATCH / "operator.php").read_text(encoding="utf-8")
+    notify = (PATCH / "notification_control.php").read_text(encoding="utf-8")
+    assert "single_take_profit_mode_keep_full_quantity_and_protect" in control
+    assert "'action' => 'PROTECT'" in control
+    assert "'suggested_partial_fraction' => null" in control
+    assert "Management checkpoint" in ui
+    assert "Final take profit" in ui
+    assert "Single-TP mode" in ui
+    assert "Final take profit" in notify
+    assert "no partial TP" in notify
+
+
+def test_competition_progress_is_exposed_with_qualification_days_and_trade_counts():
+    control = (PATCH / "portfolio_control.php").read_text(encoding="utf-8")
+    snapshot = (PATCH / "operator_snapshot.php").read_text(encoding="utf-8")
+    ui = (PATCH / "operator.php").read_text(encoding="utf-8")
+    assert "function stc_competition_min_trading_days" in control
+    assert "function stc_competition_progress" in control
+    assert "return 3;" in control
+    assert "return 5;" in control
+    assert "'competition_progress' => [" in snapshot
+    for label in ("Qualifying trading days", "Days remaining", "Trades entered", "Open / closed", "Recorded trade actions", "Realized competition P/L"):
+        assert label in ui
+
+
+def test_sizing_ui_shows_quantity_risk_and_official_position_limit():
+    ui = (PATCH / "operator.php").read_text(encoding="utf-8")
+    assert "STC POSITION SIZE" in ui
+    assert "Configured risk budget" in ui
+    assert "Official max open position" in ui
+    assert "Projected open after" in ui
+    assert "use this quantity unless the competition platform forces a smaller valid amount" in ui
+
+
+def test_manual_backfill_preserves_original_competition_day_and_uses_one_final_tp():
+    position = (PATCH / "position.php").read_text(encoding="utf-8")
+    ui = (PATCH / "operator.php").read_text(encoding="utf-8")
+    assert "manual_position_open_time_outside_competition_window" in position
+    assert "2026-09-01T08:00:00+00:00" in position
+    assert "2026-09-16T08:00:00+00:00" in position
+    assert "Original open time if known" in ui
+    assert "Final take-profit price (one TP only)" in ui
+    assert "const checkpoint=(entry+finalTp)/2;" in ui
+
+
+def test_mobile_signal_alert_contains_sizing_risk_and_single_tp_ticket():
+    notify = (PATCH / "notification_control.php").read_text(encoding="utf-8")
+    assert "'Quantity: '" in notify
+    assert "' | Risk: $'" in notify
+    assert "' | Official max: '" in notify
+    assert "'Signal score: '" in notify
+    assert "Single-TP mode: place only the final take-profit" in notify
+
