@@ -86,9 +86,12 @@ input{width:100%}button{cursor:pointer}.primary{background:#1d4ed8}.danger{backg
   <div class="bar">
     <div class="sectiontitle">Notification Center</div>
     <div class="row"><span>Browser / laptop</span><span class="value" id="browser-notify-status">Not enabled</span></div>
-    <div class="row"><span>Telegram mobile</span><span class="value">Planned • actionable alerts only</span></div>
-    <div class="row"><span>Email backup</span><span class="value">Planned • actionable alerts only</span></div>
-    <div class="small" style="margin-top:10px">Raw 15-minute feed bars should not generate user notifications. Notifications are reserved for new locked plans and future position-management changes.</div>
+    <div class="row"><span>Telegram mobile</span><span class="value" id="telegram-notify-status">Not configured</span></div>
+    <div class="row"><span>Email backup</span><span class="value" id="email-notify-status">Not configured</span></div>
+    <div class="row"><span>Recent server notification events</span><span class="value" id="server-notify-count">-</span></div>
+    <button id="test-server-notify" style="margin-top:10px">Send notification test</button>
+    <div id="server-notify-note" class="small" style="margin-top:8px">Server notification status not loaded yet.</div>
+    <div class="small" style="margin-top:10px">Raw 15-minute feed bars do not generate user notifications. Server notifications are reserved for new locked plans and non-HOLD position-management changes.</div>
   </div>
 </div>
 </div>
@@ -96,6 +99,7 @@ input{width:100%}button{cursor:pointer}.primary{background:#1d4ed8}.danger{backg
 const $=id=>document.getElementById(id);
 let snapshot=null;
 let activeTab='overview';
+let notificationStatus=null;
 let autoTimer=null;
 let autoCountdown=null;
 let secondsToRefresh=30;
@@ -208,12 +212,26 @@ function render(){
  maybeNotify(cards);
  maybeNotifyManagement(positions);
 }
+async function refreshNotificationStatus(){
+ if(!$('token').value.trim())return;
+ try{
+   notificationStatus=await api('notification.php');
+   const cfg=notificationStatus.config||{};
+   if($('telegram-notify-status'))$('telegram-notify-status').textContent=cfg.telegram_configured?'Configured':'Not configured';
+   if($('email-notify-status'))$('email-notify-status').textContent=cfg.email_configured?'Configured':'Not configured';
+   if($('server-notify-count'))$('server-notify-count').textContent=(notificationStatus.events||[]).length;
+   if($('server-notify-note'))$('server-notify-note').textContent='Actionable server notification audit loaded.';
+ }catch(e){
+   if($('server-notify-note'))$('server-notify-note').textContent='Server notification endpoint not available yet: '+e.message;
+ }
+}
 async function refresh(){
  if(!$('token').value.trim()){return}
  $('status').textContent='Loading...';
  try{
    snapshot=await api('operator_snapshot.php');
    render();
+   refreshNotificationStatus();
    secondsToRefresh=30;
    $('status').textContent='Connected • '+new Date().toLocaleTimeString();
    startAutoRefresh();
@@ -342,6 +360,14 @@ if('Notification' in window && $('browser-notify-status'))$('browser-notify-stat
 
 $('refresh').onclick=refresh;
 $('notify').onclick=enableNotifications;
+$('test-server-notify').onclick=async()=>{
+ if(!confirm('Send one harmless STC notification test through configured server channels?'))return;
+ try{
+   const r=await api('notification.php',{method:'POST',body:JSON.stringify({action:'test'})});
+   alert('Test dispatched. Check Telegram/email and the delivery audit.');
+   await refreshNotificationStatus();
+ }catch(e){alert('Notification test failed: '+e.message)}
+};
 $('logout').onclick=()=>{stopAutoRefresh();$('token').value='';snapshot=null;initializedSignals=false;seenSignalPlans.clear();seenManagement.clear();$('runtime').textContent='Runtime controls not loaded.';$('status').textContent='Token cleared';document.title='STC Owner Console'};
 </script></body></html>
 +num(c.position_sizing.risk_budget_usd,2)+'</span></div>'
