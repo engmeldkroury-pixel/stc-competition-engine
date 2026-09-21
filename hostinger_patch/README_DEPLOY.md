@@ -32,3 +32,26 @@ Do not reuse `worker_api_token`, GitHub dispatch credentials, or database creden
 6. Do not disable either control until the cloud endpoints and one blocked approval attempt have been verified.
 
 `approval.php` records only `approved`, `blocked`, or `rejected` owner decisions and always returns `execution=manual_only`. It contains no broker/order endpoint.
+
+
+## Owner console add-on
+
+After the durable approval patch is already deployed and verified, upload these two additive files:
+
+- `operator_snapshot.php`
+- `operator.php`
+
+No additional SQL migration is required.
+
+Open `/operator.php` and enter the existing private owner token for the current browser session. The page does not persist the token.
+
+The console can:
+- read the latest authoritative analyzed signal for each Capital.com competition symbol;
+- display the immutable locked plan when one exists;
+- display durable approval and runtime-control state;
+- submit a human approve/reject decision through the existing `approval.php`;
+- turn Safe Mode / Kill Switch on or off through the existing `runtime_control.php`.
+
+The console cannot place, modify, or close an order. After a signal is approved, order entry remains manual in the competition platform.
+
+For an approve action, the owner must enter the current TradingView price. The console supplies a fresh UTC observation timestamp and `market_status=open`; the existing server-side approval contract still rejects stale evidence, a price outside the envelope, Safe Mode, Kill Switch, WAIT signals, expired signals, or signals superseded by a newer event.
