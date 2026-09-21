@@ -46,3 +46,19 @@ CREATE TABLE IF NOT EXISTS stc_position_events (
       FOREIGN KEY (position_id) REFERENCES stc_positions(position_id)
       ON UPDATE RESTRICT ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+CREATE TABLE IF NOT EXISTS stc_account_state (
+    competition_id VARCHAR(128) NOT NULL PRIMARY KEY,
+    equity_usd DECIMAL(24,8) NOT NULL,
+    risk_fraction DECIMAL(10,8) NOT NULL DEFAULT 0.00500000,
+    source VARCHAR(32) NOT NULL DEFAULT 'owner_manual',
+    version BIGINT UNSIGNED NOT NULL DEFAULT 1,
+    updated_at_utc TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+INSERT INTO stc_account_state (competition_id, equity_usd, risk_fraction, source, version)
+VALUES
+    ('capital-africa-sep-2026', 100000.00, 0.00500000, 'initial_profile_seed', 1),
+    ('amp-futures-sep-2026', 250000.00, 0.00500000, 'initial_profile_seed', 1)
+ON DUPLICATE KEY UPDATE competition_id = competition_id;
