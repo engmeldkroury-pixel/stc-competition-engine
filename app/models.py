@@ -127,6 +127,20 @@ class TradingViewWebhook(BaseModel):
     macd: float
     macd_signal: float
     volume_ratio: float = 1.0
+    history_timeframe: str | None = None
+    history_time: datetime | None = None
+    history_close: float | None = None
+    history_ema50: float | None = None
+    history_ema200: float | None = None
+    history_rsi14: float | None = None
+    history_atr14: float | None = None
+    history_high_365: float | None = None
+    history_low_365: float | None = None
+    history_momentum_20: float | None = None
+    history_momentum_63: float | None = None
+    history_momentum_126: float | None = None
+    history_momentum_252: float | None = None
+    history_volatility_20: float | None = None
 
 
 class TradeEvent(BaseModel):
