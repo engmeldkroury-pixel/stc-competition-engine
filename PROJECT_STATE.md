@@ -815,3 +815,25 @@ Replace the current AMP v0.2 visual with Feed A v0.3, add Feed B v0.3 to the cha
 2) STC AMP B 8-SYMBOL 15m PROD v0.3
 Both use Any alert() function call, 15m, same STC webhook, Webhook notification only.
 Do not re-enable or reuse the stopped 16-symbol v0.2 alert.
+
+
+## AMP v0.3 alert verification — 2026-09-21 19:31 UTC
+
+Visual validation from owner screenshots:
+- Feed A v0.3 Stateful Visual is on MES1! and correctly draws EMA/entry/stop/TP zones plus current LONG label.
+- Feed B v0.3 Companion is on the chart and intentionally has no visible lines/labels.
+
+TradingView alert verification:
+- STC AMP B 8-SYMBOL 15m PROD v0.3 (5664684004): ACTIVE, webhook configured, no error, created 19:30:15Z and awaiting its next 15m cycle.
+- An extra alert named STC AMP Core Feed B v0.3 Companion (5664675386) fired 8 valid webhook events at 19:30Z with HTTP 200 for the Feed B symbols. This duplicate alert was manually STOPPED through the official MCP to prevent duplicate batches.
+- STC AMP A 8-SYMBOL 15m PROD v0.3 (5664682003): INACTIVE with last_error=study_error and last_stop_reason=error, with no fire events.
+- Full alert payload proves the faulty A alert captured the OLD Pine snapshot whose study description is STC AMP Core Feed v0.2 Stateful Visual, not the current v0.3 Feed A script. It cannot be repaired by changing alert settings because indicator-based alert conditions snapshot the Pine script at creation.
+
+Required owner action:
+Create a fresh Feed A alert from the CURRENT STC AMP Core Feed A v0.3 Stateful Visual indicator:
+- Any alert() function call
+- 15m
+- Webhook only
+- same STC webhook
+- use a distinct name such as STC AMP A 8-SYMBOL 15m PROD v0.3 FIX
+Do not restart the inactive A alert 5664682003.
