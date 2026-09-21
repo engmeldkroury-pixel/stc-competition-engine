@@ -56,12 +56,16 @@ input{width:100%}button{cursor:pointer}.primary{background:#1d4ed8}.danger{backg
 
 <div id="capital-panel" class="hidden">
   <div class="bar"><div class="sectiontitle">Capital.com Africa</div><div class="small">Independent competition lane. Capital.com symbols, account rules, risk and position limits stay separate from AMP Futures.</div></div>
-  <div id="capital-cards" class="grid"></div>
+  <div id="capital-account" class="bar"></div>
+  <div class="bar"><div class="sectiontitle">Open positions / Portfolio Supervisor</div><div id="capital-positions" class="grid"></div></div>
+  <div class="bar"><div class="sectiontitle">Latest signals</div><div id="capital-cards" class="grid"></div></div>
 </div>
 
 <div id="amp-panel" class="hidden">
   <div class="bar"><div class="sectiontitle">AMP Futures</div><div class="small">Independent futures lane. Futures symbols, contract limits, risk and position state stay separate from Capital.com Africa.</div></div>
-  <div id="amp-cards" class="grid"></div>
+  <div id="amp-account" class="bar"></div>
+  <div class="bar"><div class="sectiontitle">Open positions / Portfolio Supervisor</div><div id="amp-positions" class="grid"></div></div>
+  <div class="bar"><div class="sectiontitle">Latest signals</div><div id="amp-cards" class="grid"></div></div>
 </div>
 
 <div id="general-panel" class="hidden">
@@ -97,6 +101,7 @@ let autoCountdown=null;
 let secondsToRefresh=30;
 let initializedSignals=false;
 const seenSignalPlans=new Set();
+const seenManagement=new Set();
 function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
 function num(x,d=4){const n=Number(x);return Number.isFinite(n)?n.toFixed(d):'-'}
 function auth(){const t=$('token').value.trim();return {'Authorization':'Bearer '+t,'Content-Type':'application/json'}}
@@ -134,6 +139,1115 @@ function cardHtml(c,i){
  +'<div class="row"><span>'+esc(c.symbol)+'</span><span class="value '+cls+'">'+esc(c.recommendation)+' '+num(c.composite_score,2)+'</span></div>'
  +'<div class="row"><span>Source</span><span class="value">'+esc(c.source_time)+'</span></div>'
  +planHtml(c.locked_trade_plan)
+ +(c.position_sizing?'<div class="row"><span>Proposed quantity</span><span class="value">'+num(c.position_sizing.proposed_quantity,6)+'</span></div>'
+   +'<div class="row"><span>Risk budget</span><span class="value">
+ +'<div class="row"><span>Manual ready</span><span class="value '+(c.manual_execution_ready?'ok':'bad')+'">'+esc(c.manual_execution_ready)+'</span></div>'
+ +'<div class="small" style="margin:8px 0">'+reasons+'</div>'
+ +(canApprove?'<div class="approve"><input id="price-'+i+'" type="number" step="any" placeholder="Current price from TradingView">'
+ +'<button class="safe" onclick="approveCard('+i+',\'approve\')">Approve</button><button class="danger" onclick="approveCard('+i+',\'reject\')">Reject</button></div>'
+ :'<div class="small">WAIT signals cannot be approved as orders.</div>')
+ +(c.locked_trade_plan && a.decision==='approved'?'<button style="margin-top:8px" onclick="recordFilledPosition('+i+')">After manual fill: record open position</button>':'')
+ +'</div>';
+}
+function maybeNotify(cards){
+ const actionable=(cards||[]).filter(c=>(c.recommendation==='LONG'||c.recommendation==='SHORT')&&c.locked_trade_plan);
+ if(!initializedSignals){
+   for(const c of actionable){seenSignalPlans.add(String(c.locked_trade_plan.plan_id||c.signal_id))}
+   initializedSignals=true;
+   return;
+ }
+ for(const c of actionable){
+   const key=String(c.locked_trade_plan.plan_id||c.signal_id);
+   if(seenSignalPlans.has(key))continue;
+   seenSignalPlans.add(key);
+   const body=c.symbol+' • '+c.recommendation+' • Entry '+num(c.locked_trade_plan.entry_min)+' - '+num(c.locked_trade_plan.entry_max)+' • SL '+num(c.locked_trade_plan.initial_stop)+' • TP1 '+num(c.locked_trade_plan.target1);
+   if('Notification' in window && Notification.permission==='granted'){
+     new Notification('STC NEW LOCKED TRADE PLAN',{body,tag:key,requireInteraction:true});
+   }
+   document.title='NEW '+c.recommendation+' • '+c.symbol+' • STC';
+ }
+}
+function competitionOf(c){return c.competition_id==='amp-futures-sep-2026'?'amp':c.competition_id==='capital-africa-sep-2026'?'capital':'other'}
+function renderCards(target,cards){
+ $(target).innerHTML=(cards||[]).map((c,i)=>cardHtml(c,i)).join('')||'<div class="card">No analyzed signals found.</div>';
+}
+function accountHtml(account,competitionId){
+ if(!account)return '<div class="small">Account state unavailable.</div>';
+ return '<div class="row"><span>Owner-synced equity</span><span class="value">
+ const capital=cards.filter(c=>competitionOf(c)==='capital');
+ const amp=cards.filter(c=>competitionOf(c)==='amp');
+ const actionable=cards.filter(c=>(c.recommendation==='LONG'||c.recommendation==='SHORT')&&c.locked_trade_plan);
+ const ready=cards.filter(c=>c.manual_execution_ready);
+ const positions=(snapshot.portfolio&&snapshot.portfolio.positions)||[];
+ $('count-capital').textContent=capital.length;
+ $('count-amp').textContent=amp.length;
+ $('overview-summary').innerHTML=
+   '<div class="card"><div class="small">Capital.com cards</div><div class="big">'+capital.length+'</div></div>'
+  +'<div class="card"><div class="small">AMP Futures cards</div><div class="big">'+amp.length+'</div></div>'
+  +'<div class="card"><div class="small">Locked opportunities</div><div class="big">'+actionable.length+'</div></div>'
+  +'<div class="card"><div class="small">Manual-ready now</div><div class="big">'+ready.length+'</div></div>'
+  +'<div class="card"><div class="small">Open positions tracked</div><div class="big">'+positions.length+'</div></div>';
+ const ranked=[...actionable].sort((a,b)=>Math.abs(Number(b.composite_score||0))-Math.abs(Number(a.composite_score||0)));
+ $('overview-cards').innerHTML=ranked.length?ranked.slice(0,8).map((c,i)=>cardHtml(c,i)).join(''):'<div class="card">No actionable locked opportunities right now. Current WAIT signals are still visible inside each competition tab.</div>';
+}
+function render(){
+ const r=snapshot.runtime_control||{};
+ $('runtime').innerHTML=runtimeHtml(r);
+ const cards=snapshot.cards||[];
+ const accounts=snapshot.account_states||[];
+ const positions=(snapshot.portfolio&&snapshot.portfolio.positions)||[];
+ renderOverview(cards);
+ renderCards('capital-cards',cards.filter(c=>competitionOf(c)==='capital'));
+ renderCards('amp-cards',cards.filter(c=>competitionOf(c)==='amp'));
+ $('capital-account').innerHTML=accountHtml(accounts.find(a=>a.competition_id==='capital-africa-sep-2026'),'capital-africa-sep-2026');
+ $('amp-account').innerHTML=accountHtml(accounts.find(a=>a.competition_id==='amp-futures-sep-2026'),'amp-futures-sep-2026');
+ renderPositions('capital-positions',positions.filter(p=>p.competition_id==='capital-africa-sep-2026'));
+ renderPositions('amp-positions',positions.filter(p=>p.competition_id==='amp-futures-sep-2026'));
+ maybeNotify(cards);
+ maybeNotifyManagement(positions);
+}
+async function refresh(){
+ if(!$('token').value.trim()){return}
+ $('status').textContent='Loading...';
+ try{
+   snapshot=await api('operator_snapshot.php');
+   render();
+   secondsToRefresh=30;
+   $('status').textContent='Connected • '+new Date().toLocaleTimeString();
+   startAutoRefresh();
+ }catch(e){
+   $('status').textContent='Failed: '+e.message;
+ }
+}
+function updateAutoStatus(){
+ $('autostatus').textContent='Auto refresh: ON • next check in '+secondsToRefresh+'s';
+}
+function startAutoRefresh(){
+ if(autoTimer)return;
+ updateAutoStatus();
+ autoCountdown=setInterval(()=>{secondsToRefresh=Math.max(0,secondsToRefresh-1);updateAutoStatus()},1000);
+ autoTimer=setInterval(()=>{secondsToRefresh=30;refresh()},30000);
+}
+function stopAutoRefresh(){
+ if(autoTimer){clearInterval(autoTimer);autoTimer=null}
+ if(autoCountdown){clearInterval(autoCountdown);autoCountdown=null}
+ $('autostatus').textContent='Auto refresh: OFF';
+}
+async function enableNotifications(){
+ if(!('Notification' in window)){alert('Browser notifications are not supported in this browser.');return}
+ const p=await Notification.requestPermission();
+ $('notify').textContent=p==='granted'?'Browser alerts ON':'Enable browser alerts';
+ if($('browser-notify-status'))$('browser-notify-status').textContent=p==='granted'?'Enabled':'Not enabled';
+ if(p==='granted')new Notification('STC browser alerts enabled',{body:'You will be notified here when a new LONG/SHORT locked trade plan appears while this console is running.'});
+}
+function maybeNotifyManagement(positions){
+ for(const p of positions||[]){
+   const m=p.management||{};
+   if(!m.action || m.action==='HOLD')continue;
+   const key=p.position_id+'|'+m.action+'|'+num(m.suggested_stop||0,4);
+   if(seenManagement.has(key))continue;
+   seenManagement.add(key);
+   if('Notification' in window && Notification.permission==='granted'){
+     new Notification('STC POSITION: '+m.action,{body:p.symbol+' • '+p.side+' • R '+num(m.r_multiple,2)+' • '+(m.reasons||[]).join(', '),tag:key,requireInteraction:m.action==='EXIT_NOW'});
+   }
+ }
+}
+async function updateAccountState(competitionId){
+ const account=(snapshot.account_states||[]).find(a=>a.competition_id===competitionId);
+ const equity=Number(prompt('Current competition equity in USD',account?account.equity_usd:''));
+ if(!Number.isFinite(equity)||equity<=0)return;
+ const pct=Number(prompt('STC risk budget per new trade (%)',account?Number(account.risk_fraction)*100:0.5));
+ if(!Number.isFinite(pct)||pct<=0||pct>2){alert('Risk setting must be above 0% and at most 2%.');return}
+ try{await api('account_state.php',{method:'POST',body:JSON.stringify({competition_id:competitionId,equity_usd:equity,risk_fraction:pct/100})});await refresh()}
+ catch(e){alert('Account state update failed: '+e.message)}
+}
+async function recordFilledPosition(i){
+ const c=snapshot.cards[i];
+ if(!c||!c.locked_trade_plan||!c.approval||c.approval.decision!=='approved'){alert('An approved locked plan is required.');return}
+ const suggested=c.position_sizing?c.position_sizing.proposed_quantity:'';
+ const qty=Number(prompt('Quantity actually filled manually in the competition platform',suggested));
+ if(!Number.isFinite(qty)||qty<=0)return;
+ const entry=Number(prompt('Actual average fill price',c.current_price||c.locked_trade_plan.entry_mid));
+ if(!Number.isFinite(entry)||entry<=0)return;
+ if(!confirm('Confirm the order was already entered manually in the competition platform. STC will only record it.'))return;
+ const p=c.locked_trade_plan;
+ const body={action:'OPEN',origin:'stc_plan',competition_id:c.competition_id,symbol:c.symbol,side:p.direction,quantity:qty,entry_price:entry,initial_stop:p.initial_stop,current_stop:p.initial_stop,target1:p.target1,target2:p.target2,source_plan_id:p.plan_id,opened_at_utc:new Date().toISOString(),note:'Owner-confirmed manual fill'};
+ try{await api('position.php',{method:'POST',body:JSON.stringify(body)});await refresh()}
+ catch(e){alert('Position record failed: '+e.message)}
+}
+async function recordStopUpdate(positionId,suggested){
+ const stop=Number(prompt('Stop price already changed manually in the platform',suggested));
+ if(!Number.isFinite(stop)||stop<=0)return;
+ if(!confirm('Confirm you already changed the stop manually. This only updates the STC ledger.'))return;
+ try{await api('position.php',{method:'POST',body:JSON.stringify({action:'UPDATE_STOP',position_id:positionId,current_stop:stop,note:'Owner-confirmed manual stop change'})});await refresh()}
+ catch(e){alert('Stop record failed: '+e.message)}
+}
+async function recordPartial(positionId){
+ const qty=Number(prompt('Quantity already closed manually'));
+ const price=Number(prompt('Actual partial exit fill price'));
+ if(!Number.isFinite(qty)||qty<=0||!Number.isFinite(price)||price<=0)return;
+ if(!confirm('Confirm this partial close already happened in the platform.'))return;
+ try{await api('position.php',{method:'POST',body:JSON.stringify({action:'PARTIAL',position_id:positionId,quantity_closed:qty,exit_price:price,note:'Owner-confirmed manual partial close'})});await refresh()}
+ catch(e){alert('Partial-close record failed: '+e.message)}
+}
+async function recordClose(positionId){
+ const price=Number(prompt('Actual final exit fill price'));
+ if(!Number.isFinite(price)||price<=0)return;
+ if(!confirm('Confirm the position is already closed manually in the competition platform.'))return;
+ try{await api('position.php',{method:'POST',body:JSON.stringify({action:'CLOSE',position_id:positionId,exit_price:price,note:'Owner-confirmed manual close'})});await refresh()}
+ catch(e){alert('Close record failed: '+e.message)}
+}
+async function setControls(safe,kill){
+ if(!confirm('Confirm runtime control change? This changes approval availability but never places an order.'))return;
+ try{await api('runtime_control.php',{method:'POST',body:JSON.stringify({safe_mode:safe,kill_switch:kill,reason:$('reason').value.trim()||null})});await refresh()}
+ catch(e){alert('Control change failed: '+e.message)}
+}
+async function approveCard(i,decision){
+ const c=snapshot.cards[i];
+ if(decision==='approve'&&!confirm('Approve this signal for MANUAL order entry only? No order will be sent.'))return;
+ const price=Number($('price-'+i)?.value);
+ const body={signal_id:c.signal_id,decision,note:'STC owner console'};
+ if(decision==='approve'){
+   if(!Number.isFinite(price)||price<=0){alert('Enter the current TradingView price first.');return}
+   body.confirmation={observed_at_utc:new Date().toISOString(),quote_price:price,market_status:'open'};
+ }
+ try{const r=await api('approval.php',{method:'POST',body:JSON.stringify(body)});alert('Decision: '+r.decision);await refresh()}
+ catch(e){alert('Approval failed/blocked: '+e.message);await refresh()}
+}
+function showTab(name){
+ activeTab=name;
+ for(const el of document.querySelectorAll('.tab'))el.classList.toggle('active',el.dataset.tab===name);
+ for(const id of ['overview','capital','amp','general','notifications'])$(id+'-panel').classList.toggle('hidden',id!==name);
+ localStorage.setItem('stc_active_tab',name);
+}
+for(const el of document.querySelectorAll('.tab'))el.addEventListener('click',()=>showTab(el.dataset.tab));
+function loadGeneralSettings(){
+ try{
+   const g=JSON.parse(localStorage.getItem('stc_general_lab')||'{}');
+   $('general-capital').value=g.capital??'';
+   $('general-currency').value=g.currency||'USD';
+   $('general-symbols').value=g.symbols||'';
+ }catch(e){}
+}
+$('save-general').onclick=()=>{
+ const g={capital:$('general-capital').value,currency:$('general-currency').value,symbols:$('general-symbols').value};
+ localStorage.setItem('stc_general_lab',JSON.stringify(g));
+ $('general-status').textContent='Saved on this device. General Lab analysis will remain isolated from both competition accounts.';
+};
+loadGeneralSettings();
+showTab(localStorage.getItem('stc_active_tab')||'overview');
+if('Notification' in window && $('browser-notify-status'))$('browser-notify-status').textContent=Notification.permission==='granted'?'Enabled':'Not enabled';
+
+$('refresh').onclick=refresh;
+$('notify').onclick=enableNotifications;
+$('logout').onclick=()=>{stopAutoRefresh();$('token').value='';snapshot=null;initializedSignals=false;seenSignalPlans.clear();seenManagement.clear();$('runtime').textContent='Runtime controls not loaded.';$('status').textContent='Token cleared';document.title='STC Owner Console'};
+</script></body></html>
++num(c.position_sizing.risk_budget_usd,2)+'</span></div>'
+   +'<div class="row"><span>Estimated risk</span><span class="value">
+ +'<div class="row"><span>Manual ready</span><span class="value '+(c.manual_execution_ready?'ok':'bad')+'">'+esc(c.manual_execution_ready)+'</span></div>'
+ +'<div class="small" style="margin:8px 0">'+reasons+'</div>'
+ +(canApprove?'<div class="approve"><input id="price-'+i+'" type="number" step="any" placeholder="Current price from TradingView">'
+ +'<button class="safe" onclick="approve('+i+',\'approve\')">Approve</button><button class="danger" onclick="approve('+i+',\'reject\')">Reject</button></div>'
+ :'<div class="small">WAIT signals cannot be approved as orders.</div>')
+ +'</div>';
+}
+function maybeNotify(cards){
+ const actionable=(cards||[]).filter(c=>(c.recommendation==='LONG'||c.recommendation==='SHORT')&&c.locked_trade_plan);
+ if(!initializedSignals){
+   for(const c of actionable){seenSignalPlans.add(String(c.locked_trade_plan.plan_id||c.signal_id))}
+   initializedSignals=true;
+   return;
+ }
+ for(const c of actionable){
+   const key=String(c.locked_trade_plan.plan_id||c.signal_id);
+   if(seenSignalPlans.has(key))continue;
+   seenSignalPlans.add(key);
+   const body=c.symbol+' • '+c.recommendation+' • Entry '+num(c.locked_trade_plan.entry_min)+' - '+num(c.locked_trade_plan.entry_max)+' • SL '+num(c.locked_trade_plan.initial_stop)+' • TP1 '+num(c.locked_trade_plan.target1);
+   if('Notification' in window && Notification.permission==='granted'){
+     new Notification('STC NEW LOCKED TRADE PLAN',{body,tag:key,requireInteraction:true});
+   }
+   document.title='NEW '+c.recommendation+' • '+c.symbol+' • STC';
+ }
+}
+function competitionOf(c){return c.competition_id==='amp-futures-sep-2026'?'amp':c.competition_id==='capital-africa-sep-2026'?'capital':'other'}
+function renderCards(target,cards){
+ $(target).innerHTML=(cards||[]).map((c,i)=>cardHtml(c,i)).join('')||'<div class="card">No analyzed signals found.</div>';
+}
+function renderOverview(cards){
+ const capital=cards.filter(c=>competitionOf(c)==='capital');
+ const amp=cards.filter(c=>competitionOf(c)==='amp');
+ const actionable=cards.filter(c=>(c.recommendation==='LONG'||c.recommendation==='SHORT')&&c.locked_trade_plan);
+ const ready=cards.filter(c=>c.manual_execution_ready);
+ $('count-capital').textContent=capital.length;
+ $('count-amp').textContent=amp.length;
+ $('overview-summary').innerHTML=
+   '<div class="card"><div class="small">Capital.com cards</div><div class="big">'+capital.length+'</div></div>'
+  +'<div class="card"><div class="small">AMP Futures cards</div><div class="big">'+amp.length+'</div></div>'
+  +'<div class="card"><div class="small">Locked opportunities</div><div class="big">'+actionable.length+'</div></div>'
+  +'<div class="card"><div class="small">Manual-ready now</div><div class="big">'+ready.length+'</div></div>';
+ const ranked=[...actionable].sort((a,b)=>Math.abs(Number(b.composite_score||0))-Math.abs(Number(a.composite_score||0)));
+ $('overview-cards').innerHTML=ranked.length?ranked.slice(0,8).map((c,i)=>cardHtml(c,i)).join(''):'<div class="card">No actionable locked opportunities right now. Current WAIT signals are still visible inside each competition tab.</div>';
+}
+function render(){
+ const r=snapshot.runtime_control||{};
+ $('runtime').innerHTML=runtimeHtml(r);
+ const cards=snapshot.cards||[];
+ renderOverview(cards);
+ renderCards('capital-cards',cards.filter(c=>competitionOf(c)==='capital'));
+ renderCards('amp-cards',cards.filter(c=>competitionOf(c)==='amp'));
+ maybeNotify(cards);
+}
+async function refresh(){
+ if(!$('token').value.trim()){return}
+ $('status').textContent='Loading...';
+ try{
+   snapshot=await api('operator_snapshot.php');
+   render();
+   secondsToRefresh=30;
+   $('status').textContent='Connected • '+new Date().toLocaleTimeString();
+   startAutoRefresh();
+ }catch(e){
+   $('status').textContent='Failed: '+e.message;
+ }
+}
+function updateAutoStatus(){
+ $('autostatus').textContent='Auto refresh: ON • next check in '+secondsToRefresh+'s';
+}
+function startAutoRefresh(){
+ if(autoTimer)return;
+ updateAutoStatus();
+ autoCountdown=setInterval(()=>{secondsToRefresh=Math.max(0,secondsToRefresh-1);updateAutoStatus()},1000);
+ autoTimer=setInterval(()=>{secondsToRefresh=30;refresh()},30000);
+}
+function stopAutoRefresh(){
+ if(autoTimer){clearInterval(autoTimer);autoTimer=null}
+ if(autoCountdown){clearInterval(autoCountdown);autoCountdown=null}
+ $('autostatus').textContent='Auto refresh: OFF';
+}
+async function enableNotifications(){
+ if(!('Notification' in window)){alert('Browser notifications are not supported in this browser.');return}
+ const p=await Notification.requestPermission();
+ $('notify').textContent=p==='granted'?'Browser alerts ON':'Enable browser alerts';
+ if($('browser-notify-status'))$('browser-notify-status').textContent=p==='granted'?'Enabled':'Not enabled';
+ if(p==='granted')new Notification('STC browser alerts enabled',{body:'You will be notified here when a new LONG/SHORT locked trade plan appears while this console is running.'});
+}
+async function setControls(safe,kill){
+ if(!confirm('Confirm runtime control change? This changes approval availability but never places an order.'))return;
+ try{await api('runtime_control.php',{method:'POST',body:JSON.stringify({safe_mode:safe,kill_switch:kill,reason:$('reason').value.trim()||null})});await refresh()}
+ catch(e){alert('Control change failed: '+e.message)}
+}
+async function approve(i,decision){
+ const c=snapshot.cards[i];
+ if(decision==='approve'&&!confirm('Approve this signal for MANUAL order entry only? No order will be sent.'))return;
+ const price=Number($('price-'+i)?.value);
+ const body={signal_id:c.signal_id,decision,note:'STC owner console'};
+ if(decision==='approve'){
+   if(!Number.isFinite(price)||price<=0){alert('Enter the current TradingView price first.');return}
+   body.confirmation={observed_at_utc:new Date().toISOString(),quote_price:price,market_status:'open'};
+ }
+ try{const r=await api('approval.php',{method:'POST',body:JSON.stringify(body)});alert('Decision: '+r.decision);await refresh()}
+ catch(e){alert('Approval failed/blocked: '+e.message);await refresh()}
+}
+function showTab(name){
+ activeTab=name;
+ for(const el of document.querySelectorAll('.tab'))el.classList.toggle('active',el.dataset.tab===name);
+ for(const id of ['overview','capital','amp','general','notifications'])$(id+'-panel').classList.toggle('hidden',id!==name);
+ localStorage.setItem('stc_active_tab',name);
+}
+for(const el of document.querySelectorAll('.tab'))el.addEventListener('click',()=>showTab(el.dataset.tab));
+function loadGeneralSettings(){
+ try{
+   const g=JSON.parse(localStorage.getItem('stc_general_lab')||'{}');
+   $('general-capital').value=g.capital??'';
+   $('general-currency').value=g.currency||'USD';
+   $('general-symbols').value=g.symbols||'';
+ }catch(e){}
+}
+$('save-general').onclick=()=>{
+ const g={capital:$('general-capital').value,currency:$('general-currency').value,symbols:$('general-symbols').value};
+ localStorage.setItem('stc_general_lab',JSON.stringify(g));
+ $('general-status').textContent='Saved on this device. General Lab analysis will remain isolated from both competition accounts.';
+};
+loadGeneralSettings();
+showTab(localStorage.getItem('stc_active_tab')||'overview');
+if('Notification' in window && $('browser-notify-status'))$('browser-notify-status').textContent=Notification.permission==='granted'?'Enabled':'Not enabled';
+
+$('refresh').onclick=refresh;
+$('notify').onclick=enableNotifications;
+$('logout').onclick=()=>{stopAutoRefresh();$('token').value='';snapshot=null;initializedSignals=false;seenSignalPlans.clear();$('cards').innerHTML='';$('runtime').textContent='Runtime controls not loaded.';$('status').textContent='Token cleared';document.title='STC Owner Console'};
+</script></body></html>
++num(c.position_sizing.risk_amount_usd,2)+'</span></div>':'')
+ +'<div class="row"><span>Approval</span><span class="value">'+esc(a.decision||'none')+'</span></div>'
+ +'<div class="row"><span>Manual ready</span><span class="value '+(c.manual_execution_ready?'ok':'bad')+'">'+esc(c.manual_execution_ready)+'</span></div>'
+ +'<div class="small" style="margin:8px 0">'+reasons+'</div>'
+ +(canApprove?'<div class="approve"><input id="price-'+i+'" type="number" step="any" placeholder="Current price from TradingView">'
+ +'<button class="safe" onclick="approve('+i+',\'approve\')">Approve</button><button class="danger" onclick="approve('+i+',\'reject\')">Reject</button></div>'
+ :'<div class="small">WAIT signals cannot be approved as orders.</div>')
+ +'</div>';
+}
+function maybeNotify(cards){
+ const actionable=(cards||[]).filter(c=>(c.recommendation==='LONG'||c.recommendation==='SHORT')&&c.locked_trade_plan);
+ if(!initializedSignals){
+   for(const c of actionable){seenSignalPlans.add(String(c.locked_trade_plan.plan_id||c.signal_id))}
+   initializedSignals=true;
+   return;
+ }
+ for(const c of actionable){
+   const key=String(c.locked_trade_plan.plan_id||c.signal_id);
+   if(seenSignalPlans.has(key))continue;
+   seenSignalPlans.add(key);
+   const body=c.symbol+' • '+c.recommendation+' • Entry '+num(c.locked_trade_plan.entry_min)+' - '+num(c.locked_trade_plan.entry_max)+' • SL '+num(c.locked_trade_plan.initial_stop)+' • TP1 '+num(c.locked_trade_plan.target1);
+   if('Notification' in window && Notification.permission==='granted'){
+     new Notification('STC NEW LOCKED TRADE PLAN',{body,tag:key,requireInteraction:true});
+   }
+   document.title='NEW '+c.recommendation+' • '+c.symbol+' • STC';
+ }
+}
+function competitionOf(c){return c.competition_id==='amp-futures-sep-2026'?'amp':c.competition_id==='capital-africa-sep-2026'?'capital':'other'}
+function renderCards(target,cards){
+ $(target).innerHTML=(cards||[]).map((c,i)=>cardHtml(c,i)).join('')||'<div class="card">No analyzed signals found.</div>';
+}
+function renderOverview(cards){
+ const capital=cards.filter(c=>competitionOf(c)==='capital');
+ const amp=cards.filter(c=>competitionOf(c)==='amp');
+ const actionable=cards.filter(c=>(c.recommendation==='LONG'||c.recommendation==='SHORT')&&c.locked_trade_plan);
+ const ready=cards.filter(c=>c.manual_execution_ready);
+ $('count-capital').textContent=capital.length;
+ $('count-amp').textContent=amp.length;
+ $('overview-summary').innerHTML=
+   '<div class="card"><div class="small">Capital.com cards</div><div class="big">'+capital.length+'</div></div>'
+  +'<div class="card"><div class="small">AMP Futures cards</div><div class="big">'+amp.length+'</div></div>'
+  +'<div class="card"><div class="small">Locked opportunities</div><div class="big">'+actionable.length+'</div></div>'
+  +'<div class="card"><div class="small">Manual-ready now</div><div class="big">'+ready.length+'</div></div>';
+ const ranked=[...actionable].sort((a,b)=>Math.abs(Number(b.composite_score||0))-Math.abs(Number(a.composite_score||0)));
+ $('overview-cards').innerHTML=ranked.length?ranked.slice(0,8).map((c,i)=>cardHtml(c,i)).join(''):'<div class="card">No actionable locked opportunities right now. Current WAIT signals are still visible inside each competition tab.</div>';
+}
+function render(){
+ const r=snapshot.runtime_control||{};
+ $('runtime').innerHTML=runtimeHtml(r);
+ const cards=snapshot.cards||[];
+ renderOverview(cards);
+ renderCards('capital-cards',cards.filter(c=>competitionOf(c)==='capital'));
+ renderCards('amp-cards',cards.filter(c=>competitionOf(c)==='amp'));
+ maybeNotify(cards);
+}
+async function refresh(){
+ if(!$('token').value.trim()){return}
+ $('status').textContent='Loading...';
+ try{
+   snapshot=await api('operator_snapshot.php');
+   render();
+   secondsToRefresh=30;
+   $('status').textContent='Connected • '+new Date().toLocaleTimeString();
+   startAutoRefresh();
+ }catch(e){
+   $('status').textContent='Failed: '+e.message;
+ }
+}
+function updateAutoStatus(){
+ $('autostatus').textContent='Auto refresh: ON • next check in '+secondsToRefresh+'s';
+}
+function startAutoRefresh(){
+ if(autoTimer)return;
+ updateAutoStatus();
+ autoCountdown=setInterval(()=>{secondsToRefresh=Math.max(0,secondsToRefresh-1);updateAutoStatus()},1000);
+ autoTimer=setInterval(()=>{secondsToRefresh=30;refresh()},30000);
+}
+function stopAutoRefresh(){
+ if(autoTimer){clearInterval(autoTimer);autoTimer=null}
+ if(autoCountdown){clearInterval(autoCountdown);autoCountdown=null}
+ $('autostatus').textContent='Auto refresh: OFF';
+}
+async function enableNotifications(){
+ if(!('Notification' in window)){alert('Browser notifications are not supported in this browser.');return}
+ const p=await Notification.requestPermission();
+ $('notify').textContent=p==='granted'?'Browser alerts ON':'Enable browser alerts';
+ if($('browser-notify-status'))$('browser-notify-status').textContent=p==='granted'?'Enabled':'Not enabled';
+ if(p==='granted')new Notification('STC browser alerts enabled',{body:'You will be notified here when a new LONG/SHORT locked trade plan appears while this console is running.'});
+}
+async function setControls(safe,kill){
+ if(!confirm('Confirm runtime control change? This changes approval availability but never places an order.'))return;
+ try{await api('runtime_control.php',{method:'POST',body:JSON.stringify({safe_mode:safe,kill_switch:kill,reason:$('reason').value.trim()||null})});await refresh()}
+ catch(e){alert('Control change failed: '+e.message)}
+}
+async function approve(i,decision){
+ const c=snapshot.cards[i];
+ if(decision==='approve'&&!confirm('Approve this signal for MANUAL order entry only? No order will be sent.'))return;
+ const price=Number($('price-'+i)?.value);
+ const body={signal_id:c.signal_id,decision,note:'STC owner console'};
+ if(decision==='approve'){
+   if(!Number.isFinite(price)||price<=0){alert('Enter the current TradingView price first.');return}
+   body.confirmation={observed_at_utc:new Date().toISOString(),quote_price:price,market_status:'open'};
+ }
+ try{const r=await api('approval.php',{method:'POST',body:JSON.stringify(body)});alert('Decision: '+r.decision);await refresh()}
+ catch(e){alert('Approval failed/blocked: '+e.message);await refresh()}
+}
+function showTab(name){
+ activeTab=name;
+ for(const el of document.querySelectorAll('.tab'))el.classList.toggle('active',el.dataset.tab===name);
+ for(const id of ['overview','capital','amp','general','notifications'])$(id+'-panel').classList.toggle('hidden',id!==name);
+ localStorage.setItem('stc_active_tab',name);
+}
+for(const el of document.querySelectorAll('.tab'))el.addEventListener('click',()=>showTab(el.dataset.tab));
+function loadGeneralSettings(){
+ try{
+   const g=JSON.parse(localStorage.getItem('stc_general_lab')||'{}');
+   $('general-capital').value=g.capital??'';
+   $('general-currency').value=g.currency||'USD';
+   $('general-symbols').value=g.symbols||'';
+ }catch(e){}
+}
+$('save-general').onclick=()=>{
+ const g={capital:$('general-capital').value,currency:$('general-currency').value,symbols:$('general-symbols').value};
+ localStorage.setItem('stc_general_lab',JSON.stringify(g));
+ $('general-status').textContent='Saved on this device. General Lab analysis will remain isolated from both competition accounts.';
+};
+loadGeneralSettings();
+showTab(localStorage.getItem('stc_active_tab')||'overview');
+if('Notification' in window && $('browser-notify-status'))$('browser-notify-status').textContent=Notification.permission==='granted'?'Enabled':'Not enabled';
+
+$('refresh').onclick=refresh;
+$('notify').onclick=enableNotifications;
+$('logout').onclick=()=>{stopAutoRefresh();$('token').value='';snapshot=null;initializedSignals=false;seenSignalPlans.clear();$('cards').innerHTML='';$('runtime').textContent='Runtime controls not loaded.';$('status').textContent='Token cleared';document.title='STC Owner Console'};
+</script></body></html>
++num(account.equity_usd,2)+'</span></div>'
+  +'<div class="row"><span>STC risk budget / trade</span><span class="value">'+num(Number(account.risk_fraction)*100,2)+'%</span></div>'
+  +'<div class="row"><span>Account state source</span><span class="value">'+esc(account.source)+'</span></div>'
+  +'<div class="small">Update this whenever competition equity materially changes; STC has no broker-account read access.</div>'
+  +'<button style="margin-top:8px" onclick="updateAccountState(\''+competitionId+'\')">Update equity / risk setting</button>';
+}
+function managementClass(a){return a==='EXIT_NOW'?'short':a==='HOLD'?'ok':'wait'}
+function positionHtml(p){
+ const m=p.management||{};
+ const rotation=p.rotation_candidate;
+ let buttons='';
+ if(m.action==='PROTECT' && m.suggested_stop)buttons='<button onclick="recordStopUpdate(\''+esc(p.position_id)+'\','+Number(m.suggested_stop)+')">After manual stop change: record</button>';
+ if(m.action==='PARTIAL_TAKE_PROFIT')buttons='<button onclick="recordPartial(\''+esc(p.position_id)+'\')">After manual partial close: record</button>';
+ if(m.action==='EXIT_NOW')buttons='<button class="danger" onclick="recordClose(\''+esc(p.position_id)+'\')">After manual close: record</button>';
+ return '<div class="card"><div class="row"><span>'+esc(p.symbol)+'</span><span class="value '+(p.side==='LONG'?'long':'short')+'">'+esc(p.side)+' × '+num(p.quantity,6)+'</span></div>'
+  +'<div class="row"><span>Entry</span><span class="value">'+num(p.entry_price)+'</span></div>'
+  +'<div class="row"><span>Active stop</span><span class="value">'+num(p.current_stop)+'</span></div>'
+  +'<div class="row"><span>TP1 / TP2</span><span class="value">'+num(p.target1)+' / '+num(p.target2)+'</span></div>'
+  +'<div class="row"><span>Supervisor</span><span class="value '+managementClass(m.action)+'">'+esc(m.action||'HOLD')+'</span></div>'
+  +'<div class="row"><span>R multiple</span><span class="value">'+num(m.r_multiple,2)+'</span></div>'
+  +'<div class="row"><span>Unrealized P/L</span><span class="value">'+(m.unrealized_pnl_usd==null?'-':'
+ const capital=cards.filter(c=>competitionOf(c)==='capital');
+ const amp=cards.filter(c=>competitionOf(c)==='amp');
+ const actionable=cards.filter(c=>(c.recommendation==='LONG'||c.recommendation==='SHORT')&&c.locked_trade_plan);
+ const ready=cards.filter(c=>c.manual_execution_ready);
+ $('count-capital').textContent=capital.length;
+ $('count-amp').textContent=amp.length;
+ $('overview-summary').innerHTML=
+   '<div class="card"><div class="small">Capital.com cards</div><div class="big">'+capital.length+'</div></div>'
+  +'<div class="card"><div class="small">AMP Futures cards</div><div class="big">'+amp.length+'</div></div>'
+  +'<div class="card"><div class="small">Locked opportunities</div><div class="big">'+actionable.length+'</div></div>'
+  +'<div class="card"><div class="small">Manual-ready now</div><div class="big">'+ready.length+'</div></div>';
+ const ranked=[...actionable].sort((a,b)=>Math.abs(Number(b.composite_score||0))-Math.abs(Number(a.composite_score||0)));
+ $('overview-cards').innerHTML=ranked.length?ranked.slice(0,8).map((c,i)=>cardHtml(c,i)).join(''):'<div class="card">No actionable locked opportunities right now. Current WAIT signals are still visible inside each competition tab.</div>';
+}
+function render(){
+ const r=snapshot.runtime_control||{};
+ $('runtime').innerHTML=runtimeHtml(r);
+ const cards=snapshot.cards||[];
+ renderOverview(cards);
+ renderCards('capital-cards',cards.filter(c=>competitionOf(c)==='capital'));
+ renderCards('amp-cards',cards.filter(c=>competitionOf(c)==='amp'));
+ maybeNotify(cards);
+}
+async function refresh(){
+ if(!$('token').value.trim()){return}
+ $('status').textContent='Loading...';
+ try{
+   snapshot=await api('operator_snapshot.php');
+   render();
+   secondsToRefresh=30;
+   $('status').textContent='Connected • '+new Date().toLocaleTimeString();
+   startAutoRefresh();
+ }catch(e){
+   $('status').textContent='Failed: '+e.message;
+ }
+}
+function updateAutoStatus(){
+ $('autostatus').textContent='Auto refresh: ON • next check in '+secondsToRefresh+'s';
+}
+function startAutoRefresh(){
+ if(autoTimer)return;
+ updateAutoStatus();
+ autoCountdown=setInterval(()=>{secondsToRefresh=Math.max(0,secondsToRefresh-1);updateAutoStatus()},1000);
+ autoTimer=setInterval(()=>{secondsToRefresh=30;refresh()},30000);
+}
+function stopAutoRefresh(){
+ if(autoTimer){clearInterval(autoTimer);autoTimer=null}
+ if(autoCountdown){clearInterval(autoCountdown);autoCountdown=null}
+ $('autostatus').textContent='Auto refresh: OFF';
+}
+async function enableNotifications(){
+ if(!('Notification' in window)){alert('Browser notifications are not supported in this browser.');return}
+ const p=await Notification.requestPermission();
+ $('notify').textContent=p==='granted'?'Browser alerts ON':'Enable browser alerts';
+ if($('browser-notify-status'))$('browser-notify-status').textContent=p==='granted'?'Enabled':'Not enabled';
+ if(p==='granted')new Notification('STC browser alerts enabled',{body:'You will be notified here when a new LONG/SHORT locked trade plan appears while this console is running.'});
+}
+async function setControls(safe,kill){
+ if(!confirm('Confirm runtime control change? This changes approval availability but never places an order.'))return;
+ try{await api('runtime_control.php',{method:'POST',body:JSON.stringify({safe_mode:safe,kill_switch:kill,reason:$('reason').value.trim()||null})});await refresh()}
+ catch(e){alert('Control change failed: '+e.message)}
+}
+async function approve(i,decision){
+ const c=snapshot.cards[i];
+ if(decision==='approve'&&!confirm('Approve this signal for MANUAL order entry only? No order will be sent.'))return;
+ const price=Number($('price-'+i)?.value);
+ const body={signal_id:c.signal_id,decision,note:'STC owner console'};
+ if(decision==='approve'){
+   if(!Number.isFinite(price)||price<=0){alert('Enter the current TradingView price first.');return}
+   body.confirmation={observed_at_utc:new Date().toISOString(),quote_price:price,market_status:'open'};
+ }
+ try{const r=await api('approval.php',{method:'POST',body:JSON.stringify(body)});alert('Decision: '+r.decision);await refresh()}
+ catch(e){alert('Approval failed/blocked: '+e.message);await refresh()}
+}
+function showTab(name){
+ activeTab=name;
+ for(const el of document.querySelectorAll('.tab'))el.classList.toggle('active',el.dataset.tab===name);
+ for(const id of ['overview','capital','amp','general','notifications'])$(id+'-panel').classList.toggle('hidden',id!==name);
+ localStorage.setItem('stc_active_tab',name);
+}
+for(const el of document.querySelectorAll('.tab'))el.addEventListener('click',()=>showTab(el.dataset.tab));
+function loadGeneralSettings(){
+ try{
+   const g=JSON.parse(localStorage.getItem('stc_general_lab')||'{}');
+   $('general-capital').value=g.capital??'';
+   $('general-currency').value=g.currency||'USD';
+   $('general-symbols').value=g.symbols||'';
+ }catch(e){}
+}
+$('save-general').onclick=()=>{
+ const g={capital:$('general-capital').value,currency:$('general-currency').value,symbols:$('general-symbols').value};
+ localStorage.setItem('stc_general_lab',JSON.stringify(g));
+ $('general-status').textContent='Saved on this device. General Lab analysis will remain isolated from both competition accounts.';
+};
+loadGeneralSettings();
+showTab(localStorage.getItem('stc_active_tab')||'overview');
+if('Notification' in window && $('browser-notify-status'))$('browser-notify-status').textContent=Notification.permission==='granted'?'Enabled':'Not enabled';
+
+$('refresh').onclick=refresh;
+$('notify').onclick=enableNotifications;
+$('logout').onclick=()=>{stopAutoRefresh();$('token').value='';snapshot=null;initializedSignals=false;seenSignalPlans.clear();$('cards').innerHTML='';$('runtime').textContent='Runtime controls not loaded.';$('status').textContent='Token cleared';document.title='STC Owner Console'};
+</script></body></html>
++num(c.position_sizing.risk_budget_usd,2)+'</span></div>'
+   +'<div class="row"><span>Estimated risk</span><span class="value">
+ +'<div class="row"><span>Manual ready</span><span class="value '+(c.manual_execution_ready?'ok':'bad')+'">'+esc(c.manual_execution_ready)+'</span></div>'
+ +'<div class="small" style="margin:8px 0">'+reasons+'</div>'
+ +(canApprove?'<div class="approve"><input id="price-'+i+'" type="number" step="any" placeholder="Current price from TradingView">'
+ +'<button class="safe" onclick="approve('+i+',\'approve\')">Approve</button><button class="danger" onclick="approve('+i+',\'reject\')">Reject</button></div>'
+ :'<div class="small">WAIT signals cannot be approved as orders.</div>')
+ +'</div>';
+}
+function maybeNotify(cards){
+ const actionable=(cards||[]).filter(c=>(c.recommendation==='LONG'||c.recommendation==='SHORT')&&c.locked_trade_plan);
+ if(!initializedSignals){
+   for(const c of actionable){seenSignalPlans.add(String(c.locked_trade_plan.plan_id||c.signal_id))}
+   initializedSignals=true;
+   return;
+ }
+ for(const c of actionable){
+   const key=String(c.locked_trade_plan.plan_id||c.signal_id);
+   if(seenSignalPlans.has(key))continue;
+   seenSignalPlans.add(key);
+   const body=c.symbol+' • '+c.recommendation+' • Entry '+num(c.locked_trade_plan.entry_min)+' - '+num(c.locked_trade_plan.entry_max)+' • SL '+num(c.locked_trade_plan.initial_stop)+' • TP1 '+num(c.locked_trade_plan.target1);
+   if('Notification' in window && Notification.permission==='granted'){
+     new Notification('STC NEW LOCKED TRADE PLAN',{body,tag:key,requireInteraction:true});
+   }
+   document.title='NEW '+c.recommendation+' • '+c.symbol+' • STC';
+ }
+}
+function competitionOf(c){return c.competition_id==='amp-futures-sep-2026'?'amp':c.competition_id==='capital-africa-sep-2026'?'capital':'other'}
+function renderCards(target,cards){
+ $(target).innerHTML=(cards||[]).map((c,i)=>cardHtml(c,i)).join('')||'<div class="card">No analyzed signals found.</div>';
+}
+function renderOverview(cards){
+ const capital=cards.filter(c=>competitionOf(c)==='capital');
+ const amp=cards.filter(c=>competitionOf(c)==='amp');
+ const actionable=cards.filter(c=>(c.recommendation==='LONG'||c.recommendation==='SHORT')&&c.locked_trade_plan);
+ const ready=cards.filter(c=>c.manual_execution_ready);
+ $('count-capital').textContent=capital.length;
+ $('count-amp').textContent=amp.length;
+ $('overview-summary').innerHTML=
+   '<div class="card"><div class="small">Capital.com cards</div><div class="big">'+capital.length+'</div></div>'
+  +'<div class="card"><div class="small">AMP Futures cards</div><div class="big">'+amp.length+'</div></div>'
+  +'<div class="card"><div class="small">Locked opportunities</div><div class="big">'+actionable.length+'</div></div>'
+  +'<div class="card"><div class="small">Manual-ready now</div><div class="big">'+ready.length+'</div></div>';
+ const ranked=[...actionable].sort((a,b)=>Math.abs(Number(b.composite_score||0))-Math.abs(Number(a.composite_score||0)));
+ $('overview-cards').innerHTML=ranked.length?ranked.slice(0,8).map((c,i)=>cardHtml(c,i)).join(''):'<div class="card">No actionable locked opportunities right now. Current WAIT signals are still visible inside each competition tab.</div>';
+}
+function render(){
+ const r=snapshot.runtime_control||{};
+ $('runtime').innerHTML=runtimeHtml(r);
+ const cards=snapshot.cards||[];
+ renderOverview(cards);
+ renderCards('capital-cards',cards.filter(c=>competitionOf(c)==='capital'));
+ renderCards('amp-cards',cards.filter(c=>competitionOf(c)==='amp'));
+ maybeNotify(cards);
+}
+async function refresh(){
+ if(!$('token').value.trim()){return}
+ $('status').textContent='Loading...';
+ try{
+   snapshot=await api('operator_snapshot.php');
+   render();
+   secondsToRefresh=30;
+   $('status').textContent='Connected • '+new Date().toLocaleTimeString();
+   startAutoRefresh();
+ }catch(e){
+   $('status').textContent='Failed: '+e.message;
+ }
+}
+function updateAutoStatus(){
+ $('autostatus').textContent='Auto refresh: ON • next check in '+secondsToRefresh+'s';
+}
+function startAutoRefresh(){
+ if(autoTimer)return;
+ updateAutoStatus();
+ autoCountdown=setInterval(()=>{secondsToRefresh=Math.max(0,secondsToRefresh-1);updateAutoStatus()},1000);
+ autoTimer=setInterval(()=>{secondsToRefresh=30;refresh()},30000);
+}
+function stopAutoRefresh(){
+ if(autoTimer){clearInterval(autoTimer);autoTimer=null}
+ if(autoCountdown){clearInterval(autoCountdown);autoCountdown=null}
+ $('autostatus').textContent='Auto refresh: OFF';
+}
+async function enableNotifications(){
+ if(!('Notification' in window)){alert('Browser notifications are not supported in this browser.');return}
+ const p=await Notification.requestPermission();
+ $('notify').textContent=p==='granted'?'Browser alerts ON':'Enable browser alerts';
+ if($('browser-notify-status'))$('browser-notify-status').textContent=p==='granted'?'Enabled':'Not enabled';
+ if(p==='granted')new Notification('STC browser alerts enabled',{body:'You will be notified here when a new LONG/SHORT locked trade plan appears while this console is running.'});
+}
+async function setControls(safe,kill){
+ if(!confirm('Confirm runtime control change? This changes approval availability but never places an order.'))return;
+ try{await api('runtime_control.php',{method:'POST',body:JSON.stringify({safe_mode:safe,kill_switch:kill,reason:$('reason').value.trim()||null})});await refresh()}
+ catch(e){alert('Control change failed: '+e.message)}
+}
+async function approve(i,decision){
+ const c=snapshot.cards[i];
+ if(decision==='approve'&&!confirm('Approve this signal for MANUAL order entry only? No order will be sent.'))return;
+ const price=Number($('price-'+i)?.value);
+ const body={signal_id:c.signal_id,decision,note:'STC owner console'};
+ if(decision==='approve'){
+   if(!Number.isFinite(price)||price<=0){alert('Enter the current TradingView price first.');return}
+   body.confirmation={observed_at_utc:new Date().toISOString(),quote_price:price,market_status:'open'};
+ }
+ try{const r=await api('approval.php',{method:'POST',body:JSON.stringify(body)});alert('Decision: '+r.decision);await refresh()}
+ catch(e){alert('Approval failed/blocked: '+e.message);await refresh()}
+}
+function showTab(name){
+ activeTab=name;
+ for(const el of document.querySelectorAll('.tab'))el.classList.toggle('active',el.dataset.tab===name);
+ for(const id of ['overview','capital','amp','general','notifications'])$(id+'-panel').classList.toggle('hidden',id!==name);
+ localStorage.setItem('stc_active_tab',name);
+}
+for(const el of document.querySelectorAll('.tab'))el.addEventListener('click',()=>showTab(el.dataset.tab));
+function loadGeneralSettings(){
+ try{
+   const g=JSON.parse(localStorage.getItem('stc_general_lab')||'{}');
+   $('general-capital').value=g.capital??'';
+   $('general-currency').value=g.currency||'USD';
+   $('general-symbols').value=g.symbols||'';
+ }catch(e){}
+}
+$('save-general').onclick=()=>{
+ const g={capital:$('general-capital').value,currency:$('general-currency').value,symbols:$('general-symbols').value};
+ localStorage.setItem('stc_general_lab',JSON.stringify(g));
+ $('general-status').textContent='Saved on this device. General Lab analysis will remain isolated from both competition accounts.';
+};
+loadGeneralSettings();
+showTab(localStorage.getItem('stc_active_tab')||'overview');
+if('Notification' in window && $('browser-notify-status'))$('browser-notify-status').textContent=Notification.permission==='granted'?'Enabled':'Not enabled';
+
+$('refresh').onclick=refresh;
+$('notify').onclick=enableNotifications;
+$('logout').onclick=()=>{stopAutoRefresh();$('token').value='';snapshot=null;initializedSignals=false;seenSignalPlans.clear();$('cards').innerHTML='';$('runtime').textContent='Runtime controls not loaded.';$('status').textContent='Token cleared';document.title='STC Owner Console'};
+</script></body></html>
++num(c.position_sizing.risk_amount_usd,2)+'</span></div>':'')
+ +'<div class="row"><span>Approval</span><span class="value">'+esc(a.decision||'none')+'</span></div>'
+ +'<div class="row"><span>Manual ready</span><span class="value '+(c.manual_execution_ready?'ok':'bad')+'">'+esc(c.manual_execution_ready)+'</span></div>'
+ +'<div class="small" style="margin:8px 0">'+reasons+'</div>'
+ +(canApprove?'<div class="approve"><input id="price-'+i+'" type="number" step="any" placeholder="Current price from TradingView">'
+ +'<button class="safe" onclick="approve('+i+',\'approve\')">Approve</button><button class="danger" onclick="approve('+i+',\'reject\')">Reject</button></div>'
+ :'<div class="small">WAIT signals cannot be approved as orders.</div>')
+ +'</div>';
+}
+function maybeNotify(cards){
+ const actionable=(cards||[]).filter(c=>(c.recommendation==='LONG'||c.recommendation==='SHORT')&&c.locked_trade_plan);
+ if(!initializedSignals){
+   for(const c of actionable){seenSignalPlans.add(String(c.locked_trade_plan.plan_id||c.signal_id))}
+   initializedSignals=true;
+   return;
+ }
+ for(const c of actionable){
+   const key=String(c.locked_trade_plan.plan_id||c.signal_id);
+   if(seenSignalPlans.has(key))continue;
+   seenSignalPlans.add(key);
+   const body=c.symbol+' • '+c.recommendation+' • Entry '+num(c.locked_trade_plan.entry_min)+' - '+num(c.locked_trade_plan.entry_max)+' • SL '+num(c.locked_trade_plan.initial_stop)+' • TP1 '+num(c.locked_trade_plan.target1);
+   if('Notification' in window && Notification.permission==='granted'){
+     new Notification('STC NEW LOCKED TRADE PLAN',{body,tag:key,requireInteraction:true});
+   }
+   document.title='NEW '+c.recommendation+' • '+c.symbol+' • STC';
+ }
+}
+function competitionOf(c){return c.competition_id==='amp-futures-sep-2026'?'amp':c.competition_id==='capital-africa-sep-2026'?'capital':'other'}
+function renderCards(target,cards){
+ $(target).innerHTML=(cards||[]).map((c,i)=>cardHtml(c,i)).join('')||'<div class="card">No analyzed signals found.</div>';
+}
+function renderOverview(cards){
+ const capital=cards.filter(c=>competitionOf(c)==='capital');
+ const amp=cards.filter(c=>competitionOf(c)==='amp');
+ const actionable=cards.filter(c=>(c.recommendation==='LONG'||c.recommendation==='SHORT')&&c.locked_trade_plan);
+ const ready=cards.filter(c=>c.manual_execution_ready);
+ $('count-capital').textContent=capital.length;
+ $('count-amp').textContent=amp.length;
+ $('overview-summary').innerHTML=
+   '<div class="card"><div class="small">Capital.com cards</div><div class="big">'+capital.length+'</div></div>'
+  +'<div class="card"><div class="small">AMP Futures cards</div><div class="big">'+amp.length+'</div></div>'
+  +'<div class="card"><div class="small">Locked opportunities</div><div class="big">'+actionable.length+'</div></div>'
+  +'<div class="card"><div class="small">Manual-ready now</div><div class="big">'+ready.length+'</div></div>';
+ const ranked=[...actionable].sort((a,b)=>Math.abs(Number(b.composite_score||0))-Math.abs(Number(a.composite_score||0)));
+ $('overview-cards').innerHTML=ranked.length?ranked.slice(0,8).map((c,i)=>cardHtml(c,i)).join(''):'<div class="card">No actionable locked opportunities right now. Current WAIT signals are still visible inside each competition tab.</div>';
+}
+function render(){
+ const r=snapshot.runtime_control||{};
+ $('runtime').innerHTML=runtimeHtml(r);
+ const cards=snapshot.cards||[];
+ renderOverview(cards);
+ renderCards('capital-cards',cards.filter(c=>competitionOf(c)==='capital'));
+ renderCards('amp-cards',cards.filter(c=>competitionOf(c)==='amp'));
+ maybeNotify(cards);
+}
+async function refresh(){
+ if(!$('token').value.trim()){return}
+ $('status').textContent='Loading...';
+ try{
+   snapshot=await api('operator_snapshot.php');
+   render();
+   secondsToRefresh=30;
+   $('status').textContent='Connected • '+new Date().toLocaleTimeString();
+   startAutoRefresh();
+ }catch(e){
+   $('status').textContent='Failed: '+e.message;
+ }
+}
+function updateAutoStatus(){
+ $('autostatus').textContent='Auto refresh: ON • next check in '+secondsToRefresh+'s';
+}
+function startAutoRefresh(){
+ if(autoTimer)return;
+ updateAutoStatus();
+ autoCountdown=setInterval(()=>{secondsToRefresh=Math.max(0,secondsToRefresh-1);updateAutoStatus()},1000);
+ autoTimer=setInterval(()=>{secondsToRefresh=30;refresh()},30000);
+}
+function stopAutoRefresh(){
+ if(autoTimer){clearInterval(autoTimer);autoTimer=null}
+ if(autoCountdown){clearInterval(autoCountdown);autoCountdown=null}
+ $('autostatus').textContent='Auto refresh: OFF';
+}
+async function enableNotifications(){
+ if(!('Notification' in window)){alert('Browser notifications are not supported in this browser.');return}
+ const p=await Notification.requestPermission();
+ $('notify').textContent=p==='granted'?'Browser alerts ON':'Enable browser alerts';
+ if($('browser-notify-status'))$('browser-notify-status').textContent=p==='granted'?'Enabled':'Not enabled';
+ if(p==='granted')new Notification('STC browser alerts enabled',{body:'You will be notified here when a new LONG/SHORT locked trade plan appears while this console is running.'});
+}
+async function setControls(safe,kill){
+ if(!confirm('Confirm runtime control change? This changes approval availability but never places an order.'))return;
+ try{await api('runtime_control.php',{method:'POST',body:JSON.stringify({safe_mode:safe,kill_switch:kill,reason:$('reason').value.trim()||null})});await refresh()}
+ catch(e){alert('Control change failed: '+e.message)}
+}
+async function approve(i,decision){
+ const c=snapshot.cards[i];
+ if(decision==='approve'&&!confirm('Approve this signal for MANUAL order entry only? No order will be sent.'))return;
+ const price=Number($('price-'+i)?.value);
+ const body={signal_id:c.signal_id,decision,note:'STC owner console'};
+ if(decision==='approve'){
+   if(!Number.isFinite(price)||price<=0){alert('Enter the current TradingView price first.');return}
+   body.confirmation={observed_at_utc:new Date().toISOString(),quote_price:price,market_status:'open'};
+ }
+ try{const r=await api('approval.php',{method:'POST',body:JSON.stringify(body)});alert('Decision: '+r.decision);await refresh()}
+ catch(e){alert('Approval failed/blocked: '+e.message);await refresh()}
+}
+function showTab(name){
+ activeTab=name;
+ for(const el of document.querySelectorAll('.tab'))el.classList.toggle('active',el.dataset.tab===name);
+ for(const id of ['overview','capital','amp','general','notifications'])$(id+'-panel').classList.toggle('hidden',id!==name);
+ localStorage.setItem('stc_active_tab',name);
+}
+for(const el of document.querySelectorAll('.tab'))el.addEventListener('click',()=>showTab(el.dataset.tab));
+function loadGeneralSettings(){
+ try{
+   const g=JSON.parse(localStorage.getItem('stc_general_lab')||'{}');
+   $('general-capital').value=g.capital??'';
+   $('general-currency').value=g.currency||'USD';
+   $('general-symbols').value=g.symbols||'';
+ }catch(e){}
+}
+$('save-general').onclick=()=>{
+ const g={capital:$('general-capital').value,currency:$('general-currency').value,symbols:$('general-symbols').value};
+ localStorage.setItem('stc_general_lab',JSON.stringify(g));
+ $('general-status').textContent='Saved on this device. General Lab analysis will remain isolated from both competition accounts.';
+};
+loadGeneralSettings();
+showTab(localStorage.getItem('stc_active_tab')||'overview');
+if('Notification' in window && $('browser-notify-status'))$('browser-notify-status').textContent=Notification.permission==='granted'?'Enabled':'Not enabled';
+
+$('refresh').onclick=refresh;
+$('notify').onclick=enableNotifications;
+$('logout').onclick=()=>{stopAutoRefresh();$('token').value='';snapshot=null;initializedSignals=false;seenSignalPlans.clear();$('cards').innerHTML='';$('runtime').textContent='Runtime controls not loaded.';$('status').textContent='Token cleared';document.title='STC Owner Console'};
+</script></body></html>
++num(m.unrealized_pnl_usd,2))+'</span></div>'
+  +(m.suggested_stop?'<div class="row"><span>Suggested stop</span><span class="value">'+num(m.suggested_stop)+'</span></div>':'')
+  +(rotation?'<div class="small">Rotation candidate: '+esc(rotation.to_symbol)+' '+esc(rotation.to_direction)+' • only after current thesis degradation.</div>':'')
+  +'<div class="small" style="margin:8px 0">'+(m.reasons||[]).map(x=>'<span class="pill">'+esc(x)+'</span>').join('')+'</div>'
+  +buttons+'</div>';
+}
+function renderPositions(target,positions){
+ $(target).innerHTML=(positions||[]).map(positionHtml).join('')||'<div class="card">No open positions recorded in STC for this competition.</div>';
+}
+function renderOverview(cards){
+ const capital=cards.filter(c=>competitionOf(c)==='capital');
+ const amp=cards.filter(c=>competitionOf(c)==='amp');
+ const actionable=cards.filter(c=>(c.recommendation==='LONG'||c.recommendation==='SHORT')&&c.locked_trade_plan);
+ const ready=cards.filter(c=>c.manual_execution_ready);
+ $('count-capital').textContent=capital.length;
+ $('count-amp').textContent=amp.length;
+ $('overview-summary').innerHTML=
+   '<div class="card"><div class="small">Capital.com cards</div><div class="big">'+capital.length+'</div></div>'
+  +'<div class="card"><div class="small">AMP Futures cards</div><div class="big">'+amp.length+'</div></div>'
+  +'<div class="card"><div class="small">Locked opportunities</div><div class="big">'+actionable.length+'</div></div>'
+  +'<div class="card"><div class="small">Manual-ready now</div><div class="big">'+ready.length+'</div></div>';
+ const ranked=[...actionable].sort((a,b)=>Math.abs(Number(b.composite_score||0))-Math.abs(Number(a.composite_score||0)));
+ $('overview-cards').innerHTML=ranked.length?ranked.slice(0,8).map((c,i)=>cardHtml(c,i)).join(''):'<div class="card">No actionable locked opportunities right now. Current WAIT signals are still visible inside each competition tab.</div>';
+}
+function render(){
+ const r=snapshot.runtime_control||{};
+ $('runtime').innerHTML=runtimeHtml(r);
+ const cards=snapshot.cards||[];
+ renderOverview(cards);
+ renderCards('capital-cards',cards.filter(c=>competitionOf(c)==='capital'));
+ renderCards('amp-cards',cards.filter(c=>competitionOf(c)==='amp'));
+ maybeNotify(cards);
+}
+async function refresh(){
+ if(!$('token').value.trim()){return}
+ $('status').textContent='Loading...';
+ try{
+   snapshot=await api('operator_snapshot.php');
+   render();
+   secondsToRefresh=30;
+   $('status').textContent='Connected • '+new Date().toLocaleTimeString();
+   startAutoRefresh();
+ }catch(e){
+   $('status').textContent='Failed: '+e.message;
+ }
+}
+function updateAutoStatus(){
+ $('autostatus').textContent='Auto refresh: ON • next check in '+secondsToRefresh+'s';
+}
+function startAutoRefresh(){
+ if(autoTimer)return;
+ updateAutoStatus();
+ autoCountdown=setInterval(()=>{secondsToRefresh=Math.max(0,secondsToRefresh-1);updateAutoStatus()},1000);
+ autoTimer=setInterval(()=>{secondsToRefresh=30;refresh()},30000);
+}
+function stopAutoRefresh(){
+ if(autoTimer){clearInterval(autoTimer);autoTimer=null}
+ if(autoCountdown){clearInterval(autoCountdown);autoCountdown=null}
+ $('autostatus').textContent='Auto refresh: OFF';
+}
+async function enableNotifications(){
+ if(!('Notification' in window)){alert('Browser notifications are not supported in this browser.');return}
+ const p=await Notification.requestPermission();
+ $('notify').textContent=p==='granted'?'Browser alerts ON':'Enable browser alerts';
+ if($('browser-notify-status'))$('browser-notify-status').textContent=p==='granted'?'Enabled':'Not enabled';
+ if(p==='granted')new Notification('STC browser alerts enabled',{body:'You will be notified here when a new LONG/SHORT locked trade plan appears while this console is running.'});
+}
+async function setControls(safe,kill){
+ if(!confirm('Confirm runtime control change? This changes approval availability but never places an order.'))return;
+ try{await api('runtime_control.php',{method:'POST',body:JSON.stringify({safe_mode:safe,kill_switch:kill,reason:$('reason').value.trim()||null})});await refresh()}
+ catch(e){alert('Control change failed: '+e.message)}
+}
+async function approve(i,decision){
+ const c=snapshot.cards[i];
+ if(decision==='approve'&&!confirm('Approve this signal for MANUAL order entry only? No order will be sent.'))return;
+ const price=Number($('price-'+i)?.value);
+ const body={signal_id:c.signal_id,decision,note:'STC owner console'};
+ if(decision==='approve'){
+   if(!Number.isFinite(price)||price<=0){alert('Enter the current TradingView price first.');return}
+   body.confirmation={observed_at_utc:new Date().toISOString(),quote_price:price,market_status:'open'};
+ }
+ try{const r=await api('approval.php',{method:'POST',body:JSON.stringify(body)});alert('Decision: '+r.decision);await refresh()}
+ catch(e){alert('Approval failed/blocked: '+e.message);await refresh()}
+}
+function showTab(name){
+ activeTab=name;
+ for(const el of document.querySelectorAll('.tab'))el.classList.toggle('active',el.dataset.tab===name);
+ for(const id of ['overview','capital','amp','general','notifications'])$(id+'-panel').classList.toggle('hidden',id!==name);
+ localStorage.setItem('stc_active_tab',name);
+}
+for(const el of document.querySelectorAll('.tab'))el.addEventListener('click',()=>showTab(el.dataset.tab));
+function loadGeneralSettings(){
+ try{
+   const g=JSON.parse(localStorage.getItem('stc_general_lab')||'{}');
+   $('general-capital').value=g.capital??'';
+   $('general-currency').value=g.currency||'USD';
+   $('general-symbols').value=g.symbols||'';
+ }catch(e){}
+}
+$('save-general').onclick=()=>{
+ const g={capital:$('general-capital').value,currency:$('general-currency').value,symbols:$('general-symbols').value};
+ localStorage.setItem('stc_general_lab',JSON.stringify(g));
+ $('general-status').textContent='Saved on this device. General Lab analysis will remain isolated from both competition accounts.';
+};
+loadGeneralSettings();
+showTab(localStorage.getItem('stc_active_tab')||'overview');
+if('Notification' in window && $('browser-notify-status'))$('browser-notify-status').textContent=Notification.permission==='granted'?'Enabled':'Not enabled';
+
+$('refresh').onclick=refresh;
+$('notify').onclick=enableNotifications;
+$('logout').onclick=()=>{stopAutoRefresh();$('token').value='';snapshot=null;initializedSignals=false;seenSignalPlans.clear();$('cards').innerHTML='';$('runtime').textContent='Runtime controls not loaded.';$('status').textContent='Token cleared';document.title='STC Owner Console'};
+</script></body></html>
++num(c.position_sizing.risk_budget_usd,2)+'</span></div>'
+   +'<div class="row"><span>Estimated risk</span><span class="value">
+ +'<div class="row"><span>Manual ready</span><span class="value '+(c.manual_execution_ready?'ok':'bad')+'">'+esc(c.manual_execution_ready)+'</span></div>'
+ +'<div class="small" style="margin:8px 0">'+reasons+'</div>'
+ +(canApprove?'<div class="approve"><input id="price-'+i+'" type="number" step="any" placeholder="Current price from TradingView">'
+ +'<button class="safe" onclick="approve('+i+',\'approve\')">Approve</button><button class="danger" onclick="approve('+i+',\'reject\')">Reject</button></div>'
+ :'<div class="small">WAIT signals cannot be approved as orders.</div>')
+ +'</div>';
+}
+function maybeNotify(cards){
+ const actionable=(cards||[]).filter(c=>(c.recommendation==='LONG'||c.recommendation==='SHORT')&&c.locked_trade_plan);
+ if(!initializedSignals){
+   for(const c of actionable){seenSignalPlans.add(String(c.locked_trade_plan.plan_id||c.signal_id))}
+   initializedSignals=true;
+   return;
+ }
+ for(const c of actionable){
+   const key=String(c.locked_trade_plan.plan_id||c.signal_id);
+   if(seenSignalPlans.has(key))continue;
+   seenSignalPlans.add(key);
+   const body=c.symbol+' • '+c.recommendation+' • Entry '+num(c.locked_trade_plan.entry_min)+' - '+num(c.locked_trade_plan.entry_max)+' • SL '+num(c.locked_trade_plan.initial_stop)+' • TP1 '+num(c.locked_trade_plan.target1);
+   if('Notification' in window && Notification.permission==='granted'){
+     new Notification('STC NEW LOCKED TRADE PLAN',{body,tag:key,requireInteraction:true});
+   }
+   document.title='NEW '+c.recommendation+' • '+c.symbol+' • STC';
+ }
+}
+function competitionOf(c){return c.competition_id==='amp-futures-sep-2026'?'amp':c.competition_id==='capital-africa-sep-2026'?'capital':'other'}
+function renderCards(target,cards){
+ $(target).innerHTML=(cards||[]).map((c,i)=>cardHtml(c,i)).join('')||'<div class="card">No analyzed signals found.</div>';
+}
+function renderOverview(cards){
+ const capital=cards.filter(c=>competitionOf(c)==='capital');
+ const amp=cards.filter(c=>competitionOf(c)==='amp');
+ const actionable=cards.filter(c=>(c.recommendation==='LONG'||c.recommendation==='SHORT')&&c.locked_trade_plan);
+ const ready=cards.filter(c=>c.manual_execution_ready);
+ $('count-capital').textContent=capital.length;
+ $('count-amp').textContent=amp.length;
+ $('overview-summary').innerHTML=
+   '<div class="card"><div class="small">Capital.com cards</div><div class="big">'+capital.length+'</div></div>'
+  +'<div class="card"><div class="small">AMP Futures cards</div><div class="big">'+amp.length+'</div></div>'
+  +'<div class="card"><div class="small">Locked opportunities</div><div class="big">'+actionable.length+'</div></div>'
+  +'<div class="card"><div class="small">Manual-ready now</div><div class="big">'+ready.length+'</div></div>';
+ const ranked=[...actionable].sort((a,b)=>Math.abs(Number(b.composite_score||0))-Math.abs(Number(a.composite_score||0)));
+ $('overview-cards').innerHTML=ranked.length?ranked.slice(0,8).map((c,i)=>cardHtml(c,i)).join(''):'<div class="card">No actionable locked opportunities right now. Current WAIT signals are still visible inside each competition tab.</div>';
+}
+function render(){
+ const r=snapshot.runtime_control||{};
+ $('runtime').innerHTML=runtimeHtml(r);
+ const cards=snapshot.cards||[];
+ renderOverview(cards);
+ renderCards('capital-cards',cards.filter(c=>competitionOf(c)==='capital'));
+ renderCards('amp-cards',cards.filter(c=>competitionOf(c)==='amp'));
+ maybeNotify(cards);
+}
+async function refresh(){
+ if(!$('token').value.trim()){return}
+ $('status').textContent='Loading...';
+ try{
+   snapshot=await api('operator_snapshot.php');
+   render();
+   secondsToRefresh=30;
+   $('status').textContent='Connected • '+new Date().toLocaleTimeString();
+   startAutoRefresh();
+ }catch(e){
+   $('status').textContent='Failed: '+e.message;
+ }
+}
+function updateAutoStatus(){
+ $('autostatus').textContent='Auto refresh: ON • next check in '+secondsToRefresh+'s';
+}
+function startAutoRefresh(){
+ if(autoTimer)return;
+ updateAutoStatus();
+ autoCountdown=setInterval(()=>{secondsToRefresh=Math.max(0,secondsToRefresh-1);updateAutoStatus()},1000);
+ autoTimer=setInterval(()=>{secondsToRefresh=30;refresh()},30000);
+}
+function stopAutoRefresh(){
+ if(autoTimer){clearInterval(autoTimer);autoTimer=null}
+ if(autoCountdown){clearInterval(autoCountdown);autoCountdown=null}
+ $('autostatus').textContent='Auto refresh: OFF';
+}
+async function enableNotifications(){
+ if(!('Notification' in window)){alert('Browser notifications are not supported in this browser.');return}
+ const p=await Notification.requestPermission();
+ $('notify').textContent=p==='granted'?'Browser alerts ON':'Enable browser alerts';
+ if($('browser-notify-status'))$('browser-notify-status').textContent=p==='granted'?'Enabled':'Not enabled';
+ if(p==='granted')new Notification('STC browser alerts enabled',{body:'You will be notified here when a new LONG/SHORT locked trade plan appears while this console is running.'});
+}
+async function setControls(safe,kill){
+ if(!confirm('Confirm runtime control change? This changes approval availability but never places an order.'))return;
+ try{await api('runtime_control.php',{method:'POST',body:JSON.stringify({safe_mode:safe,kill_switch:kill,reason:$('reason').value.trim()||null})});await refresh()}
+ catch(e){alert('Control change failed: '+e.message)}
+}
+async function approve(i,decision){
+ const c=snapshot.cards[i];
+ if(decision==='approve'&&!confirm('Approve this signal for MANUAL order entry only? No order will be sent.'))return;
+ const price=Number($('price-'+i)?.value);
+ const body={signal_id:c.signal_id,decision,note:'STC owner console'};
+ if(decision==='approve'){
+   if(!Number.isFinite(price)||price<=0){alert('Enter the current TradingView price first.');return}
+   body.confirmation={observed_at_utc:new Date().toISOString(),quote_price:price,market_status:'open'};
+ }
+ try{const r=await api('approval.php',{method:'POST',body:JSON.stringify(body)});alert('Decision: '+r.decision);await refresh()}
+ catch(e){alert('Approval failed/blocked: '+e.message);await refresh()}
+}
+function showTab(name){
+ activeTab=name;
+ for(const el of document.querySelectorAll('.tab'))el.classList.toggle('active',el.dataset.tab===name);
+ for(const id of ['overview','capital','amp','general','notifications'])$(id+'-panel').classList.toggle('hidden',id!==name);
+ localStorage.setItem('stc_active_tab',name);
+}
+for(const el of document.querySelectorAll('.tab'))el.addEventListener('click',()=>showTab(el.dataset.tab));
+function loadGeneralSettings(){
+ try{
+   const g=JSON.parse(localStorage.getItem('stc_general_lab')||'{}');
+   $('general-capital').value=g.capital??'';
+   $('general-currency').value=g.currency||'USD';
+   $('general-symbols').value=g.symbols||'';
+ }catch(e){}
+}
+$('save-general').onclick=()=>{
+ const g={capital:$('general-capital').value,currency:$('general-currency').value,symbols:$('general-symbols').value};
+ localStorage.setItem('stc_general_lab',JSON.stringify(g));
+ $('general-status').textContent='Saved on this device. General Lab analysis will remain isolated from both competition accounts.';
+};
+loadGeneralSettings();
+showTab(localStorage.getItem('stc_active_tab')||'overview');
+if('Notification' in window && $('browser-notify-status'))$('browser-notify-status').textContent=Notification.permission==='granted'?'Enabled':'Not enabled';
+
+$('refresh').onclick=refresh;
+$('notify').onclick=enableNotifications;
+$('logout').onclick=()=>{stopAutoRefresh();$('token').value='';snapshot=null;initializedSignals=false;seenSignalPlans.clear();$('cards').innerHTML='';$('runtime').textContent='Runtime controls not loaded.';$('status').textContent='Token cleared';document.title='STC Owner Console'};
+</script></body></html>
++num(c.position_sizing.risk_amount_usd,2)+'</span></div>':'')
  +'<div class="row"><span>Approval</span><span class="value">'+esc(a.decision||'none')+'</span></div>'
  +'<div class="row"><span>Manual ready</span><span class="value '+(c.manual_execution_ready?'ok':'bad')+'">'+esc(c.manual_execution_ready)+'</span></div>'
  +'<div class="small" style="margin:8px 0">'+reasons+'</div>'
