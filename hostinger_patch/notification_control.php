@@ -250,8 +250,13 @@ function stc_notify_signal_event(PDO $pdo, array $config, string $eventId): arra
                 (float)$plan['initial_stop'],
                 $openQty
             );
-            $sizingText = 'Proposed quantity: ' . rtrim(rtrim(number_format((float)$sizing['proposed_quantity'], 6, '.', ''), '0'), '.')
-                . ' | Risk budget: $' . number_format((float)$sizing['risk_budget_usd'], 2, '.', '');
+            $riskPct = ((float)$account['equity_usd']) > 0
+                ? ((float)$sizing['risk_amount_usd'] / (float)$account['equity_usd']) * 100.0
+                : 0.0;
+            $sizingText = 'Quantity: ' . rtrim(rtrim(number_format((float)$sizing['proposed_quantity'], 6, '.', ''), '0'), '.')
+                . ' | Risk: $' . number_format((float)$sizing['risk_amount_usd'], 2, '.', '')
+                . ' (' . number_format($riskPct, 3, '.', '') . '%)'
+                . ' | Official max: ' . rtrim(rtrim(number_format((float)$sizing['max_position'], 6, '.', ''), '0'), '.');
         } catch (Throwable $e) {
             $sizingText = 'Sizing blocked: ' . $e->getMessage();
         }
@@ -279,9 +284,11 @@ function stc_notify_signal_event(PDO $pdo, array $config, string $eventId): arra
         'Order: ' . $orderText,
         'Entry zone: ' . $plan['entry_min'] . ' - ' . $plan['entry_max'],
         'Stop: ' . $plan['initial_stop'],
-        'TP1: ' . $plan['target1'],
-        'TP2: ' . $plan['target2'],
+        'Management checkpoint (no partial TP): ' . $plan['target1'],
+        'Final take profit: ' . $plan['target2'],
         $sizingText,
+        'Signal score: ' . number_format((float)($signal['composite_score'] ?? 0.0), 2, '.', ''),
+        'Single-TP mode: place only the final take-profit; STC uses the checkpoint for protection logic.',
         'Reconfirm the live price before approval.',
         'Manual approval + manual order entry only.',
     ]);

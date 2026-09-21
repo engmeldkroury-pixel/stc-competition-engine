@@ -296,14 +296,14 @@ function stc_supervise_position(array $position, array $history): array {
     if ($target1Hit) {
         $protective = $side === 'LONG' ? max($currentStop, $entry) : min($currentStop, $entry);
         return [
-            'action' => 'PARTIAL_TAKE_PROFIT',
+            'action' => 'PROTECT',
             'urgency' => 'normal',
             'r_multiple' => $r,
             'unrealized_pnl_usd' => $unrealized,
             'thesis_degraded' => false,
             'suggested_stop' => $protective,
-            'suggested_partial_fraction' => 0.5,
-            'reasons' => ['target1_reached', 'reduce_risk_and_protect_remainder'],
+            'suggested_partial_fraction' => null,
+            'reasons' => ['management_checkpoint_reached', 'single_take_profit_mode_keep_full_quantity_and_protect'],
         ];
     }
 
@@ -375,6 +375,73 @@ function stc_max_open_position(string $competitionId, string $symbol): ?float {
         return array_key_exists($symbol, $amp) ? $amp[$symbol] : null;
     }
     return null;
+}
+
+function stc_competition_min_trading_days(string $competitionId): int {
+    if ($competitionId === 'capital-africa-sep-2026') {
+        return 3;
+    }
+    if ($competitionId === 'amp-futures-sep-2026') {
+        return 5;
+    }
+    throw new RuntimeException('unknown_competition');
+}
+
+function stc_competition_progress(PDO $pdo, string $competitionId): array {
+    $requiredDays = stc_competition_min_trading_days($competitionId);
+
+    $stmt = $pdo->prepare(
+        "SELECT COUNT(*) AS total_entries, "
+        . "COALESCE(SUM(status = 'OPEN'), 0) AS open_positions, "
+        . "COALESCE(SUM(status = 'CLOSED'), 0) AS closed_positions, "
+        . "COALESCE(SUM(realized_pnl_usd), 0) AS realized_pnl_usd "
+        . "FROM stc_positions WHERE competition_id = ?"
+    );
+    $stmt->execute([$competitionId]);
+    $row = $stmt->fetch() ?: [];
+
+    $daysStmt = $pdo->prepare(
+        "SELECT trade_date FROM ("
+        . "SELECT DATE(opened_at_utc) AS trade_date FROM stc_positions WHERE competition_id = ? "
+        . "UNION "
+        . "SELECT DATE(e.created_at_utc) AS trade_date "
+        . "FROM stc_position_events e "
+        . "JOIN stc_positions p ON p.position_id = e.position_id "
+        . "WHERE p.competition_id = ? AND e.event_type IN ('PARTIAL', 'CLOSE')"
+        . ") q WHERE trade_date IS NOT NULL ORDER BY trade_date"
+    );
+    $daysStmt->execute([$competitionId, $competitionId]);
+    $dates = [];
+    while (($d = $daysStmt->fetchColumn()) !== false) {
+        $dates[] = (string)$d;
+    }
+
+    $qualifyingDays = count($dates);
+    $daysRemaining = max(0, $requiredDays - $qualifyingDays);
+
+    $actionStmt = $pdo->prepare(
+        "SELECT COUNT(*) FROM stc_position_events e "
+        . "JOIN stc_positions p ON p.position_id = e.position_id "
+        . "WHERE p.competition_id = ? AND e.event_type IN ('OPEN', 'PARTIAL', 'CLOSE')"
+    );
+    $actionStmt->execute([$competitionId]);
+    $positionActions = (int)$actionStmt->fetchColumn();
+
+    return [
+        'competition_id' => $competitionId,
+        'qualifying_trading_days' => $qualifyingDays,
+        'required_trading_days' => $requiredDays,
+        'days_remaining' => $daysRemaining,
+        'eligible_by_days' => $daysRemaining === 0,
+        'qualifying_dates_utc' => $dates,
+        'total_entries' => (int)($row['total_entries'] ?? 0),
+        'open_positions' => (int)($row['open_positions'] ?? 0),
+        'closed_positions' => (int)($row['closed_positions'] ?? 0),
+        'position_actions' => $positionActions,
+        'realized_pnl_usd' => (float)($row['realized_pnl_usd'] ?? 0.0),
+        'scoring_basis' => 'realized_pnl_closed_positions',
+        'qualification_rule' => 'UTC day counts when an action results in opening or closing a position',
+    ];
 }
 
 function stc_risk_cluster(string $symbol): string {

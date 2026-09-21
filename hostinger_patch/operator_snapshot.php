@@ -124,6 +124,7 @@ try {
         }
 
         $recommendation = (string)($signal['recommendation'] ?? 'WAIT');
+        $hasOpenPosition = (float)($openQty[$seenKey] ?? 0.0) > 0.0;
         $macroContext = stc_macro_risk_context($config, $symbol, $now, $macroCalendar);
         $lockedPlan = $decision['locked_trade_plan'] ?? null;
         $planValid = is_array($lockedPlan)
@@ -133,13 +134,14 @@ try {
         $manualReady = !$runtime['safe_mode']
             && !$runtime['kill_switch']
             && in_array($recommendation, ['LONG', 'SHORT'], true)
+            && !$hasOpenPosition
             && $planValid
             && $approvalFresh
             && $validUntil !== null
             && $now < $validUntil;
 
         $sizing = null;
-        if ($planValid && isset($accounts[$competitionId])) {
+        if ($planValid && !$hasOpenPosition && isset($accounts[$competitionId])) {
             try {
                 $account = $accounts[$competitionId];
                 $sizing = stc_propose_position_size(
@@ -178,6 +180,8 @@ try {
             $expiresInSeconds = $validUntil->getTimestamp() - $now->getTimestamp();
             if ($now >= $validUntil) {
                 $pendingPlanAction = 'CANCEL_PENDING_PLAN';
+            } elseif ($hasOpenPosition) {
+                $pendingPlanAction = 'MANAGE_EXISTING_POSITION';
             } elseif (in_array($recommendation, ['LONG', 'SHORT'], true)) {
                 $opportunityActive = true;
                 try {
@@ -227,6 +231,9 @@ try {
             'macro_context' => $macroContext,
             'approval' => $approval,
             'manual_execution_ready' => $manualReady,
+            'has_open_position' => $hasOpenPosition,
+            'open_position_quantity' => (float)($openQty[$seenKey] ?? 0.0),
+            'entry_blocked_reason' => $hasOpenPosition ? 'existing_open_position_managed_by_portfolio_supervisor' : null,
             'opportunity_active' => $opportunityActive,
             'expires_in_seconds' => $expiresInSeconds,
             'source_age_seconds' => $sourceAgeSeconds,
@@ -352,6 +359,10 @@ try {
             'cache_age_seconds' => $macroCalendar['cache_age_seconds'] ?? null,
         ],
         'account_states' => array_values($accounts),
+        'competition_progress' => [
+            'capital-africa-sep-2026' => stc_competition_progress($pdo, 'capital-africa-sep-2026'),
+            'amp-futures-sep-2026' => stc_competition_progress($pdo, 'amp-futures-sep-2026'),
+        ],
         'cards' => $cards,
         'portfolio' => [
             'positions' => $positions,

@@ -57,14 +57,14 @@ input{width:100%}button{cursor:pointer}.primary{background:#1d4ed8}.danger{backg
 <div id="capital-panel" class="hidden">
   <div class="bar"><div class="sectiontitle">Capital.com Africa</div><div class="small">Independent competition lane. Capital.com symbols, account rules, risk and position limits stay separate from AMP Futures.</div></div>
   <div id="capital-account" class="bar"></div>
-  <div class="bar"><div class="sectiontitle">Open positions / Portfolio Supervisor</div><div id="capital-positions" class="grid"></div></div>
+  <div class="bar"><div class="sectiontitle">Open positions / Portfolio Supervisor</div><div class="small">Executed trades stay here until you record a manual close. New signals on the same symbol do not replace them.</div><button style="margin-top:10px" onclick="recordExistingPosition('capital-africa-sep-2026')">Record an existing manual position</button><div id="capital-positions" class="grid" style="margin-top:10px"></div></div>
   <div class="bar"><div class="sectiontitle">Latest signals</div><div id="capital-cards" class="grid"></div></div>
 </div>
 
 <div id="amp-panel" class="hidden">
   <div class="bar"><div class="sectiontitle">AMP Futures</div><div class="small">Independent futures lane. Futures symbols, contract limits, risk and position state stay separate from Capital.com Africa.</div></div>
   <div id="amp-account" class="bar"></div>
-  <div class="bar"><div class="sectiontitle">Open positions / Portfolio Supervisor</div><div id="amp-positions" class="grid"></div></div>
+  <div class="bar"><div class="sectiontitle">Open positions / Portfolio Supervisor</div><div class="small">Executed trades stay here until you record a manual close. New signals on the same symbol do not replace them.</div><button style="margin-top:10px" onclick="recordExistingPosition('amp-futures-sep-2026')">Record an existing manual position</button><div id="amp-positions" class="grid" style="margin-top:10px"></div></div>
   <div class="bar"><div class="sectiontitle">Latest signals</div><div id="amp-cards" class="grid"></div></div>
 </div>
 
@@ -172,7 +172,7 @@ function formatCountdown(seconds){
  return m+'m '+String(s).padStart(2,'0')+'s';
 }
 function isOpportunityActive(c){
- if(!c||!c.locked_trade_plan||!(c.recommendation==='LONG'||c.recommendation==='SHORT'))return false;
+ if(!c||c.has_open_position||!c.locked_trade_plan||!(c.recommendation==='LONG'||c.recommendation==='SHORT'))return false;
  const left=secondsUntil(c.locked_trade_plan.valid_until);
  return left!==null && left>0;
 }
@@ -218,19 +218,27 @@ function planHtml(p){
   +'<div class="row"><span>Decision timeframe</span><span class="value">'+esc(p.decision_timeframe||'15')+' min</span></div>'
   +'<div class="row"><span>Entry zone</span><span class="value">'+num(p.entry_min)+' → '+num(p.entry_max)+'</span></div>'
   +'<div class="row"><span>Stop loss</span><span class="value">'+num(p.initial_stop)+'</span></div>'
-  +'<div class="row"><span>Take profit 1</span><span class="value">'+num(p.target1)+'</span></div>'
-  +'<div class="row"><span>Take profit 2</span><span class="value">'+num(p.target2)+'</span></div>'
+  +'<div class="row"><span>Management checkpoint</span><span class="value">'+num(p.target1)+' • no partial TP order</span></div>'
+  +'<div class="row"><span>Final take profit</span><span class="value">'+num(p.target2)+'</span></div>'
   +'<div class="row"><span>Expires</span><span class="value">'+formatLocalTime(p.valid_until)+' • <span class="countdown" data-valid-until="'+esc(p.valid_until)+'">'+formatCountdown(left)+'</span></span></div>';
 }
 
-function sizingHtml(s){
+function sizingHtml(s,c){
  if(!s)return '';
  const limited=(s.risk_budget_limited_by||[]).join(', ');
- return '<div class="row"><span>Proposed quantity</span><span class="value">'+num(s.proposed_quantity,6)+'</span></div>'
-  +'<div class="row"><span>Risk cluster</span><span class="value">'+esc(s.risk_cluster||'-')+'</span></div>'
-  +'<div class="row"><span>Risk budget now</span><span class="value">$'+num(s.risk_budget_usd,2)+'</span></div>'
-  +'<div class="row"><span>Estimated trade risk</span><span class="value">$'+num(s.risk_amount_usd,2)+'</span></div>'
-  +(limited?'<div class="small">Sizing limited by: '+esc(limited)+'</div>':'');
+ const riskPct=Number(s.equity_usd)>0?Number(s.risk_amount_usd)/Number(s.equity_usd)*100:0;
+ const p=c&&c.locked_trade_plan?c.locked_trade_plan:null;
+ return '<div class="orderbox"><div class="small">STC POSITION SIZE • use this quantity unless the competition platform forces a smaller valid amount</div>'
+  +'<div class="ordername">'+num(s.proposed_quantity,6)+' units/contracts</div>'
+  +'<div class="row"><span>Risk on this trade</span><span class="value">$'+num(s.risk_amount_usd,2)+' • '+num(riskPct,3)+'%</span></div>'
+  +'<div class="row"><span>Configured risk budget</span><span class="value">$'+num(s.risk_budget_usd,2)+' • '+num(Number(s.risk_fraction)*100,3)+'%</span></div>'
+  +'<div class="row"><span>Official max open position</span><span class="value">'+num(s.max_position,6)+'</span></div>'
+  +'<div class="row"><span>Projected open after</span><span class="value">'+num(s.projected_open_quantity,6)+'</span></div>'
+  +(p?'<div class="row"><span>Stop loss</span><span class="value">'+num(p.initial_stop)+'</span></div>':'')
+  +(p?'<div class="row"><span>Final take profit</span><span class="value">'+num(p.target2)+'</span></div>':'')
+  +'<div class="small">Single-TP mode: TP1 is an internal management checkpoint only; do not place a separate TP1 order.</div>'
+  +(limited?'<div class="small wait">Sizing reduced by: '+esc(limited)+'</div>':'')
+  +'</div>';
 }
 
 function macroHtml(m){
@@ -264,7 +272,8 @@ function cardHtml(c,i){
    ?'<span class="badge blocked">WAIT</span>'
    :(active?'<span class="badge active">ACTIVE NOW</span>':'<span class="badge expired">EXPIRED</span>');
  let blockReason='';
- if(!active&&c.recommendation!=='WAIT')blockReason='Expired opportunities are removed automatically from opportunity lists.';
+ if(c.has_open_position)blockReason='An executed position is already tracked for this symbol. New signals are used to manage that position, not to create a replacement trade.';
+ else if(!active&&c.recommendation!=='WAIT')blockReason='Expired opportunities are removed automatically from opportunity lists.';
  else if(!controlOpen)blockReason='SAFE MODE / KILL SWITCH is ON. Enable manual approval mode before approving.';
  else if(!sizingAllowed)blockReason='New entry blocked by sizing / risk capacity.';
  else if(!macroAllowed)blockReason='New entry blocked by macro-risk gate.';
@@ -275,7 +284,7 @@ function cardHtml(c,i){
   +'<div class="row"><span>Latest confirmed bar</span><span class="value">'+formatLocalTime(c.source_close_time||c.source_time)+' • '+formatAgeSeconds(c.source_age_seconds)+'</span></div>'
   +planHtml(c.locked_trade_plan)
   +orderHtml(c,i)
-  +sizingHtml(c.position_sizing)
+  +sizingHtml(c.position_sizing,c)
   +macroHtml(c.macro_context)
   +'<div class="row"><span>Approval</span><span class="value">'+esc(a.decision||'not approved yet')+'</span></div>'
   +'<div class="row"><span>Ready to execute</span><span class="value '+(c.manual_execution_ready?'ok':'wait')+'">'+(c.manual_execution_ready?'YES':'NO')+'</span></div>'
@@ -323,6 +332,17 @@ function riskSummaryFor(competitionId){
  const s=snapshot&&snapshot.portfolio&&snapshot.portfolio.summary?snapshot.portfolio.summary[competitionId]:null;
  return s||{open_positions:0,initial_risk_usd:0,clusters:{}};
 }
+function progressHtml(competitionId){
+ const p=snapshot&&snapshot.competition_progress?snapshot.competition_progress[competitionId]:null;
+ if(!p)return '';
+ return '<div class="orderbox"><div class="small">COMPETITION PROGRESS</div>'
+  +'<div class="row"><span>Qualifying trading days</span><span class="value">'+esc(p.qualifying_trading_days)+' / '+esc(p.required_trading_days)+'</span></div>'
+  +'<div class="row"><span>Days remaining</span><span class="value">'+esc(p.days_remaining)+'</span></div>'
+  +'<div class="row"><span>Trades entered</span><span class="value">'+esc(p.total_entries)+'</span></div>'
+  +'<div class="row"><span>Open / closed</span><span class="value">'+esc(p.open_positions)+' / '+esc(p.closed_positions)+'</span></div>'
+  +'<div class="row"><span>Recorded trade actions</span><span class="value">'+esc(p.position_actions)+'</span></div>'
+  +'<div class="row"><span>Realized competition P/L</span><span class="value">$'+num(p.realized_pnl_usd,2)+'</span></div></div>';
+}
 function accountHtml(account,competitionId){
  if(!account)return '<div class="small">Account state unavailable.</div>';
  const s=riskSummaryFor(competitionId);
@@ -333,7 +353,8 @@ function accountHtml(account,competitionId){
  const clusterHtml=clusters.length
    ?clusters.map(([name,v])=>'<span class="pill">'+esc(name)+': $'+num(v.initial_risk_usd,2)+'</span>').join('')
    :'<span class="small">No open risk clusters.</span>';
- return '<div class="row"><span>Owner-synced equity</span><span class="value">$'+num(account.equity_usd,2)+'</span></div>'
+ return progressHtml(competitionId)
+  +'<div class="row"><span>Owner-synced equity</span><span class="value">$'+num(account.equity_usd,2)+'</span></div>'
   +'<div class="row"><span>STC risk budget / trade</span><span class="value">'+num(Number(account.risk_fraction)*100,2)+'% • $'+num(tradeRisk,2)+'</span></div>'
   +'<div class="row"><span>Open initial risk</span><span class="value">$'+num(s.initial_risk_usd,2)+' / $'+num(portfolioCap,2)+'</span></div>'
   +'<div class="row"><span>Correlation-cluster cap</span><span class="value">$'+num(clusterCap,2)+'</span></div>'
@@ -349,16 +370,22 @@ function managementClass(a){
 function positionHtml(p){
  const m=p.management||{};
  const rotation=p.rotation_candidate;
+ const latest=(p.latest_signal_history||[]).slice(-1)[0]||null;
  let buttons='';
  if(m.action==='PROTECT' && m.suggested_stop)buttons='<button onclick="recordStopUpdate(\''+esc(p.position_id)+'\','+Number(m.suggested_stop)+')">After manual stop change: record</button>';
- if(m.action==='PARTIAL_TAKE_PROFIT')buttons='<button onclick="recordPartial(\''+esc(p.position_id)+'\')">After manual partial close: record</button>';
+ if(m.action==='PARTIAL_TAKE_PROFIT')buttons='<div class="small wait">Partial take-profit is disabled in single-TP mode. Keep the full quantity unless another management rule says EXIT_NOW.</div>';
  if(m.action==='EXIT_NOW')buttons='<button class="danger" onclick="recordClose(\''+esc(p.position_id)+'\')">After manual close: record</button>';
  return '<div class="card">'
-  +'<div class="row"><span>'+esc(p.symbol)+'</span><span class="value '+(p.side==='LONG'?'long':'short')+'">'+esc(p.side)+' × '+num(p.quantity,6)+'</span></div>'
+  +'<div class="statusline"><span class="badge active">EXECUTED • TRACKING</span><span class="pill">'+esc(p.origin==='manual_external'?'Imported manual trade':'STC plan fill')+'</span></div>'
+  +'<div class="row"><span>Symbol</span><span class="value">'+esc(p.symbol)+'</span></div>'
+  +'<div class="row"><span>Position</span><span class="value '+(p.side==='LONG'?'long':'short')+'">'+esc(p.side)+' × '+num(p.quantity,6)+'</span></div>'
+  +'<div class="row"><span>Opened</span><span class="value">'+formatLocalTime(p.opened_at_utc)+'</span></div>'
   +'<div class="row"><span>Entry</span><span class="value">'+num(p.entry_price)+'</span></div>'
   +'<div class="row"><span>Active stop</span><span class="value">'+num(p.current_stop)+'</span></div>'
-  +'<div class="row"><span>TP1 / TP2</span><span class="value">'+num(p.target1)+' / '+num(p.target2)+'</span></div>'
-  +'<div class="row"><span>Supervisor</span><span class="value '+managementClass(m.action)+'">'+esc(m.action||'HOLD')+'</span></div>'
+  +'<div class="row"><span>Management checkpoint</span><span class="value">'+num(p.target1)+' • no partial close</span></div>'
+  +'<div class="row"><span>Final take profit</span><span class="value">'+num(p.target2)+'</span></div>'
+  +(latest?'<div class="row"><span>Latest market check</span><span class="value">'+formatLocalTime(latest.time)+' • '+esc(latest.recommendation)+' '+num(latest.composite_score,2)+' @ '+num(latest.close)+'</span></div>':'')
+  +'<div class="row"><span>What to do now</span><span class="value '+managementClass(m.action)+'">'+esc(m.action||'HOLD')+'</span></div>'
   +'<div class="row"><span>R multiple</span><span class="value">'+num(m.r_multiple,2)+'</span></div>'
   +'<div class="row"><span>Unrealized P/L</span><span class="value">'+(m.unrealized_pnl_usd==null?'-':'$'+num(m.unrealized_pnl_usd,2))+'</span></div>'
   +(m.suggested_stop?'<div class="row"><span>Suggested stop</span><span class="value">'+num(m.suggested_stop)+'</span></div>':'')
@@ -498,6 +525,28 @@ async function updateAccountState(competitionId){
    await api('account_state.php',{method:'POST',body:JSON.stringify({competition_id:competitionId,equity_usd:equity,risk_fraction:pct/100})});
    await refresh();
  }catch(e){alert('Account state update failed: '+e.message);}
+}
+
+async function recordExistingPosition(competitionId){
+ const symbol=String(prompt('Symbol exactly as shown in STC / TradingView','')||'').trim();
+ if(!symbol)return;
+ const side=String(prompt('Side: LONG or SHORT','LONG')||'').trim().toUpperCase();
+ if(!(side==='LONG'||side==='SHORT')){alert('Side must be LONG or SHORT.');return;}
+ const qty=Number(prompt('Quantity currently open',''));
+ const entry=Number(prompt('Actual average entry price',''));
+ const stop=Number(prompt('Current stop price',''));
+ const finalTp=Number(prompt('Final take-profit price (one TP only)',''));
+ if(![qty,entry,stop,finalTp].every(x=>Number.isFinite(x)&&x>0)){alert('Enter valid positive numbers.');return;}
+ const geometryOk=side==='LONG'?(stop<entry&&finalTp>entry):(stop>entry&&finalTp<entry);
+ if(!geometryOk){alert('Stop / take-profit geometry does not match the selected side.');return;}
+ const checkpoint=(entry+finalTp)/2;
+ const openedLocal=String(prompt('Original open time if known (ISO/date-time). Leave blank to use now.','')||'').trim();
+ const openedAt=openedLocal?new Date(openedLocal):new Date();
+ if(Number.isNaN(openedAt.getTime())){alert('Open time is invalid.');return;}
+ if(!confirm('Confirm this trade is ALREADY OPEN in the competition platform. STC will only import and monitor it; no order will be sent.'))return;
+ const body={action:'OPEN',origin:'manual_external',competition_id:competitionId,symbol,side,quantity:qty,entry_price:entry,initial_stop:stop,current_stop:stop,target1:checkpoint,target2:finalTp,opened_at_utc:openedAt.toISOString(),note:'Backfilled existing manual position; single final TP'};
+ try{await api('position.php',{method:'POST',body:JSON.stringify(body)});await refresh();}
+ catch(e){alert('Existing-position record failed: '+e.message);}
 }
 
 async function recordFilledPosition(i){

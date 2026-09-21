@@ -106,8 +106,19 @@ try {
         }
         $now = new DateTimeImmutable('now', new DateTimeZone('UTC'));
         $age = $now->getTimestamp() - $opened->getTimestamp();
-        if ($age < -5 || $age > 86400) {
+        if ($age < -5) {
             stc_json(['ok' => false, 'error' => 'opened_at_out_of_range'], 400);
+        }
+        if ($origin === 'stc_plan' && $age > 86400) {
+            stc_json(['ok' => false, 'error' => 'opened_at_out_of_range'], 400);
+        }
+        if ($origin === 'manual_external') {
+            $competitionStart = $competitionId === 'amp-futures-sep-2026'
+                ? new DateTimeImmutable('2026-09-01T08:00:00+00:00')
+                : new DateTimeImmutable('2026-09-16T08:00:00+00:00');
+            if ($opened < $competitionStart || $opened > $now) {
+                stc_json(['ok' => false, 'error' => 'manual_position_open_time_outside_competition_window'], 400);
+            }
         }
 
         $sourcePlanId = null;
