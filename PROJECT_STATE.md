@@ -921,3 +921,23 @@ Replace the Hostinger production copies with the current main versions of:
 
 After deployment, validate the live console with Safe Mode=true and Kill Switch=true, confirm expired cards disappear on countdown, confirm readable local time/order instructions, and test browser/server notification behavior. Telegram/email delivery still requires private channel configuration and must not be committed to GitHub.
 
+## Persistent executed-position tracking + sizing + qualification progress merged — 2026-09-22
+
+Merged PR #30 to main as commit f01e7a296b20666b61e6a29f8ae77c123bd6e8a0.
+
+Post-merge STC CI run 35660463740 completed successfully.
+
+Owner-facing behavior now implemented in the Hostinger patch set:
+- Executed/open positions are persistent Portfolio Supervisor records and are not replaced by later signals on the same symbol.
+- New same-symbol signals become management evidence for the existing position instead of replacement entry opportunities.
+- Existing manually opened competition positions can be backfilled into STC with original open time, quantity, entry, current stop and one final take-profit.
+- Single-TP owner workflow: target1 is retained only as an internal management checkpoint; target2 is the owner-facing final take-profit. No automatic partial-TP recommendation is generated at the checkpoint.
+- New opportunities show proposed quantity, trade risk in USD/percent, configured risk budget, official max open position and projected open quantity.
+- Competition progress is exposed from recorded position activity, including qualifying trading days, days remaining, entries, open/closed positions, trade actions and realized P/L.
+- Capital.com Africa profile requires 3 qualifying trading days; AMP Futures profile requires 5.
+- Telegram/email notification payloads now include direction/order context, quantity, risk, official max, stop, management checkpoint, final TP and signal score.
+- Manual execution and human approval remain mandatory; no broker order path was added.
+
+Production deployment is still required for Hostinger to use the new main-branch patch files.
+Telegram delivery additionally requires private Hostinger config values for telegram_bot_token and telegram_chat_id; never commit those secrets to GitHub.
+
