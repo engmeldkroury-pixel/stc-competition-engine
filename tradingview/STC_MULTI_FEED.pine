@@ -1,31 +1,19 @@
 //@version=6
-indicator("STC Capital Multi Feed v0.6 Stateful Visual", overlay=true, max_labels_count=100)
+indicator("STC Capital Multi Feed v0.7 Historical Context", overlay=true, max_labels_count=20)
 
-// -----------------------------------------------------------------------------
-// Production feed settings.
-// The backend feed remains on its own fixed timeframe even if the chart timeframe
-// is changed for visual analysis.
-// -----------------------------------------------------------------------------
-competitionId = input.string(
-    "capital-africa-sep-2026",
-    "Competition ID",
-    options=["capital-africa-sep-2026"],
-    group="Production feed"
-)
+// Production feed
+competitionId = input.string("capital-africa-sep-2026", "Competition ID", options=["capital-africa-sep-2026"], group="Production feed")
 feedTf = input.timeframe("15", "Production feed timeframe", group="Production feed")
 feedEnabled = input.bool(true, "Enable webhook feed", group="Production feed")
 
-// -----------------------------------------------------------------------------
-// Visual analysis settings.
-// These affect chart-only zones. They do NOT place trades and are not sent as an
-// approval. They update automatically when the chart timeframe or candles change.
-// -----------------------------------------------------------------------------
+// Visual analysis
 showZones = input.bool(true, "Show entry / stop / exit zones", group="Visual analysis")
 showEMAs = input.bool(true, "Show EMA 20 / 50 / 200", group="Visual analysis")
-showStructure = input.bool(true, "Show dynamic support / resistance", group="Visual analysis")
-showBiasBackground = input.bool(true, "Shade chart by directional bias", group="Visual analysis")
-showDashboard = input.bool(true, "Show analysis dashboard", group="Visual analysis")
-
+showStructure = input.bool(false, "Show dynamic support / resistance", group="Visual analysis")
+showBiasBackground = input.bool(false, "Shade chart by live directional bias", group="Visual analysis")
+showDashboard = input.bool(true, "Show setup dashboard", group="Visual analysis")
+showCurrentSetupLabel = input.bool(true, "Show current locked setup label", group="Visual analysis")
+showHistoricalSetupLabels = input.bool(false, "Show historical LONG/SHORT labels", group="Visual analysis")
 structureLen = input.int(34, "Structure lookback bars", minval=10, maxval=200, group="Visual analysis")
 htfMultiplier = input.float(4.0, "Higher-timeframe multiplier", minval=2.0, maxval=12.0, step=1.0, group="Visual analysis")
 setupThreshold = input.float(0.50, "Setup threshold", minval=0.20, maxval=0.90, step=0.05, group="Visual analysis")
@@ -35,9 +23,6 @@ target1R = input.float(1.50, "Target 1 reward/risk", minval=0.50, maxval=5.00, s
 target2R = input.float(2.50, "Target 2 reward/risk", minval=1.00, maxval=8.00, step=0.25, group="Visual analysis")
 setupLifetimeBars = input.int(4, "Locked setup lifetime (bars)", minval=1, maxval=50, group="Visual analysis")
 
-// -----------------------------------------------------------------------------
-// Multi-symbol production payload.
-// -----------------------------------------------------------------------------
 type FeedBar
     int t
     float o
@@ -53,102 +38,154 @@ type FeedBar
     float macdSignal
     float volumeRatio
 
+type HistoryBar
+    int t
+    float c
+    float ema50
+    float ema200
+    float rsi14
+    float atr14
+    float high252
+    float low252
+    float momentum20
+    float momentum63
+    float momentum126
+    float momentum252
+    float volatility20
+
 makeFeedBar() =>
     [macdLine, signalLine, _] = ta.macd(close, 12, 26, 9)
     volSma = ta.sma(volume, 20)
-    FeedBar.new(
-        time,
-        open,
-        high,
-        low,
-        close,
-        volume,
-        ta.ema(close, 20),
-        ta.ema(close, 50),
-        ta.rsi(close, 14),
-        ta.atr(14),
-        macdLine,
-        signalLine,
-        not na(volume) and volSma > 0 ? volume / volSma : 1.0
-    )
+    FeedBar.new(time, open, high, low, close, volume, ta.ema(close, 20), ta.ema(close, 50), ta.rsi(close, 14), ta.atr(14), macdLine, signalLine, not na(volume) and volSma > 0 ? volume / volSma : 1.0)
 
 feedBar(string symbol) =>
-    request.security(
-        symbol,
-        feedTf,
-        makeFeedBar(),
-        gaps=barmerge.gaps_off,
-        lookahead=barmerge.lookahead_off,
-        ignore_invalid_symbol=false
-    )
+    request.security(symbol, feedTf, makeFeedBar(), gaps=barmerge.gaps_off, lookahead=barmerge.lookahead_off, ignore_invalid_symbol=false)
 
-buildMessage(string symbol, FeedBar d) =>
+makeHistoryBar() =>
+    m20 = close[21] != 0 ? close[1] / close[21] - 1.0 : 0.0
+    m63 = close[64] != 0 ? close[1] / close[64] - 1.0 : 0.0
+    m126 = close[127] != 0 ? close[1] / close[127] - 1.0 : 0.0
+    m252 = close[253] != 0 ? close[1] / close[253] - 1.0 : 0.0
+    vol20 = close[1] != 0 ? ta.atr(20)[1] / close[1] : 0.0
+    HistoryBar.new(time[1], close[1], ta.ema(close, 50)[1], ta.ema(close, 200)[1], ta.rsi(close, 14)[1], ta.atr(14)[1], ta.highest(high, 252)[1], ta.lowest(low, 252)[1], m20, m63, m126, m252, vol20)
+
+historyBar(string symbol) =>
+    request.security(symbol, "1D", makeHistoryBar(), gaps=barmerge.gaps_off, lookahead=barmerge.lookahead_on, ignore_invalid_symbol=false)
+
+buildMessage(string symbol, FeedBar d, HistoryBar h) =>
     eventId = competitionId + "|" + symbol + "|" + feedTf + "|" + str.tostring(d.t)
-    '{' +
-      '"event_id":"' + eventId + '",' +
-      '"event":"bar_close",' +
-      '"competition_id":"' + competitionId + '",' +
-      '"symbol":"' + symbol + '",' +
-      '"timeframe":"' + feedTf + '",' +
-      '"time":"' + str.format_time(d.t, "yyyy-MM-dd'T'HH:mm:ss'Z'", "UTC") + '",' +
-      '"open":' + str.tostring(d.o) + ',' +
-      '"high":' + str.tostring(d.h) + ',' +
-      '"low":' + str.tostring(d.l) + ',' +
-      '"close":' + str.tostring(d.c) + ',' +
-      '"volume":' + str.tostring(d.v) + ',' +
-      '"ema20":' + str.tostring(d.ema20) + ',' +
-      '"ema50":' + str.tostring(d.ema50) + ',' +
-      '"rsi14":' + str.tostring(d.rsi14) + ',' +
-      '"atr14":' + str.tostring(d.atr14) + ',' +
-      '"macd":' + str.tostring(d.macd) + ',' +
-      '"macd_signal":' + str.tostring(d.macdSignal) + ',' +
-      '"volume_ratio":' + str.tostring(d.volumeRatio) +
-      '}'
+    msg = (
+        '{"event_id":"' + eventId + '",' +
+        '"event":"bar_close",' +
+        '"competition_id":"' + competitionId + '",' +
+        '"symbol":"' + symbol + '",' +
+        '"timeframe":"' + feedTf + '",' +
+        '"time":"' + str.format_time(d.t, "yyyy-MM-dd'T'HH:mm:ss'Z'", "UTC") + '",' +
+        '"open":' + str.tostring(d.o) + ',' +
+        '"high":' + str.tostring(d.h) + ',' +
+        '"low":' + str.tostring(d.l) + ',' +
+        '"close":' + str.tostring(d.c) + ',' +
+        '"volume":' + str.tostring(d.v) + ',' +
+        '"ema20":' + str.tostring(d.ema20) + ',' +
+        '"ema50":' + str.tostring(d.ema50) + ',' +
+        '"rsi14":' + str.tostring(d.rsi14) + ',' +
+        '"atr14":' + str.tostring(d.atr14) + ',' +
+        '"macd":' + str.tostring(d.macd) + ',' +
+        '"macd_signal":' + str.tostring(d.macdSignal) + ',' +
+        '"volume_ratio":' + str.tostring(d.volumeRatio) + ',' +
+        '"history_timeframe":"1D",' +
+        '"history_time":"' + str.format_time(h.t, "yyyy-MM-dd'T'HH:mm:ss'Z'", "UTC") + '",' +
+        '"history_close":' + str.tostring(h.c) + ',' +
+        '"history_ema50":' + str.tostring(h.ema50) + ',' +
+        '"history_ema200":' + str.tostring(h.ema200) + ',' +
+        '"history_rsi14":' + str.tostring(h.rsi14) + ',' +
+        '"history_atr14":' + str.tostring(h.atr14) + ',' +
+        '"history_high_252":' + str.tostring(h.high252) + ',' +
+        '"history_low_252":' + str.tostring(h.low252) + ',' +
+        '"history_momentum_20":' + str.tostring(h.momentum20) + ',' +
+        '"history_momentum_63":' + str.tostring(h.momentum63) + ',' +
+        '"history_momentum_126":' + str.tostring(h.momentum126) + ',' +
+        '"history_momentum_252":' + str.tostring(h.momentum252) + ',' +
+        '"history_volatility_20":' + str.tostring(h.volatility20) +
+        '}'
+    )
+    msg
 
-var array<string> symbols = array.from(
-    "CAPITALCOM:BTCUSD",
-    "CAPITALCOM:ETHUSD",
-    "CAPITALCOM:DOGEUSD",
-    "CAPITALCOM:EURUSD",
-    "CAPITALCOM:AUDUSD",
-    "CAPITALCOM:USDZAR",
-    "CAPITALCOM:XAUUSD",
-    "CAPITALCOM:XAGUSD",
-    "CAPITALCOM:SPX500",
-    "CAPITALCOM:NAS100"
-)
+// Explicit production feeds
+btc = feedBar("CAPITALCOM:BTCUSD")
+eth = feedBar("CAPITALCOM:ETHUSD")
+doge = feedBar("CAPITALCOM:DOGEUSD")
+eur = feedBar("CAPITALCOM:EURUSD")
+aud = feedBar("CAPITALCOM:AUDUSD")
+zar = feedBar("CAPITALCOM:USDZAR")
+xau = feedBar("CAPITALCOM:XAUUSD")
+xag = feedBar("CAPITALCOM:XAGUSD")
+spx = feedBar("CAPITALCOM:SPX500")
+nas = feedBar("CAPITALCOM:NAS100")
 
-// Intrabar-persistent state prevents duplicate alert() calls on realtime rollback.
-varip array<int> lastSentTimes = array.new_int(array.size(symbols), na)
+btcH = historyBar("CAPITALCOM:BTCUSD")
+ethH = historyBar("CAPITALCOM:ETHUSD")
+dogeH = historyBar("CAPITALCOM:DOGEUSD")
+eurH = historyBar("CAPITALCOM:EURUSD")
+audH = historyBar("CAPITALCOM:AUDUSD")
+zarH = historyBar("CAPITALCOM:USDZAR")
+xauH = historyBar("CAPITALCOM:XAUUSD")
+xagH = historyBar("CAPITALCOM:XAGUSD")
+spxH = historyBar("CAPITALCOM:SPX500")
+nasH = historyBar("CAPITALCOM:NAS100")
 
-if feedEnabled and barstate.isconfirmed
-    for i = 0 to array.size(symbols) - 1
-        symbol = array.get(symbols, i)
-        d = feedBar(symbol)
-        previousTime = array.get(lastSentTimes, i)
+// Intrabar duplicate protection
+varip int lastBTC = na
+varip int lastETH = na
+varip int lastDOGE = na
+varip int lastEUR = na
+varip int lastAUD = na
+varip int lastZAR = na
+varip int lastXAU = na
+varip int lastXAG = na
+varip int lastSPX = na
+varip int lastNAS = na
 
-        if not na(d.t) and not na(d.c) and (na(previousTime) or d.t != previousTime)
-            array.set(lastSentTimes, i, d.t)
+if feedEnabled and barstate.isconfirmed and barstate.isrealtime
+    if not na(btc.t) and not na(btc.c) and (na(lastBTC) or btc.t != lastBTC)
+        lastBTC := btc.t
+        alert(buildMessage("CAPITALCOM:BTCUSD", btc, btcH), alert.freq_all)
+    if not na(eth.t) and not na(eth.c) and (na(lastETH) or eth.t != lastETH)
+        lastETH := eth.t
+        alert(buildMessage("CAPITALCOM:ETHUSD", eth, ethH), alert.freq_all)
+    if not na(doge.t) and not na(doge.c) and (na(lastDOGE) or doge.t != lastDOGE)
+        lastDOGE := doge.t
+        alert(buildMessage("CAPITALCOM:DOGEUSD", doge, dogeH), alert.freq_all)
+    if not na(eur.t) and not na(eur.c) and (na(lastEUR) or eur.t != lastEUR)
+        lastEUR := eur.t
+        alert(buildMessage("CAPITALCOM:EURUSD", eur, eurH), alert.freq_all)
+    if not na(aud.t) and not na(aud.c) and (na(lastAUD) or aud.t != lastAUD)
+        lastAUD := aud.t
+        alert(buildMessage("CAPITALCOM:AUDUSD", aud, audH), alert.freq_all)
+    if not na(zar.t) and not na(zar.c) and (na(lastZAR) or zar.t != lastZAR)
+        lastZAR := zar.t
+        alert(buildMessage("CAPITALCOM:USDZAR", zar, zarH), alert.freq_all)
+    if not na(xau.t) and not na(xau.c) and (na(lastXAU) or xau.t != lastXAU)
+        lastXAU := xau.t
+        alert(buildMessage("CAPITALCOM:XAUUSD", xau, xauH), alert.freq_all)
+    if not na(xag.t) and not na(xag.c) and (na(lastXAG) or xag.t != lastXAG)
+        lastXAG := xag.t
+        alert(buildMessage("CAPITALCOM:XAGUSD", xag, xagH), alert.freq_all)
+    if not na(spx.t) and not na(spx.c) and (na(lastSPX) or spx.t != lastSPX)
+        lastSPX := spx.t
+        alert(buildMessage("CAPITALCOM:SPX500", spx, spxH), alert.freq_all)
+    if not na(nas.t) and not na(nas.c) and (na(lastNAS) or nas.t != lastNAS)
+        lastNAS := nas.t
+        alert(buildMessage("CAPITALCOM:NAS100", nas, nasH), alert.freq_all)
 
-            if barstate.isrealtime
-                alert(buildMessage(symbol, d), alert.freq_all)
-
-// -----------------------------------------------------------------------------
-// Current-chart visual engine.
-// It combines trend, higher-timeframe trend, momentum, directional strength,
-// market structure, volatility/mean location, volume confirmation, and candle
-// direction. This is a technical-analysis layer only; macro/news/fundamentals
-// remain an external engine concern.
-// -----------------------------------------------------------------------------
+// Current-chart technical engine
 ema20v = ta.ema(close, 20)
 ema50v = ta.ema(close, 50)
 ema200v = ta.ema(close, 200)
-
 rsi14v = ta.rsi(close, 14)
 atr14v = ta.atr(14)
 [macdLineV, macdSignalV, _] = ta.macd(close, 12, 26, 9)
 [plusDI, minusDI, adxV] = ta.dmi(14, 14)
-
 volSmaV = ta.sma(volume, 20)
 volumeRatioV = not na(volume) and volSmaV > 0 ? volume / volSmaV : 1.0
 
@@ -163,12 +200,10 @@ rangeMid = (swingHigh + swingLow) / 2.0
 
 chartSeconds = timeframe.in_seconds()
 higherTf = timeframe.from_seconds(int((na(chartSeconds) ? 900.0 : chartSeconds) * htfMultiplier))
-
-// Previous confirmed HTF values reduce repainting from the still-open higher bar.
 htfEma50 = request.security(syminfo.tickerid, higherTf, ta.ema(close, 50)[1], lookahead=barmerge.lookahead_on)
 htfEma200 = request.security(syminfo.tickerid, higherTf, ta.ema(close, 200)[1], lookahead=barmerge.lookahead_on)
 
-// Composite directional score: -10 .. +10.
+// Composite directional score
 rawScore = 0.0
 rawScore += ema20v >= ema50v ? 1.0 : -1.0
 rawScore += ema50v >= ema200v ? 1.0 : -1.0
@@ -183,7 +218,7 @@ rawScore += volumeRatioV >= 1.0 ? (close >= open ? 1.0 : -1.0) : 0.0
 score = rawScore / 10.0
 setupDir = score >= setupThreshold ? 1 : score <= -setupThreshold ? -1 : 0
 
-// Dynamic candidate zones for the current chart symbol/timeframe.
+// Candidate calculations
 trendAnchor = (ema20v + ema50v) / 2.0
 
 longCenterBase = math.min(close, trendAnchor)
@@ -206,12 +241,7 @@ shortRisk = math.max(shortStop - shortEntryMid, atr14v)
 shortTarget1 = math.min(swingLow, shortEntryMid - shortRisk * target1R)
 shortTarget2 = math.min(shortTarget1 - atr14v * 0.25, shortEntryMid - shortRisk * target2R)
 
-// -----------------------------------------------------------------------------
-// Stateful technical setup lock.
-// A setup is created only from a confirmed chart bar and its levels stay fixed
-// until expiry or invalidation. This is chart-only technical state; the backend
-// locked trade plan remains the authoritative multi-factor/manual-approval plan.
-// -----------------------------------------------------------------------------
+// Stateful technical setup lock
 var int lockedDir = 0
 var int lockedAtBar = na
 var float lockedEntryLow = na
@@ -234,7 +264,6 @@ if barstate.isconfirmed
         lockedTarget1 := na
         lockedTarget2 := na
         lockedScore := na
-
     if lockedDir == 0 and setupDir != 0
         lockedDir := setupDir
         lockedAtBar := bar_index
@@ -254,72 +283,78 @@ target2 = lockedDir != 0 ? lockedTarget2 : na
 biasColor = lockedDir == 1 ? color.lime : lockedDir == -1 ? color.red : color.gray
 entryColor = lockedDir == 1 ? color.aqua : lockedDir == -1 ? color.orange : color.gray
 
-plot(showEMAs ? ema20v : na, "EMA 20", color=color.new(color.aqua, 0), linewidth=2)
-plot(showEMAs ? ema50v : na, "EMA 50", color=color.new(color.blue, 0), linewidth=2)
-plot(showEMAs ? ema200v : na, "EMA 200", color=color.new(color.purple, 0), linewidth=2)
+// Visual plots
+plot(showEMAs ? ema20v : na, "EMA 20", color=color.aqua, linewidth=2)
+plot(showEMAs ? ema50v : na, "EMA 50", color=color.blue, linewidth=2)
+plot(showEMAs ? ema200v : na, "EMA 200", color=color.purple, linewidth=2)
 
 plot(showStructure ? swingHigh : na, "Dynamic resistance", color=color.new(color.red, 55), linewidth=1, style=plot.style_linebr)
 plot(showStructure ? swingLow : na, "Dynamic support", color=color.new(color.lime, 55), linewidth=1, style=plot.style_linebr)
 
-pEntryLow = plot(showZones ? entryLow : na, "Entry zone low", color=color.new(entryColor, 0), linewidth=1, style=plot.style_linebr)
-pEntryHigh = plot(showZones ? entryHigh : na, "Entry zone high", color=color.new(entryColor, 0), linewidth=1, style=plot.style_linebr)
+pEntryLow = plot(showZones ? entryLow : na, "Entry zone low", color=entryColor, linewidth=1, style=plot.style_linebr)
+pEntryHigh = plot(showZones ? entryHigh : na, "Entry zone high", color=entryColor, linewidth=1, style=plot.style_linebr)
 fill(pEntryLow, pEntryHigh, color=color.new(entryColor, 84), title="Entry zone")
 
-plot(showZones ? stopLevel : na, "Invalidation / Stop", color=color.new(color.red, 0), linewidth=2, style=plot.style_linebr)
+plot(showZones ? stopLevel : na, "Invalidation / Stop", color=color.red, linewidth=2, style=plot.style_linebr)
 
-pTarget1 = plot(showZones ? target1 : na, "Exit zone start / TP1", color=color.new(color.green, 0), linewidth=1, style=plot.style_linebr)
-pTarget2 = plot(showZones ? target2 : na, "Exit zone end / TP2", color=color.new(color.green, 0), linewidth=2, style=plot.style_linebr)
+pTarget1 = plot(showZones ? target1 : na, "Exit zone start / TP1", color=color.green, linewidth=1, style=plot.style_linebr)
+pTarget2 = plot(showZones ? target2 : na, "Exit zone end / TP2", color=color.green, linewidth=2, style=plot.style_linebr)
 fill(pTarget1, pTarget2, color=color.new(color.green, 86), title="Exit / target zone")
 
-bgcolor(
-    showBiasBackground
-        ? setupDir == 1
-            ? color.new(color.green, 94)
-            : setupDir == -1
-                ? color.new(color.red, 94)
-                : na
-        : na
-)
+bgcolor(showBiasBackground ? (setupDir == 1 ? color.new(color.green, 94) : setupDir == -1 ? color.new(color.red, 94) : na) : na)
 
 newLong = lockedDir == 1 and lockedDir[1] != 1
 newShort = lockedDir == -1 and lockedDir[1] != -1
+plotshape(showHistoricalSetupLabels and newLong, title="Historical bullish setup", style=shape.labelup, location=location.belowbar, color=color.lime, text="LONG", textcolor=color.black, size=size.tiny)
+plotshape(showHistoricalSetupLabels and newShort, title="Historical bearish setup", style=shape.labeldown, location=location.abovebar, color=color.red, text="SHORT", textcolor=color.white, size=size.tiny)
 
-plotshape(newLong, title="New bullish setup", style=shape.labelup, location=location.belowbar, color=color.new(color.lime, 0), text="LONG\nZONE", textcolor=color.black, size=size.tiny)
-plotshape(newShort, title="New bearish setup", style=shape.labeldown, location=location.abovebar, color=color.new(color.red, 0), text="SHORT\nZONE", textcolor=color.white, size=size.tiny)
+// One current setup label only. It is refreshed on the last bar so the chart stays readable.
+var label currentSetupLabel = na
+if barstate.islast
+    if not na(currentSetupLabel)
+        label.delete(currentSetupLabel)
+        currentSetupLabel := na
+    if showCurrentSetupLabel and lockedDir != 0
+        setupSide = lockedDir == 1 ? "LONG" : "SHORT"
+        setupTextLabel = setupSide + "\nENTRY " + str.tostring(entryLow, format.mintick) + " - " + str.tostring(entryHigh, format.mintick) + "\nSL " + str.tostring(stopLevel, format.mintick) + "\nTP1 " + str.tostring(target1, format.mintick) + "\nTP2 " + str.tostring(target2, format.mintick)
+        setupY = lockedDir == 1 ? low - atr14v * 0.6 : high + atr14v * 0.6
+        currentSetupLabel := label.new(bar_index, setupY, setupTextLabel, style=lockedDir == 1 ? label.style_label_up : label.style_label_down, color=lockedDir == 1 ? color.new(color.green, 0) : color.new(color.red, 0), textcolor=color.white, size=size.small)
 
-// -----------------------------------------------------------------------------
-// Visual dashboard.
-// -----------------------------------------------------------------------------
-var table dashboard = table.new(position.top_right, 2, 9, border_width=1)
+// Dashboard
+var table dashboard = table.new(position.top_right, 2, 12, border_width=1)
 
 if barstate.islast
     if showDashboard
-        setupText = lockedDir == 1 ? "LOCKED LONG SETUP" : lockedDir == -1 ? "LOCKED SHORT SETUP" : "SCANNING / WAIT"
-        table.cell(dashboard, 0, 0, "STC Visual", bgcolor=color.new(color.black, 10), text_color=color.white)
-        table.cell(dashboard, 1, 0, setupText, bgcolor=color.new(biasColor, 70), text_color=color.white)
-
-        table.cell(dashboard, 0, 1, "Score", text_color=color.white)
-        table.cell(dashboard, 1, 1, str.tostring(math.round((lockedDir != 0 ? lockedScore : score) * 100.0)) + "%", text_color=color.white)
-
-        table.cell(dashboard, 0, 2, "Chart TF", text_color=color.white)
-        table.cell(dashboard, 1, 2, timeframe.period, text_color=color.white)
-
-        table.cell(dashboard, 0, 3, "Confirm TF", text_color=color.white)
-        table.cell(dashboard, 1, 3, higherTf, text_color=color.white)
-
-        table.cell(dashboard, 0, 4, "RSI 14", text_color=color.white)
-        table.cell(dashboard, 1, 4, str.tostring(rsi14v, "#.0"), text_color=color.white)
-
-        table.cell(dashboard, 0, 5, "ADX", text_color=color.white)
-        table.cell(dashboard, 1, 5, str.tostring(adxV, "#.0"), text_color=color.white)
-
-        table.cell(dashboard, 0, 6, "ATR 14", text_color=color.white)
-        table.cell(dashboard, 1, 6, str.tostring(atr14v, format.mintick), text_color=color.white)
-
-        table.cell(dashboard, 0, 7, "Volume x", text_color=color.white)
-        table.cell(dashboard, 1, 7, str.tostring(volumeRatioV, "#.00"), text_color=color.white)
-
-        table.cell(dashboard, 0, 8, "Feed", text_color=color.white)
-        table.cell(dashboard, 1, 8, feedEnabled ? "ON " + feedTf : "OFF", text_color=color.white)
+        setupText = lockedDir == 1 ? "LOCKED LONG" : lockedDir == -1 ? "LOCKED SHORT" : "SCANNING / WAIT"
+        liveBiasText = setupDir == 1 ? "BULLISH" : setupDir == -1 ? "BEARISH" : "NEUTRAL"
+        displayScore = lockedDir != 0 ? lockedScore : score
+        entryText = lockedDir != 0 ? str.tostring(entryLow, format.mintick) + " - " + str.tostring(entryHigh, format.mintick) : "-"
+        stopText = lockedDir != 0 ? str.tostring(stopLevel, format.mintick) : "-"
+        tp1Text = lockedDir != 0 ? str.tostring(target1, format.mintick) : "-"
+        tp2Text = lockedDir != 0 ? str.tostring(target2, format.mintick) : "-"
+        table.cell(dashboard, 0, 0, "SETUP", bgcolor=color.new(color.black, 10), text_color=color.white)
+        table.cell(dashboard, 1, 0, setupText, bgcolor=color.new(biasColor, 65), text_color=color.white)
+        table.cell(dashboard, 0, 1, "ENTRY", text_color=color.white)
+        table.cell(dashboard, 1, 1, entryText, text_color=color.white)
+        table.cell(dashboard, 0, 2, "STOP", text_color=color.white)
+        table.cell(dashboard, 1, 2, stopText, text_color=color.red)
+        table.cell(dashboard, 0, 3, "TP1", text_color=color.white)
+        table.cell(dashboard, 1, 3, tp1Text, text_color=color.lime)
+        table.cell(dashboard, 0, 4, "TP2", text_color=color.white)
+        table.cell(dashboard, 1, 4, tp2Text, text_color=color.lime)
+        table.cell(dashboard, 0, 5, "LOCKED SCORE", text_color=color.white)
+        table.cell(dashboard, 1, 5, str.tostring(math.round(displayScore * 100.0)) + "%", text_color=color.white)
+        table.cell(dashboard, 0, 6, "LIVE BIAS", text_color=color.white)
+        table.cell(dashboard, 1, 6, liveBiasText, text_color=setupDir == 1 ? color.lime : setupDir == -1 ? color.red : color.silver)
+        table.cell(dashboard, 0, 7, "CHART TF", text_color=color.white)
+        table.cell(dashboard, 1, 7, timeframe.period, text_color=color.white)
+        table.cell(dashboard, 0, 8, "CONFIRM TF", text_color=color.white)
+        table.cell(dashboard, 1, 8, higherTf, text_color=color.white)
+        table.cell(dashboard, 0, 9, "RSI / ADX", text_color=color.white)
+        table.cell(dashboard, 1, 9, str.tostring(rsi14v, "#.0") + " / " + str.tostring(adxV, "#.0"), text_color=color.white)
+        table.cell(dashboard, 0, 10, "VOLUME x", text_color=color.white)
+        table.cell(dashboard, 1, 10, str.tostring(volumeRatioV, "#.00"), text_color=color.white)
+        table.cell(dashboard, 0, 11, "FEED", text_color=color.white)
+        table.cell(dashboard, 1, 11, feedEnabled ? "ON " + feedTf : "OFF", text_color=color.white)
     else
-        table.clear(dashboard, 0, 0, 1, 8)
+        table.clear(dashboard, 0, 0, 1, 11)

@@ -5,7 +5,7 @@ PINE = Path(__file__).resolve().parents[1] / "tradingview" / "STC_MULTI_FEED.pin
 
 def test_visual_version_and_overlay():
     text = PINE.read_text(encoding="utf-8")
-    assert 'indicator("STC Capital Multi Feed v0.6 Stateful Visual", overlay=true' in text
+    assert 'indicator("STC Capital Multi Feed v0.7 Historical Context", overlay=true' in text
 
 
 def test_visual_engine_has_multi_factor_analysis():
@@ -55,12 +55,13 @@ def test_visual_layer_does_not_place_orders_or_change_approval_contract():
     assert "strategy.exit" not in text
     assert "strategy.order" not in text
     assert "approved" not in text
-    assert "alert(buildMessage(symbol, d), alert.freq_all)" in text
+    assert 'alert(buildMessage("CAPITALCOM:BTCUSD", btc, btcH), alert.freq_all)' in text
 
 
 def test_fire_control_fix_is_preserved():
     text = PINE.read_text(encoding="utf-8")
-    assert "varip array<int> lastSentTimes" in text
+    assert "varip int lastBTC = na" in text
+    assert "varip int lastNAS = na" in text
 
 
 def test_stateful_visual_setup_locks_levels_until_expiry_or_invalidation():

@@ -42,6 +42,26 @@ class TechnicalAnalysisResult(BaseModel):
     regime: Literal["bullish", "bearish", "mixed"]
 
 
+class HistoricalRegimeResult(BaseModel):
+    symbol: str
+    timeframe: Literal["1D"] = "1D"
+    bars_used: int
+    latest_close: float
+    ema50: float
+    ema200: float
+    rsi14: float
+    atr14: float
+    high_252: float
+    low_252: float
+    momentum_20: float
+    momentum_63: float
+    momentum_126: float
+    momentum_252: float
+    volatility_20: float
+    regime_score: float = Field(ge=-1.0, le=1.0)
+    regime: Literal["bullish", "bearish", "mixed"]
+
+
 class FactorScores(BaseModel):
     technical: float = Field(ge=-1.0, le=1.0)
     news: float = Field(default=0.0, ge=-1.0, le=1.0)
@@ -127,6 +147,55 @@ class TradingViewWebhook(BaseModel):
     macd: float
     macd_signal: float
     volume_ratio: float = 1.0
+    history_timeframe: str | None = None
+    history_time: datetime | None = None
+    history_close: float | None = None
+    history_ema50: float | None = None
+    history_ema200: float | None = None
+    history_rsi14: float | None = None
+    history_atr14: float | None = None
+    history_high_252: float | None = None
+    history_low_252: float | None = None
+    history_momentum_20: float | None = None
+    history_momentum_63: float | None = None
+    history_momentum_126: float | None = None
+    history_momentum_252: float | None = None
+    history_volatility_20: float | None = None
+
+    @model_validator(mode="after")
+    def validate_history_context(self):
+        names = (
+            "history_timeframe",
+            "history_time",
+            "history_close",
+            "history_ema50",
+            "history_ema200",
+            "history_rsi14",
+            "history_atr14",
+            "history_high_252",
+            "history_low_252",
+            "history_momentum_20",
+            "history_momentum_63",
+            "history_momentum_126",
+            "history_momentum_252",
+            "history_volatility_20",
+        )
+        values = [getattr(self, name) for name in names]
+        present = [value is not None for value in values]
+        if any(present) and not all(present):
+            raise ValueError("historical context must be complete or absent")
+        if all(present):
+            if self.history_timeframe != "1D":
+                raise ValueError("historical context timeframe must be 1D")
+            if self.history_high_252 < self.history_low_252:
+                raise ValueError("history_high_252 must be >= history_low_252")
+            if not self.history_low_252 <= self.history_close <= self.history_high_252:
+                raise ValueError("history_close must be within the 252-day range")
+            if not 0 <= self.history_rsi14 <= 100:
+                raise ValueError("history_rsi14 must be between 0 and 100")
+            if self.history_atr14 < 0 or self.history_volatility_20 < 0:
+                raise ValueError("historical volatility values must be non-negative")
+        return self
 
 
 class TradeEvent(BaseModel):
