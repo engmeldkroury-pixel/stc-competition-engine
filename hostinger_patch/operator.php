@@ -29,9 +29,11 @@ input{width:100%}button{cursor:pointer}.primary{background:#1d4ed8}.danger{backg
 <div class="controls">
 <input id="token" type="password" autocomplete="off" placeholder="Owner token — kept only in page memory">
 <button class="primary" id="refresh">Refresh</button>
+<button id="notify">Enable browser alerts</button>
 <button id="logout">Clear token</button>
 </div>
 <div id="status" class="small" style="margin-top:8px">Not connected</div>
+<div id="autostatus" class="small" style="margin-top:4px">Auto refresh: OFF</div>
 </div>
 
 <div id="runtime" class="bar">Runtime controls not loaded.</div>
@@ -40,12 +42,19 @@ input{width:100%}button{cursor:pointer}.primary{background:#1d4ed8}.danger{backg
 <script>
 const $=id=>document.getElementById(id);
 let snapshot=null;
+let autoTimer=null;
+let autoCountdown=null;
+let secondsToRefresh=30;
+let initializedSignals=false;
+const seenSignalPlans=new Set();
 function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
 function num(x,d=4){const n=Number(x);return Number.isFinite(n)?n.toFixed(d):'-'}
 function auth(){const t=$('token').value.trim();return {'Authorization':'Bearer '+t,'Content-Type':'application/json'}}
 async function api(path,opts={}){const r=await fetch(path,{cache:'no-store',...opts,headers:{...auth(),...(opts.headers||{})}});const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error((j&&j.error)||('HTTP '+r.status));return j}
 function runtimeHtml(r){
- return '<div class="row"><span>Safe Mode</span><span class="value '+(r.safe_mode?'bad':'ok')+'">'+esc(r.safe_mode)+'</span></div>'
+ return '<div class="row"><span>Decision timeframe</span><span class="value">15m</span></div>'
+ +'<div class="row"><span>Historical context</span><span class="value">1D / 252 trading days</span></div>'
+ +'<div class="row"><span>Safe Mode</span><span class="value '+(r.safe_mode?'bad':'ok')+'">'+esc(r.safe_mode)+'</span></div>'
  +'<div class="row"><span>Kill Switch</span><span class="value '+(r.kill_switch?'bad':'ok')+'">'+esc(r.kill_switch)+'</span></div>'
  +'<div class="row"><span>Version</span><span class="value">'+esc(r.version)+'</span></div>'
  +'<div class="controls" style="margin-top:10px"><input id="reason" placeholder="Reason for control change">'
@@ -55,10 +64,14 @@ function runtimeHtml(r){
 }
 function planHtml(p){
  if(!p)return '<div class="row"><span>Locked plan</span><span class="value">None</span></div>';
- return '<div class="row"><span>Entry</span><span class="value">'+num(p.entry_min)+' - '+num(p.entry_max)+'</span></div>'
+ return '<div class="row"><span>Direction</span><span class="value">'+esc(p.direction||'-')+'</span></div>'
+ +'<div class="row"><span>Decision TF</span><span class="value">'+esc(p.decision_timeframe||'15')+'</span></div>'
+ +'<div class="row"><span>Entry</span><span class="value">'+num(p.entry_min)+' - '+num(p.entry_max)+'</span></div>'
  +'<div class="row"><span>Stop</span><span class="value">'+num(p.initial_stop)+'</span></div>'
  +'<div class="row"><span>TP1</span><span class="value">'+num(p.target1)+'</span></div>'
  +'<div class="row"><span>TP2</span><span class="value">'+num(p.target2)+'</span></div>'
+ +'<div class="row"><span>Risk / unit</span><span class="value">'+num(p.risk_per_unit)+'</span></div>'
+ +'<div class="row"><span>Valid until</span><span class="value">'+esc(p.valid_until||'-')+'</span></div>'
  +'<div class="small">Plan: '+esc(p.plan_id)+'</div>';
 }
 function cardHtml(c,i){
@@ -77,15 +90,63 @@ function cardHtml(c,i){
  :'<div class="small">WAIT signals cannot be approved as orders.</div>')
  +'</div>';
 }
+function maybeNotify(cards){
+ const actionable=(cards||[]).filter(c=>(c.recommendation==='LONG'||c.recommendation==='SHORT')&&c.locked_trade_plan);
+ if(!initializedSignals){
+   for(const c of actionable){seenSignalPlans.add(String(c.locked_trade_plan.plan_id||c.signal_id))}
+   initializedSignals=true;
+   return;
+ }
+ for(const c of actionable){
+   const key=String(c.locked_trade_plan.plan_id||c.signal_id);
+   if(seenSignalPlans.has(key))continue;
+   seenSignalPlans.add(key);
+   const body=c.symbol+' • '+c.recommendation+' • Entry '+num(c.locked_trade_plan.entry_min)+' - '+num(c.locked_trade_plan.entry_max)+' • SL '+num(c.locked_trade_plan.initial_stop)+' • TP1 '+num(c.locked_trade_plan.target1);
+   if('Notification' in window && Notification.permission==='granted'){
+     new Notification('STC NEW LOCKED TRADE PLAN',{body,tag:key,requireInteraction:true});
+   }
+   document.title='NEW '+c.recommendation+' • '+c.symbol+' • STC';
+ }
+}
 function render(){
  const r=snapshot.runtime_control||{};
  $('runtime').innerHTML=runtimeHtml(r);
- $('cards').innerHTML=(snapshot.cards||[]).map(cardHtml).join('')||'<div class="card">No analyzed signals found.</div>';
+ const cards=snapshot.cards||[];
+ $('cards').innerHTML=cards.map(cardHtml).join('')||'<div class="card">No analyzed signals found.</div>';
+ maybeNotify(cards);
 }
 async function refresh(){
+ if(!$('token').value.trim()){return}
  $('status').textContent='Loading...';
- try{snapshot=await api('operator_snapshot.php');render();$('status').textContent='Connected • '+new Date().toLocaleTimeString()}
- catch(e){$('status').textContent='Failed: '+e.message}
+ try{
+   snapshot=await api('operator_snapshot.php');
+   render();
+   secondsToRefresh=30;
+   $('status').textContent='Connected • '+new Date().toLocaleTimeString();
+   startAutoRefresh();
+ }catch(e){
+   $('status').textContent='Failed: '+e.message;
+ }
+}
+function updateAutoStatus(){
+ $('autostatus').textContent='Auto refresh: ON • next check in '+secondsToRefresh+'s';
+}
+function startAutoRefresh(){
+ if(autoTimer)return;
+ updateAutoStatus();
+ autoCountdown=setInterval(()=>{secondsToRefresh=Math.max(0,secondsToRefresh-1);updateAutoStatus()},1000);
+ autoTimer=setInterval(()=>{secondsToRefresh=30;refresh()},30000);
+}
+function stopAutoRefresh(){
+ if(autoTimer){clearInterval(autoTimer);autoTimer=null}
+ if(autoCountdown){clearInterval(autoCountdown);autoCountdown=null}
+ $('autostatus').textContent='Auto refresh: OFF';
+}
+async function enableNotifications(){
+ if(!('Notification' in window)){alert('Browser notifications are not supported in this browser.');return}
+ const p=await Notification.requestPermission();
+ $('notify').textContent=p==='granted'?'Browser alerts ON':'Enable browser alerts';
+ if(p==='granted')new Notification('STC browser alerts enabled',{body:'You will be notified here when a new LONG/SHORT locked trade plan appears while this console is running.'});
 }
 async function setControls(safe,kill){
  if(!confirm('Confirm runtime control change? This changes approval availability but never places an order.'))return;
@@ -105,5 +166,6 @@ async function approve(i,decision){
  catch(e){alert('Approval failed/blocked: '+e.message);await refresh()}
 }
 $('refresh').onclick=refresh;
-$('logout').onclick=()=>{$('token').value='';snapshot=null;$('cards').innerHTML='';$('runtime').textContent='Runtime controls not loaded.';$('status').textContent='Token cleared'};
+$('notify').onclick=enableNotifications;
+$('logout').onclick=()=>{stopAutoRefresh();$('token').value='';snapshot=null;initializedSignals=false;seenSignalPlans.clear();$('cards').innerHTML='';$('runtime').textContent='Runtime controls not loaded.';$('status').textContent='Token cleared';document.title='STC Owner Console'};
 </script></body></html>
