@@ -888,3 +888,36 @@ TradingView production cycle at 19:45 UTC:
 
 Acceptance conclusion:
 The dual competition market-data ingestion path is now production-verified for 10 Capital.com symbols + 16 AMP Futures symbols per 15-minute cycle.
+
+## Opportunity lifecycle / notification UX fix ready on main; Hostinger deploy pending — 2026-09-22
+
+Owner reported from the live console that actionable cards were difficult to read, order type was unclear, expired opportunities remained visible, and an opportunity appeared without an owner notification.
+
+Code-side fix is complete on main at commit 058844580eeae37d2631b61d83bbba30abe6a6b5. GitHub Actions STC CI run 35655238485 completed successfully.
+
+Implemented behavior:
+- 15m plan validity is anchored to the confirmed TradingView bar close, not delayed worker processing time.
+- LONG/SHORT cards are actionable only while their locked plan is ACTIVE.
+- Expired opportunities auto-hide immediately when the countdown reaches zero, independent of the 30-second server refresh.
+- WAIT remains current-signal context only and is not counted as an opportunity.
+- Console times are browser-local and human-readable, with a live seconds/minutes countdown.
+- Card layout keeps labels and values closer for easier scanning.
+- Planned manual order instruction is explicit and live-price aware: MARKET, BUY_LIMIT, BUY_STOP_LIMIT, SELL_LIMIT, or SELL_STOP_LIMIT as applicable to direction and entry-zone relationship.
+- Owner-entered current TradingView price recalculates the manual order instruction before approval.
+- Browser alerts no longer silently suppress an already-active unseen plan when permission is enabled after page load; seen-plan state is persisted in localStorage.
+- Telegram/email notification generation skips expired plans and includes ACTIVE time-left plus order type.
+- No automatic broker/order execution path was added. Safe Mode / Kill Switch governance remains unchanged.
+
+Production drift check:
+- A live read of https://stc.feama.site/operator.php still shows the older Owner Console shell: competition tabs are present, but the deployed HTML still says Telegram and Email are merely "Planned", and it lacks the newer account/portfolio blocks and opportunity-lifecycle UI.
+- Therefore the user's screenshots are consistent with an older Hostinger deployment, not the current main branch.
+
+Deployment gate before production validation:
+Replace the Hostinger production copies with the current main versions of:
+- hostinger_patch/operator.php
+- hostinger_patch/operator_snapshot.php
+- hostinger_patch/portfolio_control.php
+- hostinger_patch/notification_control.php
+
+After deployment, validate the live console with Safe Mode=true and Kill Switch=true, confirm expired cards disappear on countdown, confirm readable local time/order instructions, and test browser/server notification behavior. Telegram/email delivery still requires private channel configuration and must not be committed to GitHub.
+
