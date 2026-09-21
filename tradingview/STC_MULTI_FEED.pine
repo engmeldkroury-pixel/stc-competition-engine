@@ -1,5 +1,5 @@
 //@version=6
-indicator("STC Capital Multi Feed v0.6.2 Stateful Visual", overlay=true, max_labels_count=100)
+indicator("STC Capital Multi Feed v0.6.3 Clear Visual", overlay=true, max_labels_count=20)
 
 // Production feed
 competitionId = input.string("capital-africa-sep-2026", "Competition ID", options=["capital-africa-sep-2026"], group="Production feed")
@@ -9,9 +9,11 @@ feedEnabled = input.bool(true, "Enable webhook feed", group="Production feed")
 // Visual analysis
 showZones = input.bool(true, "Show entry / stop / exit zones", group="Visual analysis")
 showEMAs = input.bool(true, "Show EMA 20 / 50 / 200", group="Visual analysis")
-showStructure = input.bool(true, "Show dynamic support / resistance", group="Visual analysis")
-showBiasBackground = input.bool(true, "Shade chart by directional bias", group="Visual analysis")
-showDashboard = input.bool(true, "Show analysis dashboard", group="Visual analysis")
+showStructure = input.bool(false, "Show dynamic support / resistance", group="Visual analysis")
+showBiasBackground = input.bool(false, "Shade chart by live directional bias", group="Visual analysis")
+showDashboard = input.bool(true, "Show setup dashboard", group="Visual analysis")
+showCurrentSetupLabel = input.bool(true, "Show current locked setup label", group="Visual analysis")
+showHistoricalSetupLabels = input.bool(false, "Show historical LONG/SHORT labels", group="Visual analysis")
 structureLen = input.int(34, "Structure lookback bars", minval=10, maxval=200, group="Visual analysis")
 htfMultiplier = input.float(4.0, "Higher-timeframe multiplier", minval=2.0, maxval=12.0, step=1.0, group="Visual analysis")
 setupThreshold = input.float(0.50, "Setup threshold", minval=0.20, maxval=0.90, step=0.05, group="Visual analysis")
@@ -252,33 +254,56 @@ bgcolor(showBiasBackground ? (setupDir == 1 ? color.new(color.green, 94) : setup
 
 newLong = lockedDir == 1 and lockedDir[1] != 1
 newShort = lockedDir == -1 and lockedDir[1] != -1
-plotshape(newLong, title="New bullish setup", style=shape.labelup, location=location.belowbar, color=color.lime, text="LONG\nZONE", textcolor=color.black, size=size.tiny)
-plotshape(newShort, title="New bearish setup", style=shape.labeldown, location=location.abovebar, color=color.red, text="SHORT\nZONE", textcolor=color.white, size=size.tiny)
+plotshape(showHistoricalSetupLabels and newLong, title="Historical bullish setup", style=shape.labelup, location=location.belowbar, color=color.lime, text="LONG", textcolor=color.black, size=size.tiny)
+plotshape(showHistoricalSetupLabels and newShort, title="Historical bearish setup", style=shape.labeldown, location=location.abovebar, color=color.red, text="SHORT", textcolor=color.white, size=size.tiny)
+
+// One current setup label only. It is refreshed on the last bar so the chart stays readable.
+var label currentSetupLabel = na
+if barstate.islast
+    if not na(currentSetupLabel)
+        label.delete(currentSetupLabel)
+        currentSetupLabel := na
+    if showCurrentSetupLabel and lockedDir != 0
+        setupSide = lockedDir == 1 ? "LONG" : "SHORT"
+        setupTextLabel = setupSide + "\nENTRY " + str.tostring(entryLow, format.mintick) + " - " + str.tostring(entryHigh, format.mintick) + "\nSL " + str.tostring(stopLevel, format.mintick) + "\nTP1 " + str.tostring(target1, format.mintick) + "\nTP2 " + str.tostring(target2, format.mintick)
+        setupY = lockedDir == 1 ? low - atr14v * 0.6 : high + atr14v * 0.6
+        currentSetupLabel := label.new(bar_index, setupY, setupTextLabel, style=lockedDir == 1 ? label.style_label_up : label.style_label_down, color=lockedDir == 1 ? color.new(color.green, 0) : color.new(color.red, 0), textcolor=color.white, size=size.small)
 
 // Dashboard
-var table dashboard = table.new(position.top_right, 2, 9, border_width=1)
+var table dashboard = table.new(position.top_right, 2, 12, border_width=1)
 
 if barstate.islast
     if showDashboard
-        setupText = lockedDir == 1 ? "LOCKED LONG SETUP" : lockedDir == -1 ? "LOCKED SHORT SETUP" : "SCANNING / WAIT"
+        setupText = lockedDir == 1 ? "LOCKED LONG" : lockedDir == -1 ? "LOCKED SHORT" : "SCANNING / WAIT"
+        liveBiasText = setupDir == 1 ? "BULLISH" : setupDir == -1 ? "BEARISH" : "NEUTRAL"
         displayScore = lockedDir != 0 ? lockedScore : score
-        table.cell(dashboard, 0, 0, "STC Visual", bgcolor=color.new(color.black, 10), text_color=color.white)
-        table.cell(dashboard, 1, 0, setupText, bgcolor=color.new(biasColor, 70), text_color=color.white)
-        table.cell(dashboard, 0, 1, "Score", text_color=color.white)
-        table.cell(dashboard, 1, 1, str.tostring(math.round(displayScore * 100.0)) + "%", text_color=color.white)
-        table.cell(dashboard, 0, 2, "Chart TF", text_color=color.white)
-        table.cell(dashboard, 1, 2, timeframe.period, text_color=color.white)
-        table.cell(dashboard, 0, 3, "Confirm TF", text_color=color.white)
-        table.cell(dashboard, 1, 3, higherTf, text_color=color.white)
-        table.cell(dashboard, 0, 4, "RSI 14", text_color=color.white)
-        table.cell(dashboard, 1, 4, str.tostring(rsi14v, "#.0"), text_color=color.white)
-        table.cell(dashboard, 0, 5, "ADX", text_color=color.white)
-        table.cell(dashboard, 1, 5, str.tostring(adxV, "#.0"), text_color=color.white)
-        table.cell(dashboard, 0, 6, "ATR 14", text_color=color.white)
-        table.cell(dashboard, 1, 6, str.tostring(atr14v, format.mintick), text_color=color.white)
-        table.cell(dashboard, 0, 7, "Volume x", text_color=color.white)
-        table.cell(dashboard, 1, 7, str.tostring(volumeRatioV, "#.00"), text_color=color.white)
-        table.cell(dashboard, 0, 8, "Feed", text_color=color.white)
-        table.cell(dashboard, 1, 8, feedEnabled ? "ON " + feedTf : "OFF", text_color=color.white)
+        entryText = lockedDir != 0 ? str.tostring(entryLow, format.mintick) + " - " + str.tostring(entryHigh, format.mintick) : "-"
+        stopText = lockedDir != 0 ? str.tostring(stopLevel, format.mintick) : "-"
+        tp1Text = lockedDir != 0 ? str.tostring(target1, format.mintick) : "-"
+        tp2Text = lockedDir != 0 ? str.tostring(target2, format.mintick) : "-"
+        table.cell(dashboard, 0, 0, "SETUP", bgcolor=color.new(color.black, 10), text_color=color.white)
+        table.cell(dashboard, 1, 0, setupText, bgcolor=color.new(biasColor, 65), text_color=color.white)
+        table.cell(dashboard, 0, 1, "ENTRY", text_color=color.white)
+        table.cell(dashboard, 1, 1, entryText, text_color=color.white)
+        table.cell(dashboard, 0, 2, "STOP", text_color=color.white)
+        table.cell(dashboard, 1, 2, stopText, text_color=color.red)
+        table.cell(dashboard, 0, 3, "TP1", text_color=color.white)
+        table.cell(dashboard, 1, 3, tp1Text, text_color=color.lime)
+        table.cell(dashboard, 0, 4, "TP2", text_color=color.white)
+        table.cell(dashboard, 1, 4, tp2Text, text_color=color.lime)
+        table.cell(dashboard, 0, 5, "LOCKED SCORE", text_color=color.white)
+        table.cell(dashboard, 1, 5, str.tostring(math.round(displayScore * 100.0)) + "%", text_color=color.white)
+        table.cell(dashboard, 0, 6, "LIVE BIAS", text_color=color.white)
+        table.cell(dashboard, 1, 6, liveBiasText, text_color=setupDir == 1 ? color.lime : setupDir == -1 ? color.red : color.silver)
+        table.cell(dashboard, 0, 7, "CHART TF", text_color=color.white)
+        table.cell(dashboard, 1, 7, timeframe.period, text_color=color.white)
+        table.cell(dashboard, 0, 8, "CONFIRM TF", text_color=color.white)
+        table.cell(dashboard, 1, 8, higherTf, text_color=color.white)
+        table.cell(dashboard, 0, 9, "RSI / ADX", text_color=color.white)
+        table.cell(dashboard, 1, 9, str.tostring(rsi14v, "#.0") + " / " + str.tostring(adxV, "#.0"), text_color=color.white)
+        table.cell(dashboard, 0, 10, "VOLUME x", text_color=color.white)
+        table.cell(dashboard, 1, 10, str.tostring(volumeRatioV, "#.00"), text_color=color.white)
+        table.cell(dashboard, 0, 11, "FEED", text_color=color.white)
+        table.cell(dashboard, 1, 11, feedEnabled ? "ON " + feedTf : "OFF", text_color=color.white)
     else
-        table.clear(dashboard, 0, 0, 1, 8)
+        table.clear(dashboard, 0, 0, 1, 11)
