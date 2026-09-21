@@ -369,16 +369,22 @@ function managementClass(a){
 function positionHtml(p){
  const m=p.management||{};
  const rotation=p.rotation_candidate;
+ const latest=(p.latest_signal_history||[]).slice(-1)[0]||null;
  let buttons='';
  if(m.action==='PROTECT' && m.suggested_stop)buttons='<button onclick="recordStopUpdate(\''+esc(p.position_id)+'\','+Number(m.suggested_stop)+')">After manual stop change: record</button>';
- if(m.action==='PARTIAL_TAKE_PROFIT')buttons='<button onclick="recordPartial(\''+esc(p.position_id)+'\')">After manual partial close: record</button>';
+ if(m.action==='PARTIAL_TAKE_PROFIT')buttons='<div class="small wait">Partial take-profit is disabled in single-TP mode. Keep the full quantity unless another management rule says EXIT_NOW.</div>';
  if(m.action==='EXIT_NOW')buttons='<button class="danger" onclick="recordClose(\''+esc(p.position_id)+'\')">After manual close: record</button>';
  return '<div class="card">'
-  +'<div class="row"><span>'+esc(p.symbol)+'</span><span class="value '+(p.side==='LONG'?'long':'short')+'">'+esc(p.side)+' × '+num(p.quantity,6)+'</span></div>'
+  +'<div class="statusline"><span class="badge active">EXECUTED • TRACKING</span><span class="pill">'+esc(p.origin==='manual_external'?'Imported manual trade':'STC plan fill')+'</span></div>'
+  +'<div class="row"><span>Symbol</span><span class="value">'+esc(p.symbol)+'</span></div>'
+  +'<div class="row"><span>Position</span><span class="value '+(p.side==='LONG'?'long':'short')+'">'+esc(p.side)+' × '+num(p.quantity,6)+'</span></div>'
+  +'<div class="row"><span>Opened</span><span class="value">'+formatLocalTime(p.opened_at_utc)+'</span></div>'
   +'<div class="row"><span>Entry</span><span class="value">'+num(p.entry_price)+'</span></div>'
   +'<div class="row"><span>Active stop</span><span class="value">'+num(p.current_stop)+'</span></div>'
-  +'<div class="row"><span>TP1 / TP2</span><span class="value">'+num(p.target1)+' / '+num(p.target2)+'</span></div>'
-  +'<div class="row"><span>Supervisor</span><span class="value '+managementClass(m.action)+'">'+esc(m.action||'HOLD')+'</span></div>'
+  +'<div class="row"><span>Management checkpoint</span><span class="value">'+num(p.target1)+' • no partial close</span></div>'
+  +'<div class="row"><span>Final take profit</span><span class="value">'+num(p.target2)+'</span></div>'
+  +(latest?'<div class="row"><span>Latest market check</span><span class="value">'+formatLocalTime(latest.time)+' • '+esc(latest.recommendation)+' '+num(latest.composite_score,2)+' @ '+num(latest.close)+'</span></div>':'')
+  +'<div class="row"><span>What to do now</span><span class="value '+managementClass(m.action)+'">'+esc(m.action||'HOLD')+'</span></div>'
   +'<div class="row"><span>R multiple</span><span class="value">'+num(m.r_multiple,2)+'</span></div>'
   +'<div class="row"><span>Unrealized P/L</span><span class="value">'+(m.unrealized_pnl_usd==null?'-':'$'+num(m.unrealized_pnl_usd,2))+'</span></div>'
   +(m.suggested_stop?'<div class="row"><span>Suggested stop</span><span class="value">'+num(m.suggested_stop)+'</span></div>':'')
