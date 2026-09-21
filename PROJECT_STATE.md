@@ -161,3 +161,30 @@ The temporary readback workflow used to obtain the final evidence was removed af
 ## Current next action
 
 Proceed to pre-market operational validation for the Capital.com competition path: verify current competition profile/rules, exact Capital.com symbols, runtime market-data availability, Safe Mode/Kill Switch state, and approval evidence requirements. Human approval remains mandatory before any competition order entry; automatic execution remains unavailable/disabled.
+
+
+## Pre-market validation — 2026-09-21 02:04 UTC
+
+Read-only Capital.com/TradingView runtime checks:
+- Exact-provider 15m OHLCV returned successfully for all 10 Capital.com competition symbols.
+- Direct batch quote rows were available for CAPITALCOM:EURUSD, CAPITALCOM:AUDUSD, and CAPITALCOM:USDZAR.
+- Direct batch quote rows were unavailable for the other 7 symbols at the check time; this remains a dynamic runtime condition and approval must fail closed without fresh trusted quote evidence.
+- No cross-provider substitution was used.
+
+Feed hardening:
+- tradingview/STC_FEED.pine upgraded to v0.2.
+- The feed now emits a deterministic event_id derived from competition + exact provider/symbol + timeframe + bar time.
+- This removes dependence on transport-generated payload hashes for normal feed idempotency and gives the cloud pipeline a stable bar identity.
+- tests/test_pine_feed_contract.py locks the webhook payload contract.
+- GitHub Actions CI run 35552943819 passed after the change.
+
+Operational architecture finding:
+- Cloud bridge processing is persistent in Hostinger/MySQL and verified.
+- The interactive approval/runtime-control implementation in app/main.py currently uses local SQLite state.
+- The production GitHub worker is serverless/stateless and returns signal/envelope results to Hostinger; it does not persist approval envelopes into a durable shared approval store.
+- Therefore cloud signal generation is verified, but a unified cloud approval UI/state path is not yet operationally complete.
+- Until that gap is closed, human approval/manual execution remains a hard boundary and the system must not claim cloud approval readiness.
+
+## Current next action
+
+Build the smallest durable cloud approval-state contract on top of the existing Hostinger bridge result source of truth, without adding automatic execution. The contract must expose analyzed signal + approval envelope, preserve Safe Mode/Kill Switch semantics, accept only trusted fresh evidence, and keep final order entry manual.
