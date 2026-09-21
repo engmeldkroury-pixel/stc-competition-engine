@@ -100,8 +100,8 @@ buildMessage(string symbol, FeedBar d, HistoryBar h) =>
         '"history_ema200":' + str.tostring(h.ema200) + ',' +
         '"history_rsi14":' + str.tostring(h.rsi14) + ',' +
         '"history_atr14":' + str.tostring(h.atr14) + ',' +
-        '"history_high_365":' + str.tostring(h.high252) + ',' +
-        '"history_low_365":' + str.tostring(h.low252) + ',' +
+        '"history_high_252":' + str.tostring(h.high252) + ',' +
+        '"history_low_252":' + str.tostring(h.low252) + ',' +
         '"history_momentum_20":' + str.tostring(h.momentum20) + ',' +
         '"history_momentum_63":' + str.tostring(h.momentum63) + ',' +
         '"history_momentum_126":' + str.tostring(h.momentum126) + ',' +
