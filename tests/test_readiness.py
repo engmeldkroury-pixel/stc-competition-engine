@@ -15,6 +15,9 @@ def test_readiness_reports_analysis_ready_and_manual_execution_only():
     assert result["human_approval_required"] is True
     assert result["capital_symbols_total"] == 10
     assert result["capital_symbols_verified"] == 10
+    assert result["amp_core_symbols_total"] == 16
+    assert result["amp_core_symbols_verified"] == 16
+    assert result["amp_core_historical_context_capable"] is True
     assert result["runtime_quote_evidence_required_for_all_approvals"] is True
 
 
