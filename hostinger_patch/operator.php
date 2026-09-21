@@ -162,6 +162,23 @@ function sizingHtml(s){
   +(limited?'<div class="small">Sizing limited by: '+esc(limited)+'</div>':'');
 }
 
+function macroHtml(m){
+ if(!m)return '';
+ const status=String(m.status||'unknown');
+ const cls=status==='safe'?'ok':status==='blackout'?'short':'wait';
+ const next=m.next_high_impact;
+ const nearby=(m.nearby_high_impact||[]);
+ let html='<div class="row"><span>Macro event risk</span><span class="value '+cls+'">'+esc(status.toUpperCase())+'</span></div>';
+ if(nearby.length){
+   const e=nearby[0];
+   html+='<div class="small bad">High-impact blackout: '+esc(e.currency)+' • '+esc(e.title)+' • '+num(e.minutes_from_now,0)+' min</div>';
+ }else if(next){
+   html+='<div class="small">Next high-impact: '+esc(next.currency)+' • '+esc(next.title)+' • '+num(next.minutes_from_now,0)+' min</div>';
+ }
+ if(m.block_new_approval)html+='<div class="small bad">New approval blocked by macro-risk gate.</div>';
+ return html;
+}
+
 function cardHtml(c,i){
  const cls=c.recommendation==='LONG'?'long':c.recommendation==='SHORT'?'short':'wait';
  const a=c.approval||{};
@@ -175,6 +192,7 @@ function cardHtml(c,i){
   +'<div class="row"><span>Source</span><span class="value">'+esc(c.source_time)+'</span></div>'
   +planHtml(c.locked_trade_plan)
   +sizingHtml(c.position_sizing)
+  +macroHtml(c.macro_context)
   +'<div class="row"><span>Approval</span><span class="value">'+esc(a.decision||'none')+'</span></div>'
   +'<div class="row"><span>Manual ready</span><span class="value '+(c.manual_execution_ready?'ok':'bad')+'">'+esc(c.manual_execution_ready)+'</span></div>'
   +(c.pending_plan_action?'<div class="row"><span>Plan supervisor</span><span class="value wait">'+esc(c.pending_plan_action)+'</span></div>':'')
@@ -288,7 +306,10 @@ function renderOverview(cards){
 
 function render(){
  const r=snapshot.runtime_control||{};
- $('runtime').innerHTML=runtimeHtml(r);
+ const mc=snapshot.macro_calendar_status||{};
+ $('runtime').innerHTML=runtimeHtml(r)
+  +'<div class="row"><span>Macro calendar</span><span class="value '+(mc.ok?'ok':'bad')+'">'+(mc.ok?'CONNECTED':'UNAVAILABLE')+'</span></div>'
+  +(!mc.ok&&mc.error?'<div class="small bad">Macro gate error: '+esc(mc.error)+'</div>':'');
  const cards=snapshot.cards||[];
  const accounts=snapshot.account_states||[];
  const positions=(snapshot.portfolio&&snapshot.portfolio.positions)||[];
