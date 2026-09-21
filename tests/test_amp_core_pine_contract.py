@@ -7,7 +7,7 @@ PINE = Path(__file__).resolve().parents[1] / "tradingview" / "STC_AMP_CORE_FEED.
 
 def test_amp_core_feed_covers_exact_verified_core_universe():
     text = PINE.read_text(encoding="utf-8")
-    assert "STC AMP Core Feed v0.1 Historical Context" in text
+    assert "STC AMP Core Feed v0.2 Stateful Visual" in text
     for symbol in AMP_CORE_FEED_SYMBOLS:
         assert f'"{symbol}"' in text
 
@@ -27,8 +27,9 @@ def test_amp_core_feed_stays_under_standard_unique_request_budget_by_design():
     assert len(AMP_CORE_FEED_SYMBOLS) == 16
     assert text.count(" = feedBar(") == 16
     assert text.count(" = historyBar(") == 16
-    assert 16 * 2 == 32
-    assert 32 < 40
+    # Two extra current-chart higher-timeframe requests are used by the visual engine.
+    assert 16 * 2 + 2 == 34
+    assert 34 < 40
 
 
 def test_amp_core_feed_has_per_symbol_realtime_deduplication():
@@ -38,3 +39,19 @@ def test_amp_core_feed_has_per_symbol_realtime_deduplication():
     assert "varip int lastMES = na" in text
     assert "varip int lastZB = na" in text
     assert 'alert(buildMessage("CME_MINI:MES1!", mes, mesH), alert.freq_all)' in text
+
+
+def test_amp_core_feed_has_stateful_visual_trade_plan_support():
+    text = PINE.read_text(encoding="utf-8")
+    assert 'overlay=true' in text
+    assert 'showZones = input.bool(true' in text
+    assert '"EMA 20"' in text
+    assert '"EMA 50"' in text
+    assert '"EMA 200"' in text
+    assert '"Entry zone low"' in text
+    assert '"Invalidation / Stop"' in text
+    assert '"Exit zone start / TP1"' in text
+    assert '"Exit zone end / TP2"' in text
+    assert '"LOCKED LONG"' in text
+    assert '"LOCKED SHORT"' in text
+    assert '"AMP ON "' in text
