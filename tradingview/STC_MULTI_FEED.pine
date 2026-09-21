@@ -1,5 +1,5 @@
 //@version=6
-indicator("STC Capital Multi Feed v0.7 Historical Context", overlay=true, max_labels_count=20)
+indicator("STC Capital Multi Feed v0.7.1 Historical Context", overlay=true, max_labels_count=20)
 
 // Production feed
 competitionId = input.string("capital-africa-sep-2026", "Competition ID", options=["capital-africa-sep-2026"], group="Production feed")
