@@ -223,3 +223,42 @@ Do NOT provide config.php, passwords, tokens, database dumps, or secret values.
 ## Current next action
 
 Inspect the four current Hostinger PHP bridge files and design the smallest compatible durable approval/runtime-control extension. No production schema or PHP deployment should be guessed before those files are reviewed.
+
+
+## Durable Hostinger approval patch — 2026-09-21 08:12 UTC
+
+Owner supplied the live-compatible Hostinger public_html PHP bridge package. Reviewed:
+- _bootstrap.php
+- inbox.php
+- claim.php
+- ack.php
+- plus health.php/status.php/webhook.php for compatibility context.
+
+Implemented and merged PR #6.
+Main commit: ae6d56d8b2f4812d4cdf144e039ee1d57f8cc00e.
+Main CI run 35576621843: SUCCESS.
+
+Additive production patch now exists in hostinger_patch/:
+- cloud_control.php
+- runtime_control.php
+- approval.php
+- migrations/001_cloud_approval.sql
+- README_DEPLOY.md
+
+Safety properties:
+- Existing webhook.php, claim.php, ack.php, inbox.php and _bootstrap.php are not replaced by this batch.
+- Runtime controls persist in MySQL and start fail-closed: safe_mode=1, kill_switch=1.
+- Owner approval uses a separate owner_api_token and never reuses worker/GitHub credentials.
+- Approval requires exact persisted signal/receipt identity, current signal freshness, no newer signal for the same target, fresh owner platform confirmation, market=open and price inside the approval envelope.
+- Approval records remain audit-only and always return execution=manual_only.
+- No broker/order endpoint is introduced.
+
+Current blocker:
+Production deployment requires owner access to Hostinger hPanel/phpMyAdmin/private config.php. The assistant does not have an authenticated Hostinger file/database management connector in this environment.
+
+Required owner deployment actions:
+1. Upload the three new PHP files from hostinger_patch/ to public_html.
+2. Run migrations/001_cloud_approval.sql once in the existing STC MySQL database.
+3. Add a new separate owner_api_token entry to the private config.php outside public_html. Do not share its value.
+4. Leave safe_mode and kill_switch ON after migration.
+5. Return after those steps for live read-only/blocked-approval verification before controls are disabled.
