@@ -82,3 +82,34 @@ def test_bullish_one_year_regime_scores_positive():
     )
     assert historical_regime_from_tradingview(p) is not None
     assert historical_regime_from_tradingview(p) > 0.5
+
+
+def test_partial_history_context_is_rejected():
+    import pytest
+    from pydantic import ValidationError
+
+    with pytest.raises(ValidationError):
+        _payload(history_timeframe="1D", history_close=4300.0)
+
+
+def test_malformed_history_range_is_rejected():
+    import pytest
+    from pydantic import ValidationError
+
+    with pytest.raises(ValidationError):
+        _payload(
+            history_timeframe="1D",
+            history_time="2026-09-20T00:00:00Z",
+            history_close=4310.0,
+            history_ema50=4300.0,
+            history_ema200=4200.0,
+            history_rsi14=60.0,
+            history_atr14=50.0,
+            history_high_252=4000.0,
+            history_low_252=4500.0,
+            history_momentum_20=0.01,
+            history_momentum_63=0.02,
+            history_momentum_126=0.03,
+            history_momentum_252=0.04,
+            history_volatility_20=0.02,
+        )
