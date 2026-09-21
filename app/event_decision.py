@@ -8,7 +8,7 @@ from .approval import build_approval_envelope
 from .competition_profiles import get_profile
 from .models import FactorScores, SignalEvaluationRequest, TradingViewWebhook
 from .pipeline_receipt import build_pipeline_receipt
-from .signals import evaluate, factors_from_tradingview
+from .signals import evaluate, factors_from_tradingview, historical_regime_from_tradingview, short_term_score_from_tradingview
 from .trade_plan import build_locked_trade_plan
 
 
@@ -84,6 +84,8 @@ def decide_bridge_event(event_id: str, payload: dict) -> dict:
             "note": "Valid competition event stored, but payload is insufficient for signal evaluation.",
         }
 
+    short_term_technical = short_term_score_from_tradingview(tv)
+    historical_regime = historical_regime_from_tradingview(tv)
     technical = factors_from_tradingview(tv)
     req = SignalEvaluationRequest(
         competition_id=tv.competition_id,
@@ -91,6 +93,12 @@ def decide_bridge_event(event_id: str, payload: dict) -> dict:
         factors=FactorScores(technical=technical),
     )
     result = evaluate(req).model_copy(update={"signal_id": deterministic_signal_id(event_id)})
+    extra_reasons = [
+        f"short_term_technical={short_term_technical:+.2f}",
+        "historical_regime=unavailable" if historical_regime is None else f"historical_regime={historical_regime:+.2f}",
+        f"blended_technical={technical:+.2f}",
+    ]
+    result = result.model_copy(update={"reasons": extra_reasons + result.reasons})
     result_dict = result.model_dump()
     envelope = build_approval_envelope(payload, result.composite_score)
     locked_plan = build_locked_trade_plan(event_id, payload, result_dict, envelope)
