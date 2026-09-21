@@ -104,8 +104,16 @@ let autoTimer=null;
 let autoCountdown=null;
 let secondsToRefresh=30;
 let initializedSignals=false;
-const seenSignalPlans=new Set(JSON.parse(localStorage.getItem('stc_seen_signal_plans')||'[]'));
-const seenManagement=new Set(JSON.parse(localStorage.getItem('stc_seen_management')||'[]'));
+function loadSeenSet(key){
+ try{
+   const value=JSON.parse(localStorage.getItem(key)||'[]');
+   return new Set(Array.isArray(value)?value:[]);
+ }catch(e){
+   return new Set();
+ }
+}
+const seenSignalPlans=loadSeenSet('stc_seen_signal_plans');
+const seenManagement=loadSeenSet('stc_seen_management');
 
 function esc(s){
  return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
