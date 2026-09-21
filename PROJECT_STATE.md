@@ -707,3 +707,32 @@ Final external owner action required:
 Upload operator_snapshot.php and operator.php to the existing Hostinger public_html STC location, then perform the first owner-console read-only check with Safe Mode and Kill Switch still ON.
 
 After that validation, any decision to disable Safe Mode / Kill Switch and make manual approvals available is an explicit owner operational decision. STC never performs automatic order execution.
+
+
+## Owner console deployment verified — 2026-09-21 15:24 UTC
+
+Owner deployed:
+- hostinger_patch/operator.php
+- hostinger_patch/operator_snapshot.php
+
+Browser validation:
+- https://stc.feama.site/operator.php loaded successfully.
+- Owner token authentication succeeded.
+- Durable runtime controls were read successfully.
+- Safe Mode=true.
+- Kill Switch=true.
+- Runtime version=1.
+- Latest analyzed Capital.com cards rendered successfully.
+- Visible cards showed WAIT recommendations and no locked plans, which correctly remained non-approvable and manual_ready=false.
+
+Production feed re-check:
+- Alert 5662088915 remains ACTIVE.
+- Last observed fire at this checkpoint: 2026-09-21T15:15:00Z.
+- The 15:15 cycle emitted all 10 expected Capital.com symbols exactly once.
+- All 10 observed webhook deliveries returned HTTP 200.
+
+Current final boundary:
+The software and owner console are operationally deployed and readback-verified.
+The system remains intentionally blocked from manual approvals because Safe Mode and Kill Switch are both ON.
+No order execution path exists in STC.
+Any future transition to manual approval availability requires an explicit owner runtime-control action.
