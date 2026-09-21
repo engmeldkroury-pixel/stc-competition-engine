@@ -867,3 +867,24 @@ The old 16-symbol v0.2 alert 5664628299 remains stopped.
 
 Next validation gate:
 Observe the next 15-minute cycle (19:45 UTC / 22:45 Cairo) and confirm A emits 8 events and B emits 8 events, all with HTTP 200, without either production alert being auto-stopped.
+
+
+## AMP 8+8 production acceptance passed — 2026-09-21 19:46 UTC
+
+TradingView production cycle at 19:45 UTC:
+- Feed A alert 5664752419 remained ACTIVE after firing.
+- Feed B alert 5664684004 remained ACTIVE after firing.
+- Feed A emitted exactly 8 events:
+  CBOT_MINI:MYM1!, CME_MINI:M2K1!, CME_MINI:MES1!, CME_MINI:MNQ1!, COMEX_MINI:MGC1!, COMEX_MINI:SIL1!, NYMEX:MCL1!, NYMEX:MNG1!
+- Feed B emitted exactly 8 events:
+  CBOT:ZB1!, CBOT:ZN1!, CME:MBT1!, CME:MET1!, CME_MINI:M6A1!, CME_MINI:M6B1!, CME_MINI:M6E1!, CME_MINI:MJY1!
+- All 16 AMP webhook deliveries returned HTTP 200.
+- Neither production alert auto-stopped.
+- Combined 15m cycle produced 26 bridge events total when the existing 10-symbol Capital.com feed is included.
+- Worker drained the batch successfully across two successful runs:
+  - claimed=20, ingested=20, rejected=0, failed=0
+  - claimed=6, ingested=6, rejected=0, failed=0
+- Total: claimed=26, ingested=26, rejected=0, failed=0.
+
+Acceptance conclusion:
+The dual competition market-data ingestion path is now production-verified for 10 Capital.com symbols + 16 AMP Futures symbols per 15-minute cycle.
