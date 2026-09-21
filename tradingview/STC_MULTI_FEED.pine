@@ -20,28 +20,33 @@ type FeedBar
     float macdSignal
     float volumeRatio
 
+makeFeedBar() =>
+    [macdLine, signalLine, _] = ta.macd(close, 12, 26, 9)
+    volSma = ta.sma(volume, 20)
+    FeedBar.new(
+        time,
+        open,
+        high,
+        low,
+        close,
+        volume,
+        ta.ema(close, 20),
+        ta.ema(close, 50),
+        ta.rsi(close, 14),
+        ta.atr(14),
+        macdLine,
+        signalLine,
+        volSma > 0 ? volume / volSma : 1.0
+    )
+
 feedBar(string symbol) =>
     request.security(
-         symbol,
-         feedTf,
-         FeedBar.new(
-             time,
-             open,
-             high,
-             low,
-             close,
-             volume,
-             ta.ema(close, 20),
-             ta.ema(close, 50),
-             ta.rsi(close, 14),
-             ta.atr(14),
-             ta.macd(close, 12, 26, 9)[0],
-             ta.macd(close, 12, 26, 9)[1],
-             ta.sma(volume, 20) > 0 ? volume / ta.sma(volume, 20) : 1.0
-         ),
-         gaps=barmerge.gaps_off,
-         lookahead=barmerge.lookahead_off,
-         ignore_invalid_symbol=false
+        symbol,
+        feedTf,
+        makeFeedBar(),
+        gaps=barmerge.gaps_off,
+        lookahead=barmerge.lookahead_off,
+        ignore_invalid_symbol=false
     )
 
 buildMessage(string symbol, FeedBar d) =>
