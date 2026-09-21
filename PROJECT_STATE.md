@@ -188,3 +188,38 @@ Operational architecture finding:
 ## Current next action
 
 Build the smallest durable cloud approval-state contract on top of the existing Hostinger bridge result source of truth, without adding automatic execution. The contract must expose analyzed signal + approval envelope, preserve Safe Mode/Kill Switch semantics, accept only trusted fresh evidence, and keep final order entry manual.
+
+
+## Cloud approval readback batch — 2026-09-21 07:52 UTC
+
+Merged PR #5: STC cloud approval readback — fail-closed.
+Main commit: a29a3ef93555e41e9c063b3ea4783071ef40544e.
+Main CI run 35574957270: SUCCESS.
+
+Implemented:
+- Authenticated GET /cloud/readiness.
+- Authenticated GET /cloud/signals.
+- Read-only projection from Hostinger bridge inbox.
+- Receipt/payload consistency validation.
+- Exact competition/provider/symbol checks.
+- Deterministic signal identity check.
+- Finite numeric and timestamp/expiry validation.
+- Conflicting/tampered records are quarantined.
+- No cloud approval write endpoint exists.
+- Effective cloud policy remains fail-closed with Safe Mode and Kill Switch represented as active defaults until durable persisted controls are connected.
+- Automatic execution remains unavailable; every signal remains manual-only and unapproved.
+
+Remaining production blocker:
+The active Hostinger PHP bridge source is not present in the GitHub repository or File Library. Durable cloud approval/runtime-control writes cannot be implemented safely without inspecting the live-compatible PHP contract and current database queries.
+
+Required source files only (credentials redacted):
+- public_html/_bootstrap.php
+- public_html/inbox.php
+- public_html/claim.php
+- public_html/ack.php
+
+Do NOT provide config.php, passwords, tokens, database dumps, or secret values.
+
+## Current next action
+
+Inspect the four current Hostinger PHP bridge files and design the smallest compatible durable approval/runtime-control extension. No production schema or PHP deployment should be guessed before those files are reviewed.
