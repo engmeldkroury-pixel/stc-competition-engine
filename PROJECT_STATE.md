@@ -434,3 +434,28 @@ Existing verified XAUUSD v0.2 production alert remains active during v0.3 valida
 
 Acceptance pending:
 Do not mark multi-symbol feed verified until the first v0.3 alert fire is observed with HTTP 200 webhook delivery, emitted-symbol coverage is inspected, and corresponding worker/persistence evidence is captured.
+
+
+## Multi-symbol production fire-control finding + fix — 2026-09-21 09:54 UTC
+
+Live v0.3 multi-feed evidence:
+- TradingView alert id 5659596015 fired at 2026-09-21T09:45:00Z for the 09:30 remote bars.
+- All 10 Capital.com competition symbols were observed in the alert log.
+- Hostinger accepted/persisted all 10 unique events despite some TradingView-side webhook timeout reports.
+- GitHub worker run 35585016862 claimed=10, ingested=10, rejected=0, failed=0.
+- A later worker run 35585019963 found claimed=0, confirming the persisted batch had already been drained.
+- TradingView automatically stopped alert 5659596015 with last_stop_reason=fire_control.
+- Root cause evidence: several symbols were emitted more than once within the same scheduler bar. Pine realtime rollback reset normal var array state between intrabar executions, so duplicate suppression did not persist intrabar.
+- The existing single-symbol XAUUSD v0.2 production alert remained active and healthy.
+
+Fix:
+- PR #8 merged.
+- Main commit: 5052cfd7e3ec8a65e642f6d3ea7edc62b32f57c1.
+- Main CI run 35585857595: SUCCESS.
+- STC Capital Multi Feed upgraded to v0.4.
+- lastSentTimes changed from var to varip so per-symbol send state persists across realtime rollback inside the scheduler bar.
+- Contract test now requires intrabar-persistent duplicate suppression.
+- No execution, approval, Safe Mode, Kill Switch, Hostinger schema, or broker behavior changed.
+
+Current validation gate:
+TradingView alerts snapshot the Pine script at alert creation. The stopped v0.3 alert cannot inherit the v0.4 fix automatically. Owner must update the Pine script to v0.4 and create a fresh multi-symbol alert. Keep the verified XAUUSD v0.2 alert active until v0.4 live proof passes.
