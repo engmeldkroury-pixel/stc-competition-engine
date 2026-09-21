@@ -1,5 +1,5 @@
 //@version=6
-indicator("STC Capital Multi Feed v0.6 Stateful Visual", overlay=true, max_labels_count=100)
+indicator("STC Capital Multi Feed v0.6.1 Stateful Visual", overlay=true, max_labels_count=100)
 
 // -----------------------------------------------------------------------------
 // Production feed settings.
@@ -105,33 +105,73 @@ buildMessage(string symbol, FeedBar d) =>
       '"volume_ratio":' + str.tostring(d.volumeRatio) +
       '}'
 
-var array<string> symbols = array.from(
-    "CAPITALCOM:BTCUSD",
-    "CAPITALCOM:ETHUSD",
-    "CAPITALCOM:DOGEUSD",
-    "CAPITALCOM:EURUSD",
-    "CAPITALCOM:AUDUSD",
-    "CAPITALCOM:USDZAR",
-    "CAPITALCOM:XAUUSD",
-    "CAPITALCOM:XAGUSD",
-    "CAPITALCOM:SPX500",
-    "CAPITALCOM:NAS100"
-)
+// -----------------------------------------------------------------------------
+// Explicit production symbol feeds.
+// Using scalar varip timestamps avoids the TradingView compiler issue observed
+// with varip array declarations while preserving intrabar duplicate protection.
+// -----------------------------------------------------------------------------
+btc = feedBar("CAPITALCOM:BTCUSD")
+eth = feedBar("CAPITALCOM:ETHUSD")
+doge = feedBar("CAPITALCOM:DOGEUSD")
+eur = feedBar("CAPITALCOM:EURUSD")
+aud = feedBar("CAPITALCOM:AUDUSD")
+zar = feedBar("CAPITALCOM:USDZAR")
+xau = feedBar("CAPITALCOM:XAUUSD")
+xag = feedBar("CAPITALCOM:XAGUSD")
+spx = feedBar("CAPITALCOM:SPX500")
+nas = feedBar("CAPITALCOM:NAS100")
 
-// Intrabar-persistent state prevents duplicate alert() calls on realtime rollback.
-varip array<int> lastSentTimes = array.new_int(array.size(symbols), na)
+varip int lastBTC = na
+varip int lastETH = na
+varip int lastDOGE = na
+varip int lastEUR = na
+varip int lastAUD = na
+varip int lastZAR = na
+varip int lastXAU = na
+varip int lastXAG = na
+varip int lastSPX = na
+varip int lastNAS = na
 
-if feedEnabled and barstate.isconfirmed
-    for i = 0 to array.size(symbols) - 1
-        symbol = array.get(symbols, i)
-        d = feedBar(symbol)
-        previousTime = array.get(lastSentTimes, i)
+if feedEnabled and barstate.isconfirmed and barstate.isrealtime
+    if not na(btc.t) and not na(btc.c) and (na(lastBTC) or btc.t != lastBTC)
+        lastBTC := btc.t
+        alert(buildMessage("CAPITALCOM:BTCUSD", btc), alert.freq_all)
 
-        if not na(d.t) and not na(d.c) and (na(previousTime) or d.t != previousTime)
-            array.set(lastSentTimes, i, d.t)
+    if not na(eth.t) and not na(eth.c) and (na(lastETH) or eth.t != lastETH)
+        lastETH := eth.t
+        alert(buildMessage("CAPITALCOM:ETHUSD", eth), alert.freq_all)
 
-            if barstate.isrealtime
-                alert(buildMessage(symbol, d), alert.freq_all)
+    if not na(doge.t) and not na(doge.c) and (na(lastDOGE) or doge.t != lastDOGE)
+        lastDOGE := doge.t
+        alert(buildMessage("CAPITALCOM:DOGEUSD", doge), alert.freq_all)
+
+    if not na(eur.t) and not na(eur.c) and (na(lastEUR) or eur.t != lastEUR)
+        lastEUR := eur.t
+        alert(buildMessage("CAPITALCOM:EURUSD", eur), alert.freq_all)
+
+    if not na(aud.t) and not na(aud.c) and (na(lastAUD) or aud.t != lastAUD)
+        lastAUD := aud.t
+        alert(buildMessage("CAPITALCOM:AUDUSD", aud), alert.freq_all)
+
+    if not na(zar.t) and not na(zar.c) and (na(lastZAR) or zar.t != lastZAR)
+        lastZAR := zar.t
+        alert(buildMessage("CAPITALCOM:USDZAR", zar), alert.freq_all)
+
+    if not na(xau.t) and not na(xau.c) and (na(lastXAU) or xau.t != lastXAU)
+        lastXAU := xau.t
+        alert(buildMessage("CAPITALCOM:XAUUSD", xau), alert.freq_all)
+
+    if not na(xag.t) and not na(xag.c) and (na(lastXAG) or xag.t != lastXAG)
+        lastXAG := xag.t
+        alert(buildMessage("CAPITALCOM:XAGUSD", xag), alert.freq_all)
+
+    if not na(spx.t) and not na(spx.c) and (na(lastSPX) or spx.t != lastSPX)
+        lastSPX := spx.t
+        alert(buildMessage("CAPITALCOM:SPX500", spx), alert.freq_all)
+
+    if not na(nas.t) and not na(nas.c) and (na(lastNAS) or nas.t != lastNAS)
+        lastNAS := nas.t
+        alert(buildMessage("CAPITALCOM:NAS100", nas), alert.freq_all)
 
 // -----------------------------------------------------------------------------
 // Current-chart visual engine.
