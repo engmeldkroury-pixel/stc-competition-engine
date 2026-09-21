@@ -377,6 +377,38 @@ function stc_max_open_position(string $competitionId, string $symbol): ?float {
     return null;
 }
 
+function stc_risk_cluster(string $symbol): string {
+    $map = [
+        'CAPITALCOM:BTCUSD' => 'crypto',
+        'CAPITALCOM:ETHUSD' => 'crypto',
+        'CAPITALCOM:DOGEUSD' => 'crypto',
+        'CAPITALCOM:EURUSD' => 'fx_usd',
+        'CAPITALCOM:AUDUSD' => 'fx_usd',
+        'CAPITALCOM:USDZAR' => 'fx_usd',
+        'CAPITALCOM:XAUUSD' => 'metals',
+        'CAPITALCOM:XAGUSD' => 'metals',
+        'CAPITALCOM:SPX500' => 'equity_indices',
+        'CAPITALCOM:NAS100' => 'equity_indices',
+        'CME_MINI:MES1!' => 'equity_indices',
+        'CME_MINI:MNQ1!' => 'equity_indices',
+        'CBOT_MINI:MYM1!' => 'equity_indices',
+        'CME_MINI:M2K1!' => 'equity_indices',
+        'NYMEX:MCL1!' => 'energy',
+        'NYMEX:MNG1!' => 'energy',
+        'COMEX_MINI:MGC1!' => 'metals',
+        'COMEX_MINI:SIL1!' => 'metals',
+        'CME_MINI:M6E1!' => 'fx_usd',
+        'CME_MINI:M6B1!' => 'fx_usd',
+        'CME_MINI:MJY1!' => 'fx_usd',
+        'CME_MINI:M6A1!' => 'fx_usd',
+        'CME:MBT1!' => 'crypto',
+        'CME:MET1!' => 'crypto',
+        'CBOT:ZN1!' => 'rates',
+        'CBOT:ZB1!' => 'rates',
+    ];
+    return (string)($map[$symbol] ?? 'other');
+}
+
 function stc_commission_rate(string $competitionId): float {
     if ($competitionId === 'capital-africa-sep-2026') {
         return 0.0001;
@@ -394,10 +426,17 @@ function stc_propose_position_size(
     float $riskFraction,
     float $entryPrice,
     float $stopPrice,
-    float $currentOpenQuantity
+    float $currentOpenQuantity,
+    float $portfolioOpenRiskUsd = 0.0,
+    float $clusterOpenRiskUsd = 0.0,
+    float $portfolioRiskMultiple = 6.0,
+    float $clusterRiskMultiple = 3.0
 ): array {
     if ($equity <= 0 || $entryPrice <= 0 || $stopPrice <= 0 || $riskFraction <= 0 || $riskFraction > 0.02) {
         throw new RuntimeException('invalid_sizing_input');
+    }
+    if ($portfolioOpenRiskUsd < 0 || $clusterOpenRiskUsd < 0 || $portfolioRiskMultiple < 1 || $clusterRiskMultiple < 1) {
+        throw new RuntimeException('invalid_portfolio_risk_input');
     }
     $maxPosition = stc_max_open_position($competitionId, $symbol);
     if ($maxPosition === null) {
@@ -410,7 +449,21 @@ function stc_propose_position_size(
     }
     $commission = 2.0 * $entryPrice * $value * stc_commission_rate($competitionId);
     $totalRisk = $stopRisk + $commission;
-    $budget = $equity * $riskFraction;
+
+    $configuredBudget = $equity * $riskFraction;
+    $portfolioCap = $equity * $riskFraction * $portfolioRiskMultiple;
+    $clusterCap = $equity * $riskFraction * $clusterRiskMultiple;
+    $remainingPortfolio = max(0.0, $portfolioCap - $portfolioOpenRiskUsd);
+    $remainingCluster = max(0.0, $clusterCap - $clusterOpenRiskUsd);
+    $budget = min($configuredBudget, $remainingPortfolio, $remainingCluster);
+    $limitedBy = [];
+    if ($remainingPortfolio + 1e-12 < $configuredBudget) {
+        $limitedBy[] = 'portfolio_risk_capacity';
+    }
+    if ($remainingCluster + 1e-12 < $configuredBudget) {
+        $limitedBy[] = 'correlation_cluster_capacity';
+    }
+
     $raw = $budget / $totalRisk;
     $room = max(0.0, $maxPosition - $currentOpenQuantity);
 
@@ -421,6 +474,14 @@ function stc_propose_position_size(
         $qty = floor(min($raw, $room) * 1000000.0) / 1000000.0;
         $integerContracts = false;
     }
+
+    $riskAmount = $qty * $totalRisk;
+    $portfolioAfter = $portfolioOpenRiskUsd + $riskAmount;
+    $clusterAfter = $clusterOpenRiskUsd + $riskAmount;
+    $allowed = $qty > 0
+        && ($currentOpenQuantity + $qty) <= $maxPosition + 1e-12
+        && $portfolioAfter <= $portfolioCap + 1e-9
+        && $clusterAfter <= $clusterCap + 1e-9;
 
     return [
         'equity_usd' => $equity,
@@ -435,10 +496,18 @@ function stc_propose_position_size(
         'max_position' => $maxPosition,
         'current_open_quantity' => $currentOpenQuantity,
         'projected_open_quantity' => $currentOpenQuantity + $qty,
-        'risk_amount_usd' => $qty * $totalRisk,
+        'risk_amount_usd' => $riskAmount,
+        'risk_cluster' => stc_risk_cluster($symbol),
+        'portfolio_risk_cap_usd' => $portfolioCap,
+        'cluster_risk_cap_usd' => $clusterCap,
+        'portfolio_risk_before_usd' => $portfolioOpenRiskUsd,
+        'cluster_risk_before_usd' => $clusterOpenRiskUsd,
+        'portfolio_risk_after_usd' => $portfolioAfter,
+        'cluster_risk_after_usd' => $clusterAfter,
+        'risk_budget_limited_by' => $limitedBy,
         'quantity_is_integer_contracts' => $integerContracts,
-        'allowed_by_position_limit' => $qty > 0 && ($currentOpenQuantity + $qty) <= $maxPosition + 1e-12,
+        'allowed_by_position_limit' => $allowed,
         'provisional_risk_setting' => true,
-        'note' => 'STC sizing proposal only. Human approval and manual order entry required.',
+        'note' => 'STC sizing proposal only. Portfolio and correlation-cluster caps are STC risk controls, not official competition limits. Human approval and manual order entry required.',
     ];
 }
