@@ -22,6 +22,11 @@ class InboxReader(Protocol):
     def inbox(self, status: str = "received", limit: int = 20) -> dict[str, Any]: ...
 
 
+class OperatorReader(InboxReader, Protocol):
+    def runtime_control(self) -> dict[str, Any]: ...
+    def approval(self, signal_id: str) -> dict[str, Any]: ...
+
+
 BLOCKERS = (
     "durable_runtime_control_not_connected",
     "durable_owner_approval_not_connected",
@@ -256,3 +261,141 @@ def read_cloud_snapshot(
         now=now,
         scan_limit=limit,
     )
+
+
+def build_operator_snapshot(
+    base_snapshot: dict[str, Any],
+    runtime_body: dict[str, Any],
+    approval_by_signal: Mapping[str, dict[str, Any]],
+) -> dict[str, Any]:
+    """Enrich a validated read-only signal snapshot with durable cloud control state.
+
+    This function never writes approval state and never performs execution.
+    """
+    if not isinstance(base_snapshot, dict) or base_snapshot.get("ok") is not True:
+        raise CloudSnapshotError("invalid_base_snapshot")
+    if not isinstance(runtime_body, dict) or runtime_body.get("ok") is not True:
+        raise CloudSnapshotError("invalid_runtime_control_contract")
+    runtime = runtime_body.get("runtime_control")
+    if not isinstance(runtime, dict):
+        raise CloudSnapshotError("missing_runtime_control")
+
+    safe_mode = runtime.get("safe_mode")
+    kill_switch = runtime.get("kill_switch")
+    version = runtime.get("version")
+    if not isinstance(safe_mode, bool) or not isinstance(kill_switch, bool):
+        raise CloudSnapshotError("invalid_runtime_control_flags")
+    if isinstance(version, bool) or not isinstance(version, int) or version < 1:
+        raise CloudSnapshotError("invalid_runtime_control_version")
+
+    cards = []
+    actionable = 0
+    blocked = 0
+
+    for source in base_snapshot.get("cards", []):
+        if not isinstance(source, dict):
+            raise CloudSnapshotError("invalid_signal_card")
+        card = dict(source)
+        signal_id = card["signal_id"]
+        approval_body = approval_by_signal.get(signal_id)
+        approval = None
+        approval_decision = "none"
+        approval_reasons: list[str] = []
+
+        if approval_body is not None:
+            if not isinstance(approval_body, dict) or approval_body.get("ok") is not True:
+                raise CloudSnapshotError("invalid_approval_readback_contract")
+            if approval_body.get("signal_id") != signal_id:
+                raise CloudSnapshotError("approval_signal_mismatch")
+            approval = approval_body.get("approval")
+            if approval is not None:
+                if not isinstance(approval, dict):
+                    raise CloudSnapshotError("invalid_approval_record")
+                approval_decision = str(approval.get("decision") or "unknown")
+                reasons = approval.get("reasons") or []
+                if not isinstance(reasons, list) or any(not isinstance(x, str) for x in reasons):
+                    raise CloudSnapshotError("invalid_approval_reasons")
+                approval_reasons = reasons
+
+        operational_blockers = list(card.get("blockers") or [])
+        operational_blockers = [
+            x for x in operational_blockers
+            if x not in {
+                "durable_runtime_control_not_connected",
+                "durable_owner_approval_not_connected",
+            }
+        ]
+        if safe_mode:
+            operational_blockers.append("safe_mode_active")
+        if kill_switch:
+            operational_blockers.append("kill_switch_active")
+        if approval_decision != "approved":
+            operational_blockers.append(
+                "owner_approval_missing" if approval_decision == "none"
+                else f"owner_approval_{approval_decision}"
+            )
+        operational_blockers = list(dict.fromkeys(operational_blockers))
+
+        can_execute_manually = (
+            card.get("recommendation") in {"LONG", "SHORT"}
+            and card.get("locked_trade_plan") is not None
+            and not operational_blockers
+            and approval_decision == "approved"
+            and not safe_mode
+            and not kill_switch
+        )
+
+        if can_execute_manually:
+            actionable += 1
+        else:
+            blocked += 1
+
+        card.update({
+            "runtime_control": {
+                "safe_mode": safe_mode,
+                "kill_switch": kill_switch,
+                "version": version,
+                "reason": runtime.get("reason"),
+                "updated_at_utc": runtime.get("updated_at_utc"),
+            },
+            "durable_approval": approval,
+            "durable_approval_decision": approval_decision,
+            "durable_approval_reasons": approval_reasons,
+            "operational_blockers": operational_blockers,
+            "manual_execution_ready": can_execute_manually,
+            "execution": "manual_only",
+        })
+        cards.append(card)
+
+    return {
+        **base_snapshot,
+        "scope": "durable_operator_read_only",
+        "runtime_control": {
+            "safe_mode": safe_mode,
+            "kill_switch": kill_switch,
+            "version": version,
+            "reason": runtime.get("reason"),
+            "updated_at_utc": runtime.get("updated_at_utc"),
+        },
+        "cards": cards,
+        "actionable_manual_count": actionable,
+        "blocked_count": blocked,
+        "automatic_execution_available": False,
+        "execution_mode": "manual_only",
+    }
+
+
+def read_operator_snapshot(
+    client: OperatorReader,
+    allowed: Mapping[str, Collection[str]],
+    *,
+    now: datetime | None = None,
+    limit: int = 100,
+) -> dict[str, Any]:
+    base = read_cloud_snapshot(client, allowed, now=now, limit=limit)
+    runtime = client.runtime_control()
+    approvals: dict[str, dict[str, Any]] = {}
+    for card in base["cards"]:
+        signal_id = card["signal_id"]
+        approvals[signal_id] = client.approval(signal_id)
+    return build_operator_snapshot(base, runtime, approvals)

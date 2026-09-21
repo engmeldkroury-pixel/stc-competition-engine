@@ -2,7 +2,7 @@ import hashlib
 import json
 from datetime import datetime, timezone
 
-from app.cloud_approval import build_cloud_snapshot, cloud_readiness
+from app.cloud_approval import build_cloud_snapshot, build_operator_snapshot, cloud_readiness
 
 NOW = datetime(2026, 9, 21, 8, 0, tzinfo=timezone.utc)
 ALLOWED = {"capital-africa-sep-2026": {"CAPITALCOM:XAUUSD"}}
@@ -90,3 +90,58 @@ def test_cloud_readiness_fails_closed():
     assert r["effective_policy"]["safe_mode"] is True
     assert r["effective_policy"]["kill_switch"] is True
     assert r["automatic_execution_available"] is False
+
+
+def test_operator_snapshot_uses_durable_runtime_and_approval_state():
+    base = build_cloud_snapshot({"ok": True, "events": [_row()]}, ALLOWED, now=NOW)
+    signal_id = base["cards"][0]["signal_id"]
+    runtime = {
+        "ok": True,
+        "runtime_control": {
+            "safe_mode": False,
+            "kill_switch": False,
+            "reason": None,
+            "version": 2,
+            "updated_at_utc": "2026-09-21 08:00:00",
+        },
+    }
+    approval = {
+        "ok": True,
+        "signal_id": signal_id,
+        "approval": {
+            "decision": "approved",
+            "reasons": [],
+            "approval_id": "approval-1",
+        },
+        "execution": "manual_only",
+    }
+    result = build_operator_snapshot(base, runtime, {signal_id: approval})
+    card = result["cards"][0]
+    assert card["runtime_control"]["safe_mode"] is False
+    assert card["durable_approval_decision"] == "approved"
+    # Synthetic row has no locked plan; it must remain non-executable.
+    assert card["manual_execution_ready"] is False
+    assert result["automatic_execution_available"] is False
+
+
+def test_operator_snapshot_blocks_safe_mode_even_with_approval():
+    base = build_cloud_snapshot({"ok": True, "events": [_row()]}, ALLOWED, now=NOW)
+    signal_id = base["cards"][0]["signal_id"]
+    runtime = {
+        "ok": True,
+        "runtime_control": {
+            "safe_mode": True,
+            "kill_switch": False,
+            "reason": "hold",
+            "version": 5,
+            "updated_at_utc": "2026-09-21 08:00:00",
+        },
+    }
+    approval = {
+        "ok": True,
+        "signal_id": signal_id,
+        "approval": {"decision": "approved", "reasons": []},
+    }
+    result = build_operator_snapshot(base, runtime, {signal_id: approval})
+    assert "safe_mode_active" in result["cards"][0]["operational_blockers"]
+    assert result["cards"][0]["manual_execution_ready"] is False

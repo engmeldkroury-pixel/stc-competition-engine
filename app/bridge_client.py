@@ -107,3 +107,35 @@ class BridgeClient:
         if response.status_code != 200:
             raise BridgeClientError(f"inbox_failed:{response.status_code}:{response.text[:200]}")
         return response.json()
+
+
+    def runtime_control(self) -> dict[str, Any]:
+        with self._client() as client:
+            response = client.get(
+                f"{self.base_url}/runtime_control.php",
+                headers=self.headers,
+            )
+        if response.status_code != 200:
+            raise BridgeClientError(
+                f"runtime_control_failed:{response.status_code}:{response.text[:200]}"
+            )
+        body = response.json()
+        if body.get("ok") is not True:
+            raise BridgeClientError(f"runtime_control_rejected:{body}")
+        return body
+
+    def approval(self, signal_id: str) -> dict[str, Any]:
+        with self._client() as client:
+            response = client.get(
+                f"{self.base_url}/approval.php",
+                headers=self.headers,
+                params={"signal_id": signal_id},
+            )
+        if response.status_code != 200:
+            raise BridgeClientError(
+                f"approval_read_failed:{response.status_code}:{response.text[:200]}"
+            )
+        body = response.json()
+        if body.get("ok") is not True:
+            raise BridgeClientError(f"approval_read_rejected:{body}")
+        return body
