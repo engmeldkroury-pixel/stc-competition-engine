@@ -5,7 +5,7 @@ PATCH = ROOT / "hostinger_patch"
 
 
 def test_hostinger_patch_files_present():
-    for name in ("cloud_control.php", "runtime_control.php", "approval.php", "operator_snapshot.php", "operator.php", "migrations/001_cloud_approval.sql"):
+    for name in ("cloud_control.php", "runtime_control.php", "approval.php", "operator_snapshot.php", "operator.php", "portfolio_control.php", "position.php", "account_state.php", "migrations/001_cloud_approval.sql", "migrations/002_portfolio_supervisor.sql"):
         assert (PATCH / name).exists()
 
 
@@ -100,3 +100,62 @@ def test_owner_console_has_separate_navigation_for_competitions_general_and_noti
     assert "stc_general_lab" in ui
     assert "Separate research/sandbox area" in ui
     assert "does not affect either competition account" in ui
+
+
+def test_portfolio_migration_is_additive_and_manual_only():
+    sql = (PATCH / "migrations" / "002_portfolio_supervisor.sql").read_text(encoding="utf-8")
+    assert "CREATE TABLE IF NOT EXISTS stc_positions" in sql
+    assert "CREATE TABLE IF NOT EXISTS stc_position_events" in sql
+    assert "CREATE TABLE IF NOT EXISTS stc_account_state" in sql
+    assert "initial_profile_seed" in sql
+    assert "DROP TABLE" not in sql.upper()
+    assert "DELETE FROM" not in sql.upper()
+    assert "ALTER TABLE stc_webhook_events" not in sql
+
+
+def test_position_ledger_never_places_orders_and_requires_owner_auth():
+    position = (PATCH / "position.php").read_text(encoding="utf-8")
+    control = (PATCH / "portfolio_control.php").read_text(encoding="utf-8")
+    account = (PATCH / "account_state.php").read_text(encoding="utf-8")
+    for text in (position, account):
+        assert "stc_require_owner_auth($config);" in text
+    combined = position + control + account
+    for forbidden in ("place_order", "submit_order", "broker_order", "strategy.entry"):
+        assert forbidden not in combined
+    assert "manual_only" in position
+    assert "Owner confirmed manual competition fill" in position
+    assert "stop_risk_widening_blocked" in position
+
+
+def test_portfolio_supervisor_has_anti_churn_and_manual_management_actions():
+    control = (PATCH / "portfolio_control.php").read_text(encoding="utf-8")
+    snapshot = (PATCH / "operator_snapshot.php").read_text(encoding="utf-8")
+    ui = (PATCH / "operator.php").read_text(encoding="utf-8")
+    assert "two_closed_bars_confirmed_strong_opposite_signal" in control
+    for action in ("HOLD", "PROTECT", "PARTIAL_TAKE_PROFIT", "EXIT_NOW"):
+        assert action in control
+    assert "rotation_candidates" in snapshot
+    assert "score_advantage" in snapshot
+    assert "current_thesis_degraded_and_new_locked_plan_materially_stronger" in snapshot
+    assert "After manual fill: record open position" in ui
+    assert "After manual stop change: record" in ui
+    assert "After manual partial close: record" in ui
+    assert "After manual close: record" in ui
+
+
+def test_console_exposes_owner_synced_equity_and_provisional_sizing():
+    snapshot = (PATCH / "operator_snapshot.php").read_text(encoding="utf-8")
+    ui = (PATCH / "operator.php").read_text(encoding="utf-8")
+    account = (PATCH / "account_state.php").read_text(encoding="utf-8")
+    assert "stc_account_state" in snapshot
+    assert "position_sizing" in snapshot
+    assert "provisional_risk_setting" in (PATCH / "portfolio_control.php").read_text(encoding="utf-8")
+    assert "Owner-synced equity" in ui
+    assert "STC risk budget / trade" in ui
+    assert "risk_fraction_out_of_range" in account
+
+
+def test_filtered_signal_cards_keep_actions_bound_to_authoritative_snapshot_index():
+    ui = (PATCH / "operator.php").read_text(encoding="utf-8")
+    assert "all.indexOf(c)" in ui
+    assert "approveCard(" in ui

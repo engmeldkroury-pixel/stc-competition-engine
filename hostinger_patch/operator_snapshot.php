@@ -1,25 +1,51 @@
 <?php
 declare(strict_types=1);
-require __DIR__ . '/cloud_control.php';
+require __DIR__ . '/portfolio_control.php';
 
 stc_require_owner_auth($config);
 $pdo = stc_pdo($config);
 
 try {
     $runtime = stc_runtime_control_row($pdo);
+    $now = new DateTimeImmutable('now', new DateTimeZone('UTC'));
+
+    $accounts = [];
+    $accountStmt = $pdo->query(
+        'SELECT competition_id, equity_usd, risk_fraction, source, version, updated_at_utc '
+        . 'FROM stc_account_state ORDER BY competition_id'
+    );
+    while (($row = $accountStmt->fetch()) !== false) {
+        $accounts[(string)$row['competition_id']] = [
+            'competition_id' => (string)$row['competition_id'],
+            'equity_usd' => (float)$row['equity_usd'],
+            'risk_fraction' => (float)$row['risk_fraction'],
+            'source' => (string)$row['source'],
+            'version' => (int)$row['version'],
+            'updated_at_utc' => $row['updated_at_utc'],
+        ];
+    }
+
+    $openQty = [];
+    $qtyStmt = $pdo->query(
+        "SELECT competition_id, symbol, SUM(quantity) AS qty FROM stc_positions "
+        . "WHERE status = 'OPEN' GROUP BY competition_id, symbol"
+    );
+    while (($row = $qtyStmt->fetch()) !== false) {
+        $openQty[(string)$row['competition_id'] . '|' . (string)$row['symbol']] = (float)$row['qty'];
+    }
+
     $stmt = $pdo->prepare(
         'SELECT id, event_id, payload_json, result_json, analysis_completed_at_utc '
         . 'FROM stc_webhook_events '
         . "WHERE status = 'ingested' "
         . "AND JSON_UNQUOTE(JSON_EXTRACT(payload_json, '$.competition_id')) IN (?, ?) "
         . "AND JSON_UNQUOTE(JSON_EXTRACT(result_json, '$.decision.action')) = 'signal_created' "
-        . 'ORDER BY id DESC LIMIT 250'
+        . 'ORDER BY id DESC LIMIT 400'
     );
     $stmt->execute(['capital-africa-sep-2026', 'amp-futures-sep-2026']);
 
     $cards = [];
     $seen = [];
-    $now = new DateTimeImmutable('now', new DateTimeZone('UTC'));
 
     while (($row = $stmt->fetch()) !== false) {
         $payload = json_decode((string)$row['payload_json'], true);
@@ -85,34 +111,157 @@ try {
             && $validUntil !== null
             && $now < $validUntil;
 
+        $sizing = null;
+        if ($planValid && isset($accounts[$competitionId])) {
+            try {
+                $account = $accounts[$competitionId];
+                $sizing = stc_propose_position_size(
+                    $competitionId,
+                    $symbol,
+                    (float)$account['equity_usd'],
+                    (float)$account['risk_fraction'],
+                    (float)$lockedPlan['entry_mid'],
+                    (float)$lockedPlan['initial_stop'],
+                    (float)($openQty[$seenKey] ?? 0.0)
+                );
+            } catch (Throwable $e) {
+                $sizing = [
+                    'proposed_quantity' => 0.0,
+                    'allowed_by_position_limit' => false,
+                    'error' => $e->getMessage(),
+                ];
+            }
+        }
+
         $cards[] = [
             'event_id' => (string)$row['event_id'],
             'signal_id' => $signalId,
             'competition_id' => $competitionId,
             'symbol' => $symbol,
             'source_time' => (string)($payload['time'] ?? ''),
+            'current_price' => (float)($payload['close'] ?? 0.0),
             'recommendation' => $recommendation,
             'composite_score' => (float)($signal['composite_score'] ?? 0.0),
             'confidence' => (float)($signal['confidence'] ?? 0.0),
             'reasons' => is_array($signal['reasons'] ?? null) ? $signal['reasons'] : [],
             'envelope' => $envelope,
             'locked_trade_plan' => $planValid ? $lockedPlan : null,
+            'position_sizing' => $sizing,
             'approval' => $approval,
             'manual_execution_ready' => $manualReady,
             'execution' => 'manual_only',
         ];
-        if (count($cards) >= 40) {
+        if (count($cards) >= 80) {
             break;
         }
     }
 
+    $cardByTarget = [];
+    foreach ($cards as $card) {
+        $cardByTarget[$card['competition_id'] . '|' . $card['symbol']] = $card;
+    }
+
+    $positions = [];
+    $summary = [
+        'capital-africa-sep-2026' => ['open_positions' => 0, 'initial_risk_usd' => 0.0],
+        'amp-futures-sep-2026' => ['open_positions' => 0, 'initial_risk_usd' => 0.0],
+    ];
+    $rotationCandidates = [];
+
+    $posStmt = $pdo->query(
+        "SELECT * FROM stc_positions WHERE status = 'OPEN' ORDER BY opened_at_utc ASC, id ASC"
+    );
+    while (($positionRow = $posStmt->fetch()) !== false) {
+        $public = stc_position_public($positionRow);
+        $history = stc_recent_signal_states(
+            $pdo,
+            (string)$positionRow['competition_id'],
+            (string)$positionRow['symbol'],
+            3
+        );
+        $advice = stc_supervise_position($positionRow, $history);
+        $public['management'] = $advice;
+        $public['latest_signal_history'] = $history;
+
+        try {
+            $value = stc_price_value_usd(
+                (string)$positionRow['competition_id'],
+                (string)$positionRow['symbol'],
+                (float)$positionRow['entry_price']
+            );
+            $risk = abs((float)$positionRow['entry_price'] - (float)$positionRow['initial_stop'])
+                * (float)$positionRow['quantity'] * $value;
+        } catch (Throwable $e) {
+            $risk = 0.0;
+        }
+        $cid = (string)$positionRow['competition_id'];
+        if (!isset($summary[$cid])) {
+            $summary[$cid] = ['open_positions' => 0, 'initial_risk_usd' => 0.0];
+        }
+        $summary[$cid]['open_positions'] += 1;
+        $summary[$cid]['initial_risk_usd'] += $risk;
+
+        if (($advice['thesis_degraded'] ?? false) === true) {
+            $latestScore = 0.0;
+            if ($history !== []) {
+                $latest = $history[count($history) - 1];
+                $latestScore = (float)$latest['composite_score'];
+            }
+            $alignment = (string)$positionRow['side'] === 'LONG' ? $latestScore : -$latestScore;
+            $baseline = max(0.0, $alignment);
+            $best = null;
+
+            foreach ($cards as $candidate) {
+                if ($candidate['competition_id'] !== $cid
+                    || $candidate['symbol'] === (string)$positionRow['symbol']
+                    || !in_array($candidate['recommendation'], ['LONG', 'SHORT'], true)
+                    || !is_array($candidate['locked_trade_plan'])) {
+                    continue;
+                }
+                $advantage = abs((float)$candidate['composite_score']) - $baseline;
+                if ($advantage < 0.25) {
+                    continue;
+                }
+                if ($best === null || $advantage > $best['score_advantage']) {
+                    $best = [
+                        'competition_id' => $cid,
+                        'from_position_id' => (string)$positionRow['position_id'],
+                        'from_symbol' => (string)$positionRow['symbol'],
+                        'to_symbol' => (string)$candidate['symbol'],
+                        'to_direction' => (string)$candidate['recommendation'],
+                        'score_advantage' => $advantage,
+                        'to_plan_id' => (string)$candidate['locked_trade_plan']['plan_id'],
+                        'reason' => 'current_thesis_degraded_and_new_locked_plan_materially_stronger',
+                    ];
+                }
+            }
+            if ($best !== null) {
+                $rotationCandidates[] = $best;
+                $public['rotation_candidate'] = $best;
+            } else {
+                $public['rotation_candidate'] = null;
+            }
+        } else {
+            $public['rotation_candidate'] = null;
+        }
+
+        $positions[] = $public;
+    }
+
     stc_json([
         'ok' => true,
-        'scope' => 'owner_console_dual_competition_read_only_snapshot',
+        'scope' => 'owner_console_dual_competition_portfolio_snapshot',
         'competitions' => ['capital-africa-sep-2026', 'amp-futures-sep-2026'],
         'observed_at_utc' => $now->format(DateTimeInterface::ATOM),
         'runtime_control' => $runtime,
+        'account_states' => array_values($accounts),
         'cards' => $cards,
+        'portfolio' => [
+            'positions' => $positions,
+            'summary' => $summary,
+            'rotation_candidates' => $rotationCandidates,
+            'anti_churn_policy' => 'two_closed_bar_opposite_confirmation_and_material_score_advantage',
+        ],
         'execution' => 'manual_only',
         'automatic_execution_available' => false,
     ]);

@@ -55,3 +55,50 @@ The console can:
 The console cannot place, modify, or close an order. After a signal is approved, order entry remains manual in the competition platform.
 
 For an approve action, the owner must enter the current TradingView price. The console supplies a fresh UTC observation timestamp and `market_status=open`; the existing server-side approval contract still rejects stale evidence, a price outside the envelope, Safe Mode, Kill Switch, WAIT signals, expired signals, or signals superseded by a newer event.
+
+
+## Portfolio Supervisor add-on
+
+After the owner console is deployed, this additive batch adds durable manual position tracking, owner-synced competition equity, position sizing, and portfolio-management advice.
+
+Upload these files to the same `public_html` directory:
+
+- `portfolio_control.php`
+- `position.php`
+- `account_state.php`
+- updated `operator_snapshot.php`
+- updated `operator.php`
+
+Then run once:
+
+- `migrations/002_portfolio_supervisor.sql`
+
+Deployment order matters:
+1. Run the SQL migration first.
+2. Upload `portfolio_control.php`, `position.php`, and `account_state.php`.
+3. Replace `operator_snapshot.php`.
+4. Replace `operator.php`.
+5. Keep Safe Mode and Kill Switch ON.
+6. Refresh the owner console and confirm both competition tabs still load.
+
+The new account-state rows are seeded from the known competition initial balances:
+- Capital.com Africa: USD 100,000
+- AMP Futures: USD 250,000
+
+The seeded risk fraction is an STC provisional configuration of 0.50% per new trade. It is not an official competition risk limit. The owner console can update equity and the configured risk fraction manually because the verified STC integration has no broker-account read access.
+
+Position records are created only after the owner confirms the fill already occurred manually in the competition platform. The ledger supports:
+- OPEN after a confirmed manual fill;
+- STOP_UPDATE after the stop is changed manually;
+- PARTIAL after a manual partial close;
+- CLOSE after a manual full close.
+
+The API never sends broker orders. Stop updates that widen risk are rejected.
+
+Portfolio Supervisor actions are decision support only:
+- `HOLD`
+- `PROTECT`
+- `PARTIAL_TAKE_PROFIT`
+- `EXIT_NOW`
+
+Anti-churn rule: a stronger opportunity alone cannot force rotation. The current thesis must first degrade, including two consecutive strong opposite closed-bar signals when reversal is the reason, and a same-competition locked opportunity must be materially stronger before it is surfaced as a rotation candidate.

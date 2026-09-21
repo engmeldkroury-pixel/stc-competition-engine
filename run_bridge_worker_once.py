@@ -1,9 +1,12 @@
 from __future__ import annotations
 
 import os
+import time
 
-from app.bridge_client import BridgeClient
-from app.serverless_worker import run_serverless_once
+import httpx
+
+from app.bridge_client import BridgeClient, BridgeClientError
+from app.serverless_worker import run_serverless_drain
 
 
 def main() -> None:
@@ -17,12 +20,24 @@ def main() -> None:
     limit = max(1, min(limit, 20))
     if not base_url or not token:
         raise SystemExit("STC_BRIDGE_URL and STC_WORKER_TOKEN are required")
-    result = run_serverless_once(
-        BridgeClient(base_url, token, timeout_seconds=8.0),
-        worker_id=worker_id,
-        limit=limit,
-    )
-    print(result.to_dict())
+    client = BridgeClient(base_url, token, timeout_seconds=8.0)
+    last_error: Exception | None = None
+    for attempt in range(3):
+        try:
+            result = run_serverless_drain(
+                client,
+                worker_id=worker_id,
+                limit=limit,
+                max_batches=5,
+            )
+            print(result.to_dict())
+            return
+        except (httpx.HTTPError, BridgeClientError) as exc:
+            last_error = exc
+            if attempt < 2:
+                time.sleep(2 ** attempt)
+    if last_error is not None:
+        raise last_error
 
 
 if __name__ == "__main__":
