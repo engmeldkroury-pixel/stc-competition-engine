@@ -11,10 +11,11 @@ def build_readiness(runtime_control: dict) -> dict:
     fallback_quote_symbols = sorted(s for s, c in CAPABILITIES.items() if not c.direct_quote)
 
     capability_complete = competition_symbols == verified_symbols
-    analysis_ready = capability_complete and all(
+    historical_context_capable = capability_complete and all(
         CAPABILITIES[s].ohlcv and CAPABILITIES[s].local_technicals_from_ohlcv
         for s in competition_symbols
     )
+    analysis_ready = historical_context_capable
     execution_api_available = any(CAPABILITIES[s].execution_write for s in competition_symbols)
 
     blockers: list[str] = []
@@ -22,6 +23,8 @@ def build_readiness(runtime_control: dict) -> dict:
         blockers.append("capital_capability_matrix_incomplete")
     if not analysis_ready:
         blockers.append("analysis_capability_incomplete")
+    if not historical_context_capable:
+        blockers.append("historical_context_capability_incomplete")
     if runtime_control.get("kill_switch"):
         blockers.append("kill_switch_active")
     if runtime_control.get("safe_mode"):
@@ -29,6 +32,11 @@ def build_readiness(runtime_control: dict) -> dict:
 
     return {
         "analysis_ready": analysis_ready,
+        "historical_context_capable": historical_context_capable,
+        "historical_context_required": True,
+        "historical_window_trading_days": 252,
+        "historical_context_timeframe": "1D",
+        "historical_context_policy": "previous_confirmed_daily_bar",
         "approval_runtime_ready": not blockers,
         "execution_mode": "manual_only",
         "automatic_execution_available": execution_api_available,
@@ -41,7 +49,8 @@ def build_readiness(runtime_control: dict) -> dict:
         "independent_quote_or_owner_confirmation_symbols": fallback_quote_symbols,
         "blockers": blockers,
         "note": (
-            "Static readiness does not prove that the market is open or that a live quote "
-            "is currently available. Approval still requires fresh trusted runtime evidence."
+            "Static readiness does not prove that the market is open, that a live quote is "
+            "currently available, or that the latest v0.7 historical context has been observed "
+            "in a production event. Approval still requires fresh trusted runtime evidence."
         ),
     }
