@@ -222,6 +222,13 @@ function stc_notify_signal_event(PDO $pdo, array $config, string $eventId): arra
         return ['ok' => true, 'skipped' => true, 'reason' => 'wait_signal'];
     }
 
+    $validUntil = stc_parse_utc((string)($plan['valid_until'] ?? ''));
+    $now = new DateTimeImmutable('now', new DateTimeZone('UTC'));
+    if ($validUntil === null || $now >= $validUntil) {
+        return ['ok' => true, 'skipped' => true, 'reason' => 'expired_plan'];
+    }
+    $minutesLeft = max(1, (int)ceil(($validUntil->getTimestamp() - $now->getTimestamp()) / 60));
+
     $competitionId = (string)$payload['competition_id'];
     $symbol = (string)$payload['symbol'];
     $account = stc_account_state_for($pdo, $competitionId);
@@ -250,15 +257,32 @@ function stc_notify_signal_event(PDO $pdo, array $config, string $eventId): arra
         }
     }
 
+    $order = stc_entry_order_instruction(
+        $direction,
+        (float)($payload['close'] ?? 0.0),
+        (float)$plan['entry_min'],
+        (float)$plan['entry_max']
+    );
+    $orderText = trim(((string)($order['side'] ?? '')) . ' ' . (string)($order['order_type'] ?? 'ENTRY'));
+    if (($order['trigger_price'] ?? null) !== null) {
+        $orderText .= ' | trigger ' . $order['trigger_price'];
+    }
+    if (($order['limit_price'] ?? null) !== null) {
+        $orderText .= ' | limit ' . $order['limit_price'];
+    }
+
     $label = $competitionId === 'amp-futures-sep-2026' ? 'AMP Futures' : 'Capital.com Africa';
     $title = 'STC NEW PLAN • ' . $label . ' • ' . $direction;
     $body = implode("\n", [
         $symbol,
-        'Entry: ' . $plan['entry_min'] . ' - ' . $plan['entry_max'],
+        'STATUS: ACTIVE • ' . $minutesLeft . ' min left',
+        'Order: ' . $orderText,
+        'Entry zone: ' . $plan['entry_min'] . ' - ' . $plan['entry_max'],
         'Stop: ' . $plan['initial_stop'],
         'TP1: ' . $plan['target1'],
         'TP2: ' . $plan['target2'],
         $sizingText,
+        'Reconfirm the live price before approval.',
         'Manual approval + manual order entry only.',
     ]);
 

@@ -513,3 +513,107 @@ function stc_propose_position_size(
         'note' => 'STC sizing proposal only. Portfolio and correlation-cluster caps are STC risk controls, not official competition limits. Human approval and manual order entry required.',
     ];
 }
+
+
+function stc_entry_order_instruction(
+    string $direction,
+    float $currentPrice,
+    float $entryMin,
+    float $entryMax
+): array {
+    $direction = strtoupper(trim($direction));
+    if (!in_array($direction, ['LONG', 'SHORT'], true)) {
+        return [
+            'order_type' => 'NONE',
+            'side' => null,
+            'status' => 'not_actionable',
+            'trigger_price' => null,
+            'limit_price' => null,
+            'explanation' => 'No actionable LONG/SHORT plan.',
+        ];
+    }
+    if ($currentPrice <= 0 || $entryMin <= 0 || $entryMax <= 0 || $entryMin > $entryMax) {
+        throw new RuntimeException('invalid_order_instruction_input');
+    }
+
+    $mid = ($entryMin + $entryMax) / 2.0;
+    if ($currentPrice >= $entryMin && $currentPrice <= $entryMax) {
+        return [
+            'order_type' => 'MARKET',
+            'side' => $direction === 'LONG' ? 'BUY' : 'SELL',
+            'status' => 'inside_entry_zone',
+            'trigger_price' => null,
+            'limit_price' => null,
+            'reference_price' => $currentPrice,
+            'explanation' => 'Latest confirmed price is inside the locked entry zone. Reconfirm the live price before manual execution.',
+        ];
+    }
+
+    if ($direction === 'LONG') {
+        if ($currentPrice > $entryMax) {
+            return [
+                'order_type' => 'BUY_LIMIT',
+                'side' => 'BUY',
+                'status' => 'wait_pullback',
+                'trigger_price' => null,
+                'limit_price' => $mid,
+                'reference_price' => $currentPrice,
+                'explanation' => 'Price is above the entry zone; wait for a pullback into the locked zone.',
+            ];
+        }
+        return [
+            'order_type' => 'BUY_STOP_LIMIT',
+            'side' => 'BUY',
+            'status' => 'wait_breakout_into_zone',
+            'trigger_price' => $entryMin,
+            'limit_price' => $entryMax,
+            'reference_price' => $currentPrice,
+            'explanation' => 'Price is below the entry zone; enter only if price rises into the locked zone.',
+        ];
+    }
+
+    if ($currentPrice < $entryMin) {
+        return [
+            'order_type' => 'SELL_LIMIT',
+            'side' => 'SELL',
+            'status' => 'wait_rebound',
+            'trigger_price' => null,
+            'limit_price' => $mid,
+            'reference_price' => $currentPrice,
+            'explanation' => 'Price is below the entry zone; wait for a rebound into the locked zone.',
+        ];
+    }
+
+    return [
+        'order_type' => 'SELL_STOP_LIMIT',
+        'side' => 'SELL',
+        'status' => 'wait_breakdown_into_zone',
+        'trigger_price' => $entryMax,
+        'limit_price' => $entryMin,
+        'reference_price' => $currentPrice,
+        'explanation' => 'Price is above the entry zone; enter only if price falls into the locked zone.',
+    ];
+}
+
+
+function stc_feed_bar_close_utc(string $timeValue, string $timeframe): ?DateTimeImmutable {
+    $opened = stc_parse_utc($timeValue);
+    if ($opened === null) {
+        return null;
+    }
+    $tf = strtolower(trim($timeframe));
+    $seconds = null;
+    if (preg_match('/^\d+$/', $tf) === 1) {
+        $seconds = ((int)$tf) * 60;
+    } elseif (preg_match('/^(\d+)m$/', $tf, $m) === 1) {
+        $seconds = ((int)$m[1]) * 60;
+    } elseif (preg_match('/^(\d+)h$/', $tf, $m) === 1) {
+        $seconds = ((int)$m[1]) * 3600;
+    } elseif ($tf === '1d') {
+        $seconds = 86400;
+    }
+    if ($seconds === null || $seconds <= 0) {
+        return $opened;
+    }
+    return $opened->modify('+' . $seconds . ' seconds');
+}

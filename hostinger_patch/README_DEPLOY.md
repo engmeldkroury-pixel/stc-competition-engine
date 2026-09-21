@@ -177,3 +177,29 @@ Optional private `config.php` overrides:
 ```
 
 The calendar gate is event-risk control, not a directional macro forecast. Signal reasons still state that a live directional macro factor is unavailable until a separate verified source exists.
+
+
+## Active-opportunity lifecycle and clearer order-entry UX
+
+This patch changes only decision-support behavior and presentation. It does not add broker execution.
+
+Replace these deployed files after CI passes:
+- `operator_snapshot.php`
+- `operator.php`
+- `portfolio_control.php`
+- `notification_control.php`
+
+The Python worker code also changes `app/approval.py`; deploy by merging to `main` so GitHub Actions uses the updated worker automatically.
+
+Behavior after deployment:
+- LONG/SHORT opportunities are considered active only until the locked plan expiry.
+- Expired LONG/SHORT plans disappear automatically from opportunity lists, including between the 30-second server refreshes.
+- WAIT remains visible only as a current signal, not an opportunity.
+- Times are rendered in the browser's local timezone in a short human-readable form.
+- The countdown updates every second.
+- The card shows a planned order type based on the latest confirmed 15-minute close.
+- Entering the current TradingView price recalculates the manual order type before approval.
+- Browser notifications can fire for already-active unseen opportunities immediately after notification permission is granted.
+- Server Telegram/email notifications skip expired plans and include ACTIVE time-left plus order type.
+
+Validity is anchored to the TradingView bar close rather than the later GitHub worker processing time. The Pine feed sends the bar-open timestamp, so STC derives the close time from the feed timeframe before calculating plan expiry. This prevents a delayed worker from extending an old opportunity artificially.
