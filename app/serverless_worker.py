@@ -46,6 +46,14 @@ def run_serverless_once(
                 result.rejected += 1
             else:
                 result.ingested += 1
+                notifier = getattr(client, "notify_signal", None)
+                if callable(notifier) and outcome.get("decision", {}).get("locked_trade_plan"):
+                    try:
+                        notifier(item.event_id)
+                    except Exception:
+                        # Notifications are secondary. Never turn a successfully
+                        # persisted market event into a failed trading signal.
+                        pass
         except Exception as exc:
             result.failed += 1
             try:
@@ -92,5 +100,14 @@ def run_serverless_drain(
         total.failed += batch.failed
         if batch.claimed < limit:
             break
+
+    portfolio_notifier = getattr(client, "notify_portfolio", None)
+    if callable(portfolio_notifier) and total.claimed > 0:
+        try:
+            portfolio_notifier()
+        except Exception:
+            # Fail-soft: position-management alerts must never compromise
+            # ingestion of the authoritative market-data cycle.
+            pass
 
     return total

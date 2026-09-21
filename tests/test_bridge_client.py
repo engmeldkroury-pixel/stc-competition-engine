@@ -85,3 +85,20 @@ def test_runtime_control_and_approval_reads_use_bearer_auth():
     assert client.runtime_control()["runtime_control"]["version"] == 3
     assert client.approval("sig-1")["signal_id"] == "sig-1"
     assert [x[1] for x in seen] == ["/runtime_control.php", "/approval.php"]
+
+
+def test_notification_bridge_calls_are_authenticated():
+    seen = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        assert request.headers.get("authorization") == "Bearer secret"
+        body = json.loads(request.content)
+        seen.append(body)
+        if body["action"] == "signal":
+            assert body["event_id"] == "evt-notify"
+        return httpx.Response(200, json={"ok": True, "notifications": []})
+
+    client = BridgeClient("https://bridge.test", "secret", transport=httpx.MockTransport(handler))
+    assert client.notify_signal("evt-notify")["ok"] is True
+    assert client.notify_portfolio()["ok"] is True
+    assert [x["action"] for x in seen] == ["signal", "portfolio"]

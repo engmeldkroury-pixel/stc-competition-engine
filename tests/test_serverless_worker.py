@@ -80,3 +80,65 @@ def test_drain_processes_multiple_full_batches_in_one_invocation():
     assert result.ingested == 26
     assert result.failed == 0
     assert len(client.acks) == 26
+
+
+class NotificationFakeClient(FakeClient):
+    def __init__(self, payload):
+        super().__init__(payload)
+        self.signal_notifications = []
+        self.portfolio_notifications = 0
+
+    def notify_signal(self, event_id):
+        self.signal_notifications.append(event_id)
+        return {"ok": True}
+
+    def notify_portfolio(self):
+        self.portfolio_notifications += 1
+        return {"ok": True}
+
+
+def _actionable_payload():
+    return {
+        "event_id": "evt-actionable-notify",
+        "event": "bar_close",
+        "competition_id": "capital-africa-sep-2026",
+        "symbol": "CAPITALCOM:XAUUSD",
+        "timeframe": "15",
+        "time": "2026-09-21T18:00:00Z",
+        "open": 4300,
+        "high": 4330,
+        "low": 4295,
+        "close": 4325,
+        "volume": 2000,
+        "ema20": 4310,
+        "ema50": 4280,
+        "rsi14": 72,
+        "atr14": 12,
+        "macd": 8,
+        "macd_signal": 3,
+        "volume_ratio": 2.0,
+    }
+
+
+def test_actionable_locked_plan_triggers_fail_soft_signal_notification():
+    client = NotificationFakeClient(_actionable_payload())
+    result = run_serverless_once(client, worker_id="notify", limit=5)
+    assert result.ingested == 1
+    assert client.signal_notifications == ["evt-serverless-1"]
+
+
+class DrainNotificationClient(DrainFakeClient):
+    def __init__(self, batches):
+        super().__init__(batches)
+        self.portfolio_notifications = 0
+
+    def notify_portfolio(self):
+        self.portfolio_notifications += 1
+        return {"ok": True}
+
+
+def test_drain_triggers_one_portfolio_notification_evaluation_after_batching():
+    client = DrainNotificationClient([list(range(20)), list(range(20, 26)), []])
+    result = run_serverless_drain(client, worker_id="notify-drain", limit=20, max_batches=5)
+    assert result.ingested == 26
+    assert client.portfolio_notifications == 1

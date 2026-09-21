@@ -139,3 +139,36 @@ class BridgeClient:
         if body.get("ok") is not True:
             raise BridgeClientError(f"approval_read_rejected:{body}")
         return body
+
+
+    def notify_signal(self, event_id: str) -> dict[str, Any]:
+        with self._client() as client:
+            response = client.post(
+                f"{self.base_url}/notification.php",
+                headers={**self.headers, "Content-Type": "application/json"},
+                json={"action": "signal", "event_id": event_id},
+            )
+        if response.status_code != 200:
+            raise BridgeClientError(
+                f"notify_signal_failed:{response.status_code}:{response.text[:200]}"
+            )
+        body = response.json()
+        if body.get("ok") is not True:
+            raise BridgeClientError(f"notify_signal_rejected:{body}")
+        return body
+
+    def notify_portfolio(self) -> dict[str, Any]:
+        with self._client() as client:
+            response = client.post(
+                f"{self.base_url}/notification.php",
+                headers={**self.headers, "Content-Type": "application/json"},
+                json={"action": "portfolio"},
+            )
+        if response.status_code != 200:
+            raise BridgeClientError(
+                f"notify_portfolio_failed:{response.status_code}:{response.text[:200]}"
+            )
+        body = response.json()
+        if body.get("ok") is not True:
+            raise BridgeClientError(f"notify_portfolio_rejected:{body}")
+        return body

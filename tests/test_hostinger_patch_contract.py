@@ -5,7 +5,7 @@ PATCH = ROOT / "hostinger_patch"
 
 
 def test_hostinger_patch_files_present():
-    for name in ("cloud_control.php", "runtime_control.php", "approval.php", "operator_snapshot.php", "operator.php", "portfolio_control.php", "position.php", "account_state.php", "migrations/001_cloud_approval.sql", "migrations/002_portfolio_supervisor.sql"):
+    for name in ("cloud_control.php", "runtime_control.php", "approval.php", "operator_snapshot.php", "operator.php", "portfolio_control.php", "position.php", "account_state.php", "notification_control.php", "notification.php", "migrations/001_cloud_approval.sql", "migrations/002_portfolio_supervisor.sql", "migrations/003_notifications.sql"):
         assert (PATCH / name).exists()
 
 
@@ -159,3 +159,47 @@ def test_filtered_signal_cards_keep_actions_bound_to_authoritative_snapshot_inde
     ui = (PATCH / "operator.php").read_text(encoding="utf-8")
     assert "all.indexOf(c)" in ui
     assert "approveCard(" in ui
+
+
+def test_notification_migration_is_additive_and_auditable():
+    sql = (PATCH / "migrations" / "003_notifications.sql").read_text(encoding="utf-8")
+    assert "CREATE TABLE IF NOT EXISTS stc_notification_events" in sql
+    assert "CREATE TABLE IF NOT EXISTS stc_notification_deliveries" in sql
+    assert "CREATE TABLE IF NOT EXISTS stc_notification_state" in sql
+    assert "event_key VARCHAR(255) NOT NULL UNIQUE" in sql
+    assert "DROP TABLE" not in sql.upper()
+    assert "DELETE FROM" not in sql.upper()
+
+
+def test_notification_endpoint_is_actionable_only_and_has_no_order_execution():
+    endpoint = (PATCH / "notification.php").read_text(encoding="utf-8")
+    control = (PATCH / "notification_control.php").read_text(encoding="utf-8")
+    combined = endpoint + control
+    assert "stc_require_operator_auth($config)" in endpoint
+    assert "NEW_LOCKED_PLAN" in control
+    assert "POSITION_MANAGEMENT" in control
+    assert "wait_signal" in control
+    assert "Manual approval + manual order entry only." in control
+    for forbidden in ("place_order", "submit_order", "broker_order", "strategy.entry"):
+        assert forbidden not in combined
+
+
+def test_notification_secrets_are_config_only_and_never_committed_as_values():
+    control = (PATCH / "notification_control.php").read_text(encoding="utf-8")
+    assert "telegram_bot_token" in control
+    assert "telegram_chat_id" in control
+    assert "notification_email" in control
+    assert "CHANGE_ME_TELEGRAM_BOT_TOKEN" in control
+    assert "api.telegram.org/bot" in control
+    # Token is read from private config and appended at runtime, not hardcoded.
+    assert "123456789:" not in control
+
+
+def test_owner_console_exposes_server_notification_status_and_test():
+    ui = (PATCH / "operator.php").read_text(encoding="utf-8")
+    assert "Telegram mobile" in ui
+    assert "Email backup" in ui
+    assert "Send notification test" in ui
+    assert "refreshNotificationStatus()" in ui
+    assert "action:'test'" in ui
+    assert "Raw 15-minute feed bars do not generate user notifications." in ui

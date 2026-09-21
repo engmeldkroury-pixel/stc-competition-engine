@@ -102,3 +102,43 @@ Portfolio Supervisor actions are decision support only:
 - `EXIT_NOW`
 
 Anti-churn rule: a stronger opportunity alone cannot force rotation. The current thesis must first degrade, including two consecutive strong opposite closed-bar signals when reversal is the reason, and a same-competition locked opportunity must be materially stronger before it is surfaced as a rotation candidate.
+
+
+## Actionable mobile/email notification add-on
+
+This batch is additive and never sends broker orders.
+
+Upload:
+- `notification_control.php`
+- `notification.php`
+- updated `operator.php`
+
+Run once:
+- `migrations/003_notifications.sql`
+
+Add only the channels you want to the private `config.php` outside `public_html`.
+
+Telegram:
+```php
+'telegram_bot_token' => 'CHANGE_ME_TELEGRAM_BOT_TOKEN',
+'telegram_chat_id' => 'CHANGE_ME_TELEGRAM_CHAT_ID',
+```
+
+Email backup:
+```php
+'notification_email' => 'owner@example.com',
+'notification_from_email' => 'stc@example.com',
+```
+
+Do not commit real tokens or addresses into GitHub and do not paste a bot token into chat.
+
+The GitHub worker calls `notification.php` after durable ingestion. Notification failures are fail-soft and cannot turn a successfully ingested market event into a failed trading signal.
+
+Server notification policy:
+- NEW locked LONG/SHORT plan: notify.
+- WAIT signal: do not notify.
+- Raw 15-minute feed bar: do not notify.
+- Open-position management action `HOLD`: do not notify.
+- `PROTECT`, `PARTIAL_TAKE_PROFIT`, or `EXIT_NOW`: notify when the de-duplicated management state changes.
+
+The owner console Notifications tab shows whether Telegram/email are configured and provides a harmless test button. Browser notifications remain independent and can work alongside both server channels.
