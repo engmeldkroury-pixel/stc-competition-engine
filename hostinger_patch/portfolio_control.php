@@ -594,3 +594,26 @@ function stc_entry_order_instruction(
         'explanation' => 'Price is above the entry zone; enter only if price falls into the locked zone.',
     ];
 }
+
+
+function stc_feed_bar_close_utc(string $timeValue, string $timeframe): ?DateTimeImmutable {
+    $opened = stc_parse_utc($timeValue);
+    if ($opened === null) {
+        return null;
+    }
+    $tf = strtolower(trim($timeframe));
+    $seconds = null;
+    if (preg_match('/^\d+$/', $tf) === 1) {
+        $seconds = ((int)$tf) * 60;
+    } elseif (preg_match('/^(\d+)m$/', $tf, $m) === 1) {
+        $seconds = ((int)$m[1]) * 60;
+    } elseif (preg_match('/^(\d+)h$/', $tf, $m) === 1) {
+        $seconds = ((int)$m[1]) * 3600;
+    } elseif ($tf === '1d') {
+        $seconds = 86400;
+    }
+    if ($seconds === null || $seconds <= 0) {
+        return $opened;
+    }
+    return $opened->modify('+' . $seconds . ' seconds');
+}
