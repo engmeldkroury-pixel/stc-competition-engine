@@ -459,3 +459,48 @@ Fix:
 
 Current validation gate:
 TradingView alerts snapshot the Pine script at alert creation. The stopped v0.3 alert cannot inherit the v0.4 fix automatically. Owner must update the Pine script to v0.4 and create a fresh multi-symbol alert. Keep the verified XAUUSD v0.2 alert active until v0.4 live proof passes.
+
+
+## Immutable trade-plan state — 2026-09-21 11:22 UTC
+
+Merged PR #10.
+Main commit: 69863c3ef22b6259c15c823813818ca53bbd1569.
+PR CI run 35593561765: SUCCESS.
+Main CI run 35593621193: in progress at state update time.
+
+Implemented:
+- app/trade_plan.py builds deterministic locked plans for actionable LONG/SHORT signals.
+- WAIT signals do not create a trade plan.
+- Each locked plan freezes:
+  - plan_id
+  - direction
+  - competition/symbol
+  - decision timeframe
+  - source event/signal/time
+  - validity
+  - entry_min / entry_max / entry_mid
+  - initial_stop
+  - target1 / target2
+  - risk_per_unit and R multiples
+  - source composite score
+  - rule version
+- Levels are marked levels_locked=true and management_policy=fixed_initial_plan_no_silent_repricing.
+- A later bar creates a new plan_id instead of mutating/repricing the old plan.
+- Cloud signal readback validates and exposes locked_trade_plan when present.
+- No automatic order execution or auto-approval was introduced; execution remains manual_only and human approval remains mandatory.
+
+TradingView alert snapshot at this stage:
+- STC XAUUSD 15m PROD (5659303693): ACTIVE; last observed fire 2026-09-21T11:15:00Z.
+- STC CAPITAL 10-SYMBOL 15m PROD v0.3 (5659596015): INACTIVE due prior fire_control stop.
+- An older simple CAPITALCOM:XAUUSD cross alert (5651139895) remains active but has no observed fire in the current project proof.
+- Attempt to mute mobile/popup/email on alert 5659303693 through TradingView MCP failed with webhook_requires_2fa; no alert settings were changed.
+
+Operational rule:
+Keep the verified XAUUSD v0.2 webhook alert active until a replacement multi-symbol alert with the fire-control fix is live-verified. User-facing notification noise may be muted manually in TradingView while leaving Webhook URL enabled; do not disable the webhook until replacement feed acceptance passes.
+
+Next engineering gap:
+The backend now has authoritative immutable trade plans, but Pine cannot fetch arbitrary backend HTTP state. Therefore automatic rendering of the authoritative backend locked plan on a TradingView chart requires either:
+1) a TradingView-native stateful visual plan that is explicitly labeled technical-only and non-authoritative, or
+2) manual input/synchronization of backend locked levels into Pine, or
+3) a separate STC dashboard/UI that renders authoritative backend plans.
+Do not misrepresent moving Pine technical zones as authoritative locked trade plans.
