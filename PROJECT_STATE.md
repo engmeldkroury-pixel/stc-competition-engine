@@ -629,3 +629,48 @@ Initial acceptance state:
 - fire_control stability: PENDING.
 
 Do not retire XAUUSD v0.2 until all pending v0.7.1 live acceptance gates pass.
+
+
+## v0.7.1 live production acceptance — 2026-09-21 14:31 UTC
+
+Acceptance is COMPLETE.
+
+TradingView:
+- alert_id 5662088915 (STC CAPITAL 10-SYMBOL 15m PROD v0.7.1) remains ACTIVE.
+- Cycle 1 fired at 2026-09-21T14:15:01Z for remote bar time 2026-09-21T14:00:00Z.
+- Cycle 2 fired at 2026-09-21T14:30:00Z for remote bar time 2026-09-21T14:15:00Z.
+- Both cycles emitted exactly the 10 expected Capital.com symbols once each:
+  BTCUSD, ETHUSD, DOGEUSD, EURUSD, AUDUSD, USDZAR, XAUUSD, XAGUSD, SPX500, NAS100.
+- Every observed webhook delivery returned HTTP 200.
+- No duplicate burst and no fire_control stop occurred across the two observed cycles.
+- v0.7.1 alert remained active after cycle 2.
+
+Hostinger / GitHub worker:
+- First accepted batch: claimed=10, ingested=10, rejected=0, failed=0.
+- Second accepted batch: claimed=10, ingested=10, rejected=0, failed=0.
+- Extra repository_dispatch runs were concurrency-cancelled or drained claimed=0; no data loss was observed.
+- Worker processing remained SUCCESS.
+
+Durable readback for the first v0.7.1 cycle:
+- count=10 current-cycle events.
+- history_complete=true on all 10.
+- historical_regime and blended_technical reasons were present on all 10.
+- SPX500 produced an actionable LONG and immutable locked plan:
+  plan_id=plan-b0859d87722568e03cc6a9bbb6673830
+  levels_locked=true
+  execution=manual_only.
+- Other symbols in that cycle were WAIT and therefore correctly had no locked trade plan.
+- This proves the historical-context scoring path and locked-plan path are live in production.
+
+Repository:
+- A temporary CI mismatch caused by the indicator version string v0.7 -> v0.7.1 was corrected.
+- Main CI run 35611415039: SUCCESS.
+
+Fallback retirement:
+- Old single-symbol alert STC XAUUSD 15m PROD (5659303693) was PAUSED after v0.7.1 acceptance passed.
+- It was not deleted, so history/settings remain available for rollback.
+- v0.7.1 is now the active production market-data feed.
+
+Operational conclusion:
+The 10-symbol TradingView -> webhook -> Hostinger -> GitHub worker -> historical regime -> blended signal -> immutable trade-plan pipeline is production-verified.
+Safe Mode / Kill Switch / human approval boundaries remain unchanged; no automatic trade execution has been enabled.
