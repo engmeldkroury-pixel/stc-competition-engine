@@ -1,5 +1,5 @@
 //@version=6
-indicator("STC Capital Multi Feed v0.3", overlay=false)
+indicator("STC Capital Multi Feed v0.4", overlay=false)
 
 competitionId = input.string("capital-africa-sep-2026", "Competition ID", options=["capital-africa-sep-2026"])
 feedTf = input.timeframe("15", "Feed timeframe")
@@ -84,7 +84,7 @@ var array<string> symbols = array.from(
     "CAPITALCOM:SPX500",
     "CAPITALCOM:NAS100"
 )
-var array<int> lastSentTimes = array.new_int(array.size(symbols), na)
+varip array<int> lastSentTimes = array.new_int(array.size(symbols), na)
 
 if feedEnabled and barstate.isconfirmed
     for i = 0 to array.size(symbols) - 1
