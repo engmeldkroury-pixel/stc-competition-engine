@@ -940,4 +940,32 @@ Owner-facing behavior now implemented in the Hostinger patch set:
 
 Production deployment is still required for Hostinger to use the new main-branch patch files.
 Telegram delivery additionally requires private Hostinger config values for telegram_bot_token and telegram_chat_id; never commit those secrets to GitHub.
+## Live Owner Console recovered; historical trade import merged — 2026-09-22
 
+Production screenshot confirmed the Owner Console is connected again after the missing Hostinger files/migrations were completed:
+- Capital.com symbols monitored: 10
+- AMP Futures symbols monitored: 16
+- Macro calendar: CONNECTED
+- Safe Mode: true
+- Kill Switch: true
+- ACTIVE opportunities at validation moment: 0
+- Open positions tracked at validation moment: 0
+
+The HTTP 500 deployment drift was resolved by completing the current Hostinger dependency set, including portfolio/account/notification tables and the required macro-control dependency.
+
+Merged PR #31 as commit d772575c02f2ef199e7837153d3812f54a0a8cde.
+Post-merge STC CI run 35662614893 completed successfully.
+
+PR #31 adds:
+- owner-only import of already-closed historical competition trades;
+- original open/close timestamps preserved for qualification-day accounting;
+- optional actual realized P/L from the competition platform, otherwise STC estimate;
+- historical open/close audit events without broker execution;
+- Owner Console button for past closed-trade import;
+- competition progress counting historical closed dates rather than import date;
+- complete Hostinger production file manifest to prevent future partial-deployment drift.
+
+Next owner dependency:
+- deploy current main versions of hostinger_patch/operator.php, hostinger_patch/position.php, and hostinger_patch/portfolio_control.php to expose the historical closed-trade import UI/logic;
+- then backfill the owner's earlier competition trades using actual platform records/screenshots;
+- Telegram delivery remains pending private bot token + chat ID configuration on Hostinger. Secrets must not be committed to GitHub.
