@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from dataclasses import asdict, dataclass
 
+from .competition_profiles import AMP_CORE_FEED_SYMBOLS
+
 
 @dataclass(frozen=True)
 class SymbolCapability:
@@ -76,6 +78,32 @@ def _capital(
     )
 
 
+def _amp_core(symbol: str) -> SymbolCapability:
+    return SymbolCapability(
+        symbol=symbol,
+        provider=provider_of(symbol),
+        verified=True,
+        symbol_search=True,
+        ohlcv=True,
+        native_technicals=False,
+        local_technicals_from_ohlcv=True,
+        news=False,
+        economic_calendar_context=True,
+        direct_quote=False,
+        alerts_read=True,
+        alert_log_read=True,
+        execution_account_read=False,
+        execution_write=False,
+        notes=(
+            "Exact-provider 15m and 1D OHLCV were live-verified on 2026-09-21 for this AMP core-feed symbol.",
+            "400 daily bars were returned for one-year historical context.",
+            "TradingView OHLCV is analysis/context data, not execution-time quote evidence.",
+            "No broker/execution-account read/write API is available through the verified TradingView MCP path.",
+            "Human approval and manual competition order entry remain mandatory.",
+        ),
+    )
+
+
 CAPABILITIES: dict[str, SymbolCapability] = {
     "CAPITALCOM:BTCUSD": _capital(
         "CAPITALCOM:BTCUSD", symbol_search=False, native_technicals=False, direct_quote=False
@@ -111,6 +139,7 @@ CAPABILITIES: dict[str, SymbolCapability] = {
     "CAPITALCOM:NAS100": _capital(
         "CAPITALCOM:NAS100", symbol_search=False, native_technicals=False, direct_quote=False
     ),
+    **{symbol: _amp_core(symbol) for symbol in AMP_CORE_FEED_SYMBOLS},
 }
 
 
