@@ -203,3 +203,35 @@ Behavior after deployment:
 - Server Telegram/email notifications skip expired plans and include ACTIVE time-left plus order type.
 
 Validity is anchored to the TradingView bar close rather than the later GitHub worker processing time. The Pine feed sends the bar-open timestamp, so STC derives the close time from the feed timeframe before calculating plan expiry. This prevents a delayed worker from extending an old opportunity artificially.
+## Current production file manifest
+
+When deploying the current Owner Console / Portfolio Supervisor / Notifications build to a fresh or partially updated Hostinger site, keep these PHP files together in the same deployed directory:
+
+- `cloud_control.php`
+- `runtime_control.php`
+- `approval.php`
+- `macro_control.php`
+- `portfolio_control.php`
+- `position.php`
+- `account_state.php`
+- `notification_control.php`
+- `notification.php`
+- `operator_snapshot.php`
+- `operator.php`
+
+Required additive migrations, once per database:
+- `migrations/001_cloud_approval.sql`
+- `migrations/002_portfolio_supervisor.sql`
+- `migrations/003_notifications.sql`
+
+A partial deployment can leave the HTML shell visible while authenticated data calls fail. In particular, the current `operator_snapshot.php` requires `macro_control.php`, `portfolio_control.php`, and the portfolio/account tables.
+
+## Historical competition activity backfill
+
+The Owner Console can import:
+- a position that is still open, preserving its original open timestamp; or
+- a past position that is already closed, preserving original open/close timestamps.
+
+Historical closed imports are ledger/audit operations only. They never send broker orders. If the owner supplies the actual realized P/L from the competition platform, STC stores that value as the authoritative owner-platform record; otherwise STC calculates an estimate from entry/exit/quantity using its verified contract-value model.
+
+Qualification-day progress uses the original recorded open and close dates plus any recorded partial-close dates, so importing older trades does not incorrectly turn today's import date into the historical trading day.
