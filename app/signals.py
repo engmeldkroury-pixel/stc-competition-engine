@@ -74,8 +74,8 @@ def historical_regime_from_tradingview(payload: TradingViewWebhook) -> float | N
         payload.history_close,
         payload.history_ema50,
         payload.history_ema200,
-        payload.history_high_365,
-        payload.history_low_365,
+        payload.history_high_252,
+        payload.history_low_252,
         payload.history_momentum_20,
         payload.history_momentum_63,
         payload.history_momentum_126,
@@ -87,8 +87,8 @@ def historical_regime_from_tradingview(payload: TradingViewWebhook) -> float | N
     close = float(payload.history_close)
     ema50 = float(payload.history_ema50)
     ema200 = float(payload.history_ema200)
-    high = float(payload.history_high_365)
-    low = float(payload.history_low_365)
+    high = float(payload.history_high_252)
+    low = float(payload.history_low_252)
     m20 = float(payload.history_momentum_20)
     m63 = float(payload.history_momentum_63)
     m126 = float(payload.history_momentum_126)
