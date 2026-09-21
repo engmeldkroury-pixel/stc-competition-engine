@@ -5,7 +5,7 @@ PATCH = ROOT / "hostinger_patch"
 
 
 def test_hostinger_patch_files_present():
-    for name in ("cloud_control.php", "runtime_control.php", "approval.php", "migrations/001_cloud_approval.sql"):
+    for name in ("cloud_control.php", "runtime_control.php", "approval.php", "operator_snapshot.php", "operator.php", "migrations/001_cloud_approval.sql"):
         assert (PATCH / name).exists()
 
 
@@ -40,3 +40,28 @@ def test_patch_validates_receipt_and_fresh_confirmation():
     assert "market_not_open" in control
     assert "safe_mode" in (PATCH / "runtime_control.php").read_text(encoding="utf-8")
     assert "kill_switch" in (PATCH / "runtime_control.php").read_text(encoding="utf-8")
+
+
+def test_owner_console_is_human_initiated_and_has_no_order_execution():
+    snapshot = (PATCH / "operator_snapshot.php").read_text(encoding="utf-8")
+    ui = (PATCH / "operator.php").read_text(encoding="utf-8")
+    assert "stc_require_owner_auth($config);" in snapshot
+    assert "'automatic_execution_available' => false" in snapshot
+    assert "'execution' => 'manual_only'" in snapshot
+    assert "approval.php" in ui
+    assert "runtime_control.php" in ui
+    assert "This page never places an order." in ui
+    assert "confirm(" in ui
+    combined = snapshot + ui
+    for forbidden in ("place_order", "submit_order", "broker_order", "strategy.entry"):
+        assert forbidden not in combined
+
+
+def test_owner_console_requires_fresh_manual_confirmation_for_approval():
+    snapshot = (PATCH / "operator_snapshot.php").read_text(encoding="utf-8")
+    ui = (PATCH / "operator.php").read_text(encoding="utf-8")
+    assert "approvalFresh" in snapshot
+    assert "$age >= 0 && $age <= 60" in snapshot
+    assert "observed_at_utc:new Date().toISOString()" in ui
+    assert "quote_price:price" in ui
+    assert "market_status:'open'" in ui
