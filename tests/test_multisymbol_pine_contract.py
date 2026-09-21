@@ -20,7 +20,7 @@ def test_multisymbol_feed_covers_exact_capital_profile_symbols():
     text = PINE.read_text(encoding="utf-8")
     present = {symbol for symbol in EXPECTED if f'"{symbol}"' in text}
     assert present == EXPECTED
-    assert "STC Capital Multi Feed v0.3" in text
+    assert "STC Capital Multi Feed v0.4" in text
 
 
 def test_multisymbol_feed_uses_remote_security_and_all_alert_calls():
@@ -44,6 +44,6 @@ def test_multisymbol_feed_has_stable_remote_bar_event_identity():
 
 def test_multisymbol_feed_deduplicates_closed_markets():
     text = PINE.read_text(encoding="utf-8")
-    assert "lastSentTimes" in text
+    assert "varip array<int> lastSentTimes" in text
     assert "d.t != previousTime" in text
     assert "array.set(lastSentTimes, i, d.t)" in text
