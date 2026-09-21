@@ -736,3 +736,26 @@ The software and owner console are operationally deployed and readback-verified.
 The system remains intentionally blocked from manual approvals because Safe Mode and Kill Switch are both ON.
 No order execution path exists in STC.
 Any future transition to manual approval availability requires an explicit owner runtime-control action.
+
+
+## Final go-live requirements expanded by owner — 2026-09-21
+
+Owner clarified that the final system must not be only a signal generator. It must have portfolio-level awareness of all open competition positions and avoid churn between opportunities.
+
+Mandatory before declaring competition-ready:
+- Do not enable manual approval mode yet.
+- Add a durable open-position ledger for the production Hostinger path.
+- Add a Portfolio Supervisor that evaluates every open position against current market state and new opportunities.
+- Supervisor actions must distinguish: HOLD, PROTECT/TIGHTEN, PARTIAL TAKE PROFIT, EXIT NOW, CANCEL PENDING PLAN, and ROTATION CANDIDATE.
+- A stronger new signal must not automatically close an existing trade. Rotation requires current-thesis deterioration/invalidation plus a materially better net risk-adjusted opportunity after spread/commission/slippage and portfolio exposure.
+- Add anti-churn controls (state hysteresis/cooldown/closed-bar confirmation) so small score changes cannot repeatedly flip positions.
+- Add final position sizing so an approved plan states exact proposed quantity subject to competition maximums and configured risk fraction.
+- Add live portfolio risk aggregation across correlated/open positions.
+- Add explicit multi-timeframe decision context in the backend; current production decision is 15m plus confirmed 1D historical regime. Final target should expose entry/decision TF and higher-timeframe confirmations explicitly.
+- Integrate non-technical live factors before go-live. Current production event decision supplies technical factor only; news, macro, volatility-quality, and liquidity-quality remain zero unless populated elsewhere. Do not describe the current live signal as full multi-factor analysis until this is implemented and verified.
+- Add actionable notifications for NEW PLAN and POSITION MANAGEMENT changes; do not notify on every raw 15m feed bar.
+- Notification target should support redundant mobile channels (preferred: Telegram plus email or another push channel) in addition to browser notification.
+- Owner console auto-refresh patch is merged in main; Hostinger operator.php must be replaced with the latest main version to activate 30-second auto refresh and browser notification opt-in.
+
+Critical competition identity check:
+Recent TradingView screenshots have shown a bottom trading account labelled The Leap / AMP FUTURES with a 250,000 balance while the active STC production feed/profile is capital-africa-sep-2026 using CAPITALCOM symbols and a 100,000 profile. Before any competition trade is approved, confirm which competition account is actually being used. Position sizing, allowed instruments, and rule validation must match the real active competition.
