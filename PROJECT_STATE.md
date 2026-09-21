@@ -504,3 +504,30 @@ The backend now has authoritative immutable trade plans, but Pine cannot fetch a
 2) manual input/synchronization of backend locked levels into Pine, or
 3) a separate STC dashboard/UI that renders authoritative backend plans.
 Do not misrepresent moving Pine technical zones as authoritative locked trade plans.
+
+
+## Stateful Pine visual layer — 2026-09-21 11:24 UTC
+
+Merged PR #11.
+Main commit: c2166a6936fc8720903147ea5ff0e1c57f07f876.
+PR CI run 35593772017: SUCCESS.
+
+Implemented in tradingview/STC_MULTI_FEED.pine:
+- Version renamed to STC Capital Multi Feed v0.6 Stateful Visual.
+- Technical setup levels are created only on confirmed chart bars.
+- Once created, visual entry zone, stop, TP1 and TP2 remain frozen.
+- Locked visual setup expires only after configured setupLifetimeBars or invalidates when stop level is breached.
+- While locked, later bars do not silently reprice the displayed setup.
+- Visual status distinguishes LOCKED LONG SETUP / LOCKED SHORT SETUP / SCANNING-WAIT.
+- Production multi-symbol 15m feed remains independent of chart timeframe.
+- varip fire-control duplicate protection is preserved.
+- No Pine strategy/order execution exists.
+
+Architecture:
+- Pine locked setup is technical-only chart state.
+- Backend locked_trade_plan remains the authoritative multi-factor plan and is immutable per signal.
+- Timeframe changes reload Pine chart context and may generate a new technical setup; they do not mutate an already persisted backend plan.
+- No automatic order execution or auto-approval has been introduced.
+
+Next owner validation:
+Load STC Capital Multi Feed v0.6 Stateful Visual into TradingView Pine Editor, Save and Add to chart. Do not create a new production alert until compile/runtime and the fixed-zone behavior are visually confirmed.
