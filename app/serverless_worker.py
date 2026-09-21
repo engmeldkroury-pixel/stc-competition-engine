@@ -64,3 +64,33 @@ def run_serverless_once(
             except Exception:
                 pass
     return result
+
+
+
+def run_serverless_drain(
+    client: BridgeClient,
+    *,
+    worker_id: str = "stc-vercel-worker",
+    limit: int = 20,
+    max_batches: int = 5,
+) -> ServerlessRunResult:
+    """Drain multiple bridge batches in one runner invocation.
+
+    A 10+16 symbol production cycle can enqueue 26 events at once. Draining
+    several batches makes one successful workflow sufficient, instead of
+    depending on a second queued workflow run.
+    """
+    limit = max(1, min(int(limit), 20))
+    max_batches = max(1, min(int(max_batches), 10))
+    total = ServerlessRunResult()
+
+    for _ in range(max_batches):
+        batch = run_serverless_once(client, worker_id=worker_id, limit=limit)
+        total.claimed += batch.claimed
+        total.ingested += batch.ingested
+        total.rejected += batch.rejected
+        total.failed += batch.failed
+        if batch.claimed < limit:
+            break
+
+    return total
