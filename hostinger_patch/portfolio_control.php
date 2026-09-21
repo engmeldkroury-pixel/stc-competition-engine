@@ -404,13 +404,16 @@ function stc_competition_progress(PDO $pdo, string $competitionId): array {
         "SELECT trade_date FROM ("
         . "SELECT DATE(opened_at_utc) AS trade_date FROM stc_positions WHERE competition_id = ? "
         . "UNION "
+        . "SELECT DATE(closed_at_utc) AS trade_date FROM stc_positions "
+        . "WHERE competition_id = ? AND closed_at_utc IS NOT NULL "
+        . "UNION "
         . "SELECT DATE(e.created_at_utc) AS trade_date "
         . "FROM stc_position_events e "
         . "JOIN stc_positions p ON p.position_id = e.position_id "
-        . "WHERE p.competition_id = ? AND e.event_type IN ('PARTIAL', 'CLOSE')"
+        . "WHERE p.competition_id = ? AND e.event_type = 'PARTIAL'"
         . ") q WHERE trade_date IS NOT NULL ORDER BY trade_date"
     );
-    $daysStmt->execute([$competitionId, $competitionId]);
+    $daysStmt->execute([$competitionId, $competitionId, $competitionId]);
     $dates = [];
     while (($d = $daysStmt->fetchColumn()) !== false) {
         $dates[] = (string)$d;
