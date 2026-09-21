@@ -8,8 +8,10 @@ from app.portfolio import (
     PositionState,
     aggregate_open_risk,
     choose_rotation_candidate,
+    effective_pnl_correlation,
     price_value_usd_per_price_unit,
     propose_position_size,
+    return_correlation,
     risk_cluster,
     supervise_position,
 )
@@ -323,3 +325,22 @@ def test_aggregate_open_risk_includes_cluster_breakdown():
     assert result["clusters"]["equity_indices"]["open_positions"] == 2
     # MES: 20 points * $5 * 2 = $200; MNQ: 50 * $2 = $100.
     assert result["clusters"]["equity_indices"]["initial_risk_usd"] == 300
+
+
+
+def test_return_correlation_detects_high_positive_relationship():
+    a = [100 + i for i in range(30)]
+    b = [200 + 2 * i for i in range(30)]
+    corr = return_correlation(a, b)
+    assert corr is not None
+    assert corr > 0.99
+
+
+def test_return_correlation_requires_enough_history():
+    assert return_correlation([100, 101, 102], [200, 201, 202]) is None
+
+
+def test_effective_position_correlation_accounts_for_trade_direction():
+    assert effective_pnl_correlation(0.8, "LONG", "LONG") == pytest.approx(0.8)
+    assert effective_pnl_correlation(0.8, "LONG", "SHORT") == pytest.approx(-0.8)
+    assert effective_pnl_correlation(-0.8, "LONG", "SHORT") == pytest.approx(0.8)
