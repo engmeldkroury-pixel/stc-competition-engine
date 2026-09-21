@@ -9,6 +9,7 @@ from .competition_profiles import get_profile
 from .models import FactorScores, SignalEvaluationRequest, TradingViewWebhook
 from .pipeline_receipt import build_pipeline_receipt
 from .signals import evaluate, factors_from_tradingview
+from .trade_plan import build_locked_trade_plan
 
 
 def deterministic_signal_id(event_id: str) -> str:
@@ -92,6 +93,7 @@ def decide_bridge_event(event_id: str, payload: dict) -> dict:
     result = evaluate(req).model_copy(update={"signal_id": deterministic_signal_id(event_id)})
     result_dict = result.model_dump()
     envelope = build_approval_envelope(payload, result.composite_score)
+    locked_plan = build_locked_trade_plan(event_id, payload, result_dict, envelope)
     status = "analyzed"
     action = "signal_created"
     return {
@@ -101,6 +103,7 @@ def decide_bridge_event(event_id: str, payload: dict) -> dict:
             "action": action,
             "signal": result_dict,
             "approval_envelope": envelope,
+            "locked_trade_plan": locked_plan,
             "execution": "manual_approval_required",
         },
         "receipt": build_pipeline_receipt(

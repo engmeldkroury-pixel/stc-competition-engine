@@ -146,6 +146,17 @@ def _card(
         blockers.append("signal_expired")
     if recommendation == "WAIT":
         blockers.append("wait_is_not_an_order")
+    locked_plan = decision.get("locked_trade_plan")
+    if locked_plan is not None:
+        if not isinstance(locked_plan, dict):
+            raise ValueError("invalid_locked_trade_plan")
+        if locked_plan.get("source_signal_id") != signal_id:
+            raise ValueError("locked_plan_signal_mismatch")
+        if locked_plan.get("competition_id") != competition or locked_plan.get("symbol") != symbol:
+            raise ValueError("locked_plan_target_mismatch")
+        if locked_plan.get("levels_locked") is not True or locked_plan.get("execution") != "manual_only":
+            raise ValueError("unsafe_locked_trade_plan")
+
     return {
         "event_id": row["event_id"],
         "signal_id": signal_id,
@@ -163,6 +174,7 @@ def _card(
             "reference_price": ref,
             "entry_max": upper,
         },
+        "locked_trade_plan": locked_plan,
         "approved": False,
         "approval_status": "blocked",
         "human_approval_required": True,
