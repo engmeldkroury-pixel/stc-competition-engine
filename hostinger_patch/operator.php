@@ -340,6 +340,7 @@ function progressHtml(competitionId){
   +'<div class="row"><span>Days remaining</span><span class="value">'+esc(p.days_remaining)+'</span></div>'
   +'<div class="row"><span>Trades entered</span><span class="value">'+esc(p.total_entries)+'</span></div>'
   +'<div class="row"><span>Open / closed</span><span class="value">'+esc(p.open_positions)+' / '+esc(p.closed_positions)+'</span></div>'
+  +'<div class="row"><span>Recorded trade actions</span><span class="value">'+esc(p.position_actions)+'</span></div>'
   +'<div class="row"><span>Realized competition P/L</span><span class="value">$'+num(p.realized_pnl_usd,2)+'</span></div></div>';
 }
 function accountHtml(account,competitionId){
@@ -539,7 +540,7 @@ async function recordExistingPosition(competitionId){
  const geometryOk=side==='LONG'?(stop<entry&&finalTp>entry):(stop>entry&&finalTp<entry);
  if(!geometryOk){alert('Stop / take-profit geometry does not match the selected side.');return;}
  const checkpoint=(entry+finalTp)/2;
- const openedLocal=String(prompt('Original open time if known; leave blank to use now.','')||'').trim();
+ const openedLocal=String(prompt('Original open time if known (ISO/date-time). Leave blank to use now.','')||'').trim();
  const openedAt=openedLocal?new Date(openedLocal):new Date();
  if(Number.isNaN(openedAt.getTime())){alert('Open time is invalid.');return;}
  if(!confirm('Confirm this trade is ALREADY OPEN in the competition platform. STC will only import and monitor it; no order will be sent.'))return;
