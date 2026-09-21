@@ -573,3 +573,32 @@ Important architecture distinction:
 
 Current production validation gate:
 The owner is currently running v0.6.4 Clear Visual in TradingView. v0.7 Historical Context is merged and CI-green but is not yet compiled/live-validated in the TradingView UI. Existing XAUUSD v0.2 production alert remains active. Do not mark the 10-symbol v0.7 feed production-ready until the owner installs v0.7 and one live 15m cycle proves: compile success, no fire_control stop, all available symbol events accepted, historical fields persisted, and backend reasons show historical_regime + blended_technical.
+
+
+## TradingView v0.7.1 compile acceptance — 2026-09-21 13:18 UTC
+
+Owner loaded STC Capital Multi Feed v0.7.1 Historical Context in TradingView Pine Editor on CAPITALCOM:BTCUSD 15m.
+Visual evidence shows:
+- Pine script compiled with no visible error banner.
+- Script was added to the chart successfully.
+- Indicator title on chart: STC Capital Multi Feed v0.7.1 Historical Context.
+- Stateful visual setup rendered on chart with locked LONG label and entry/SL/TP1/TP2 values.
+- Existing verified STC XAUUSD 15m PROD alert remains active separately.
+
+This satisfies the Pine compile/add-to-chart gate for v0.7.1.
+
+Remaining production gate:
+TradingView indicator alerts snapshot script state at creation, so the old stopped v0.3 multi-symbol alert cannot validate v0.7.1. A fresh indicator alert must be created manually in TradingView UI because the TradingView MCP create-alert action does not support indicator/study alerts.
+
+Required owner action:
+Create one new alert on CAPITALCOM:BTCUSD 15m with:
+- Condition: STC Capital Multi Feed v0.7.1 Historical Context
+- Trigger: Any alert() function call
+- Name: STC CAPITAL 10-SYMBOL 15m PROD v0.7.1
+- Webhook URL: existing STC webhook endpoint already used by verified production alert
+- Keep auto-deactivate OFF
+- User-facing App/Toast notifications may be disabled to avoid 10-symbol notification noise
+Do not stop the verified XAUUSD v0.2 production alert until v0.7.1 completes one full live acceptance cycle.
+
+Acceptance after creation:
+Observe one 15m fire cycle, confirm no fire_control stop, inspect alert log symbol coverage, verify Hostinger accepts unique events, confirm GitHub worker success, and verify historical_regime + blended_technical evidence in durable signal readback.
