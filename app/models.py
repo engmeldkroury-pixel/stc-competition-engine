@@ -42,6 +42,26 @@ class TechnicalAnalysisResult(BaseModel):
     regime: Literal["bullish", "bearish", "mixed"]
 
 
+class HistoricalRegimeResult(BaseModel):
+    symbol: str
+    timeframe: Literal["1D"] = "1D"
+    bars_used: int
+    latest_close: float
+    ema50: float
+    ema200: float
+    rsi14: float
+    atr14: float
+    high_252: float
+    low_252: float
+    momentum_20: float
+    momentum_63: float
+    momentum_126: float
+    momentum_252: float
+    volatility_20: float
+    regime_score: float = Field(ge=-1.0, le=1.0)
+    regime: Literal["bullish", "bearish", "mixed"]
+
+
 class FactorScores(BaseModel):
     technical: float = Field(ge=-1.0, le=1.0)
     news: float = Field(default=0.0, ge=-1.0, le=1.0)
