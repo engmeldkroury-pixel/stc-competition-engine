@@ -351,3 +351,27 @@ def test_php_derives_confirmed_bar_close_from_feed_timeframe():
     assert "function stc_feed_bar_close_utc" in control
     assert "preg_match('/^\\d+$/'" in control
     assert "$opened->modify('+' . $seconds . ' seconds')" in control
+
+def test_executed_positions_persist_and_block_replacement_opportunities():
+    snapshot = (PATCH / "operator_snapshot.php").read_text(encoding="utf-8")
+    ui = (PATCH / "operator.php").read_text(encoding="utf-8")
+    assert "$hasOpenPosition = (float)($openQty[$seenKey] ?? 0.0) > 0.0;" in snapshot
+    assert "&& !$hasOpenPosition" in snapshot
+    assert "'has_open_position' => $hasOpenPosition" in snapshot
+    assert "'entry_blocked_reason' => $hasOpenPosition ? 'existing_open_position_managed_by_portfolio_supervisor'" in snapshot
+    assert "$pendingPlanAction = 'MANAGE_EXISTING_POSITION';" in snapshot
+    assert "c.has_open_position" in ui
+    assert "EXECUTED • TRACKING" in ui
+    assert "New signals are used to manage that position, not to create a replacement trade." in ui
+
+
+def test_owner_console_can_backfill_existing_manual_positions_for_supervision():
+    ui = (PATCH / "operator.php").read_text(encoding="utf-8")
+    assert "Record an existing manual position" in ui
+    assert "function recordExistingPosition(competitionId)" in ui
+    assert "origin:'manual_external'" in ui
+    assert "ALREADY OPEN in the competition platform" in ui
+    assert "no order will be sent" in ui
+    assert "Latest market check" in ui
+    assert "What to do now" in ui
+
