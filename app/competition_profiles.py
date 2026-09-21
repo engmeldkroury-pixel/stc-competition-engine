@@ -126,6 +126,26 @@ AMP_LIMITS = {
     "CME:LE1!": 25.0,
 }
 
+AMP_CORE_FEED_SYMBOLS = (
+    "CME_MINI:MES1!",
+    "CME_MINI:MNQ1!",
+    "CBOT_MINI:MYM1!",
+    "CME_MINI:M2K1!",
+    "NYMEX:MCL1!",
+    "NYMEX:MNG1!",
+    "COMEX_MINI:MGC1!",
+    "COMEX_MINI:SIL1!",
+    "CME_MINI:M6E1!",
+    "CME_MINI:M6B1!",
+    "CME_MINI:MJY1!",
+    "CME_MINI:M6A1!",
+    "CME:MBT1!",
+    "CME:MET1!",
+    "CBOT:ZN1!",
+    "CBOT:ZB1!",
+)
+
+
 CAPITAL_AFRICA_LIMITS = {
     "CAPITALCOM:BTCUSD": 0.5,
     "CAPITALCOM:ETHUSD": 15.0,

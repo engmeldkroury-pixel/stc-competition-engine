@@ -79,7 +79,9 @@ function cardHtml(c,i){
  const a=c.approval||{};
  const reasons=(c.reasons||[]).slice(0,8).map(x=>'<span class="pill">'+esc(x)+'</span>').join('');
  const canApprove=(c.recommendation==='LONG'||c.recommendation==='SHORT')&&!!c.locked_trade_plan;
- return '<div class="card"><div class="row"><span>'+esc(c.symbol)+'</span><span class="value '+cls+'">'+esc(c.recommendation)+' '+num(c.composite_score,2)+'</span></div>'
+ const competitionLabel=c.competition_id==='amp-futures-sep-2026'?'AMP Futures':'Capital.com Africa';
+ return '<div class="card"><div class="row"><span>'+esc(competitionLabel)+'</span><span class="pill">'+esc(c.competition_id||'-')+'</span></div>'
+ +'<div class="row"><span>'+esc(c.symbol)+'</span><span class="value '+cls+'">'+esc(c.recommendation)+' '+num(c.composite_score,2)+'</span></div>'
  +'<div class="row"><span>Source</span><span class="value">'+esc(c.source_time)+'</span></div>'
  +planHtml(c.locked_trade_plan)
  +'<div class="row"><span>Approval</span><span class="value">'+esc(a.decision||'none')+'</span></div>'

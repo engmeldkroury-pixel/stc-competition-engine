@@ -11,11 +11,11 @@ try {
         'SELECT id, event_id, payload_json, result_json, analysis_completed_at_utc '
         . 'FROM stc_webhook_events '
         . "WHERE status = 'ingested' "
-        . "AND JSON_UNQUOTE(JSON_EXTRACT(payload_json, '$.competition_id')) = ? "
+        . "AND JSON_UNQUOTE(JSON_EXTRACT(payload_json, '$.competition_id')) IN (?, ?) "
         . "AND JSON_UNQUOTE(JSON_EXTRACT(result_json, '$.decision.action')) = 'signal_created' "
-        . 'ORDER BY id DESC LIMIT 100'
+        . 'ORDER BY id DESC LIMIT 250'
     );
-    $stmt->execute(['capital-africa-sep-2026']);
+    $stmt->execute(['capital-africa-sep-2026', 'amp-futures-sep-2026']);
 
     $cards = [];
     $seen = [];
@@ -35,15 +35,17 @@ try {
             continue;
         }
 
+        $competitionId = (string)($payload['competition_id'] ?? '');
         $symbol = (string)($payload['symbol'] ?? '');
         $signalId = (string)($signal['signal_id'] ?? '');
-        if ($symbol === '' || $signalId === '' || isset($seen[$symbol])) {
+        $seenKey = $competitionId . '|' . $symbol;
+        if ($competitionId === '' || $symbol === '' || $signalId === '' || isset($seen[$seenKey])) {
             continue;
         }
         if (!stc_validate_signal_receipt($row, $payload, $result, $signalId)) {
             continue;
         }
-        $seen[$symbol] = true;
+        $seen[$seenKey] = true;
 
         $approvalStmt = $pdo->prepare(
             'SELECT approval_id, decision, quote_evidence_id, runtime_control_version, '
@@ -86,6 +88,7 @@ try {
         $cards[] = [
             'event_id' => (string)$row['event_id'],
             'signal_id' => $signalId,
+            'competition_id' => $competitionId,
             'symbol' => $symbol,
             'source_time' => (string)($payload['time'] ?? ''),
             'recommendation' => $recommendation,
@@ -98,14 +101,15 @@ try {
             'manual_execution_ready' => $manualReady,
             'execution' => 'manual_only',
         ];
-        if (count($cards) >= 10) {
+        if (count($cards) >= 40) {
             break;
         }
     }
 
     stc_json([
         'ok' => true,
-        'scope' => 'owner_console_read_only_snapshot',
+        'scope' => 'owner_console_dual_competition_read_only_snapshot',
+        'competitions' => ['capital-africa-sep-2026', 'amp-futures-sep-2026'],
         'observed_at_utc' => $now->format(DateTimeInterface::ATOM),
         'runtime_control' => $runtime,
         'cards' => $cards,

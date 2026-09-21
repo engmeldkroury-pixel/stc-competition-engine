@@ -76,3 +76,14 @@ def test_owner_console_auto_refresh_and_actionable_browser_notifications():
     assert "WAIT" in ui
     assert "Decision timeframe" in ui
     assert "Historical context" in ui
+
+
+def test_owner_snapshot_covers_both_competitions_without_mixing_symbol_identity():
+    snapshot = (PATCH / "operator_snapshot.php").read_text(encoding="utf-8")
+    ui = (PATCH / "operator.php").read_text(encoding="utf-8")
+    assert "capital-africa-sep-2026" in snapshot
+    assert "amp-futures-sep-2026" in snapshot
+    assert "$seenKey = $competitionId . '|' . $symbol;" in snapshot
+    assert "'competition_id' => $competitionId" in snapshot
+    assert "AMP Futures" in ui
+    assert "Capital.com Africa" in ui
