@@ -241,7 +241,7 @@ def test_snapshot_exposes_correlation_cluster_risk_and_expired_plan_cancellation
     assert "allowed_by_risk_policy" in control
     assert "correlation_cluster_capacity" in control
     assert "CANCEL_PENDING_PLAN" in snapshot
-    assert "deterministic_asset_risk_groups_not_statistical_correlation" in snapshot
+    assert "max_of_deterministic_asset_group_and_rolling_15m_effective_pnl_correlation" in snapshot
 
 
 
@@ -288,3 +288,20 @@ def test_hostinger_php_patch_files_are_syntax_valid_when_php_is_available():
             check=False,
         )
         assert result.returncode == 0, f"{name}: {result.stdout}\n{result.stderr}"
+
+
+
+def test_portfolio_uses_rolling_effective_correlation_when_history_is_mature():
+    control = (PATCH / "portfolio_control.php").read_text(encoding="utf-8")
+    snapshot = (PATCH / "operator_snapshot.php").read_text(encoding="utf-8")
+    ui = (PATCH / "operator.php").read_text(encoding="utf-8")
+    assert "stc_recent_close_series" in control
+    assert "stc_return_correlation" in control
+    assert "stc_dynamic_correlated_open_risk" in control
+    assert "minimumReturns = 20" in control
+    assert "effective_pnl_correlation" in control
+    assert "dynamic_correlation_threshold" in snapshot
+    assert "0.70" in snapshot
+    assert "max($deterministicClusterRisk, $dynamicClusterRisk)" in snapshot
+    assert "Max effective 15m correlation" in ui
+    assert "deterministic risk group is used as fallback" in ui

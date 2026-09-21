@@ -409,6 +409,170 @@ function stc_risk_cluster(string $symbol): string {
     return (string)($map[$symbol] ?? 'other');
 }
 
+function stc_recent_close_series(
+    PDO $pdo,
+    string $competitionId,
+    string $symbol,
+    int $limit = 64
+): array {
+    static $cache = [];
+    $limit = max(21, min($limit, 96));
+    $key = $competitionId . '|' . $symbol . '|' . $limit;
+    if (array_key_exists($key, $cache)) {
+        return $cache[$key];
+    }
+
+    $stmt = $pdo->prepare(
+        'SELECT '
+        . "JSON_UNQUOTE(JSON_EXTRACT(payload_json, '$.time')) AS bar_time, "
+        . "JSON_UNQUOTE(JSON_EXTRACT(payload_json, '$.close')) AS close_price "
+        . 'FROM stc_webhook_events '
+        . "WHERE status = 'ingested' "
+        . "AND JSON_UNQUOTE(JSON_EXTRACT(payload_json, '$.competition_id')) = ? "
+        . "AND JSON_UNQUOTE(JSON_EXTRACT(payload_json, '$.symbol')) = ? "
+        . "AND JSON_UNQUOTE(JSON_EXTRACT(payload_json, '$.timeframe')) = '15' "
+        . 'ORDER BY id DESC LIMIT ' . $limit
+    );
+    $stmt->execute([$competitionId, $symbol]);
+    $rows = [];
+    while (($row = $stmt->fetch()) !== false) {
+        $time = trim((string)($row['bar_time'] ?? ''));
+        $price = (float)($row['close_price'] ?? 0.0);
+        if ($time !== '' && is_finite($price) && $price > 0) {
+            $rows[$time] = $price;
+        }
+    }
+    ksort($rows);
+    $cache[$key] = $rows;
+    return $rows;
+}
+
+function stc_return_correlation(array $seriesA, array $seriesB, int $minimumReturns = 20): ?float {
+    $commonKeys = array_values(array_intersect(array_keys($seriesA), array_keys($seriesB)));
+    sort($commonKeys, SORT_STRING);
+    if (count($commonKeys) < $minimumReturns + 1) {
+        return null;
+    }
+
+    $returnsA = [];
+    $returnsB = [];
+    $previousA = null;
+    $previousB = null;
+    foreach ($commonKeys as $key) {
+        $a = (float)$seriesA[$key];
+        $b = (float)$seriesB[$key];
+        if ($a <= 0 || $b <= 0) {
+            continue;
+        }
+        if ($previousA !== null && $previousB !== null) {
+            $returnsA[] = $a / $previousA - 1.0;
+            $returnsB[] = $b / $previousB - 1.0;
+        }
+        $previousA = $a;
+        $previousB = $b;
+    }
+    $n = min(count($returnsA), count($returnsB));
+    if ($n < $minimumReturns) {
+        return null;
+    }
+
+    $meanA = array_sum($returnsA) / $n;
+    $meanB = array_sum($returnsB) / $n;
+    $cov = 0.0;
+    $varA = 0.0;
+    $varB = 0.0;
+    for ($i = 0; $i < $n; $i++) {
+        $da = (float)$returnsA[$i] - $meanA;
+        $db = (float)$returnsB[$i] - $meanB;
+        $cov += $da * $db;
+        $varA += $da * $da;
+        $varB += $db * $db;
+    }
+    if ($varA <= 0 || $varB <= 0) {
+        return null;
+    }
+    $corr = $cov / sqrt($varA * $varB);
+    return max(-1.0, min(1.0, $corr));
+}
+
+function stc_dynamic_correlated_open_risk(
+    PDO $pdo,
+    string $competitionId,
+    string $candidateSymbol,
+    string $candidateSide,
+    float $threshold = 0.70
+): array {
+    $candidateSide = strtoupper($candidateSide);
+    if (!in_array($candidateSide, ['LONG', 'SHORT'], true)) {
+        throw new RuntimeException('invalid_candidate_side');
+    }
+    $candidateSeries = stc_recent_close_series($pdo, $competitionId, $candidateSymbol);
+    $candidateSign = $candidateSide === 'LONG' ? 1.0 : -1.0;
+    $risk = 0.0;
+    $relationships = [];
+    $maxEffective = null;
+
+    $stmt = $pdo->prepare(
+        "SELECT position_id, symbol, side, quantity, entry_price, initial_stop "
+        . "FROM stc_positions WHERE status = 'OPEN' AND competition_id = ?"
+    );
+    $stmt->execute([$competitionId]);
+    while (($row = $stmt->fetch()) !== false) {
+        $otherSymbol = (string)$row['symbol'];
+        $otherSeries = stc_recent_close_series($pdo, $competitionId, $otherSymbol);
+        $corr = stc_return_correlation($candidateSeries, $otherSeries, 20);
+        if ($corr === null) {
+            continue;
+        }
+        $otherSide = (string)$row['side'];
+        $otherSign = $otherSide === 'LONG' ? 1.0 : -1.0;
+        $effective = $corr * $candidateSign * $otherSign;
+        if ($maxEffective === null || $effective > $maxEffective) {
+            $maxEffective = $effective;
+        }
+
+        try {
+            $value = stc_price_value_usd(
+                $competitionId,
+                $otherSymbol,
+                (float)$row['entry_price']
+            );
+            $positionRisk = abs((float)$row['entry_price'] - (float)$row['initial_stop'])
+                * (float)$row['quantity'] * $value;
+        } catch (Throwable $e) {
+            $positionRisk = 0.0;
+        }
+
+        $relationships[] = [
+            'position_id' => (string)$row['position_id'],
+            'symbol' => $otherSymbol,
+            'side' => $otherSide,
+            'return_correlation' => $corr,
+            'effective_pnl_correlation' => $effective,
+            'initial_risk_usd' => $positionRisk,
+            'counts_toward_dynamic_cluster' => $effective >= $threshold,
+        ];
+        if ($effective >= $threshold) {
+            $risk += $positionRisk;
+        }
+    }
+
+    usort(
+        $relationships,
+        static fn(array $a, array $b): int =>
+            (float)$b['effective_pnl_correlation'] <=> (float)$a['effective_pnl_correlation']
+    );
+
+    return [
+        'minimum_aligned_returns' => 20,
+        'threshold' => $threshold,
+        'dynamic_correlated_risk_usd' => $risk,
+        'max_effective_pnl_correlation' => $maxEffective,
+        'relationships' => $relationships,
+        'history_ready' => count($candidateSeries) >= 21,
+    ];
+}
+
 function stc_commission_rate(string $competitionId): float {
     if ($competitionId === 'capital-africa-sep-2026') {
         return 0.0001;

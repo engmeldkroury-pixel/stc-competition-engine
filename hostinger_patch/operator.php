@@ -159,6 +159,8 @@ function sizingHtml(s){
   +'<div class="row"><span>Estimated trade risk</span><span class="value">$'+num(s.risk_amount_usd,2)+'</span></div>'
   +'<div class="row"><span>Portfolio risk after</span><span class="value">$'+num(s.portfolio_risk_after_usd,2)+' / $'+num(s.portfolio_risk_cap_usd,2)+'</span></div>'
   +'<div class="row"><span>Cluster risk after</span><span class="value">$'+num(s.cluster_risk_after_usd,2)+' / $'+num(s.cluster_risk_cap_usd,2)+'</span></div>'
+  +(s.dynamic_correlation?'<div class="row"><span>Max effective 15m correlation</span><span class="value">'+num(s.dynamic_correlation.max_effective_pnl_correlation,2)+'</span></div>':'')
+  +(s.dynamic_correlation && s.dynamic_correlation.history_ready===false?'<div class="small wait">Dynamic correlation history not mature yet; deterministic risk group is used as fallback.</div>':'')
   +(limited?'<div class="small">Sizing limited by: '+esc(limited)+'</div>':'');
 }
 
