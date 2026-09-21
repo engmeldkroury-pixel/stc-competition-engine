@@ -169,7 +169,8 @@ function maybeNotify(cards){
 }
 function competitionOf(c){return c.competition_id==='amp-futures-sep-2026'?'amp':c.competition_id==='capital-africa-sep-2026'?'capital':'other'}
 function renderCards(target,cards){
- $(target).innerHTML=(cards||[]).map((c,i)=>cardHtml(c,i)).join('')||'<div class="card">No analyzed signals found.</div>';
+ const all=snapshot&&snapshot.cards?snapshot.cards:[];
+ $(target).innerHTML=(cards||[]).map(c=>cardHtml(c,all.indexOf(c))).join('')||'<div class="card">No analyzed signals found.</div>';
 }
 function accountHtml(account,competitionId){
  if(!account)return '<div class="small">Account state unavailable.</div>';
@@ -188,7 +189,8 @@ function accountHtml(account,competitionId){
   +'<div class="card"><div class="small">Manual-ready now</div><div class="big">'+ready.length+'</div></div>'
   +'<div class="card"><div class="small">Open positions tracked</div><div class="big">'+positions.length+'</div></div>';
  const ranked=[...actionable].sort((a,b)=>Math.abs(Number(b.composite_score||0))-Math.abs(Number(a.composite_score||0)));
- $('overview-cards').innerHTML=ranked.length?ranked.slice(0,8).map((c,i)=>cardHtml(c,i)).join(''):'<div class="card">No actionable locked opportunities right now. Current WAIT signals are still visible inside each competition tab.</div>';
+ const all=snapshot&&snapshot.cards?snapshot.cards:[];
+ $('overview-cards').innerHTML=ranked.length?ranked.slice(0,8).map(c=>cardHtml(c,all.indexOf(c))).join(''):'<div class="card">No actionable locked opportunities right now. Current WAIT signals are still visible inside each competition tab.</div>';
 }
 function render(){
  const r=snapshot.runtime_control||{};
