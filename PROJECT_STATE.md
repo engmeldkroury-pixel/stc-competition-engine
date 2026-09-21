@@ -531,3 +531,45 @@ Architecture:
 
 Next owner validation:
 Load STC Capital Multi Feed v0.6 Stateful Visual into TradingView Pine Editor, Save and Add to chart. Do not create a new production alert until compile/runtime and the fixed-zone behavior are visually confirmed.
+
+
+## Historical context architecture — 2026-09-21 13:03 UTC
+
+User raised a critical analysis-validity question: new webhook bars alone are not enough to establish long-term market context.
+
+Verified TradingView historical access:
+- Official TradingView MCP get_ohlcv supports up to 5000 bars per request.
+- Exact-provider CAPITALCOM historical OHLCV was re-verified on all 10 competition symbols.
+- 400 daily bars were returned for every allowed Capital.com symbol, providing at least a one-year regime window.
+- Historical OHLCV is explicitly delayed/context data and is not accepted as an execution-time quote.
+
+Merged PR #12.
+Main commit: 314ef7a90a3753780374e69204ea84a993a6e552.
+PR CI: SUCCESS.
+Main CI run 35603066077: SUCCESS.
+
+STC v0.7 changes:
+- TradingView multi-feed now attaches confirmed previous-day historical context to every 15m event.
+- Historical context uses 252 trading-day lookback and includes:
+  - daily close
+  - EMA50 / EMA200
+  - RSI14 / ATR14
+  - 252-day high / low
+  - 20 / 63 / 126 / 252-day momentum
+  - normalized 20-day volatility
+- Daily history uses the previous confirmed daily bar to avoid using an unfinished daily candle.
+- Backend accepts historical context only as complete-or-absent; partial/malformed history fails validation.
+- Short-term technical score and historical regime score are stored separately in signal reasons.
+- Blended technical score = 65% short-term + 35% historical regime when history is available.
+- Backward compatibility is preserved for older v0.2/v0.6 events without history.
+- app/history.py can independently derive the one-year regime from raw daily OHLCV for research/backtest validation.
+
+Important architecture distinction:
+- Pine has access to chart history and calculates indicators across historical bars even before the first realtime webhook fires.
+- Hostinger/GitHub does not receive all raw old candles automatically from alerts; it receives new events.
+- Therefore each new v0.7 event carries a compact, confirmed long-term regime summary derived from TradingView history.
+- Raw historical OHLCV remains available through TradingView MCP for deeper research/backtesting and can be processed by app/history.py.
+- Historical/delayed data is never used as a fresh execution quote.
+
+Current production validation gate:
+The owner is currently running v0.6.4 Clear Visual in TradingView. v0.7 Historical Context is merged and CI-green but is not yet compiled/live-validated in the TradingView UI. Existing XAUUSD v0.2 production alert remains active. Do not mark the 10-symbol v0.7 feed production-ready until the owner installs v0.7 and one live 15m cycle proves: compile success, no fire_control stop, all available symbol events accepted, historical fields persisted, and backend reasons show historical_regime + blended_technical.
