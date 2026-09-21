@@ -779,3 +779,39 @@ UI polish merged in PR #20 after CI success:
 
 Next owner-required step:
 Provision the AMP Futures TradingView Pine feed from tradingview/STC_AMP_CORE_FEED.pine and create its indicator alert to the existing STC webhook. Do not disable Safe Mode/Kill Switch.
+
+
+## AMP alert flood-stop discovered and fixed — 2026-09-21 19:22 UTC
+
+Owner created TradingView alert:
+- name: STC AMP 16-SYMBOL 15m PROD v0.2
+- alert_id: 5664628299
+- scheduler symbol: CME_MINI:MES1!
+- resolution: 15m
+
+Immediate verification found:
+- active=false
+- last_fire_time=null
+- no AMP alert-log events
+
+Root cause:
+The single Pine script could emit 16 alert() calls in one realtime cycle. This exceeds the safe script-alert burst design and can trigger TradingView's alert flood-stop behavior.
+
+Fix merged in PR #22 after CI success:
+- Feed A: tradingview/STC_AMP_CORE_FEED.pine
+  - STC AMP Core Feed A v0.3 Stateful Visual
+  - 8 symbols: MES, MNQ, MYM, M2K, MCL, MNG, MGC, SIL
+  - retains stateful chart visuals
+- Feed B: tradingview/STC_AMP_CORE_FEED_B.pine
+  - STC AMP Core Feed B v0.3 Companion
+  - 8 symbols: M6E, M6B, MJY, M6A, MBT, MET, ZN, ZB
+  - no chart clutter
+- Regression tests cap each production alert at 8 symbol events per cycle.
+- Full 16-symbol AMP coverage remains intact.
+
+Owner next action:
+Replace the current AMP v0.2 visual with Feed A v0.3, add Feed B v0.3 to the chart, and create two webhook alerts:
+1) STC AMP A 8-SYMBOL 15m PROD v0.3
+2) STC AMP B 8-SYMBOL 15m PROD v0.3
+Both use Any alert() function call, 15m, same STC webhook, Webhook notification only.
+Do not re-enable or reuse the stopped 16-symbol v0.2 alert.
