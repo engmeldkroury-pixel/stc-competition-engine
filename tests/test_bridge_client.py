@@ -52,3 +52,36 @@ def test_inbox_uses_bearer_auth():
 
     client = BridgeClient("https://bridge.test", "secret", transport=httpx.MockTransport(handler))
     assert client.inbox()["count"] == 0
+
+
+def test_runtime_control_and_approval_reads_use_bearer_auth():
+    seen = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        assert request.headers.get("authorization") == "Bearer secret"
+        seen.append((request.method, request.url.path, dict(request.url.params)))
+        if request.url.path.endswith("/runtime_control.php"):
+            return httpx.Response(200, json={
+                "ok": True,
+                "runtime_control": {
+                    "safe_mode": True,
+                    "kill_switch": True,
+                    "reason": "test",
+                    "version": 3,
+                    "updated_at_utc": "2026-09-21 14:00:00",
+                },
+            })
+        if request.url.path.endswith("/approval.php"):
+            assert request.url.params["signal_id"] == "sig-1"
+            return httpx.Response(200, json={
+                "ok": True,
+                "signal_id": "sig-1",
+                "approval": None,
+                "execution": "manual_only",
+            })
+        return httpx.Response(404)
+
+    client = BridgeClient("https://bridge.test", "secret", transport=httpx.MockTransport(handler))
+    assert client.runtime_control()["runtime_control"]["version"] == 3
+    assert client.approval("sig-1")["signal_id"] == "sig-1"
+    assert [x[1] for x in seen] == ["/runtime_control.php", "/approval.php"]
