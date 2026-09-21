@@ -335,3 +335,110 @@ function stc_supervise_position(array $position, array $history): array {
         'reasons' => ['original_thesis_not_invalidated', 'no_confirmed_exit_condition'],
     ];
 }
+
+
+function stc_max_open_position(string $competitionId, string $symbol): ?float {
+    $capital = [
+        'CAPITALCOM:BTCUSD' => 0.5,
+        'CAPITALCOM:ETHUSD' => 15.0,
+        'CAPITALCOM:DOGEUSD' => 500000.0,
+        'CAPITALCOM:EURUSD' => 800000.0,
+        'CAPITALCOM:AUDUSD' => 1200000.0,
+        'CAPITALCOM:USDZAR' => 800000.0,
+        'CAPITALCOM:XAUUSD' => 75.0,
+        'CAPITALCOM:XAGUSD' => 5000.0,
+        'CAPITALCOM:SPX500' => 40.0,
+        'CAPITALCOM:NAS100' => 10.0,
+    ];
+    if ($competitionId === 'capital-africa-sep-2026') {
+        return array_key_exists($symbol, $capital) ? $capital[$symbol] : null;
+    }
+    if ($competitionId === 'amp-futures-sep-2026') {
+        $amp = [
+            'CME_MINI:MES1!' => 500.0,
+            'CME_MINI:MNQ1!' => 500.0,
+            'CBOT_MINI:MYM1!' => 500.0,
+            'CME_MINI:M2K1!' => 500.0,
+            'NYMEX:MCL1!' => 100.0,
+            'NYMEX:MNG1!' => 10.0,
+            'COMEX_MINI:MGC1!' => 100.0,
+            'COMEX_MINI:SIL1!' => 10.0,
+            'CME_MINI:M6E1!' => 25.0,
+            'CME_MINI:M6B1!' => 10.0,
+            'CME_MINI:MJY1!' => 5.0,
+            'CME_MINI:M6A1!' => 25.0,
+            'CME:MBT1!' => 25.0,
+            'CME:MET1!' => 25.0,
+            'CBOT:ZN1!' => 100.0,
+            'CBOT:ZB1!' => 100.0,
+        ];
+        return array_key_exists($symbol, $amp) ? $amp[$symbol] : null;
+    }
+    return null;
+}
+
+function stc_commission_rate(string $competitionId): float {
+    if ($competitionId === 'capital-africa-sep-2026') {
+        return 0.0001;
+    }
+    if ($competitionId === 'amp-futures-sep-2026') {
+        return 0.0;
+    }
+    throw new RuntimeException('unknown_competition');
+}
+
+function stc_propose_position_size(
+    string $competitionId,
+    string $symbol,
+    float $equity,
+    float $riskFraction,
+    float $entryPrice,
+    float $stopPrice,
+    float $currentOpenQuantity
+): array {
+    if ($equity <= 0 || $entryPrice <= 0 || $stopPrice <= 0 || $riskFraction <= 0 || $riskFraction > 0.02) {
+        throw new RuntimeException('invalid_sizing_input');
+    }
+    $maxPosition = stc_max_open_position($competitionId, $symbol);
+    if ($maxPosition === null) {
+        throw new RuntimeException('symbol_not_allowed');
+    }
+    $value = stc_price_value_usd($competitionId, $symbol, $entryPrice);
+    $stopRisk = abs($entryPrice - $stopPrice) * $value;
+    if ($stopRisk <= 0) {
+        throw new RuntimeException('invalid_stop_distance');
+    }
+    $commission = 2.0 * $entryPrice * $value * stc_commission_rate($competitionId);
+    $totalRisk = $stopRisk + $commission;
+    $budget = $equity * $riskFraction;
+    $raw = $budget / $totalRisk;
+    $room = max(0.0, $maxPosition - $currentOpenQuantity);
+
+    if ($competitionId === 'amp-futures-sep-2026') {
+        $qty = floor(min($raw, $room) + 1e-12);
+        $integerContracts = true;
+    } else {
+        $qty = floor(min($raw, $room) * 1000000.0) / 1000000.0;
+        $integerContracts = false;
+    }
+
+    return [
+        'equity_usd' => $equity,
+        'risk_fraction' => $riskFraction,
+        'risk_budget_usd' => $budget,
+        'entry_price' => $entryPrice,
+        'stop_price' => $stopPrice,
+        'price_value_usd_per_price_unit' => $value,
+        'stop_risk_usd_per_unit' => $stopRisk,
+        'estimated_round_trip_commission_usd_per_unit' => $commission,
+        'proposed_quantity' => $qty,
+        'max_position' => $maxPosition,
+        'current_open_quantity' => $currentOpenQuantity,
+        'projected_open_quantity' => $currentOpenQuantity + $qty,
+        'risk_amount_usd' => $qty * $totalRisk,
+        'quantity_is_integer_contracts' => $integerContracts,
+        'allowed_by_position_limit' => $qty > 0 && ($currentOpenQuantity + $qty) <= $maxPosition + 1e-12,
+        'provisional_risk_setting' => true,
+        'note' => 'STC sizing proposal only. Human approval and manual order entry required.',
+    ];
+}
