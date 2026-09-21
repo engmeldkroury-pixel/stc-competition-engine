@@ -306,3 +306,25 @@ Temporary Hostinger production/readback proof workflows were removed after their
 ## Current owner action required
 
 Add the same private owner_api_token value already configured in Hostinger config.php as a GitHub Actions repository secret named STC_OWNER_TOKEN. Do not paste or expose the value in chat. After the secret exists, re-run only the failed owner approval gate job; the assistant can perform the rerun through the GitHub connector.
+
+
+## Owner-auth durable approval gate — 2026-09-21 08:36 UTC
+
+GitHub Actions repository secret STC_OWNER_TOKEN was configured by the owner without exposing its value.
+
+Owner approval production gate:
+- Workflow run: 35578258416
+- Attempt: 2
+- Conclusion: SUCCESS
+- Owner credential was accepted by Hostinger approval.php.
+- POST approve request for signal bridge-6892e51a1282c352aaafd4a4d1e35aac returned a durable blocked decision as designed.
+- Blocking reasons included safe_mode_active, kill_switch_active, and wait_is_not_an_order.
+- Durable approval readback returned approval.decision=blocked.
+- Runtime control remained safe_mode=true, kill_switch=true, version=1.
+- Execution remained manual_only.
+- No trade or broker action occurred.
+
+The temporary owner approval gate workflow was removed after evidence capture. STC_OWNER_TOKEN remains stored as a GitHub Actions secret for future authenticated owner-control workflows; its value is not recorded in project files or chat.
+
+Current operational gap:
+The backend control/approval path is now production-verified, but continuous TradingView feed operation for the Capital.com competition still requires the production Pine feed/alerts to be installed for the allowed competition symbols. The TradingView MCP webhook-alert creation path previously returned webhook_requires_2fa despite browser 2FA being enabled, so production alert provisioning may require manual TradingView UI steps unless that MCP defect is resolved.
