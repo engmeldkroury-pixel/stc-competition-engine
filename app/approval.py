@@ -13,6 +13,40 @@ def timeframe_validity_minutes(timeframe: str) -> int:
     return table.get(tf, 15)
 
 
+def _timeframe_duration(timeframe: str) -> timedelta:
+    tf = str(timeframe).strip().lower()
+    table = {
+        "1": timedelta(minutes=1),
+        "1m": timedelta(minutes=1),
+        "5": timedelta(minutes=5),
+        "5m": timedelta(minutes=5),
+        "15": timedelta(minutes=15),
+        "15m": timedelta(minutes=15),
+        "30": timedelta(minutes=30),
+        "30m": timedelta(minutes=30),
+        "60": timedelta(hours=1),
+        "1h": timedelta(hours=1),
+        "240": timedelta(hours=4),
+        "4h": timedelta(hours=4),
+        "1d": timedelta(days=1),
+    }
+    return table.get(tf, timedelta(0))
+
+
+def source_bar_close_time(payload: dict, fallback_now: datetime | None = None) -> datetime:
+    fallback_now = fallback_now or datetime.now(timezone.utc)
+    raw = payload.get("time")
+    if raw is None:
+        return fallback_now
+    try:
+        opened = datetime.fromisoformat(str(raw).replace("Z", "+00:00"))
+        if opened.tzinfo is None:
+            return fallback_now
+        return opened.astimezone(timezone.utc) + _timeframe_duration(str(payload.get("timeframe", "")))
+    except Exception:
+        return fallback_now
+
+
 def market_state_hash(payload: dict) -> str:
     keys = ["competition_id", "symbol", "timeframe", "close", "ema20", "ema50", "rsi14", "atr14", "macd", "macd_signal"]
     state = {k: payload.get(k) for k in keys}
@@ -23,6 +57,7 @@ def market_state_hash(payload: dict) -> str:
 def build_approval_envelope(payload: dict, composite_score: float, rule_version: str = "stc-rule-v1") -> dict:
     now = datetime.now(timezone.utc)
     minutes = timeframe_validity_minutes(str(payload.get("timeframe", "5")))
+    bar_close = source_bar_close_time(payload, now)
     ref = float(payload.get("close") or 0.0)
     atr = abs(float(payload.get("atr14") or 0.0))
     # Dynamic price tolerance: half ATR, bounded to 0.10%..1.00% of reference price.
@@ -31,7 +66,9 @@ def build_approval_envelope(payload: dict, composite_score: float, rule_version:
         pct = min(0.01, max(0.001, (0.5 * atr) / ref))
     return {
         "issued_at": now.isoformat(),
-        "valid_until": (now + timedelta(minutes=minutes)).isoformat(),
+        "source_bar_time": payload.get("time"),
+        "source_bar_close_time": bar_close.isoformat(),
+        "valid_until": (bar_close + timedelta(minutes=minutes)).isoformat(),
         "validity_minutes": minutes,
         "competition_id": payload.get("competition_id"),
         "symbol": payload.get("symbol"),
