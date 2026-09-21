@@ -87,3 +87,16 @@ def test_owner_snapshot_covers_both_competitions_without_mixing_symbol_identity(
     assert "'competition_id' => $competitionId" in snapshot
     assert "AMP Futures" in ui
     assert "Capital.com Africa" in ui
+
+
+def test_owner_console_has_separate_navigation_for_competitions_general_and_notifications():
+    ui = (PATCH / "operator.php").read_text(encoding="utf-8")
+    for label in ("Overview", "Capital.com Africa", "AMP Futures", "General Lab", "Notification Center"):
+        assert label in ui
+    assert 'data-tab="capital"' in ui
+    assert 'data-tab="amp"' in ui
+    assert 'data-tab="general"' in ui
+    assert 'data-tab="notifications"' in ui
+    assert "stc_general_lab" in ui
+    assert "Separate research/sandbox area" in ui
+    assert "does not affect either competition account" in ui

@@ -14,6 +14,9 @@ header('Content-Type: text/html; charset=utf-8');
 .wrap{max-width:1320px;margin:auto;padding:18px}.bar,.card{background:#101827;border:1px solid #263247;border-radius:14px}
 .bar{padding:14px;margin-bottom:14px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:14px}.card{padding:15px}
 h1{margin:0 0 4px}.muted,.small{color:#94a3b8}.small{font-size:12px}.row{display:flex;justify-content:space-between;gap:10px;margin:7px 0}.value{font-weight:700;text-align:right}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}.tab{background:#0b1220;border:1px solid #334155;border-radius:10px;padding:10px 14px;color:#cbd5e1;cursor:pointer}.tab.active{background:#1d4ed8;border-color:#1d4ed8;color:#fff}.tabcount{font-size:11px;opacity:.8;margin-left:5px}
+.hidden{display:none!important}.summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px}.summary .card{min-height:90px}.big{font-size:24px;font-weight:800}.sectiontitle{font-weight:800;margin:0 0 8px}.generalbox{display:grid;grid-template-columns:1fr 1fr;gap:10px}.generalbox textarea{width:100%;min-height:90px;background:#0b1220;color:#e5e7eb;border:1px solid #334155;border-radius:9px;padding:9px;font:inherit}
+@media(max-width:700px){.generalbox{grid-template-columns:1fr}}
 input,button,select{font:inherit;border:1px solid #334155;border-radius:9px;padding:9px;background:#0b1220;color:#e5e7eb}
 input{width:100%}button{cursor:pointer}.primary{background:#1d4ed8}.danger{background:#991b1b}.safe{background:#166534}
 .long,.ok{color:#22c55e}.short,.bad{color:#f87171}.wait{color:#facc15}.pill{display:inline-block;border:1px solid #334155;border-radius:999px;padding:3px 7px;margin:2px;font-size:11px}
@@ -24,6 +27,14 @@ input{width:100%}button{cursor:pointer}.primary{background:#1d4ed8}.danger{backg
 <body><div class="wrap">
 <h1>STC Owner Console</h1>
 <p class="muted">Human approval + manual order entry only. This page never places an order.</p>
+
+<div class="tabs" id="tabs">
+<button class="tab active" data-tab="overview">Overview</button>
+<button class="tab" data-tab="capital">Capital.com Africa <span class="tabcount" id="count-capital">0</span></button>
+<button class="tab" data-tab="amp">AMP Futures <span class="tabcount" id="count-amp">0</span></button>
+<button class="tab" data-tab="general">General Lab</button>
+<button class="tab" data-tab="notifications">Notifications</button>
+</div>
 
 <div class="bar">
 <div class="controls">
@@ -37,11 +48,50 @@ input{width:100%}button{cursor:pointer}.primary{background:#1d4ed8}.danger{backg
 </div>
 
 <div id="runtime" class="bar">Runtime controls not loaded.</div>
-<div id="cards" class="grid"></div>
+
+<div id="overview-panel">
+  <div id="overview-summary" class="summary"></div>
+  <div class="bar" style="margin-top:14px"><div class="sectiontitle">Latest opportunities across both competitions</div><div id="overview-cards" class="grid"></div></div>
+</div>
+
+<div id="capital-panel" class="hidden">
+  <div class="bar"><div class="sectiontitle">Capital.com Africa</div><div class="small">Independent competition lane. Capital.com symbols, account rules, risk and position limits stay separate from AMP Futures.</div></div>
+  <div id="capital-cards" class="grid"></div>
+</div>
+
+<div id="amp-panel" class="hidden">
+  <div class="bar"><div class="sectiontitle">AMP Futures</div><div class="small">Independent futures lane. Futures symbols, contract limits, risk and position state stay separate from Capital.com Africa.</div></div>
+  <div id="amp-cards" class="grid"></div>
+</div>
+
+<div id="general-panel" class="hidden">
+  <div class="bar">
+    <div class="sectiontitle">General Lab</div>
+    <div class="small">Separate research/sandbox area. It does not affect either competition account.</div>
+    <div class="generalbox" style="margin-top:12px">
+      <div><label class="small">Research capital</label><input id="general-capital" type="number" min="0" step="any" placeholder="Example: 10000"></div>
+      <div><label class="small">Preferred base currency</label><select id="general-currency"><option>USD</option><option>EUR</option><option>GBP</option><option>EGP</option></select></div>
+      <div style="grid-column:1/-1"><label class="small">Watch symbols / ideas</label><textarea id="general-symbols" placeholder="Examples: EURUSD, XAUUSD, BTCUSD ..."></textarea></div>
+    </div>
+    <button class="primary" id="save-general" style="margin-top:10px">Save General Lab settings on this device</button>
+    <div id="general-status" class="small" style="margin-top:8px">The General Lab engine is intentionally separate from competition execution.</div>
+  </div>
+</div>
+
+<div id="notifications-panel" class="hidden">
+  <div class="bar">
+    <div class="sectiontitle">Notification Center</div>
+    <div class="row"><span>Browser / laptop</span><span class="value" id="browser-notify-status">Not enabled</span></div>
+    <div class="row"><span>Telegram mobile</span><span class="value">Planned • actionable alerts only</span></div>
+    <div class="row"><span>Email backup</span><span class="value">Planned • actionable alerts only</span></div>
+    <div class="small" style="margin-top:10px">Raw 15-minute feed bars should not generate user notifications. Notifications are reserved for new locked plans and future position-management changes.</div>
+  </div>
+</div>
 </div>
 <script>
 const $=id=>document.getElementById(id);
 let snapshot=null;
+let activeTab='overview';
 let autoTimer=null;
 let autoCountdown=null;
 let secondsToRefresh=30;
@@ -110,11 +160,32 @@ function maybeNotify(cards){
    document.title='NEW '+c.recommendation+' • '+c.symbol+' • STC';
  }
 }
+function competitionOf(c){return c.competition_id==='amp-futures-sep-2026'?'amp':c.competition_id==='capital-africa-sep-2026'?'capital':'other'}
+function renderCards(target,cards){
+ $(target).innerHTML=(cards||[]).map((c,i)=>cardHtml(c,i)).join('')||'<div class="card">No analyzed signals found.</div>';
+}
+function renderOverview(cards){
+ const capital=cards.filter(c=>competitionOf(c)==='capital');
+ const amp=cards.filter(c=>competitionOf(c)==='amp');
+ const actionable=cards.filter(c=>(c.recommendation==='LONG'||c.recommendation==='SHORT')&&c.locked_trade_plan);
+ const ready=cards.filter(c=>c.manual_execution_ready);
+ $('count-capital').textContent=capital.length;
+ $('count-amp').textContent=amp.length;
+ $('overview-summary').innerHTML=
+   '<div class="card"><div class="small">Capital.com cards</div><div class="big">'+capital.length+'</div></div>'
+  +'<div class="card"><div class="small">AMP Futures cards</div><div class="big">'+amp.length+'</div></div>'
+  +'<div class="card"><div class="small">Locked opportunities</div><div class="big">'+actionable.length+'</div></div>'
+  +'<div class="card"><div class="small">Manual-ready now</div><div class="big">'+ready.length+'</div></div>';
+ const ranked=[...actionable].sort((a,b)=>Math.abs(Number(b.composite_score||0))-Math.abs(Number(a.composite_score||0)));
+ renderCards('overview-cards',ranked.slice(0,8));
+}
 function render(){
  const r=snapshot.runtime_control||{};
  $('runtime').innerHTML=runtimeHtml(r);
  const cards=snapshot.cards||[];
- $('cards').innerHTML=cards.map(cardHtml).join('')||'<div class="card">No analyzed signals found.</div>';
+ renderOverview(cards);
+ renderCards('capital-cards',cards.filter(c=>competitionOf(c)==='capital'));
+ renderCards('amp-cards',cards.filter(c=>competitionOf(c)==='amp'));
  maybeNotify(cards);
 }
 async function refresh(){
@@ -148,6 +219,7 @@ async function enableNotifications(){
  if(!('Notification' in window)){alert('Browser notifications are not supported in this browser.');return}
  const p=await Notification.requestPermission();
  $('notify').textContent=p==='granted'?'Browser alerts ON':'Enable browser alerts';
+ if($('browser-notify-status'))$('browser-notify-status').textContent=p==='granted'?'Enabled':'Not enabled';
  if(p==='granted')new Notification('STC browser alerts enabled',{body:'You will be notified here when a new LONG/SHORT locked trade plan appears while this console is running.'});
 }
 async function setControls(safe,kill){
@@ -167,6 +239,30 @@ async function approve(i,decision){
  try{const r=await api('approval.php',{method:'POST',body:JSON.stringify(body)});alert('Decision: '+r.decision);await refresh()}
  catch(e){alert('Approval failed/blocked: '+e.message);await refresh()}
 }
+function showTab(name){
+ activeTab=name;
+ for(const el of document.querySelectorAll('.tab'))el.classList.toggle('active',el.dataset.tab===name);
+ for(const id of ['overview','capital','amp','general','notifications'])$(id+'-panel').classList.toggle('hidden',id!==name);
+ localStorage.setItem('stc_active_tab',name);
+}
+for(const el of document.querySelectorAll('.tab'))el.addEventListener('click',()=>showTab(el.dataset.tab));
+function loadGeneralSettings(){
+ try{
+   const g=JSON.parse(localStorage.getItem('stc_general_lab')||'{}');
+   $('general-capital').value=g.capital??'';
+   $('general-currency').value=g.currency||'USD';
+   $('general-symbols').value=g.symbols||'';
+ }catch(e){}
+}
+$('save-general').onclick=()=>{
+ const g={capital:$('general-capital').value,currency:$('general-currency').value,symbols:$('general-symbols').value};
+ localStorage.setItem('stc_general_lab',JSON.stringify(g));
+ $('general-status').textContent='Saved on this device. General Lab analysis will remain isolated from both competition accounts.';
+};
+loadGeneralSettings();
+showTab(localStorage.getItem('stc_active_tab')||'overview');
+if('Notification' in window && $('browser-notify-status'))$('browser-notify-status').textContent=Notification.permission==='granted'?'Enabled':'Not enabled';
+
 $('refresh').onclick=refresh;
 $('notify').onclick=enableNotifications;
 $('logout').onclick=()=>{stopAutoRefresh();$('token').value='';snapshot=null;initializedSignals=false;seenSignalPlans.clear();$('cards').innerHTML='';$('runtime').textContent='Runtime controls not loaded.';$('status').textContent='Token cleared';document.title='STC Owner Console'};
