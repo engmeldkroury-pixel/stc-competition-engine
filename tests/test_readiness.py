@@ -4,6 +4,11 @@ from app.readiness import build_readiness
 def test_readiness_reports_analysis_ready_and_manual_execution_only():
     result = build_readiness({"safe_mode": False, "kill_switch": False, "reason": None, "updated_utc": "2026-09-21T00:00:00+00:00"})
     assert result["analysis_ready"] is True
+    assert result["historical_context_capable"] is True
+    assert result["historical_context_required"] is True
+    assert result["historical_window_trading_days"] == 252
+    assert result["historical_context_timeframe"] == "1D"
+    assert result["historical_context_policy"] == "previous_confirmed_daily_bar"
     assert result["approval_runtime_ready"] is True
     assert result["execution_mode"] == "manual_only"
     assert result["automatic_execution_available"] is False
