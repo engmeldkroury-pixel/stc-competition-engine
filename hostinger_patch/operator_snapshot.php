@@ -34,6 +34,30 @@ try {
         $openQty[(string)$row['competition_id'] . '|' . (string)$row['symbol']] = (float)$row['qty'];
     }
 
+    $riskByCompetition = [
+        'capital-africa-sep-2026' => 0.0,
+        'amp-futures-sep-2026' => 0.0,
+    ];
+    $riskByCluster = [];
+    $riskStmt = $pdo->query(
+        "SELECT competition_id, symbol, quantity, entry_price, initial_stop "
+        . "FROM stc_positions WHERE status = 'OPEN'"
+    );
+    while (($row = $riskStmt->fetch()) !== false) {
+        $cid = (string)$row['competition_id'];
+        $symbol = (string)$row['symbol'];
+        try {
+            $value = stc_price_value_usd($cid, $symbol, (float)$row['entry_price']);
+            $risk = abs((float)$row['entry_price'] - (float)$row['initial_stop'])
+                * (float)$row['quantity'] * $value;
+        } catch (Throwable $e) {
+            $risk = 0.0;
+        }
+        $riskByCompetition[$cid] = (float)($riskByCompetition[$cid] ?? 0.0) + $risk;
+        $clusterKey = $cid . '|' . stc_risk_cluster($symbol);
+        $riskByCluster[$clusterKey] = (float)($riskByCluster[$clusterKey] ?? 0.0) + $risk;
+    }
+
     $stmt = $pdo->prepare(
         'SELECT id, event_id, payload_json, result_json, analysis_completed_at_utc '
         . 'FROM stc_webhook_events '
@@ -122,7 +146,9 @@ try {
                     (float)$account['risk_fraction'],
                     (float)$lockedPlan['entry_mid'],
                     (float)$lockedPlan['initial_stop'],
-                    (float)($openQty[$seenKey] ?? 0.0)
+                    (float)($openQty[$seenKey] ?? 0.0),
+                    (float)($riskByCompetition[$competitionId] ?? 0.0),
+                    (float)($riskByCluster[$competitionId . '|' . stc_risk_cluster($symbol)] ?? 0.0)
                 );
             } catch (Throwable $e) {
                 $sizing = [
@@ -163,8 +189,8 @@ try {
 
     $positions = [];
     $summary = [
-        'capital-africa-sep-2026' => ['open_positions' => 0, 'initial_risk_usd' => 0.0],
-        'amp-futures-sep-2026' => ['open_positions' => 0, 'initial_risk_usd' => 0.0],
+        'capital-africa-sep-2026' => ['open_positions' => 0, 'initial_risk_usd' => 0.0, 'clusters' => []],
+        'amp-futures-sep-2026' => ['open_positions' => 0, 'initial_risk_usd' => 0.0, 'clusters' => []],
     ];
     $rotationCandidates = [];
 
@@ -196,10 +222,16 @@ try {
         }
         $cid = (string)$positionRow['competition_id'];
         if (!isset($summary[$cid])) {
-            $summary[$cid] = ['open_positions' => 0, 'initial_risk_usd' => 0.0];
+            $summary[$cid] = ['open_positions' => 0, 'initial_risk_usd' => 0.0, 'clusters' => []];
         }
         $summary[$cid]['open_positions'] += 1;
         $summary[$cid]['initial_risk_usd'] += $risk;
+        $cluster = stc_risk_cluster((string)$positionRow['symbol']);
+        if (!isset($summary[$cid]['clusters'][$cluster])) {
+            $summary[$cid]['clusters'][$cluster] = ['open_positions' => 0, 'initial_risk_usd' => 0.0];
+        }
+        $summary[$cid]['clusters'][$cluster]['open_positions'] += 1;
+        $summary[$cid]['clusters'][$cluster]['initial_risk_usd'] += $risk;
 
         if (($advice['thesis_degraded'] ?? false) === true) {
             $latestScore = 0.0;
@@ -259,6 +291,13 @@ try {
         'portfolio' => [
             'positions' => $positions,
             'summary' => $summary,
+            'risk_policy' => [
+                'per_trade_risk_fraction_source' => 'owner_configured',
+                'portfolio_cap_multiple_of_trade_risk' => 6.0,
+                'correlation_cluster_cap_multiple_of_trade_risk' => 3.0,
+                'cluster_model' => 'deterministic_asset_risk_groups_not_statistical_correlation',
+                'official_competition_limit' => false,
+            ],
             'rotation_candidates' => $rotationCandidates,
             'anti_churn_policy' => 'two_closed_bar_opposite_confirmation_and_material_score_advantage',
         ],
