@@ -1,6 +1,6 @@
 <?php
 declare(strict_types=1);
-require __DIR__ . '/cloud_control.php';
+require __DIR__ . '/macro_control.php';
 
 $pdo = stc_pdo($config);
 
@@ -79,6 +79,7 @@ try {
     $status = 'rejected';
     $reasons = [];
     $evidenceId = null;
+    $macroContext = null;
 
     if ($requested === 'approve') {
         if ($control['safe_mode']) {
@@ -99,6 +100,14 @@ try {
         if ($latestEventId === null || $latestEventId !== (string)$signalRow['event_id']) {
             $reasons[] = 'newer_signal_exists';
         }
+
+        $macroContext = stc_macro_risk_context($config, $symbol, $now);
+        if (($macroContext['block_new_approval'] ?? false) === true) {
+            $reasons[] = ($macroContext['status'] ?? '') === 'blackout'
+                ? 'macro_high_impact_blackout'
+                : 'macro_calendar_unavailable_fail_closed';
+        }
+
         $confirmation = $data['confirmation'] ?? null;
         if (!is_array($confirmation)) {
             $reasons[] = 'owner_confirmation_missing';
@@ -121,7 +130,10 @@ try {
                     $checked['evidence']['observed_at_utc'],
                     $checked['evidence']['quote_price'],
                     $checked['evidence']['market_status'],
-                    json_encode(['attestation' => 'owner_platform_confirmation'], JSON_UNESCAPED_SLASHES),
+                    json_encode([
+                        'attestation' => 'owner_platform_confirmation',
+                        'macro_context' => $macroContext,
+                    ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
                     'owner',
                 ]);
             }
@@ -158,6 +170,7 @@ try {
         'reasons' => $reasons,
         'quote_evidence_id' => $evidenceId,
         'runtime_control_version' => $control['version'],
+        'macro_context' => $macroContext,
         'execution' => 'manual_only',
     ], $status === 'blocked' ? 409 : 200);
 } catch (Throwable $e) {

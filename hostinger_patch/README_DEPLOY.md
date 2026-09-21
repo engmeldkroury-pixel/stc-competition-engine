@@ -142,3 +142,38 @@ Server notification policy:
 - `PROTECT`, `PARTIAL_TAKE_PROFIT`, or `EXIT_NOW`: notify when the de-duplicated management state changes.
 
 The owner console Notifications tab shows whether Telegram/email are configured and provides a harmless test button. Browser notifications remain independent and can work alongside both server channels.
+
+
+## High-impact macro approval gate
+
+Upload:
+- `macro_control.php`
+- updated `approval.php`
+- updated `operator_snapshot.php`
+- updated `operator.php`
+
+No SQL migration is required for this gate.
+
+Default source:
+- Forex Factory weekly JSON export served from `https://nfs.faireconomy.media/ff_calendar_thisweek.json`.
+
+Default STC policy:
+- enabled;
+- cached for 10 minutes;
+- high-impact events only;
+- block new approvals from 45 minutes before through 30 minutes after a relevant high-impact event;
+- fail closed if the external calendar becomes unavailable;
+- existing open positions are not auto-closed because of the calendar.
+
+Optional private `config.php` overrides:
+```php
+'macro_calendar_enabled' => true,
+'macro_calendar_url' => 'https://nfs.faireconomy.media/ff_calendar_thisweek.json',
+'macro_calendar_cache_seconds' => 600,
+'macro_calendar_timeout_ms' => 1800,
+'macro_blackout_before_minutes' => 45,
+'macro_blackout_after_minutes' => 30,
+'macro_calendar_fail_closed' => true,
+```
+
+The calendar gate is event-risk control, not a directional macro forecast. Signal reasons still state that a live directional macro factor is unavailable until a separate verified source exists.
