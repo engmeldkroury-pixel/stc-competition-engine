@@ -171,9 +171,39 @@ try {
         }
 
         $pendingPlanAction = null;
-        if ($planValid && $validUntil !== null && $now >= $validUntil) {
-            $pendingPlanAction = 'CANCEL_PENDING_PLAN';
+        $opportunityActive = false;
+        $expiresInSeconds = null;
+        $orderInstruction = null;
+        if ($planValid && $validUntil !== null) {
+            $expiresInSeconds = $validUntil->getTimestamp() - $now->getTimestamp();
+            if ($now >= $validUntil) {
+                $pendingPlanAction = 'CANCEL_PENDING_PLAN';
+            } elseif (in_array($recommendation, ['LONG', 'SHORT'], true)) {
+                $opportunityActive = true;
+                try {
+                    $orderInstruction = stc_entry_order_instruction(
+                        $recommendation,
+                        (float)($payload['close'] ?? 0.0),
+                        (float)$lockedPlan['entry_min'],
+                        (float)$lockedPlan['entry_max']
+                    );
+                } catch (Throwable $e) {
+                    $orderInstruction = [
+                        'order_type' => 'UNKNOWN',
+                        'side' => null,
+                        'status' => 'instruction_unavailable',
+                        'trigger_price' => null,
+                        'limit_price' => null,
+                        'explanation' => 'Order instruction could not be derived safely.',
+                    ];
+                }
+            }
         }
+
+        $sourceTime = stc_parse_utc((string)($payload['time'] ?? ''));
+        $sourceAgeSeconds = $sourceTime === null
+            ? null
+            : max(0, $now->getTimestamp() - $sourceTime->getTimestamp());
 
         $cards[] = [
             'event_id' => (string)$row['event_id'],
@@ -192,6 +222,10 @@ try {
             'macro_context' => $macroContext,
             'approval' => $approval,
             'manual_execution_ready' => $manualReady,
+            'opportunity_active' => $opportunityActive,
+            'expires_in_seconds' => $expiresInSeconds,
+            'source_age_seconds' => $sourceAgeSeconds,
+            'order_instruction' => $orderInstruction,
             'pending_plan_action' => $pendingPlanAction,
             'execution' => 'manual_only',
         ];
@@ -265,7 +299,8 @@ try {
                 if ($candidate['competition_id'] !== $cid
                     || $candidate['symbol'] === (string)$positionRow['symbol']
                     || !in_array($candidate['recommendation'], ['LONG', 'SHORT'], true)
-                    || !is_array($candidate['locked_trade_plan'])) {
+                    || !is_array($candidate['locked_trade_plan'])
+                    || ($candidate['opportunity_active'] ?? false) !== true) {
                     continue;
                 }
                 $advantage = abs((float)$candidate['composite_score']) - $baseline;
