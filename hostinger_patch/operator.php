@@ -104,8 +104,8 @@ let autoTimer=null;
 let autoCountdown=null;
 let secondsToRefresh=30;
 let initializedSignals=false;
-const seenSignalPlans=new Set();
-const seenManagement=new Set();
+const seenSignalPlans=new Set(JSON.parse(localStorage.getItem('stc_seen_signal_plans')||'[]'));
+const seenManagement=new Set(JSON.parse(localStorage.getItem('stc_seen_management')||'[]'));
 
 function esc(s){
  return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
@@ -282,23 +282,23 @@ function cardHtml(c,i){
   +'</div>';
 }
 
+function persistSeenSet(key,set){
+ try{localStorage.setItem(key,JSON.stringify([...set].slice(-250)))}catch(e){}
+}
 function maybeNotify(cards){
  const actionable=(cards||[]).filter(c=>isOpportunityActive(c));
- if(!initializedSignals){
-   for(const c of actionable)seenSignalPlans.add(String(c.locked_trade_plan.plan_id||c.signal_id));
-   initializedSignals=true;
-   return;
- }
+ initializedSignals=true;
  for(const c of actionable){
    const key=String(c.locked_trade_plan.plan_id||c.signal_id);
    if(seenSignalPlans.has(key))continue;
-   seenSignalPlans.add(key);
    const oi=c.order_instruction||{};
    const body=c.symbol+' • '+c.recommendation+' • '+(oi.order_type||'ENTRY')+' • Entry '+num(c.locked_trade_plan.entry_min)+' - '+num(c.locked_trade_plan.entry_max)+' • SL '+num(c.locked_trade_plan.initial_stop)+' • TP1 '+num(c.locked_trade_plan.target1)+' • Expires '+formatLocalTime(c.locked_trade_plan.valid_until);
-   if('Notification' in window && Notification.permission==='granted'){
-     new Notification('STC NEW LOCKED TRADE PLAN',{body,tag:key,requireInteraction:true});
-   }
    document.title='NEW '+c.recommendation+' • '+c.symbol+' • STC';
+   if('Notification' in window && Notification.permission==='granted'){
+     new Notification('STC NEW ACTIVE TRADE PLAN',{body,tag:key,requireInteraction:true});
+     seenSignalPlans.add(key);
+     persistSeenSet('stc_seen_signal_plans',seenSignalPlans);
+   }
  }
 }
 
@@ -461,7 +461,10 @@ async function enableNotifications(){
  const p=await Notification.requestPermission();
  $('notify').textContent=p==='granted'?'Browser alerts ON':'Enable browser alerts';
  if($('browser-notify-status'))$('browser-notify-status').textContent=p==='granted'?'Enabled':'Not enabled';
- if(p==='granted')new Notification('STC browser alerts enabled',{body:'You will be notified when a new locked trade plan or management action appears while this console is running.'});
+ if(p==='granted'){
+   new Notification('STC browser alerts enabled',{body:'Active opportunities will now notify even if they already appeared before this permission was enabled.'});
+   if(snapshot)maybeNotify(snapshot.cards||[]);
+ }
 }
 function maybeNotifyManagement(positions){
  for(const p of positions||[]){
@@ -469,9 +472,10 @@ function maybeNotifyManagement(positions){
    if(!m.action || m.action==='HOLD')continue;
    const key=p.position_id+'|'+m.action+'|'+num(m.suggested_stop||0,4);
    if(seenManagement.has(key))continue;
-   seenManagement.add(key);
    if('Notification' in window && Notification.permission==='granted'){
      new Notification('STC POSITION: '+m.action,{body:p.symbol+' • '+p.side+' • R '+num(m.r_multiple,2)+' • '+(m.reasons||[]).join(', '),tag:key,requireInteraction:m.action==='EXIT_NOW'});
+     seenManagement.add(key);
+     persistSeenSet('stc_seen_management',seenManagement);
    }
  }
 }
