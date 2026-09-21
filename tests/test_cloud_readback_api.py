@@ -25,6 +25,7 @@ def test_cloud_routes_require_auth():
     client = TestClient(module.app)
     assert client.get("/cloud/readiness").status_code == 401
     assert client.get("/cloud/signals").status_code == 401
+    assert client.get("/cloud/operator").status_code == 401
 
 
 def test_cloud_readiness_is_blocked_and_no_store():
@@ -54,4 +55,45 @@ def test_cloud_signals_reads_only_inbox(monkeypatch):
 def test_no_cloud_write_route_added():
     routes = {(route.path, method) for route in module.app.routes
               for method in getattr(route, "methods", set()) if route.path.startswith("/cloud/")}
-    assert routes == {("/cloud/signals", "GET"), ("/cloud/readiness", "GET")}
+    assert routes == {("/cloud/signals", "GET"), ("/cloud/readiness", "GET"), ("/cloud/operator", "GET")}
+
+
+def test_cloud_operator_reads_runtime_and_approval_state(monkeypatch):
+    def handle(request):
+        assert request.headers.get("authorization") == "Bearer test-worker-secret"
+        if request.url.path == "/inbox.php":
+            return httpx.Response(200, json={"ok": True, "events": []})
+        if request.url.path == "/runtime_control.php":
+            return httpx.Response(200, json={
+                "ok": True,
+                "runtime_control": {
+                    "safe_mode": True,
+                    "kill_switch": True,
+                    "reason": "competition-hold",
+                    "version": 1,
+                    "updated_at_utc": "2026-09-21 14:00:00",
+                },
+            })
+        raise AssertionError(f"unexpected path {request.url.path}")
+
+    real = module.BridgeClient
+    monkeypatch.setattr(
+        module,
+        "BridgeClient",
+        lambda url, token, **kwargs: real(
+            url, token, transport=httpx.MockTransport(handle), **kwargs
+        ),
+    )
+    r = TestClient(module.app).get("/cloud/operator", headers=HEADERS)
+    assert r.status_code == 200
+    body = r.json()
+    assert body["runtime_control"]["safe_mode"] is True
+    assert body["automatic_execution_available"] is False
+    assert body["execution_mode"] == "manual_only"
+
+
+def test_operator_page_is_read_only_ui():
+    r = TestClient(module.app).get("/operator")
+    assert r.status_code == 200
+    assert "STC Competition Operator" in r.text
+    assert "Manual approval and manual order entry only" in r.text
