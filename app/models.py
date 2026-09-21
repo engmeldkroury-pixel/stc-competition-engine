@@ -134,8 +134,8 @@ class TradingViewWebhook(BaseModel):
     history_ema200: float | None = None
     history_rsi14: float | None = None
     history_atr14: float | None = None
-    history_high_365: float | None = None
-    history_low_365: float | None = None
+    history_high_252: float | None = None
+    history_low_252: float | None = None
     history_momentum_20: float | None = None
     history_momentum_63: float | None = None
     history_momentum_126: float | None = None
