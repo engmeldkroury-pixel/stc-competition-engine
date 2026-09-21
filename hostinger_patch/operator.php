@@ -172,7 +172,7 @@ function formatCountdown(seconds){
  return m+'m '+String(s).padStart(2,'0')+'s';
 }
 function isOpportunityActive(c){
- if(!c||!c.locked_trade_plan||!(c.recommendation==='LONG'||c.recommendation==='SHORT'))return false;
+ if(!c||c.has_open_position||!c.locked_trade_plan||!(c.recommendation==='LONG'||c.recommendation==='SHORT'))return false;
  const left=secondsUntil(c.locked_trade_plan.valid_until);
  return left!==null && left>0;
 }
@@ -218,8 +218,8 @@ function planHtml(p){
   +'<div class="row"><span>Decision timeframe</span><span class="value">'+esc(p.decision_timeframe||'15')+' min</span></div>'
   +'<div class="row"><span>Entry zone</span><span class="value">'+num(p.entry_min)+' → '+num(p.entry_max)+'</span></div>'
   +'<div class="row"><span>Stop loss</span><span class="value">'+num(p.initial_stop)+'</span></div>'
-  +'<div class="row"><span>Take profit 1</span><span class="value">'+num(p.target1)+'</span></div>'
-  +'<div class="row"><span>Take profit 2</span><span class="value">'+num(p.target2)+'</span></div>'
+  +'<div class="row"><span>Management checkpoint</span><span class="value">'+num(p.target1)+' • no partial TP order</span></div>'
+  +'<div class="row"><span>Final take profit</span><span class="value">'+num(p.target2)+'</span></div>'
   +'<div class="row"><span>Expires</span><span class="value">'+formatLocalTime(p.valid_until)+' • <span class="countdown" data-valid-until="'+esc(p.valid_until)+'">'+formatCountdown(left)+'</span></span></div>';
 }
 
@@ -264,7 +264,8 @@ function cardHtml(c,i){
    ?'<span class="badge blocked">WAIT</span>'
    :(active?'<span class="badge active">ACTIVE NOW</span>':'<span class="badge expired">EXPIRED</span>');
  let blockReason='';
- if(!active&&c.recommendation!=='WAIT')blockReason='Expired opportunities are removed automatically from opportunity lists.';
+ if(c.has_open_position)blockReason='An executed position is already tracked for this symbol. New signals are used to manage that position, not to create a replacement trade.';
+ else if(!active&&c.recommendation!=='WAIT')blockReason='Expired opportunities are removed automatically from opportunity lists.';
  else if(!controlOpen)blockReason='SAFE MODE / KILL SWITCH is ON. Enable manual approval mode before approving.';
  else if(!sizingAllowed)blockReason='New entry blocked by sizing / risk capacity.';
  else if(!macroAllowed)blockReason='New entry blocked by macro-risk gate.';
