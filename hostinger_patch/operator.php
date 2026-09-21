@@ -57,14 +57,14 @@ input{width:100%}button{cursor:pointer}.primary{background:#1d4ed8}.danger{backg
 <div id="capital-panel" class="hidden">
   <div class="bar"><div class="sectiontitle">Capital.com Africa</div><div class="small">Independent competition lane. Capital.com symbols, account rules, risk and position limits stay separate from AMP Futures.</div></div>
   <div id="capital-account" class="bar"></div>
-  <div class="bar"><div class="sectiontitle">Open positions / Portfolio Supervisor</div><div id="capital-positions" class="grid"></div></div>
+  <div class="bar"><div class="sectiontitle">Open positions / Portfolio Supervisor</div><div class="small">Executed trades stay here until you record a manual close. New signals on the same symbol do not replace them.</div><button style="margin-top:10px" onclick="recordExistingPosition('capital-africa-sep-2026')">Record an existing manual position</button><div id="capital-positions" class="grid" style="margin-top:10px"></div></div>
   <div class="bar"><div class="sectiontitle">Latest signals</div><div id="capital-cards" class="grid"></div></div>
 </div>
 
 <div id="amp-panel" class="hidden">
   <div class="bar"><div class="sectiontitle">AMP Futures</div><div class="small">Independent futures lane. Futures symbols, contract limits, risk and position state stay separate from Capital.com Africa.</div></div>
   <div id="amp-account" class="bar"></div>
-  <div class="bar"><div class="sectiontitle">Open positions / Portfolio Supervisor</div><div id="amp-positions" class="grid"></div></div>
+  <div class="bar"><div class="sectiontitle">Open positions / Portfolio Supervisor</div><div class="small">Executed trades stay here until you record a manual close. New signals on the same symbol do not replace them.</div><button style="margin-top:10px" onclick="recordExistingPosition('amp-futures-sep-2026')">Record an existing manual position</button><div id="amp-positions" class="grid" style="margin-top:10px"></div></div>
   <div class="bar"><div class="sectiontitle">Latest signals</div><div id="amp-cards" class="grid"></div></div>
 </div>
 
@@ -172,7 +172,7 @@ function formatCountdown(seconds){
  return m+'m '+String(s).padStart(2,'0')+'s';
 }
 function isOpportunityActive(c){
- if(!c||!c.locked_trade_plan||!(c.recommendation==='LONG'||c.recommendation==='SHORT'))return false;
+ if(!c||c.has_open_position||!c.locked_trade_plan||!(c.recommendation==='LONG'||c.recommendation==='SHORT'))return false;
  const left=secondsUntil(c.locked_trade_plan.valid_until);
  return left!==null && left>0;
 }
@@ -264,7 +264,8 @@ function cardHtml(c,i){
    ?'<span class="badge blocked">WAIT</span>'
    :(active?'<span class="badge active">ACTIVE NOW</span>':'<span class="badge expired">EXPIRED</span>');
  let blockReason='';
- if(!active&&c.recommendation!=='WAIT')blockReason='Expired opportunities are removed automatically from opportunity lists.';
+ if(c.has_open_position)blockReason='An executed position is already tracked for this symbol. New signals are used to manage that position, not to create a replacement trade.';
+ else if(!active&&c.recommendation!=='WAIT')blockReason='Expired opportunities are removed automatically from opportunity lists.';
  else if(!controlOpen)blockReason='SAFE MODE / KILL SWITCH is ON. Enable manual approval mode before approving.';
  else if(!sizingAllowed)blockReason='New entry blocked by sizing / risk capacity.';
  else if(!macroAllowed)blockReason='New entry blocked by macro-risk gate.';
@@ -349,16 +350,21 @@ function managementClass(a){
 function positionHtml(p){
  const m=p.management||{};
  const rotation=p.rotation_candidate;
+ const latest=(p.latest_signal_history||[]).slice(-1)[0]||null;
  let buttons='';
  if(m.action==='PROTECT' && m.suggested_stop)buttons='<button onclick="recordStopUpdate(\''+esc(p.position_id)+'\','+Number(m.suggested_stop)+')">After manual stop change: record</button>';
  if(m.action==='PARTIAL_TAKE_PROFIT')buttons='<button onclick="recordPartial(\''+esc(p.position_id)+'\')">After manual partial close: record</button>';
  if(m.action==='EXIT_NOW')buttons='<button class="danger" onclick="recordClose(\''+esc(p.position_id)+'\')">After manual close: record</button>';
  return '<div class="card">'
-  +'<div class="row"><span>'+esc(p.symbol)+'</span><span class="value '+(p.side==='LONG'?'long':'short')+'">'+esc(p.side)+' × '+num(p.quantity,6)+'</span></div>'
+  +'<div class="statusline"><span class="badge active">EXECUTED • TRACKING</span><span class="pill">'+esc(p.origin==='manual_external'?'Imported manual trade':'STC plan fill')+'</span></div>'
+  +'<div class="row"><span>Symbol</span><span class="value">'+esc(p.symbol)+'</span></div>'
+  +'<div class="row"><span>Position</span><span class="value '+(p.side==='LONG'?'long':'short')+'">'+esc(p.side)+' × '+num(p.quantity,6)+'</span></div>'
+  +'<div class="row"><span>Opened</span><span class="value">'+formatLocalTime(p.opened_at_utc)+'</span></div>'
   +'<div class="row"><span>Entry</span><span class="value">'+num(p.entry_price)+'</span></div>'
   +'<div class="row"><span>Active stop</span><span class="value">'+num(p.current_stop)+'</span></div>'
   +'<div class="row"><span>TP1 / TP2</span><span class="value">'+num(p.target1)+' / '+num(p.target2)+'</span></div>'
-  +'<div class="row"><span>Supervisor</span><span class="value '+managementClass(m.action)+'">'+esc(m.action||'HOLD')+'</span></div>'
+  +(latest?'<div class="row"><span>Latest market check</span><span class="value">'+formatLocalTime(latest.time)+' • '+esc(latest.recommendation)+' '+num(latest.composite_score,2)+' @ '+num(latest.close)+'</span></div>':'')
+  +'<div class="row"><span>What to do now</span><span class="value '+managementClass(m.action)+'">'+esc(m.action||'HOLD')+'</span></div>'
   +'<div class="row"><span>R multiple</span><span class="value">'+num(m.r_multiple,2)+'</span></div>'
   +'<div class="row"><span>Unrealized P/L</span><span class="value">'+(m.unrealized_pnl_usd==null?'-':'$'+num(m.unrealized_pnl_usd,2))+'</span></div>'
   +(m.suggested_stop?'<div class="row"><span>Suggested stop</span><span class="value">'+num(m.suggested_stop)+'</span></div>':'')
@@ -498,6 +504,26 @@ async function updateAccountState(competitionId){
    await api('account_state.php',{method:'POST',body:JSON.stringify({competition_id:competitionId,equity_usd:equity,risk_fraction:pct/100})});
    await refresh();
  }catch(e){alert('Account state update failed: '+e.message);}
+}
+
+async function recordExistingPosition(competitionId){
+ const symbol=String(prompt('Symbol exactly as shown in STC / TradingView (example CAPITALCOM:BTCUSD or CME_MINI:MES1!)','')||'').trim();
+ if(!symbol)return;
+ const side=String(prompt('Side: LONG or SHORT','LONG')||'').trim().toUpperCase();
+ if(!(side==='LONG'||side==='SHORT')){alert('Side must be LONG or SHORT.');return;}
+ const qty=Number(prompt('Quantity currently open',''));
+ const entry=Number(prompt('Actual average entry price',''));
+ const stop=Number(prompt('Current stop price',''));
+ const tp1=Number(prompt('Current TP1',''));
+ const tp2=Number(prompt('Current TP2',''));
+ if(![qty,entry,stop,tp1,tp2].every(x=>Number.isFinite(x)&&x>0)){alert('Enter valid positive numbers for quantity, entry, stop, TP1 and TP2.');return;}
+ if(!confirm('Confirm this trade is ALREADY OPEN in the competition platform. STC will only import and monitor it; no order will be sent.'))return;
+ const body={action:'OPEN',origin:'manual_external',competition_id:competitionId,symbol,side,quantity:qty,entry_price:entry,initial_stop:stop,current_stop:stop,target1:tp1,target2:tp2,opened_at_utc:new Date().toISOString(),note:'Backfilled existing manual position; imported into STC for ongoing supervision'};
+ try{
+   await api('position.php',{method:'POST',body:JSON.stringify(body)});
+   alert('Existing position recorded. It will remain under Portfolio Supervisor until you record a partial/stop/close action.');
+   await refresh();
+ }catch(e){alert('Existing-position record failed: '+e.message);}
 }
 
 async function recordFilledPosition(i){
