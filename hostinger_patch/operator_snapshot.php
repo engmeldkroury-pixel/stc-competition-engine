@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 require __DIR__ . '/portfolio_control.php';
+require_once __DIR__ . '/macro_control.php';
 
 stc_require_owner_auth($config);
 $pdo = stc_pdo($config);
@@ -8,6 +9,7 @@ $pdo = stc_pdo($config);
 try {
     $runtime = stc_runtime_control_row($pdo);
     $now = new DateTimeImmutable('now', new DateTimeZone('UTC'));
+    $macroCalendar = stc_macro_calendar_fetch($config);
 
     $accounts = [];
     $accountStmt = $pdo->query(
@@ -122,6 +124,7 @@ try {
         }
 
         $recommendation = (string)($signal['recommendation'] ?? 'WAIT');
+        $macroContext = stc_macro_risk_context($config, $symbol, $now, $macroCalendar);
         $lockedPlan = $decision['locked_trade_plan'] ?? null;
         $planValid = is_array($lockedPlan)
             && ($lockedPlan['levels_locked'] ?? false) === true
@@ -163,6 +166,9 @@ try {
             $manualReady = ($sizing['allowed_by_position_limit'] ?? false) === true
                 && ($sizing['allowed_by_risk_policy'] ?? false) === true;
         }
+        if ($manualReady && ($macroContext['block_new_approval'] ?? false) === true) {
+            $manualReady = false;
+        }
 
         $pendingPlanAction = null;
         if ($planValid && $validUntil !== null && $now >= $validUntil) {
@@ -183,6 +189,7 @@ try {
             'envelope' => $envelope,
             'locked_trade_plan' => $planValid ? $lockedPlan : null,
             'position_sizing' => $sizing,
+            'macro_context' => $macroContext,
             'approval' => $approval,
             'manual_execution_ready' => $manualReady,
             'pending_plan_action' => $pendingPlanAction,
@@ -297,6 +304,13 @@ try {
         'competitions' => ['capital-africa-sep-2026', 'amp-futures-sep-2026'],
         'observed_at_utc' => $now->format(DateTimeInterface::ATOM),
         'runtime_control' => $runtime,
+        'macro_calendar_status' => [
+            'ok' => ($macroCalendar['ok'] ?? false) === true,
+            'error' => $macroCalendar['error'] ?? null,
+            'source' => $macroCalendar['source'] ?? ($config['macro_calendar_url'] ?? 'https://nfs.faireconomy.media/ff_calendar_thisweek.json'),
+            'fetched_at_utc' => $macroCalendar['fetched_at_utc'] ?? null,
+            'cache_age_seconds' => $macroCalendar['cache_age_seconds'] ?? null,
+        ],
         'account_states' => array_values($accounts),
         'cards' => $cards,
         'portfolio' => [
