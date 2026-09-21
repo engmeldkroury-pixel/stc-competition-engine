@@ -272,7 +272,7 @@ function cardHtml(c,i){
   +'<div class="statusline">'+statusBadge+'<span class="pill">'+esc(competitionLabel)+'</span></div>'
   +'<div class="row"><span>Symbol</span><span class="value">'+esc(c.symbol)+'</span></div>'
   +'<div class="row"><span>Signal</span><span class="value '+cls+'">'+esc(c.recommendation)+' '+num(c.composite_score,2)+'</span></div>'
-  +'<div class="row"><span>Latest confirmed bar</span><span class="value">'+formatLocalTime(c.source_time)+' • '+formatAgeSeconds(c.source_age_seconds)+'</span></div>'
+  +'<div class="row"><span>Latest confirmed bar</span><span class="value">'+formatLocalTime(c.source_close_time||c.source_time)+' • '+formatAgeSeconds(c.source_age_seconds)+'</span></div>'
   +planHtml(c.locked_trade_plan)
   +orderHtml(c,i)
   +sizingHtml(c.position_sizing)
