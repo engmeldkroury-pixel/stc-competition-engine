@@ -1,4 +1,8 @@
 from pathlib import Path
+import shutil
+import subprocess
+
+import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 PATCH = ROOT / "hostinger_patch"
@@ -203,3 +207,38 @@ def test_owner_console_exposes_server_notification_status_and_test():
     assert "refreshNotificationStatus()" in ui
     assert "action:'test'" in ui
     assert "Raw 15-minute feed bars do not generate user notifications." in ui
+
+
+
+def test_owner_console_embedded_javascript_is_syntax_valid_and_has_no_trailing_corruption():
+    ui = (PATCH / "operator.php").read_text(encoding="utf-8")
+    assert ui.count("</html>") == 1
+    assert ui.rstrip().endswith("</html>")
+    assert "function accountHtml(account,competitionId)" in ui
+    assert "function renderOverview(cards)" in ui
+    assert "function renderPositions(target,positions)" in ui
+    assert "allowed_by_risk_policy" in ui
+    node = shutil.which("node")
+    if node is None:
+        pytest.skip("node is not available for JavaScript syntax validation")
+    script = ui.split("<script>", 1)[1].split("</script>", 1)[0]
+    result = subprocess.run(
+        [node, "--check"],
+        input=script,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    assert result.returncode == 0, result.stderr
+
+
+def test_snapshot_exposes_correlation_cluster_risk_and_expired_plan_cancellation():
+    snapshot = (PATCH / "operator_snapshot.php").read_text(encoding="utf-8")
+    control = (PATCH / "portfolio_control.php").read_text(encoding="utf-8")
+    assert "stc_risk_cluster" in control
+    assert "portfolio_risk_cap_usd" in control
+    assert "cluster_risk_cap_usd" in control
+    assert "allowed_by_risk_policy" in control
+    assert "correlation_cluster_capacity" in control
+    assert "CANCEL_PENDING_PLAN" in snapshot
+    assert "deterministic_asset_risk_groups_not_statistical_correlation" in snapshot
