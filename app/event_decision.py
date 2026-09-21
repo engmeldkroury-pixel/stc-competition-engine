@@ -8,7 +8,14 @@ from .approval import build_approval_envelope
 from .competition_profiles import get_profile
 from .models import FactorScores, SignalEvaluationRequest, TradingViewWebhook
 from .pipeline_receipt import build_pipeline_receipt
-from .signals import evaluate, factors_from_tradingview, historical_regime_from_tradingview, short_term_score_from_tradingview
+from .signals import (
+    evaluate,
+    factors_from_tradingview,
+    historical_regime_from_tradingview,
+    liquidity_quality_from_tradingview,
+    short_term_score_from_tradingview,
+    volatility_quality_from_tradingview,
+)
 from .trade_plan import build_locked_trade_plan
 
 
@@ -87,16 +94,26 @@ def decide_bridge_event(event_id: str, payload: dict) -> dict:
     short_term_technical = short_term_score_from_tradingview(tv)
     historical_regime = historical_regime_from_tradingview(tv)
     technical = factors_from_tradingview(tv)
+    volatility_quality = volatility_quality_from_tradingview(tv, technical)
+    liquidity_quality = liquidity_quality_from_tradingview(tv, technical)
     req = SignalEvaluationRequest(
         competition_id=tv.competition_id,
         symbol=tv.symbol,
-        factors=FactorScores(technical=technical),
+        factors=FactorScores(
+            technical=technical,
+            volatility_quality=volatility_quality,
+            liquidity_quality=liquidity_quality,
+        ),
     )
     result = evaluate(req).model_copy(update={"signal_id": deterministic_signal_id(event_id)})
     extra_reasons = [
         f"short_term_technical={short_term_technical:+.2f}",
         "historical_regime=unavailable" if historical_regime is None else f"historical_regime={historical_regime:+.2f}",
         f"blended_technical={technical:+.2f}",
+        f"volatility_quality_live={volatility_quality:+.2f}",
+        f"liquidity_quality_live={liquidity_quality:+.2f}",
+        "news_factor=unavailable_live_source",
+        "macro_factor=unavailable_live_source",
     ]
     result = result.model_copy(update={"reasons": extra_reasons + result.reasons})
     result_dict = result.model_dump()
