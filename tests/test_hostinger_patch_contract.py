@@ -136,14 +136,15 @@ def test_portfolio_supervisor_has_anti_churn_and_manual_management_actions():
     snapshot = (PATCH / "operator_snapshot.php").read_text(encoding="utf-8")
     ui = (PATCH / "operator.php").read_text(encoding="utf-8")
     assert "two_closed_bars_confirmed_strong_opposite_signal" in control
-    for action in ("HOLD", "PROTECT", "PARTIAL_TAKE_PROFIT", "EXIT_NOW"):
+    for action in ("HOLD", "PROTECT", "EXIT_NOW"):
         assert action in control
+    assert "PARTIAL_TAKE_PROFIT" not in control
     assert "rotation_candidates" in snapshot
     assert "score_advantage" in snapshot
     assert "current_thesis_degraded_and_new_locked_plan_materially_stronger" in snapshot
     assert "After manual fill: record open position" in ui
     assert "After manual stop change: record" in ui
-    assert "After manual partial close: record" in ui
+    assert "Partial take-profit is disabled in single-TP mode" in ui
     assert "After manual close: record" in ui
 
 
