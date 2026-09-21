@@ -57,14 +57,14 @@ input{width:100%}button{cursor:pointer}.primary{background:#1d4ed8}.danger{backg
 <div id="capital-panel" class="hidden">
   <div class="bar"><div class="sectiontitle">Capital.com Africa</div><div class="small">Independent competition lane. Capital.com symbols, account rules, risk and position limits stay separate from AMP Futures.</div></div>
   <div id="capital-account" class="bar"></div>
-  <div class="bar"><div class="sectiontitle">Open positions / Portfolio Supervisor</div><div id="capital-positions" class="grid"></div></div>
+  <div class="bar"><div class="sectiontitle">Open positions / Portfolio Supervisor</div><div class="small">Executed trades stay here until you record a manual close. New signals on the same symbol do not replace them.</div><button style="margin-top:10px" onclick="recordExistingPosition('capital-africa-sep-2026')">Record an existing manual position</button><div id="capital-positions" class="grid" style="margin-top:10px"></div></div>
   <div class="bar"><div class="sectiontitle">Latest signals</div><div id="capital-cards" class="grid"></div></div>
 </div>
 
 <div id="amp-panel" class="hidden">
   <div class="bar"><div class="sectiontitle">AMP Futures</div><div class="small">Independent futures lane. Futures symbols, contract limits, risk and position state stay separate from Capital.com Africa.</div></div>
   <div id="amp-account" class="bar"></div>
-  <div class="bar"><div class="sectiontitle">Open positions / Portfolio Supervisor</div><div id="amp-positions" class="grid"></div></div>
+  <div class="bar"><div class="sectiontitle">Open positions / Portfolio Supervisor</div><div class="small">Executed trades stay here until you record a manual close. New signals on the same symbol do not replace them.</div><button style="margin-top:10px" onclick="recordExistingPosition('amp-futures-sep-2026')">Record an existing manual position</button><div id="amp-positions" class="grid" style="margin-top:10px"></div></div>
   <div class="bar"><div class="sectiontitle">Latest signals</div><div id="amp-cards" class="grid"></div></div>
 </div>
 
