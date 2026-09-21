@@ -1,5 +1,5 @@
 //@version=6
-indicator("STC Competition Feed v0.1", overlay=false)
+indicator("STC Competition Feed v0.2", overlay=false)
 
 competitionId = input.string("capital-africa-sep-2026", "Competition ID", options=["capital-africa-sep-2026", "amp-futures-sep-2026"])
 feedEnabled = input.bool(true, "Enable webhook feed")
@@ -16,7 +16,9 @@ seconds = timeframe.in_seconds()
 validTf = na(seconds) ? false : seconds >= 60
 
 if feedEnabled and validTf and barstate.isconfirmed
+    eventId = competitionId + "|" + syminfo.prefix + ":" + syminfo.ticker + "|" + timeframe.period + "|" + str.tostring(time)
     msg = '{' +
+      '"event_id":"' + eventId + '",' +
       '"event":"bar_close",' +
       '"competition_id":"' + competitionId + '",' +
       '"symbol":"' + syminfo.prefix + ':' + syminfo.ticker + '",' +
