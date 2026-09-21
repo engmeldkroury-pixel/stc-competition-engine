@@ -39,6 +39,42 @@ AMP_PRICE_VALUE_USD_PER_PRICE_UNIT: dict[str, float] = {
 }
 
 
+RISK_CLUSTER_BY_SYMBOL: dict[str, str] = {
+    # Capital.com
+    "CAPITALCOM:BTCUSD": "crypto",
+    "CAPITALCOM:ETHUSD": "crypto",
+    "CAPITALCOM:DOGEUSD": "crypto",
+    "CAPITALCOM:EURUSD": "fx_usd",
+    "CAPITALCOM:AUDUSD": "fx_usd",
+    "CAPITALCOM:USDZAR": "fx_usd",
+    "CAPITALCOM:XAUUSD": "metals",
+    "CAPITALCOM:XAGUSD": "metals",
+    "CAPITALCOM:SPX500": "equity_indices",
+    "CAPITALCOM:NAS100": "equity_indices",
+    # AMP Futures core feed
+    "CME_MINI:MES1!": "equity_indices",
+    "CME_MINI:MNQ1!": "equity_indices",
+    "CBOT_MINI:MYM1!": "equity_indices",
+    "CME_MINI:M2K1!": "equity_indices",
+    "NYMEX:MCL1!": "energy",
+    "NYMEX:MNG1!": "energy",
+    "COMEX_MINI:MGC1!": "metals",
+    "COMEX_MINI:SIL1!": "metals",
+    "CME_MINI:M6E1!": "fx_usd",
+    "CME_MINI:M6B1!": "fx_usd",
+    "CME_MINI:MJY1!": "fx_usd",
+    "CME_MINI:M6A1!": "fx_usd",
+    "CME:MBT1!": "crypto",
+    "CME:MET1!": "crypto",
+    "CBOT:ZN1!": "rates",
+    "CBOT:ZB1!": "rates",
+}
+
+
+def risk_cluster(symbol: str) -> str:
+    return RISK_CLUSTER_BY_SYMBOL.get(symbol, "other")
+
+
 @dataclass(frozen=True)
 class PositionState:
     position_id: str
@@ -84,6 +120,14 @@ class PositionSizingResult:
     max_position: float
     projected_open_quantity: float
     risk_amount_usd: float
+    risk_cluster: str
+    portfolio_risk_cap_usd: float
+    cluster_risk_cap_usd: float
+    portfolio_risk_before_usd: float
+    cluster_risk_before_usd: float
+    portfolio_risk_after_usd: float
+    cluster_risk_after_usd: float
+    risk_budget_limited_by: tuple[str, ...]
     allowed_by_position_limit: bool
     quantity_is_integer_contracts: bool
     note: str
@@ -174,6 +218,10 @@ def propose_position_size(
     entry_price: float,
     stop_price: float,
     current_open_quantity: float = 0.0,
+    portfolio_open_risk_usd: float = 0.0,
+    cluster_open_risk_usd: float = 0.0,
+    portfolio_risk_multiple: float = 6.0,
+    cluster_risk_multiple: float = 3.0,
 ) -> PositionSizingResult:
     equity = _finite_positive(equity, "equity")
     entry_price = _finite_positive(entry_price, "entry_price")
@@ -182,6 +230,16 @@ def propose_position_size(
         raise ValueError("risk_fraction_must_be_between_0_and_0.02")
     if not math.isfinite(current_open_quantity) or current_open_quantity < 0:
         raise ValueError("current_open_quantity_invalid")
+    for value, field in (
+        (portfolio_open_risk_usd, "portfolio_open_risk_usd"),
+        (cluster_open_risk_usd, "cluster_open_risk_usd"),
+    ):
+        if not math.isfinite(value) or value < 0:
+            raise ValueError(f"{field}_invalid")
+    if not math.isfinite(portfolio_risk_multiple) or portfolio_risk_multiple < 1:
+        raise ValueError("portfolio_risk_multiple_invalid")
+    if not math.isfinite(cluster_risk_multiple) or cluster_risk_multiple < 1:
+        raise ValueError("cluster_risk_multiple_invalid")
 
     profile = get_profile(competition_id)
     max_position = profile.max_open_position.get(symbol)
@@ -201,7 +259,17 @@ def propose_position_size(
     # the risk budget instead of assuming frictionless fills.
     commission_per_unit = 2.0 * entry_price * value_per_price_unit * profile.commission_rate
     total_risk_per_unit = stop_risk_per_unit + commission_per_unit
-    risk_budget = equity * risk_fraction
+    configured_trade_budget = equity * risk_fraction
+    portfolio_cap = equity * risk_fraction * portfolio_risk_multiple
+    cluster_cap = equity * risk_fraction * cluster_risk_multiple
+    remaining_portfolio = max(0.0, portfolio_cap - portfolio_open_risk_usd)
+    remaining_cluster = max(0.0, cluster_cap - cluster_open_risk_usd)
+    risk_budget = min(configured_trade_budget, remaining_portfolio, remaining_cluster)
+    limited_by: list[str] = []
+    if remaining_portfolio + 1e-12 < configured_trade_budget:
+        limited_by.append("portfolio_risk_capacity")
+    if remaining_cluster + 1e-12 < configured_trade_budget:
+        limited_by.append("correlation_cluster_capacity")
     raw_quantity = risk_budget / total_risk_per_unit
 
     integer_contracts = competition_id == "amp-futures-sep-2026"
@@ -218,11 +286,18 @@ def propose_position_size(
 
     risk_amount = proposed * total_risk_per_unit
     projected = current_open_quantity + proposed
-    allowed = proposed > 0 and projected <= float(max_position) + 1e-12
+    portfolio_after = portfolio_open_risk_usd + risk_amount
+    cluster_after = cluster_open_risk_usd + risk_amount
+    allowed = (
+        proposed > 0
+        and projected <= float(max_position) + 1e-12
+        and portfolio_after <= portfolio_cap + 1e-9
+        and cluster_after <= cluster_cap + 1e-9
+    )
 
     note = (
         "Provisional STC sizing only; human approval and manual order entry required. "
-        "Risk fraction is an STC configuration, not an official competition risk limit."
+        "Risk fraction and concentration multiples are STC risk controls, not official competition limits."
     )
     if competition_id == "capital-africa-sep-2026":
         note += " Broker quantity-step rounding must be confirmed in the order ticket."
@@ -242,6 +317,14 @@ def propose_position_size(
         max_position=float(max_position),
         projected_open_quantity=projected,
         risk_amount_usd=risk_amount,
+        risk_cluster=risk_cluster(symbol),
+        portfolio_risk_cap_usd=portfolio_cap,
+        cluster_risk_cap_usd=cluster_cap,
+        portfolio_risk_before_usd=portfolio_open_risk_usd,
+        cluster_risk_before_usd=cluster_open_risk_usd,
+        portfolio_risk_after_usd=portfolio_after,
+        cluster_risk_after_usd=cluster_after,
+        risk_budget_limited_by=tuple(limited_by),
         allowed_by_position_limit=allowed,
         quantity_is_integer_contracts=integer_contracts,
         note=note,
@@ -476,8 +559,8 @@ def choose_rotation_candidate(
     )
 
 
-def aggregate_open_risk(positions: Sequence[PositionState]) -> dict[str, dict[str, float]]:
-    totals: dict[str, dict[str, float]] = {}
+def aggregate_open_risk(positions: Sequence[PositionState]) -> dict[str, dict]:
+    totals: dict[str, dict] = {}
     for p in positions:
         value = price_value_usd_per_price_unit(
             p.competition_id,
@@ -487,8 +570,15 @@ def aggregate_open_risk(positions: Sequence[PositionState]) -> dict[str, dict[st
         risk = p.initial_risk_price * p.quantity * value
         bucket = totals.setdefault(
             p.competition_id,
-            {"open_positions": 0.0, "initial_risk_usd": 0.0},
+            {"open_positions": 0.0, "initial_risk_usd": 0.0, "clusters": {}},
         )
         bucket["open_positions"] += 1.0
         bucket["initial_risk_usd"] += risk
+        cluster = risk_cluster(p.symbol)
+        cluster_bucket = bucket["clusters"].setdefault(
+            cluster,
+            {"open_positions": 0.0, "initial_risk_usd": 0.0},
+        )
+        cluster_bucket["open_positions"] += 1.0
+        cluster_bucket["initial_risk_usd"] += risk
     return totals
