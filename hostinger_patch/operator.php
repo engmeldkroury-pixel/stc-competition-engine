@@ -273,16 +273,17 @@ function cardHtml(c,i){
   +'<div class="row"><span>Ready to execute</span><span class="value '+(c.manual_execution_ready?'ok':'wait')+'">'+(c.manual_execution_ready?'YES':'NO')+'</span></div>'
   +(blockReason?'<div class="small wait" style="margin:8px 0">'+esc(blockReason)+'</div>':'')
   +'<div class="small" style="margin:8px 0">'+reasons+'</div>'
-  +(canApprove?'<div class="approve"><input id="price-'+i+'" type="number" step="any" placeholder="Current TradingView price" oninput="updateOrderHint('+i+')">'
-    +'<button class="safe" onclick="approveCard('+i+',\'approve\')">Approve</button>'
-    +'<button class="danger" onclick="approveCard('+i+',\'reject\')">Reject</button></div>'
+  +(active&&(c.recommendation==='LONG'||c.recommendation==='SHORT')
+    ?'<div class="approve"><input id="price-'+i+'" type="number" step="any" placeholder="Current TradingView price" oninput="updateOrderHint('+i+')">'
+      +(canApprove?'<button class="safe" onclick="approveCard('+i+',\'approve\')">Approve</button><button class="danger" onclick="approveCard('+i+',\'reject\')">Reject</button>':'')
+      +'</div>'
     :'')
   +(active && c.locked_trade_plan && a.decision==='approved'?'<button style="margin-top:8px" onclick="recordFilledPosition('+i+')">After manual fill: record open position</button>':'')
   +'</div>';
 }
 
 function maybeNotify(cards){
- const actionable=(cards||[]).filter(c=>(c.recommendation==='LONG'||c.recommendation==='SHORT')&&c.locked_trade_plan);
+ const actionable=(cards||[]).filter(c=>isOpportunityActive(c));
  if(!initializedSignals){
    for(const c of actionable)seenSignalPlans.add(String(c.locked_trade_plan.plan_id||c.signal_id));
    initializedSignals=true;
@@ -292,7 +293,8 @@ function maybeNotify(cards){
    const key=String(c.locked_trade_plan.plan_id||c.signal_id);
    if(seenSignalPlans.has(key))continue;
    seenSignalPlans.add(key);
-   const body=c.symbol+' • '+c.recommendation+' • Entry '+num(c.locked_trade_plan.entry_min)+' - '+num(c.locked_trade_plan.entry_max)+' • SL '+num(c.locked_trade_plan.initial_stop)+' • TP1 '+num(c.locked_trade_plan.target1);
+   const oi=c.order_instruction||{};
+   const body=c.symbol+' • '+c.recommendation+' • '+(oi.order_type||'ENTRY')+' • Entry '+num(c.locked_trade_plan.entry_min)+' - '+num(c.locked_trade_plan.entry_max)+' • SL '+num(c.locked_trade_plan.initial_stop)+' • TP1 '+num(c.locked_trade_plan.target1)+' • Expires '+formatLocalTime(c.locked_trade_plan.valid_until);
    if('Notification' in window && Notification.permission==='granted'){
      new Notification('STC NEW LOCKED TRADE PLAN',{body,tag:key,requireInteraction:true});
    }
@@ -305,7 +307,8 @@ function competitionOf(c){
 }
 function renderCards(target,cards){
  const all=snapshot&&snapshot.cards?snapshot.cards:[];
- $(target).innerHTML=(cards||[]).map(c=>cardHtml(c,all.indexOf(c))).join('')||'<div class="card">No analyzed signals found.</div>';
+ const visible=(cards||[]).filter(c=>c.recommendation==='WAIT'||isOpportunityActive(c));
+ $(target).innerHTML=visible.map(c=>cardHtml(c,all.indexOf(c))).join('')||'<div class="card">No current signals or active opportunities.</div>';
 }
 
 function riskSummaryFor(competitionId){
@@ -362,22 +365,22 @@ function renderPositions(target,positions){
 function renderOverview(cards){
  const capital=cards.filter(c=>competitionOf(c)==='capital');
  const amp=cards.filter(c=>competitionOf(c)==='amp');
- const actionable=cards.filter(c=>(c.recommendation==='LONG'||c.recommendation==='SHORT')&&c.locked_trade_plan);
+ const actionable=cards.filter(c=>isOpportunityActive(c));
  const ready=cards.filter(c=>c.manual_execution_ready);
  const positions=(snapshot.portfolio&&snapshot.portfolio.positions)||[];
  $('count-capital').textContent=capital.length;
  $('count-amp').textContent=amp.length;
  $('overview-summary').innerHTML=
-   '<div class="card"><div class="small">Capital.com cards</div><div class="big">'+capital.length+'</div></div>'
-  +'<div class="card"><div class="small">AMP Futures cards</div><div class="big">'+amp.length+'</div></div>'
-  +'<div class="card"><div class="small">Locked opportunities</div><div class="big">'+actionable.length+'</div></div>'
+   '<div class="card"><div class="small">Capital symbols monitored</div><div class="big">'+capital.length+'</div></div>'
+  +'<div class="card"><div class="small">AMP symbols monitored</div><div class="big">'+amp.length+'</div></div>'
+  +'<div class="card"><div class="small">ACTIVE opportunities now</div><div class="big">'+actionable.length+'</div></div>'
   +'<div class="card"><div class="small">Manual-ready now</div><div class="big">'+ready.length+'</div></div>'
   +'<div class="card"><div class="small">Open positions tracked</div><div class="big">'+positions.length+'</div></div>';
  const ranked=[...actionable].sort((a,b)=>Math.abs(Number(b.composite_score||0))-Math.abs(Number(a.composite_score||0)));
  const all=snapshot&&snapshot.cards?snapshot.cards:[];
  $('overview-cards').innerHTML=ranked.length
    ?ranked.slice(0,8).map(c=>cardHtml(c,all.indexOf(c))).join('')
-   :'<div class="card">No actionable locked opportunities right now. Current WAIT signals are still visible inside each competition tab.</div>';
+   :'<div class="card">No ACTIVE opportunity right now. Expired plans are removed automatically; WAIT signals remain visible inside each competition tab.</div>';
 }
 
 function render(){
@@ -432,10 +435,19 @@ async function refresh(){
 function updateAutoStatus(){
  $('autostatus').textContent='Auto refresh: ON • next check in '+secondsToRefresh+'s';
 }
+function updateLiveCountdowns(){
+ let expiredVisible=false;
+ for(const el of document.querySelectorAll('[data-valid-until]')){
+   const left=secondsUntil(el.dataset.validUntil);
+   el.textContent=formatCountdown(left);
+   if(left!==null&&left<=0)expiredVisible=true;
+ }
+ if(expiredVisible&&snapshot)render();
+}
 function startAutoRefresh(){
  if(autoTimer)return;
  updateAutoStatus();
- autoCountdown=setInterval(()=>{secondsToRefresh=Math.max(0,secondsToRefresh-1);updateAutoStatus()},1000);
+ autoCountdown=setInterval(()=>{secondsToRefresh=Math.max(0,secondsToRefresh-1);updateAutoStatus();updateLiveCountdowns()},1000);
  autoTimer=setInterval(()=>{secondsToRefresh=30;refresh()},30000);
 }
 function stopAutoRefresh(){
@@ -479,6 +491,7 @@ async function updateAccountState(competitionId){
 async function recordFilledPosition(i){
  const c=snapshot.cards[i];
  if(!c||!c.locked_trade_plan||!c.approval||c.approval.decision!=='approved'){alert('An approved locked plan is required.');return;}
+ if(!isOpportunityActive(c)){alert('This locked plan has expired. Do not enter it; wait for a new active plan.');await refresh();return;}
  if(c.position_sizing && (c.position_sizing.allowed_by_position_limit===false || c.position_sizing.allowed_by_risk_policy===false)){alert('STC position limit or portfolio risk capacity currently blocks a new entry.');return;}
  const suggested=c.position_sizing?c.position_sizing.proposed_quantity:'';
  const qty=Number(prompt('Quantity actually filled manually in the competition platform',suggested));
@@ -522,6 +535,7 @@ async function setControls(safe,kill){
 async function approveCard(i,decision){
  const c=snapshot.cards[i];
  if(!c)return;
+ if(decision==='approve'&&!isOpportunityActive(c)){alert('This opportunity has expired and was removed from the active set. Wait for a new locked plan.');await refresh();return;}
  if(decision==='approve' && c.position_sizing && (c.position_sizing.allowed_by_position_limit===false || c.position_sizing.allowed_by_risk_policy===false)){alert('Approval blocked by competition position limit or STC portfolio/cluster risk capacity.');return;}
  if(decision==='approve'&&!confirm('Approve this signal for MANUAL order entry only? No order will be sent.'))return;
  const price=Number($('price-'+i)?.value);
