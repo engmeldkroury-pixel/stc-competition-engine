@@ -602,3 +602,30 @@ Do not stop the verified XAUUSD v0.2 production alert until v0.7.1 completes one
 
 Acceptance after creation:
 Observe one 15m fire cycle, confirm no fire_control stop, inspect alert log symbol coverage, verify Hostinger accepts unique events, confirm GitHub worker success, and verify historical_regime + blended_technical evidence in durable signal readback.
+
+
+## v0.7.1 production alert provisioned — 2026-09-21 14:04 UTC
+
+TradingView alert:
+- alert_id: 5662088915
+- name: STC CAPITAL 10-SYMBOL 15m PROD v0.7.1
+- scheduler symbol: CAPITALCOM:BTCUSD
+- resolution: 15m
+- alert type: pine_alert
+- active: true
+- create_time: 2026-09-21T14:02:06Z
+- expiration: 2026-10-21T13:59:22Z
+- first fire: pending at initial verification
+- existing verified XAUUSD v0.2 alert 5659303693 remains active as fallback.
+
+Initial acceptance state:
+- v0.7.1 Pine compile/add-to-chart: VERIFIED.
+- Fresh v0.7.1 indicator alert creation: VERIFIED.
+- First v0.7.1 live fire: PENDING.
+- 10-symbol unique coverage: PENDING.
+- historical context delivery/persistence: PENDING.
+- GitHub worker ingestion: PENDING.
+- durable signal reasons with historical_regime/blended_technical: PENDING.
+- fire_control stability: PENDING.
+
+Do not retire XAUUSD v0.2 until all pending v0.7.1 live acceptance gates pass.
