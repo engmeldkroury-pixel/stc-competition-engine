@@ -1,9 +1,9 @@
-from app.competition_profiles import CAPITAL_AFRICA_LIMITS
+from app.competition_profiles import AMP_CORE_FEED_SYMBOLS, CAPITAL_AFRICA_LIMITS
 from app.data_capabilities import CAPABILITIES, get_capability, validate_provider_mapping
 
 
 def test_all_capital_competition_symbols_have_verified_capability_records():
-    assert set(CAPITAL_AFRICA_LIMITS) == set(CAPABILITIES)
+    assert set(CAPITAL_AFRICA_LIMITS).issubset(CAPABILITIES)
     for symbol in CAPITAL_AFRICA_LIMITS:
         c = get_capability(symbol)
         assert c.verified is True
@@ -60,3 +60,13 @@ def test_silent_provider_switch_is_blocked():
 def test_same_provider_mapping_is_allowed():
     allowed, _ = validate_provider_mapping("CAPITALCOM:XAUUSD", "CAPITALCOM:XAUUSD")
     assert allowed is True
+
+
+def test_amp_core_feed_symbols_have_verified_ohlcv_capabilities():
+    for symbol in AMP_CORE_FEED_SYMBOLS:
+        c = get_capability(symbol)
+        assert c.verified is True
+        assert c.ohlcv is True
+        assert c.local_technicals_from_ohlcv is True
+        assert c.execution_account_read is False
+        assert c.execution_write is False
