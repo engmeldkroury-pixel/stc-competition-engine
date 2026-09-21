@@ -837,3 +837,33 @@ Create a fresh Feed A alert from the CURRENT STC AMP Core Feed A v0.3 Stateful V
 - same STC webhook
 - use a distinct name such as STC AMP A 8-SYMBOL 15m PROD v0.3 FIX
 Do not restart the inactive A alert 5664682003.
+
+
+## AMP Feed A v0.3 alert recreated correctly — 2026-09-21 19:40 UTC
+
+Owner recreated Feed A alert from the CURRENT v0.3 Pine snapshot:
+- alert_id: 5664752419
+- name: STC AMP A 8-SYMBOL 15m PROD v0.3 FIX
+- active=true
+- resolution=15
+- webhook configured
+- mobile_push=false
+- popup=false
+- last_error=null
+- TradingView alert payload confirms study description:
+  STC AMP Core Feed A v0.3 Stateful Visual
+
+Feed B production alert:
+- alert_id: 5664684004
+- name: STC AMP B 8-SYMBOL 15m PROD v0.3
+- active=true
+- resolution=15
+- webhook configured
+- last_error=null
+
+The duplicate Feed B alert 5664675386 remains stopped.
+The broken A alert 5664682003 remains stopped.
+The old 16-symbol v0.2 alert 5664628299 remains stopped.
+
+Next validation gate:
+Observe the next 15-minute cycle (19:45 UTC / 22:45 Cairo) and confirm A emits 8 events and B emits 8 events, all with HTTP 200, without either production alert being auto-stopped.
