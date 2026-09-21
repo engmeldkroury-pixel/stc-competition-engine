@@ -62,4 +62,12 @@ jobs:
             },
             execution
           }'
-          echo '{"worker_write_boundary":"verified_401"}'
+          runtime_code="$(curl -sS -o /tmp/runtime-write.json -w '%{http_code}' -X POST \
+            -H "Authorization: Bearer $STC_WORKER_TOKEN" \
+            -H "Content-Type: application/json" \
+            --data '{"safe_mode":false,"kill_switch":false,"reason":"worker-boundary-test"}' \
+            "$BRIDGE_URL/runtime_control.php")"
+          test "$runtime_code" = "401"
+          verify="$(curl --fail-with-body -sS -H "Authorization: Bearer $STC_WORKER_TOKEN" "$BRIDGE_URL/runtime_control.php")"
+          printf '%s' "$verify" | jq -e '.runtime_control.safe_mode == true and .runtime_control.kill_switch == true and .runtime_control.version == 1' >/dev/null
+          echo '{"worker_approval_write_boundary":"verified_401","worker_runtime_write_boundary":"verified_401","runtime_controls_unchanged":true}'
