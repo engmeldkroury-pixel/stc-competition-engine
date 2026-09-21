@@ -142,6 +142,19 @@ try {
         if ($planValid && isset($accounts[$competitionId])) {
             try {
                 $account = $accounts[$competitionId];
+                $deterministicClusterRisk = (float)(
+                    $riskByCluster[$competitionId . '|' . stc_risk_cluster($symbol)] ?? 0.0
+                );
+                $dynamicCorrelation = stc_dynamic_correlated_open_risk(
+                    $pdo,
+                    $competitionId,
+                    $symbol,
+                    (string)$lockedPlan['direction'],
+                    0.70
+                );
+                $dynamicClusterRisk = (float)($dynamicCorrelation['dynamic_correlated_risk_usd'] ?? 0.0);
+                $effectiveClusterRisk = max($deterministicClusterRisk, $dynamicClusterRisk);
+
                 $sizing = stc_propose_position_size(
                     $competitionId,
                     $symbol,
@@ -151,12 +164,17 @@ try {
                     (float)$lockedPlan['initial_stop'],
                     (float)($openQty[$seenKey] ?? 0.0),
                     (float)($riskByCompetition[$competitionId] ?? 0.0),
-                    (float)($riskByCluster[$competitionId . '|' . stc_risk_cluster($symbol)] ?? 0.0)
+                    $effectiveClusterRisk
                 );
+                $sizing['deterministic_cluster_risk_before_usd'] = $deterministicClusterRisk;
+                $sizing['dynamic_correlated_risk_before_usd'] = $dynamicClusterRisk;
+                $sizing['effective_cluster_risk_before_usd'] = $effectiveClusterRisk;
+                $sizing['dynamic_correlation'] = $dynamicCorrelation;
             } catch (Throwable $e) {
                 $sizing = [
                     'proposed_quantity' => 0.0,
                     'allowed_by_position_limit' => false,
+                    'allowed_by_risk_policy' => false,
                     'error' => $e->getMessage(),
                 ];
             }
@@ -320,7 +338,9 @@ try {
                 'per_trade_risk_fraction_source' => 'owner_configured',
                 'portfolio_cap_multiple_of_trade_risk' => 6.0,
                 'correlation_cluster_cap_multiple_of_trade_risk' => 3.0,
-                'cluster_model' => 'deterministic_asset_risk_groups_not_statistical_correlation',
+                'cluster_model' => 'max_of_deterministic_asset_group_and_rolling_15m_effective_pnl_correlation',
+                'dynamic_correlation_threshold' => 0.70,
+                'dynamic_correlation_minimum_aligned_returns' => 20,
                 'official_competition_limit' => false,
             ],
             'rotation_candidates' => $rotationCandidates,
