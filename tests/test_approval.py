@@ -2,7 +2,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from app import storage
-from app.approval import build_approval_envelope, market_state_hash, revalidate_envelope
+from app.approval import build_approval_envelope, market_state_hash, revalidate_envelope, source_bar_close_time
 
 
 def test_dynamic_validity_depends_on_timeframe():
@@ -58,3 +58,27 @@ def test_revalidation_blocks_closed_or_unverified_market():
     r=revalidate_envelope(e,cur)
     assert r["valid"] is False
     assert "market_closed_or_unverified" in r["reasons"]
+
+
+
+def test_validity_is_anchored_to_confirmed_bar_close_not_worker_clock():
+    payload = {
+        "competition_id": "capital-africa-sep-2026",
+        "symbol": "CAPITALCOM:XAUUSD",
+        "timeframe": "15",
+        "time": "2026-09-21T20:30:00Z",
+        "close": 4300,
+        "atr14": 10,
+        "ema20": 4290,
+        "ema50": 4280,
+        "rsi14": 60,
+        "macd": 2,
+        "macd_signal": 1,
+    }
+    close_time = source_bar_close_time(payload)
+    assert close_time.isoformat() == "2026-09-21T20:45:00+00:00"
+
+    envelope = build_approval_envelope(payload, 0.7)
+    assert envelope["source_bar_time"] == "2026-09-21T20:30:00Z"
+    assert envelope["source_bar_close_time"] == "2026-09-21T20:45:00+00:00"
+    assert envelope["valid_until"] == "2026-09-21T21:15:00+00:00"
