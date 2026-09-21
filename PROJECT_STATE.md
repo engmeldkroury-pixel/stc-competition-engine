@@ -410,3 +410,27 @@ Evidence:
 
 Current next action:
 Owner loads STC_MULTI_FEED.pine into TradingView Pine Editor on CAPITALCOM:BTCUSD 15m, saves/adds it to chart, and reports any compile/runtime error or confirms successful add-to-chart. Do not remove the verified XAUUSD v0.2 production alert during this validation.
+
+
+## Multi-symbol production alert provisioned — 2026-09-21 09:32 UTC
+
+TradingView alert:
+- alert_id: 5659596015
+- name: STC CAPITAL 10-SYMBOL 15m PROD
+- scheduler symbol: CAPITALCOM:BTCUSD
+- resolution: 15m
+- alert type: pine_alert
+- Pine: STC Capital Multi Feed v0.3
+- monitored feed timeframe: 15
+- active: true
+- webhook configured: true
+- auto_deactivate: false
+- create_time: 2026-09-21T09:30:38Z
+- expiration: 2026-10-21T09:30:01Z
+- last_error: null
+- first fire: pending at time of provisioning check
+
+Existing verified XAUUSD v0.2 production alert remains active during v0.3 validation.
+
+Acceptance pending:
+Do not mark multi-symbol feed verified until the first v0.3 alert fire is observed with HTTP 200 webhook delivery, emitted-symbol coverage is inspected, and corresponding worker/persistence evidence is captured.
