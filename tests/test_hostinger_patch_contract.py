@@ -75,7 +75,7 @@ def test_owner_console_auto_refresh_and_actionable_browser_notifications():
     ui = (PATCH / "operator.php").read_text(encoding="utf-8")
     assert "setInterval(()=>{secondsToRefresh=30;refresh()},30000)" in ui
     assert "Notification.requestPermission()" in ui
-    assert "STC NEW LOCKED TRADE PLAN" in ui
+    assert "STC NEW ACTIVE TRADE PLAN" in ui
     assert "LONG" in ui and "SHORT" in ui
     assert "WAIT" in ui
     assert "Decision timeframe" in ui
