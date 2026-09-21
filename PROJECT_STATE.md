@@ -382,3 +382,31 @@ The one-time production readback workflow was removed after evidence capture.
 
 Current next action:
 Provision the same STC Competition Feed v0.2 + Any alert() function call + webhook configuration for the remaining Capital.com competition symbols required by the profile. Keep Safe Mode and Kill Switch ON until multi-symbol feed coverage and pre-market readiness checks are completed.
+
+
+## Capital multi-symbol feed candidate — 2026-09-21 09:16 UTC
+
+Merged PR #7.
+Main commit: c401cd2f2717108a71938e9a63a959f14135562e.
+Main CI run 35582300372: SUCCESS.
+
+Added tradingview/STC_MULTI_FEED.pine as a separate v0.3 candidate. Existing verified STC_FEED v0.2 remains unchanged and the live XAUUSD alert stays active.
+
+Design:
+- One Pine indicator can monitor all 10 exact Capital.com competition symbols using request.security() from a single 15m scheduler chart.
+- Recommended scheduler chart: CAPITALCOM:BTCUSD on 15m so the script continues to evaluate on a 24/7 market while non-crypto markets may be closed.
+- Each remote symbol carries the same payload contract as v0.2.
+- Stable event identity: competition|symbol|feed_timeframe|remote_bar_time.
+- Per-symbol lastSentTimes suppress duplicate submissions when a market is closed or not producing a new bar.
+- alert.freq_all is used so multiple newly closed symbol bars can be emitted from one chart-bar calculation.
+- 10 unique remote contexts are below TradingView's request.* limit.
+- No execution or approval behavior was changed.
+
+Evidence:
+- Official TradingView Pine documentation states a single script alert on “Any alert() function call” includes all executed alert() calls; alert.freq_all allows all calls in the realtime bar to trigger.
+- Official TradingView documentation permits multi-symbol monitoring through request.security() and documents the request.* context limits.
+- Static repository contract tests cover all 10 exact Capital.com symbols, remote requests, event identity, duplicate suppression and alert frequency.
+- TradingView compile/runtime acceptance of v0.3 is still pending and must not be marked verified until the owner loads it into Pine Editor and the first multi-symbol alert fires successfully through the production bridge.
+
+Current next action:
+Owner loads STC_MULTI_FEED.pine into TradingView Pine Editor on CAPITALCOM:BTCUSD 15m, saves/adds it to chart, and reports any compile/runtime error or confirms successful add-to-chart. Do not remove the verified XAUUSD v0.2 production alert during this validation.
