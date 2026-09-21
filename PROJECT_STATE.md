@@ -262,3 +262,47 @@ Required owner deployment actions:
 3. Add a new separate owner_api_token entry to the private config.php outside public_html. Do not share its value.
 4. Leave safe_mode and kill_switch ON after migration.
 5. Return after those steps for live read-only/blocked-approval verification before controls are disabled.
+
+
+## Capital.com live signal + cloud approval boundary proof — 2026-09-21 08:30 UTC
+
+TradingView manual Capital.com test alert:
+- Alert id: 5659023932
+- Symbol: CAPITALCOM:XAUUSD
+- Event id: stc-capital-e2e-manual-20260921-001
+- Fired: 2026-09-21T08:26:49Z
+- Webhook result: HTTP 200
+- Alert auto-deactivated after fire.
+
+Bridge processing:
+- GitHub repository_dispatch run: 35577945674
+- Worker conclusion: SUCCESS
+- Processing result: claimed=1, ingested=1, rejected=0, failed=0
+
+Persisted signal:
+- signal_id: bridge-6892e51a1282c352aaafd4a4d1e35aac
+- recommendation: WAIT
+- composite_score: -0.0675
+- receipt_id: stc-receipt-938021575b1b1405d07a00c1e0962873
+- receipt execution: manual_only
+- approval envelope valid_until: 2026-09-21T08:57:06.647864+00:00
+
+Production readback:
+- approval.php GET is reachable and authenticated with worker read credential.
+- No prior owner approval existed at readback.
+- Runtime control remained safe_mode=true, kill_switch=true, version=1.
+- Worker credential POST to approval.php returned HTTP 401.
+- Worker credential POST attempting to disable runtime controls returned HTTP 401.
+- Runtime controls remained unchanged after the denied write attempts.
+
+Owner-auth production gate:
+- Workflow .github/workflows/stc-owner-approval-gate.yml is prepared.
+- First run 35578258416 intentionally failed at the prerequisite step because STC_OWNER_TOKEN is not configured as a GitHub Actions secret.
+- No owner approval write occurred in that failed run.
+- Next proof will POST an approve request for the persisted WAIT signal and must be blocked by safe_mode + kill_switch + WAIT safeguards, then read back the durable blocked approval. No trade execution is possible in this workflow.
+
+Temporary Hostinger production/readback proof workflows were removed after their evidence was captured.
+
+## Current owner action required
+
+Add the same private owner_api_token value already configured in Hostinger config.php as a GitHub Actions repository secret named STC_OWNER_TOKEN. Do not paste or expose the value in chat. After the secret exists, re-run only the failed owner approval gate job; the assistant can perform the rerun through the GitHub connector.
