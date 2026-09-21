@@ -129,6 +129,7 @@ class PositionSizingResult:
     cluster_risk_after_usd: float
     risk_budget_limited_by: tuple[str, ...]
     allowed_by_position_limit: bool
+    allowed_by_risk_policy: bool
     quantity_is_integer_contracts: bool
     note: str
 
@@ -288,9 +289,9 @@ def propose_position_size(
     projected = current_open_quantity + proposed
     portfolio_after = portfolio_open_risk_usd + risk_amount
     cluster_after = cluster_open_risk_usd + risk_amount
-    allowed = (
+    position_limit_allowed = proposed > 0 and projected <= float(max_position) + 1e-12
+    risk_policy_allowed = (
         proposed > 0
-        and projected <= float(max_position) + 1e-12
         and portfolio_after <= portfolio_cap + 1e-9
         and cluster_after <= cluster_cap + 1e-9
     )
@@ -325,7 +326,8 @@ def propose_position_size(
         portfolio_risk_after_usd=portfolio_after,
         cluster_risk_after_usd=cluster_after,
         risk_budget_limited_by=tuple(limited_by),
-        allowed_by_position_limit=allowed,
+        allowed_by_position_limit=position_limit_allowed,
+        allowed_by_risk_policy=risk_policy_allowed,
         quantity_is_integer_contracts=integer_contracts,
         note=note,
     )
