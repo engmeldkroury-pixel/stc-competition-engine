@@ -193,3 +193,13 @@ def test_notification_secrets_are_config_only_and_never_committed_as_values():
     assert "api.telegram.org/bot" in control
     # Token is read from private config and appended at runtime, not hardcoded.
     assert "123456789:" not in control
+
+
+def test_owner_console_exposes_server_notification_status_and_test():
+    ui = (PATCH / "operator.php").read_text(encoding="utf-8")
+    assert "Telegram mobile" in ui
+    assert "Email backup" in ui
+    assert "Send notification test" in ui
+    assert "refreshNotificationStatus()" in ui
+    assert "action:'test'" in ui
+    assert "Raw 15-minute feed bars do not generate user notifications." in ui
