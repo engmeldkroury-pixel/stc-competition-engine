@@ -478,8 +478,9 @@ function stc_propose_position_size(
     $riskAmount = $qty * $totalRisk;
     $portfolioAfter = $portfolioOpenRiskUsd + $riskAmount;
     $clusterAfter = $clusterOpenRiskUsd + $riskAmount;
-    $allowed = $qty > 0
-        && ($currentOpenQuantity + $qty) <= $maxPosition + 1e-12
+    $positionLimitAllowed = $qty > 0
+        && ($currentOpenQuantity + $qty) <= $maxPosition + 1e-12;
+    $riskPolicyAllowed = $qty > 0
         && $portfolioAfter <= $portfolioCap + 1e-9
         && $clusterAfter <= $clusterCap + 1e-9;
 
@@ -506,7 +507,8 @@ function stc_propose_position_size(
         'cluster_risk_after_usd' => $clusterAfter,
         'risk_budget_limited_by' => $limitedBy,
         'quantity_is_integer_contracts' => $integerContracts,
-        'allowed_by_position_limit' => $allowed,
+        'allowed_by_position_limit' => $positionLimitAllowed,
+        'allowed_by_risk_policy' => $riskPolicyAllowed,
         'provisional_risk_setting' => true,
         'note' => 'STC sizing proposal only. Portfolio and correlation-cluster caps are STC risk controls, not official competition limits. Human approval and manual order entry required.',
     ];
