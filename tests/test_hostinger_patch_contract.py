@@ -241,7 +241,7 @@ def test_snapshot_exposes_correlation_cluster_risk_and_expired_plan_cancellation
     assert "allowed_by_risk_policy" in control
     assert "correlation_cluster_capacity" in control
     assert "CANCEL_PENDING_PLAN" in snapshot
-    assert "deterministic_asset_risk_groups_not_statistical_correlation" in snapshot
+    assert "max_of_deterministic_asset_group_and_rolling_15m_effective_pnl_correlation" in snapshot
 
 
 
