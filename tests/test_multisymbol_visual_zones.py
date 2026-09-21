@@ -5,7 +5,7 @@ PINE = Path(__file__).resolve().parents[1] / "tradingview" / "STC_MULTI_FEED.pin
 
 def test_visual_version_and_overlay():
     text = PINE.read_text(encoding="utf-8")
-    assert 'indicator("STC Capital Multi Feed v0.7 Historical Context", overlay=true' in text
+    assert 'indicator("STC Capital Multi Feed v0.7.1 Historical Context", overlay=true' in text
 
 
 def test_visual_engine_has_multi_factor_analysis():
