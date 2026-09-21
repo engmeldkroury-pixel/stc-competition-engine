@@ -9,7 +9,7 @@ PATCH = ROOT / "hostinger_patch"
 
 
 def test_hostinger_patch_files_present():
-    for name in ("cloud_control.php", "runtime_control.php", "approval.php", "operator_snapshot.php", "operator.php", "portfolio_control.php", "position.php", "account_state.php", "notification_control.php", "notification.php", "migrations/001_cloud_approval.sql", "migrations/002_portfolio_supervisor.sql", "migrations/003_notifications.sql"):
+    for name in ("cloud_control.php", "runtime_control.php", "approval.php", "operator_snapshot.php", "operator.php", "portfolio_control.php", "position.php", "account_state.php", "notification_control.php", "notification.php", "macro_control.php", "migrations/001_cloud_approval.sql", "migrations/002_portfolio_supervisor.sql", "migrations/003_notifications.sql"):
         assert (PATCH / name).exists()
 
 
@@ -242,3 +242,49 @@ def test_snapshot_exposes_correlation_cluster_risk_and_expired_plan_cancellation
     assert "correlation_cluster_capacity" in control
     assert "CANCEL_PENDING_PLAN" in snapshot
     assert "deterministic_asset_risk_groups_not_statistical_correlation" in snapshot
+
+
+
+def test_macro_calendar_gate_is_fail_closed_for_new_approvals_and_audited():
+    macro = (PATCH / "macro_control.php").read_text(encoding="utf-8")
+    approval = (PATCH / "approval.php").read_text(encoding="utf-8")
+    snapshot = (PATCH / "operator_snapshot.php").read_text(encoding="utf-8")
+    ui = (PATCH / "operator.php").read_text(encoding="utf-8")
+    assert "https://nfs.faireconomy.media/ff_calendar_thisweek.json" in macro
+    assert "macro_calendar_fail_closed" in macro
+    assert "macro_blackout_before_minutes" in macro
+    assert "macro_blackout_after_minutes" in macro
+    assert "High" in macro
+    assert "macro_high_impact_blackout" in approval
+    assert "macro_calendar_unavailable_fail_closed" in approval
+    assert "'macro_context' => $macroContext" in approval
+    assert "'macro_context' => $macroContext" in snapshot
+    assert "macro_calendar_status" in snapshot
+    assert "Macro event risk" in ui
+    assert "New approval blocked by macro-risk gate." in ui
+
+
+def test_hostinger_php_patch_files_are_syntax_valid_when_php_is_available():
+    php = shutil.which("php")
+    if php is None:
+        pytest.skip("php is not available for syntax validation")
+    names = [
+        "approval.php",
+        "cloud_control.php",
+        "portfolio_control.php",
+        "operator_snapshot.php",
+        "operator.php",
+        "position.php",
+        "account_state.php",
+        "notification_control.php",
+        "notification.php",
+        "macro_control.php",
+    ]
+    for name in names:
+        result = subprocess.run(
+            [php, "-l", str(PATCH / name)],
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+        assert result.returncode == 0, f"{name}: {result.stdout}\n{result.stderr}"
