@@ -116,3 +116,75 @@ def factors_from_tradingview(payload: TradingViewWebhook) -> float:
     if historical is None:
         return short_term
     return max(-1.0, min(1.0, short_term * 0.65 + historical * 0.35))
+
+
+
+def _directional_quality(technical_direction: float, raw_quality: float) -> float:
+    """Align non-directional market quality with the active technical thesis.
+
+    Quality must never create a LONG or SHORT by itself. Good quality increases
+    confidence in the technical direction; poor quality reduces it symmetrically.
+    """
+    if technical_direction > 0:
+        sign = 1.0
+    elif technical_direction < 0:
+        sign = -1.0
+    else:
+        return 0.0
+    return max(-1.0, min(1.0, sign * raw_quality))
+
+
+def volatility_quality_from_tradingview(
+    payload: TradingViewWebhook,
+    technical_direction: float,
+) -> float:
+    """Directional execution-quality factor from closed-bar range vs ATR.
+
+    This is not a volatility-direction signal. It only judges whether the latest
+    confirmed bar is reasonably tradable relative to its own ATR. Extreme shock
+    bars reduce confidence; ordinary movement increases confidence.
+    """
+    atr = float(payload.atr14)
+    if atr <= 0:
+        return 0.0
+
+    bar_range = max(0.0, float(payload.high) - float(payload.low))
+    ratio = bar_range / atr
+
+    if 0.40 <= ratio <= 1.80:
+        raw_quality = 0.50
+    elif 0.20 <= ratio <= 2.50:
+        raw_quality = 0.20
+    elif ratio > 3.00:
+        raw_quality = -0.80
+    else:
+        raw_quality = -0.20
+
+    return _directional_quality(technical_direction, raw_quality)
+
+
+def liquidity_quality_from_tradingview(
+    payload: TradingViewWebhook,
+    technical_direction: float,
+) -> float:
+    """Directional liquidity/participation quality from relative volume.
+
+    TradingView volume can be exchange volume for futures and a provider/tick
+    volume proxy for some CFDs, so this factor is deliberately modest. It never
+    creates direction by itself.
+    """
+    volume = float(payload.volume)
+    ratio = float(payload.volume_ratio)
+    if volume <= 0 or ratio < 0:
+        return 0.0
+
+    if ratio >= 1.50:
+        raw_quality = 0.60
+    elif ratio >= 0.80:
+        raw_quality = 0.30
+    elif ratio >= 0.40:
+        raw_quality = 0.00
+    else:
+        raw_quality = -0.50
+
+    return _directional_quality(technical_direction, raw_quality)
