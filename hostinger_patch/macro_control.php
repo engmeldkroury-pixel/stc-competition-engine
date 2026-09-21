@@ -168,7 +168,8 @@ function stc_macro_calendar_fetch(array $config): array {
 function stc_macro_risk_context(
     array $config,
     string $symbol,
-    ?DateTimeImmutable $now = null
+    ?DateTimeImmutable $now = null,
+    ?array $preloadedCalendar = null
 ): array {
     $now = $now ?? new DateTimeImmutable('now', new DateTimeZone('UTC'));
     $now = $now->setTimezone(new DateTimeZone('UTC'));
@@ -176,7 +177,7 @@ function stc_macro_risk_context(
     $afterMinutes = max(0, min((int)($config['macro_blackout_after_minutes'] ?? 30), 180));
     $failClosed = (bool)($config['macro_calendar_fail_closed'] ?? true);
     $currencies = stc_macro_currencies_for_symbol($symbol);
-    $calendar = stc_macro_calendar_fetch($config);
+    $calendar = $preloadedCalendar ?? stc_macro_calendar_fetch($config);
 
     if (($calendar['ok'] ?? false) !== true) {
         return [
