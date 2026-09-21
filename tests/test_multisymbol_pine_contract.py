@@ -20,7 +20,7 @@ def test_multisymbol_feed_covers_exact_capital_profile_symbols():
     text = PINE.read_text(encoding="utf-8")
     present = {symbol for symbol in EXPECTED if f'"{symbol}"' in text}
     assert present == EXPECTED
-    assert "STC Capital Multi Feed v0.5 Visual Zones" in text
+    assert "STC Capital Multi Feed v0.6 Stateful Visual" in text
 
 
 def test_multisymbol_feed_uses_remote_security_and_all_alert_calls():

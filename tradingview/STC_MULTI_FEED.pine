@@ -1,5 +1,5 @@
 //@version=6
-indicator("STC Capital Multi Feed v0.5 Visual Zones", overlay=true, max_labels_count=100)
+indicator("STC Capital Multi Feed v0.6 Stateful Visual", overlay=true, max_labels_count=100)
 
 // -----------------------------------------------------------------------------
 // Production feed settings.
@@ -33,6 +33,7 @@ entryHalfWidthAtr = input.float(0.25, "Entry zone half-width (ATR)", minval=0.10
 stopAtr = input.float(0.90, "Minimum stop distance (ATR)", minval=0.50, maxval=3.00, step=0.10, group="Visual analysis")
 target1R = input.float(1.50, "Target 1 reward/risk", minval=0.50, maxval=5.00, step=0.25, group="Visual analysis")
 target2R = input.float(2.50, "Target 2 reward/risk", minval=1.00, maxval=8.00, step=0.25, group="Visual analysis")
+setupLifetimeBars = input.int(4, "Locked setup lifetime (bars)", minval=1, maxval=50, group="Visual analysis")
 
 // -----------------------------------------------------------------------------
 // Multi-symbol production payload.
@@ -205,14 +206,53 @@ shortRisk = math.max(shortStop - shortEntryMid, atr14v)
 shortTarget1 = math.min(swingLow, shortEntryMid - shortRisk * target1R)
 shortTarget2 = math.min(shortTarget1 - atr14v * 0.25, shortEntryMid - shortRisk * target2R)
 
-entryLow = setupDir == 1 ? longEntryLow : setupDir == -1 ? shortEntryLow : na
-entryHigh = setupDir == 1 ? longEntryHigh : setupDir == -1 ? shortEntryHigh : na
-stopLevel = setupDir == 1 ? longStop : setupDir == -1 ? shortStop : na
-target1 = setupDir == 1 ? longTarget1 : setupDir == -1 ? shortTarget1 : na
-target2 = setupDir == 1 ? longTarget2 : setupDir == -1 ? shortTarget2 : na
+// -----------------------------------------------------------------------------
+// Stateful technical setup lock.
+// A setup is created only from a confirmed chart bar and its levels stay fixed
+// until expiry or invalidation. This is chart-only technical state; the backend
+// locked trade plan remains the authoritative multi-factor/manual-approval plan.
+// -----------------------------------------------------------------------------
+var int lockedDir = 0
+var int lockedAtBar = na
+var float lockedEntryLow = na
+var float lockedEntryHigh = na
+var float lockedStop = na
+var float lockedTarget1 = na
+var float lockedTarget2 = na
+var float lockedScore = na
 
-biasColor = setupDir == 1 ? color.lime : setupDir == -1 ? color.red : color.gray
-entryColor = setupDir == 1 ? color.aqua : setupDir == -1 ? color.orange : color.gray
+lockedExpired = lockedDir != 0 and not na(lockedAtBar) and (bar_index - lockedAtBar >= setupLifetimeBars)
+lockedInvalidated = lockedDir == 1 ? low <= lockedStop : lockedDir == -1 ? high >= lockedStop : false
+
+if barstate.isconfirmed
+    if lockedDir != 0 and (lockedExpired or lockedInvalidated)
+        lockedDir := 0
+        lockedAtBar := na
+        lockedEntryLow := na
+        lockedEntryHigh := na
+        lockedStop := na
+        lockedTarget1 := na
+        lockedTarget2 := na
+        lockedScore := na
+
+    if lockedDir == 0 and setupDir != 0
+        lockedDir := setupDir
+        lockedAtBar := bar_index
+        lockedEntryLow := setupDir == 1 ? longEntryLow : shortEntryLow
+        lockedEntryHigh := setupDir == 1 ? longEntryHigh : shortEntryHigh
+        lockedStop := setupDir == 1 ? longStop : shortStop
+        lockedTarget1 := setupDir == 1 ? longTarget1 : shortTarget1
+        lockedTarget2 := setupDir == 1 ? longTarget2 : shortTarget2
+        lockedScore := score
+
+entryLow = lockedDir != 0 ? lockedEntryLow : na
+entryHigh = lockedDir != 0 ? lockedEntryHigh : na
+stopLevel = lockedDir != 0 ? lockedStop : na
+target1 = lockedDir != 0 ? lockedTarget1 : na
+target2 = lockedDir != 0 ? lockedTarget2 : na
+
+biasColor = lockedDir == 1 ? color.lime : lockedDir == -1 ? color.red : color.gray
+entryColor = lockedDir == 1 ? color.aqua : lockedDir == -1 ? color.orange : color.gray
 
 plot(showEMAs ? ema20v : na, "EMA 20", color=color.new(color.aqua, 0), linewidth=2)
 plot(showEMAs ? ema50v : na, "EMA 50", color=color.new(color.blue, 0), linewidth=2)
@@ -241,8 +281,8 @@ bgcolor(
         : na
 )
 
-newLong = setupDir == 1 and setupDir[1] != 1
-newShort = setupDir == -1 and setupDir[1] != -1
+newLong = lockedDir == 1 and lockedDir[1] != 1
+newShort = lockedDir == -1 and lockedDir[1] != -1
 
 plotshape(newLong, title="New bullish setup", style=shape.labelup, location=location.belowbar, color=color.new(color.lime, 0), text="LONG\nZONE", textcolor=color.black, size=size.tiny)
 plotshape(newShort, title="New bearish setup", style=shape.labeldown, location=location.abovebar, color=color.new(color.red, 0), text="SHORT\nZONE", textcolor=color.white, size=size.tiny)
@@ -254,12 +294,12 @@ var table dashboard = table.new(position.top_right, 2, 9, border_width=1)
 
 if barstate.islast
     if showDashboard
-        setupText = setupDir == 1 ? "BULLISH ZONE" : setupDir == -1 ? "BEARISH ZONE" : "NEUTRAL / WAIT"
+        setupText = lockedDir == 1 ? "LOCKED LONG SETUP" : lockedDir == -1 ? "LOCKED SHORT SETUP" : "SCANNING / WAIT"
         table.cell(dashboard, 0, 0, "STC Visual", bgcolor=color.new(color.black, 10), text_color=color.white)
         table.cell(dashboard, 1, 0, setupText, bgcolor=color.new(biasColor, 70), text_color=color.white)
 
         table.cell(dashboard, 0, 1, "Score", text_color=color.white)
-        table.cell(dashboard, 1, 1, str.tostring(math.round(score * 100.0)) + "%", text_color=color.white)
+        table.cell(dashboard, 1, 1, str.tostring(math.round((lockedDir != 0 ? lockedScore : score) * 100.0)) + "%", text_color=color.white)
 
         table.cell(dashboard, 0, 2, "Chart TF", text_color=color.white)
         table.cell(dashboard, 1, 2, timeframe.period, text_color=color.white)

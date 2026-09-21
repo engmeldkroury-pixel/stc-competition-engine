@@ -5,7 +5,7 @@ PINE = Path(__file__).resolve().parents[1] / "tradingview" / "STC_MULTI_FEED.pin
 
 def test_visual_version_and_overlay():
     text = PINE.read_text(encoding="utf-8")
-    assert 'indicator("STC Capital Multi Feed v0.5 Visual Zones", overlay=true' in text
+    assert 'indicator("STC Capital Multi Feed v0.6 Stateful Visual", overlay=true' in text
 
 
 def test_visual_engine_has_multi_factor_analysis():
@@ -61,3 +61,30 @@ def test_visual_layer_does_not_place_orders_or_change_approval_contract():
 def test_fire_control_fix_is_preserved():
     text = PINE.read_text(encoding="utf-8")
     assert "varip array<int> lastSentTimes" in text
+
+
+def test_stateful_visual_setup_locks_levels_until_expiry_or_invalidation():
+    text = PINE.read_text(encoding="utf-8")
+    for token in (
+        "var int lockedDir = 0",
+        "var int lockedAtBar = na",
+        "var float lockedEntryLow = na",
+        "var float lockedEntryHigh = na",
+        "var float lockedStop = na",
+        "var float lockedTarget1 = na",
+        "var float lockedTarget2 = na",
+        "setupLifetimeBars",
+        "lockedExpired",
+        "lockedInvalidated",
+        "if lockedDir == 0 and setupDir != 0",
+    ):
+        assert token in text
+
+
+def test_stateful_visual_levels_are_not_recomputed_while_locked():
+    text = PINE.read_text(encoding="utf-8")
+    assert "entryLow = lockedDir != 0 ? lockedEntryLow : na" in text
+    assert "entryHigh = lockedDir != 0 ? lockedEntryHigh : na" in text
+    assert "stopLevel = lockedDir != 0 ? lockedStop : na" in text
+    assert "target1 = lockedDir != 0 ? lockedTarget1 : na" in text
+    assert "target2 = lockedDir != 0 ? lockedTarget2 : na" in text
