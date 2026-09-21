@@ -431,3 +431,20 @@ def test_mobile_signal_alert_contains_sizing_risk_and_single_tp_ticket():
     assert "'Signal score: '" in notify
     assert "Single-TP mode: place only the final take-profit" in notify
 
+def test_historical_closed_trade_import_is_manual_audited_and_counts_original_dates():
+    position = (PATCH / "position.php").read_text(encoding="utf-8")
+    control = (PATCH / "portfolio_control.php").read_text(encoding="utf-8")
+    ui = (PATCH / "operator.php").read_text(encoding="utf-8")
+    assert "IMPORT_CLOSED" in position
+    assert "historical_trade_outside_competition_window" in position
+    assert "realized_pnl_source" in position
+    assert "owner_platform_record" in position
+    assert "Historical owner-confirmed open import" in position
+    assert "Historical owner-confirmed close import" in position
+    assert "SELECT DATE(closed_at_utc) AS trade_date" in control
+    assert "e.event_type = 'PARTIAL'" in control
+    assert "Import a past closed trade" in ui
+    assert "function recordClosedTradeHistory(competitionId)" in ui
+    assert "ALREADY CLOSED historical competition activity" in ui
+    assert "sends no order" in ui
+

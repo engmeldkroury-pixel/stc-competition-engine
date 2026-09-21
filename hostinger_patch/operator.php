@@ -57,14 +57,14 @@ input{width:100%}button{cursor:pointer}.primary{background:#1d4ed8}.danger{backg
 <div id="capital-panel" class="hidden">
   <div class="bar"><div class="sectiontitle">Capital.com Africa</div><div class="small">Independent competition lane. Capital.com symbols, account rules, risk and position limits stay separate from AMP Futures.</div></div>
   <div id="capital-account" class="bar"></div>
-  <div class="bar"><div class="sectiontitle">Open positions / Portfolio Supervisor</div><div class="small">Executed trades stay here until you record a manual close. New signals on the same symbol do not replace them.</div><button style="margin-top:10px" onclick="recordExistingPosition('capital-africa-sep-2026')">Record an existing manual position</button><div id="capital-positions" class="grid" style="margin-top:10px"></div></div>
+  <div class="bar"><div class="sectiontitle">Open positions / Portfolio Supervisor</div><div class="small">Executed trades stay here until you record a manual close. New signals on the same symbol do not replace them.</div><button style="margin-top:10px" onclick="recordExistingPosition('capital-africa-sep-2026')">Record an existing manual position</button> <button style="margin-top:10px" onclick="recordClosedTradeHistory('capital-africa-sep-2026')">Import a past closed trade</button><div id="capital-positions" class="grid" style="margin-top:10px"></div></div>
   <div class="bar"><div class="sectiontitle">Latest signals</div><div id="capital-cards" class="grid"></div></div>
 </div>
 
 <div id="amp-panel" class="hidden">
   <div class="bar"><div class="sectiontitle">AMP Futures</div><div class="small">Independent futures lane. Futures symbols, contract limits, risk and position state stay separate from Capital.com Africa.</div></div>
   <div id="amp-account" class="bar"></div>
-  <div class="bar"><div class="sectiontitle">Open positions / Portfolio Supervisor</div><div class="small">Executed trades stay here until you record a manual close. New signals on the same symbol do not replace them.</div><button style="margin-top:10px" onclick="recordExistingPosition('amp-futures-sep-2026')">Record an existing manual position</button><div id="amp-positions" class="grid" style="margin-top:10px"></div></div>
+  <div class="bar"><div class="sectiontitle">Open positions / Portfolio Supervisor</div><div class="small">Executed trades stay here until you record a manual close. New signals on the same symbol do not replace them.</div><button style="margin-top:10px" onclick="recordExistingPosition('amp-futures-sep-2026')">Record an existing manual position</button> <button style="margin-top:10px" onclick="recordClosedTradeHistory('amp-futures-sep-2026')">Import a past closed trade</button><div id="amp-positions" class="grid" style="margin-top:10px"></div></div>
   <div class="bar"><div class="sectiontitle">Latest signals</div><div id="amp-cards" class="grid"></div></div>
 </div>
 
@@ -525,6 +525,35 @@ async function updateAccountState(competitionId){
    await api('account_state.php',{method:'POST',body:JSON.stringify({competition_id:competitionId,equity_usd:equity,risk_fraction:pct/100})});
    await refresh();
  }catch(e){alert('Account state update failed: '+e.message);}
+}
+
+async function recordClosedTradeHistory(competitionId){
+ const symbol=String(prompt('Historical symbol exactly as shown in STC / TradingView','')||'').trim();
+ if(!symbol)return;
+ const side=String(prompt('Historical side: LONG or SHORT','LONG')||'').trim().toUpperCase();
+ if(!(side==='LONG'||side==='SHORT')){alert('Side must be LONG or SHORT.');return;}
+ const qty=Number(prompt('Historical filled quantity',''));
+ const entry=Number(prompt('Historical average entry price',''));
+ const exit=Number(prompt('Historical average/final exit price',''));
+ if(![qty,entry,exit].every(x=>Number.isFinite(x)&&x>0)){alert('Enter valid positive quantity, entry and exit prices.');return;}
+ const openedText=String(prompt('Original open date/time (example 2026-09-20 14:35)','')||'').trim();
+ const closedText=String(prompt('Original close date/time (example 2026-09-20 16:10)','')||'').trim();
+ const opened=new Date(openedText);
+ const closed=new Date(closedText);
+ if(Number.isNaN(opened.getTime())||Number.isNaN(closed.getTime())||closed<opened){alert('Historical open/close times are invalid.');return;}
+ const pnlText=String(prompt('Actual realized P/L in USD from the competition platform. Leave blank if unknown; STC will estimate it.','')||'').trim();
+ let realized=null;
+ if(pnlText!==''){
+   realized=Number(pnlText);
+   if(!Number.isFinite(realized)){alert('Realized P/L must be a valid number or left blank.');return;}
+ }
+ if(!confirm('Import this trade as ALREADY CLOSED historical competition activity? This only updates STC progress/audit and sends no order.'))return;
+ const body={action:'IMPORT_CLOSED',competition_id:competitionId,symbol,side,quantity:qty,entry_price:entry,exit_price:exit,opened_at_utc:opened.toISOString(),closed_at_utc:closed.toISOString(),realized_pnl_usd:realized,note:'Owner-confirmed historical trade import'};
+ try{
+   await api('position.php',{method:'POST',body:JSON.stringify(body)});
+   alert('Historical closed trade imported. Qualification progress and trade counts will refresh now.');
+   await refresh();
+ }catch(e){alert('Historical trade import failed: '+e.message);}
 }
 
 async function recordExistingPosition(competitionId){

@@ -52,6 +52,118 @@ $body = stc_json_body();
 $action = strtoupper(trim((string)($body['action'] ?? '')));
 
 try {
+    if ($action === 'IMPORT_CLOSED') {
+        $competitionId = trim((string)($body['competition_id'] ?? ''));
+        $symbol = trim((string)($body['symbol'] ?? ''));
+        if (!in_array($competitionId, ['capital-africa-sep-2026', 'amp-futures-sep-2026'], true)
+            || $symbol === ''
+            || stc_max_open_position($competitionId, $symbol) === null) {
+            stc_json(['ok' => false, 'error' => 'invalid_position_target'], 400);
+        }
+
+        $side = stc_position_side($body['side'] ?? null);
+        $quantity = stc_num($body['quantity'] ?? null, 'quantity');
+        $entryPrice = stc_num($body['entry_price'] ?? null, 'entry_price');
+        $exitPrice = stc_num($body['exit_price'] ?? null, 'exit_price');
+
+        $opened = stc_parse_utc(trim((string)($body['opened_at_utc'] ?? '')));
+        $closed = stc_parse_utc(trim((string)($body['closed_at_utc'] ?? '')));
+        if ($opened === null || $closed === null || $closed < $opened) {
+            stc_json(['ok' => false, 'error' => 'invalid_historical_trade_times'], 400);
+        }
+
+        $now = new DateTimeImmutable('now', new DateTimeZone('UTC'));
+        $competitionStart = $competitionId === 'amp-futures-sep-2026'
+            ? new DateTimeImmutable('2026-09-01T08:00:00+00:00')
+            : new DateTimeImmutable('2026-09-16T08:00:00+00:00');
+        if ($opened < $competitionStart || $closed < $competitionStart || $closed > $now) {
+            stc_json(['ok' => false, 'error' => 'historical_trade_outside_competition_window'], 400);
+        }
+
+        $sign = $side === 'LONG' ? 1.0 : -1.0;
+        $value = stc_price_value_usd($competitionId, $symbol, $entryPrice);
+        $computedPnl = ($exitPrice - $entryPrice) * $sign * $quantity * $value;
+        $realizedPnl = $computedPnl;
+        $pnlSource = 'stc_estimate';
+        if (array_key_exists('realized_pnl_usd', $body) && $body['realized_pnl_usd'] !== null && $body['realized_pnl_usd'] !== '') {
+            if (!is_int($body['realized_pnl_usd']) && !is_float($body['realized_pnl_usd'])) {
+                stc_json(['ok' => false, 'error' => 'invalid_realized_pnl_usd'], 400);
+            }
+            $realizedPnl = (float)$body['realized_pnl_usd'];
+            if (!is_finite($realizedPnl)) {
+                stc_json(['ok' => false, 'error' => 'invalid_realized_pnl_usd'], 400);
+            }
+            $pnlSource = 'owner_platform_record';
+        }
+
+        $positionId = stc_position_id();
+        $note = trim((string)($body['note'] ?? ''));
+        $note = trim(($note !== '' ? $note . ' | ' : '')
+            . 'Historical closed trade imported by owner; no broker action. P/L source: ' . $pnlSource
+            . '. Historical stop/targets unavailable in import and stored as entry-price placeholders.');
+
+        $pdo->beginTransaction();
+        $stmt = $pdo->prepare(
+            'INSERT INTO stc_positions '
+            . '(position_id, competition_id, symbol, side, origin, initial_quantity, quantity, '
+            . 'entry_price, initial_stop, current_stop, target1, target2, source_plan_id, source_signal_id, '
+            . "status, opened_at_utc, closed_at_utc, exit_price, realized_pnl_usd, note) "
+            . "VALUES (?, ?, ?, ?, 'manual_external', ?, 0, ?, ?, ?, ?, ?, NULL, NULL, 'CLOSED', ?, ?, ?, ?, ?)"
+        );
+        $stmt->execute([
+            $positionId,
+            $competitionId,
+            $symbol,
+            $side,
+            $quantity,
+            $entryPrice,
+            $entryPrice,
+            $entryPrice,
+            $entryPrice,
+            $entryPrice,
+            $opened->format('Y-m-d H:i:s'),
+            $closed->format('Y-m-d H:i:s'),
+            $exitPrice,
+            $realizedPnl,
+            $note,
+        ]);
+
+        $evt = $pdo->prepare(
+            'INSERT INTO stc_position_events '
+            . '(event_id, position_id, event_type, quantity_delta, price, realized_pnl_delta_usd, note, created_at_utc) '
+            . 'VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
+        );
+        $evt->execute([
+            stc_position_event_id($positionId, 'OPEN_IMPORT'),
+            $positionId,
+            'OPEN',
+            $quantity,
+            $entryPrice,
+            0.0,
+            'Historical owner-confirmed open import; STC did not place the order.',
+            $opened->format('Y-m-d H:i:s'),
+        ]);
+        $evt->execute([
+            stc_position_event_id($positionId, 'CLOSE_IMPORT'),
+            $positionId,
+            'CLOSE',
+            -$quantity,
+            $exitPrice,
+            $realizedPnl,
+            'Historical owner-confirmed close import; STC did not place the order.',
+            $closed->format('Y-m-d H:i:s'),
+        ]);
+        $pdo->commit();
+
+        stc_json([
+            'ok' => true,
+            'position' => stc_position_public(stc_position_row($pdo, $positionId)),
+            'realized_pnl_source' => $pnlSource,
+            'execution' => 'manual_only',
+            'note' => 'Historical closed trade recorded for competition progress/audit only. No broker order was sent.',
+        ], 201);
+    }
+
     if ($action === 'OPEN') {
         $competitionId = trim((string)($body['competition_id'] ?? ''));
         $symbol = trim((string)($body['symbol'] ?? ''));
