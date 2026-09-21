@@ -20,7 +20,7 @@ h1{margin:0 0 4px}.muted,.small{color:#94a3b8}.small{font-size:12px}.row{display
 input,button,select{font:inherit;border:1px solid #334155;border-radius:9px;padding:9px;background:#0b1220;color:#e5e7eb}
 input{width:100%}button{cursor:pointer}.primary{background:#1d4ed8}.danger{background:#991b1b}.safe{background:#166534}
 .long,.ok{color:#22c55e}.short,.bad{color:#f87171}.wait{color:#facc15}.pill{display:inline-block;border:1px solid #334155;border-radius:999px;padding:3px 7px;margin:2px;font-size:11px}
-.controls{display:grid;grid-template-columns:1fr auto auto;gap:8px}.approve{display:grid;grid-template-columns:1fr auto auto;gap:8px;margin-top:10px}
+.controls{display:grid;grid-template-columns:1fr auto auto auto;gap:8px}.approve{display:grid;grid-template-columns:1fr auto auto;gap:8px;margin-top:10px}
 @media(max-width:700px){.controls,.approve{grid-template-columns:1fr}}
 </style>
 </head>
@@ -177,7 +177,7 @@ function renderOverview(cards){
   +'<div class="card"><div class="small">Locked opportunities</div><div class="big">'+actionable.length+'</div></div>'
   +'<div class="card"><div class="small">Manual-ready now</div><div class="big">'+ready.length+'</div></div>';
  const ranked=[...actionable].sort((a,b)=>Math.abs(Number(b.composite_score||0))-Math.abs(Number(a.composite_score||0)));
- renderCards('overview-cards',ranked.slice(0,8));
+ $('overview-cards').innerHTML=ranked.length?ranked.slice(0,8).map((c,i)=>cardHtml(c,i)).join(''):'<div class="card">No actionable locked opportunities right now. Current WAIT signals are still visible inside each competition tab.</div>';
 }
 function render(){
  const r=snapshot.runtime_control||{};
