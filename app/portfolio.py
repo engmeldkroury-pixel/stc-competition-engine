@@ -584,3 +584,53 @@ def aggregate_open_risk(positions: Sequence[PositionState]) -> dict[str, dict]:
         cluster_bucket["open_positions"] += 1.0
         cluster_bucket["initial_risk_usd"] += risk
     return totals
+
+
+
+def return_correlation(
+    closes_a: Sequence[float],
+    closes_b: Sequence[float],
+    *,
+    minimum_returns: int = 20,
+) -> float | None:
+    """Pearson correlation of synchronized close-to-close returns.
+
+    This helper assumes the caller has already aligned both close series by
+    timestamp. It returns None until enough paired returns exist.
+    """
+    n = min(len(closes_a), len(closes_b))
+    if n < minimum_returns + 1:
+        return None
+
+    a = [float(x) for x in closes_a[-n:]]
+    b = [float(x) for x in closes_b[-n:]]
+    if any((not math.isfinite(x) or x <= 0) for x in a + b):
+        return None
+
+    ra = [(a[i] / a[i - 1]) - 1.0 for i in range(1, n)]
+    rb = [(b[i] / b[i - 1]) - 1.0 for i in range(1, n)]
+    if len(ra) < minimum_returns:
+        return None
+
+    ma = sum(ra) / len(ra)
+    mb = sum(rb) / len(rb)
+    da = [x - ma for x in ra]
+    db = [x - mb for x in rb]
+    va = sum(x * x for x in da)
+    vb = sum(x * x for x in db)
+    if va <= 0 or vb <= 0:
+        return None
+    cov = sum(x * y for x, y in zip(da, db))
+    corr = cov / math.sqrt(va * vb)
+    return max(-1.0, min(1.0, corr))
+
+
+def effective_pnl_correlation(
+    return_corr: float,
+    side_a: Side,
+    side_b: Side,
+) -> float:
+    """Convert underlying-return correlation into position-P/L correlation."""
+    if not math.isfinite(return_corr) or not -1.0 <= return_corr <= 1.0:
+        raise ValueError("return_correlation_invalid")
+    return return_corr * _direction_sign(side_a) * _direction_sign(side_b)
