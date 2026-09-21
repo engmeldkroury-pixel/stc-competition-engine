@@ -81,7 +81,7 @@ def _capital(
 def _amp_core(symbol: str) -> SymbolCapability:
     return SymbolCapability(
         symbol=symbol,
-        provider=provider_of(symbol),
+        provider=symbol.split(":", 1)[0].upper(),
         verified=True,
         symbol_search=True,
         ohlcv=True,
