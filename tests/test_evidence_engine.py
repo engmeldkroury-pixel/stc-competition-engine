@@ -1,6 +1,7 @@
 from app.evidence_engine import (
     NewsMacroContext,
     aggregate_evidence,
+    aggregate_live_family_scores,
     apply_news_macro_overlay,
     make_observation,
 )
@@ -161,3 +162,39 @@ def test_participation_percent_is_transparent_and_normalized():
     assert round(sum(p.values()), 10) == 100.0
     assert p["structure"] == 40.0
     assert p["news"] == 10.0
+
+
+
+def _family_bundle(value=0.8):
+    return {
+        "trend": value,
+        "momentum": value,
+        "volatility": value,
+        "volume": value,
+        "vwap": value,
+        "market_structure": value,
+        "smc_liquidity": value,
+        "price_action": value,
+        "microstructure": value,
+    }
+
+
+def test_live_family_evidence_requires_complete_bundle_and_broad_agreement():
+    assert aggregate_live_family_scores({"trend": 0.9}) is None
+    result = aggregate_live_family_scores(_family_bundle(0.8))
+    assert result is not None
+    assert result.score > 0.70
+    assert result.agreement_ratio == 1.0
+    assert result.aligned_families == 9
+    assert result.conflicting_families == 0
+
+
+def test_live_family_conflicts_are_counted_and_reduce_agreement():
+    scores = _family_bundle(0.8)
+    scores["momentum"] = -0.9
+    scores["price_action"] = -0.8
+    result = aggregate_live_family_scores(scores)
+    assert result is not None
+    assert result.conflicting_families == 2
+    assert result.agreement_ratio < 1.0
+    assert result.aligned_families >= 5

@@ -109,6 +109,15 @@ def _strong_confirmation():
         "trend_4h_score": 0.82,
         "trend_1m_time": "2026-09-01T00:00:00Z",
         "trend_1m_score": 0.72,
+        "family_trend": 0.85,
+        "family_momentum": 0.78,
+        "family_volatility": 0.65,
+        "family_volume": 0.72,
+        "family_vwap": 0.70,
+        "family_market_structure": 0.88,
+        "family_smc_liquidity": 0.86,
+        "family_price_action": 0.75,
+        "family_microstructure": 0.68,
     }
 
 
@@ -259,3 +268,55 @@ def test_live_signal_exposes_mtf_confirmation_and_separates_quality_from_probabi
     assert probability["status"] == "NOT_CALIBRATED"
     assert probability["estimated_probability"] is None
     assert "not win probability" in probability["note"].lower()
+
+
+
+def _strong_directional_payload(event_id: str):
+    return {
+        "event_id": event_id,
+        "event": "bar_close",
+        "competition_id": "capital-africa-sep-2026",
+        "symbol": "CAPITALCOM:XAUUSD",
+        "timeframe": "15",
+        "time": "2026-09-21T18:00:00Z",
+        "open": 3600,
+        "high": 3614,
+        "low": 3598,
+        "close": 3610,
+        "volume": 1800,
+        "ema20": 3605,
+        "ema50": 3590,
+        "rsi14": 60,
+        "atr14": 10,
+        "macd": 5,
+        "macd_signal": 2,
+        "volume_ratio": 1.8,
+        **_strong_confirmation(),
+        **_strong_history(),
+    }
+
+
+def test_strong_mtf_candidate_without_family_breadth_fails_closed():
+    payload = _strong_directional_payload("evt-no-families")
+    for key in list(payload):
+        if key.startswith("family_"):
+            del payload[key]
+    result = decide_bridge_event("evt-no-families", payload)
+    signal = result["decision"]["signal"]
+    assert signal["recommendation"] == "WAIT"
+    assert signal["live_family_evidence"] is None
+    assert "gate_block=family_evidence_present" in signal["reasons"]
+    assert result["decision"]["locked_trade_plan"] is None
+
+
+def test_three_strongly_conflicting_evidence_families_block_a_plus_plan():
+    payload = _strong_directional_payload("evt-family-conflict")
+    payload["family_momentum"] = -0.90
+    payload["family_price_action"] = -0.85
+    payload["family_microstructure"] = -0.80
+    result = decide_bridge_event("evt-family-conflict", payload)
+    signal = result["decision"]["signal"]
+    assert signal["recommendation"] == "WAIT"
+    assert signal["live_family_evidence"]["conflicting_families"] >= 3
+    assert "gate_block=family_conflicts" in signal["reasons"]
+    assert result["decision"]["locked_trade_plan"] is None

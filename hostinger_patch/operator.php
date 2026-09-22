@@ -275,11 +275,28 @@ function convictionHtml(c){
  }
  const mtf=tf(String(t.entry_timeframe||'15')+'m','entry_score')
    +tf('1H','1h_score')+tf('2H','2h_score')+tf('4H','4h_score')+tf('1D','1d_score')+tf('1M','1m_score');
+ const f=c.live_family_evidence||null;
+ let familyHtml='<div class="small wait" style="margin-top:6px">Family evidence: unavailable — candidate cannot pass the A+ breadth gate.</div>';
+ if(f){
+   const fs=f.family_scores||{};
+   function fam(label,key){
+     const v=fs[key];
+     return '<span class="pill">'+esc(label)+' '+(v===null||v===undefined?'-':(Number(v)>=0?'+':'')+num(v,2))+'</span>';
+   }
+   const familyPills=fam('Trend','trend')+fam('Momentum','momentum')+fam('Volatility','volatility')
+     +fam('Volume','volume')+fam('VWAP','vwap')+fam('Structure','market_structure')
+     +fam('SMC','smc_liquidity')+fam('Price Action','price_action')+fam('Micro','microstructure');
+   familyHtml='<div class="row"><span>Independent evidence families</span><span class="value">'
+     +(Number(f.score)>=0?'+':'')+num(f.score,2)+' • agreement '+num(Number(f.agreement_ratio)*100,0)
+     +'% • aligned '+esc(f.aligned_families||0)+'/9 • conflicts '+esc(f.conflicting_families||0)+'</span></div>'
+     +'<div class="small" style="margin-top:6px">'+familyPills+'</div>';
+ }
  return '<div class="orderbox"><div class="small">CONVICTION / VALIDATION</div>'
    +'<div class="row"><span>Setup quality</span><span class="value">'+esc(qText)+' • '+esc(c.setup_grade||'MONITOR_ONLY')+'</span></div>'
    +'<div class="row"><span>Empirical win probability</span><span class="value">'+esc(pText)+'</span></div>'
    +'<div class="small">Setup Quality is not win probability. Probability is shown only after out-of-sample + forward calibration.</div>'
-   +'<div class="small" style="margin-top:6px">'+mtf+'</div></div>';
+   +'<div class="small" style="margin-top:6px">'+mtf+'</div>'
+   +familyHtml+'</div>';
 }
 
 function cardHtml(c,i){

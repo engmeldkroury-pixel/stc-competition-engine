@@ -28,6 +28,16 @@ class EvidenceSummary:
 
 
 @dataclass(frozen=True)
+class LiveFamilyEvidence:
+    score: float
+    agreement_ratio: float
+    aligned_families: int
+    conflicting_families: int
+    family_scores: Mapping[str, float]
+    strategy_id: str | None
+
+
+@dataclass(frozen=True)
 class NewsMacroContext:
     scheduled_high_impact: bool = False
     minutes_to_event: float | None = None
@@ -324,6 +334,58 @@ def aggregate_evidence(
         family_weights_used=family_weights,
         conflicts=tuple(conflicts),
         strongest_features=strongest_features,
+    )
+
+
+def aggregate_live_family_scores(
+    scores: Mapping[str, float | None],
+    *,
+    strategy_id: str | None = None,
+) -> LiveFamilyEvidence | None:
+    """Aggregate nine pre-computed live evidence families without equal voting.
+
+    Returns None unless the full family bundle is present. Strategy family
+    multipliers may reweight relevance, but cannot remove the breadth gate.
+    """
+    required = tuple(FAMILY_PRIOR_WEIGHT)
+    if any(scores.get(name) is None for name in required):
+        return None
+
+    multipliers = STRATEGY_FAMILY_MULTIPLIER.get(strategy_id or "", {})
+    weighted = 0.0
+    total_weight = 0.0
+    positive = 0.0
+    negative = 0.0
+    clean: dict[str, float] = {}
+
+    for family in required:
+        value = max(-1.0, min(1.0, float(scores[family])))
+        clean[family] = value
+        weight = FAMILY_PRIOR_WEIGHT[family] * multipliers.get(family, 1.0)
+        weighted += value * weight
+        total_weight += weight
+        if value > 0:
+            positive += value * weight
+        elif value < 0:
+            negative += (-value) * weight
+
+    score = 0.0 if total_weight <= 0 else max(-1.0, min(1.0, weighted / total_weight))
+    directional_mass = positive + negative
+    agreement = 0.0 if directional_mass <= 0 else max(positive, negative) / directional_mass
+    sign = 1.0 if score > 0 else -1.0 if score < 0 else 0.0
+    aligned = sum(1 for value in clean.values() if sign != 0 and sign * value >= 0.35)
+    conflicting = sum(1 for value in clean.values() if sign != 0 and sign * value <= -0.35)
+
+    breadth = min(1.0, aligned / 6.0)
+    score *= 0.45 + 0.55 * breadth
+
+    return LiveFamilyEvidence(
+        score=max(-1.0, min(1.0, score)),
+        agreement_ratio=agreement,
+        aligned_families=aligned,
+        conflicting_families=conflicting,
+        family_scores=clean,
+        strategy_id=strategy_id,
     )
 
 

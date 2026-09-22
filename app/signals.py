@@ -165,6 +165,10 @@ def high_conviction_assessment(
     trend_2h_score: float | None,
     trend_4h_score: float | None,
     trend_1m_score: float | None,
+    family_evidence_score: float | None,
+    family_agreement_ratio: float | None,
+    family_aligned_count: int | None,
+    family_conflict_count: int | None,
 ) -> tuple[bool, list[str]]:
     """Fail-closed A+ entry gate for competition alerts.
 
@@ -185,6 +189,11 @@ def high_conviction_assessment(
         ("trend_4h_alignment", trend_4h_score is not None and sign * trend_4h_score >= 0.65),
         ("trend_1m_present", trend_1m_score is not None),
         ("trend_1m_alignment", trend_1m_score is not None and sign * trend_1m_score >= 0.55),
+        ("family_evidence_present", family_evidence_score is not None),
+        ("family_direction_alignment", family_evidence_score is not None and sign * family_evidence_score >= 0.45),
+        ("family_agreement", family_agreement_ratio is not None and family_agreement_ratio >= 0.65),
+        ("family_breadth", family_aligned_count is not None and family_aligned_count >= 5),
+        ("family_conflicts", family_conflict_count is not None and family_conflict_count <= 2),
         ("short_term_strength", sign * short_term_technical >= 0.75),
         ("historical_alignment", historical_regime is not None and sign * historical_regime >= 0.55),
         ("blended_technical_strength", sign * blended_technical >= 0.70),
@@ -209,6 +218,7 @@ def setup_quality_score(
     blended_technical: float,
     volatility_quality: float,
     liquidity_quality: float,
+    family_evidence_score: float | None,
 ) -> int:
     """Return a transparent 0-100 setup-quality score, not win probability."""
     if recommendation not in {"LONG", "SHORT"}:
@@ -216,15 +226,16 @@ def setup_quality_score(
     sign = 1.0 if recommendation == "LONG" else -1.0
 
     components = [
-        (sign * short_term_technical, 0.16),
-        (sign * (confirmation_score or -1.0), 0.18),
-        (sign * (trend_2h_score or -1.0), 0.14),
-        (sign * (trend_4h_score or -1.0), 0.14),
-        (sign * (historical_regime or -1.0), 0.14),
-        (sign * (trend_1m_score or -1.0), 0.10),
+        (sign * short_term_technical, 0.14),
+        (sign * (confirmation_score if confirmation_score is not None else -1.0), 0.15),
+        (sign * (trend_2h_score if trend_2h_score is not None else -1.0), 0.12),
+        (sign * (trend_4h_score if trend_4h_score is not None else -1.0), 0.12),
+        (sign * (historical_regime if historical_regime is not None else -1.0), 0.12),
+        (sign * (trend_1m_score if trend_1m_score is not None else -1.0), 0.08),
         (sign * blended_technical, 0.06),
-        (sign * volatility_quality, 0.04),
-        (sign * liquidity_quality, 0.04),
+        (sign * volatility_quality, 0.03),
+        (sign * liquidity_quality, 0.03),
+        (sign * (family_evidence_score if family_evidence_score is not None else -1.0), 0.15),
     ]
     raw = 0.0
     for value, weight in components:

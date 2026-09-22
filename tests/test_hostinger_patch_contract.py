@@ -480,3 +480,15 @@ def test_owner_console_exposes_setup_quality_probability_status_and_multitimefra
     assert "'Setup quality: '" in notify
     assert "'Empirical win probability: '" in notify
     assert "'MTF: '" in notify
+
+
+
+def test_owner_console_and_notifications_expose_live_family_evidence_breadth():
+    snapshot = (PATCH / "operator_snapshot.php").read_text(encoding="utf-8")
+    ui = (PATCH / "operator.php").read_text(encoding="utf-8")
+    notify = (PATCH / "notification_control.php").read_text(encoding="utf-8")
+    assert "live_family_evidence" in snapshot
+    assert "Independent evidence families" in ui
+    assert "aligned '+esc(f.aligned_families||0)+'/9" in ui
+    assert "Family evidence: unavailable" in ui
+    assert "'Evidence families: ' . $familyText" in notify
