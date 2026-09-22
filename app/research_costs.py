@@ -39,6 +39,20 @@ def competition_id_for_symbol(symbol: str) -> str:
     return "amp-futures-sep-2026"
 
 
+def research_cost_policy(symbol: str) -> dict[str, float | str]:
+    competition_id = competition_id_for_symbol(symbol)
+    profile = get_profile(competition_id)
+    asset_class = strategy_asset_class(symbol)
+    return {
+        "competition_id": competition_id,
+        "asset_class": asset_class,
+        "commission_rate_per_side": profile.commission_rate,
+        "assumed_round_trip_atr_friction_fraction": ASSET_ROUND_TRIP_ATR_FRICTION.get(asset_class, 0.04),
+        "model": "2x_profile_commission_plus_asset_atr_friction",
+        "authority": "research_only_not_live_quote",
+    }
+
+
 def estimate_research_cost_r(
     symbol: str,
     *,
