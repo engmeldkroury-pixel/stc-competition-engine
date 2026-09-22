@@ -158,6 +158,12 @@ class TradingViewWebhook(BaseModel):
     confirm_macd: float | None = None
     confirm_macd_signal: float | None = None
     confirm_volume_ratio: float | None = None
+    trend_2h_time: datetime | None = None
+    trend_2h_score: float | None = None
+    trend_4h_time: datetime | None = None
+    trend_4h_score: float | None = None
+    trend_1m_time: datetime | None = None
+    trend_1m_score: float | None = None
     history_timeframe: str | None = None
     history_time: datetime | None = None
     history_close: float | None = None
@@ -199,6 +205,22 @@ class TradingViewWebhook(BaseModel):
                 raise ValueError("confirm_rsi14 must be between 0 and 100")
             if self.confirm_atr14 < 0 or self.confirm_volume_ratio < 0:
                 raise ValueError("confirmation quality values must be non-negative")
+        return self
+
+    @model_validator(mode="after")
+    def validate_multi_timeframe_trends(self):
+        pairs = (
+            ("trend_2h_time", "trend_2h_score"),
+            ("trend_4h_time", "trend_4h_score"),
+            ("trend_1m_time", "trend_1m_score"),
+        )
+        for time_name, score_name in pairs:
+            t = getattr(self, time_name)
+            s = getattr(self, score_name)
+            if (t is None) != (s is None):
+                raise ValueError(f"{time_name}/{score_name} must be both present or both absent")
+            if s is not None and not -1.0 <= float(s) <= 1.0:
+                raise ValueError(f"{score_name} must be between -1 and 1")
         return self
 
     @model_validator(mode="after")
