@@ -97,7 +97,7 @@ def _segment_performance(
             if abs(direction) < activation_threshold:
                 continue
             local_atr_raw = atr_values.get(i) if atr_values is not None else atr(bars[: i + 1], 14)
-        local_atr = max(float(local_atr_raw), abs(bars[i].close) * 1e-8, 1e-9)
+            local_atr = max(float(local_atr_raw), abs(bars[i].close) * 1e-8, 1e-9)
             future = bars[i + horizon_bars].close
             seg.append((1.0 if direction > 0 else -1.0) * (future - bars[i].close) / local_atr)
         if len(seg) >= 3:
