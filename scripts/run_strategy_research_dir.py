@@ -55,9 +55,9 @@ def load_series_dir(path: Path) -> dict:
         series[key] = payload
 
     research_mode = str(meta.get("research_mode") or "full").strip().lower()
-    if research_mode not in {"full", "matrix_only", "mtf_compare", "regime_compare"}:
+    if research_mode not in {"full", "matrix_only", "mtf_compare", "regime_compare", "regime_pool_compare"}:
         raise ValueError(
-            "meta.json research_mode must be full, matrix_only, mtf_compare, or regime_compare"
+            "meta.json research_mode must be full, matrix_only, mtf_compare, regime_compare, or regime_pool_compare"
         )
     return {"symbol": symbol, "series": series, "research_mode": research_mode}
 
@@ -86,6 +86,7 @@ def main() -> int:
         calibrate_features=calibrate_features,
         compare_mtf=(research_mode == "mtf_compare"),
         compare_regimes=(research_mode == "regime_compare"),
+        compare_regime_pools=(research_mode == "regime_pool_compare"),
     )
     result["research_mode"] = payload.get("research_mode", "full")
     args.output.parent.mkdir(parents=True, exist_ok=True)
