@@ -155,3 +155,12 @@ def test_split_directory_loader_supports_matrix_only_screening_mode(tmp_path):
         (target / filename).write_text(json.dumps(_series()), encoding="utf-8")
     payload = runner.load_series_dir(target)
     assert payload["research_mode"] == "matrix_only"
+
+
+
+def test_research_workflow_prints_feature_participation():
+    text = (ROOT / ".github" / "workflows" / "stc-research.yml").read_text(encoding="utf-8")
+    assert "STC_FEATURE_PARTICIPATION=" in text
+    assert "feature_participation_pct" in text
+    assert '"live_entry_research_report"' in text
+    assert '"research_report"' in text
