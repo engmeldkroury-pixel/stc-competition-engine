@@ -1,6 +1,6 @@
 {
   "symbol": "CAPITALCOM:BTCUSD",
-  "research_mode": "matrix_only",
+  "research_mode": "full",
   "source": "TradingView Official MCP exact-provider OHLCV",
   "captured_date": "2026-09-22",
   "intervals": [
@@ -10,5 +10,6 @@
     "1h",
     "4h",
     "1D"
-  ]
+  ],
+  "reason": "Full feature calibration for validated BTCUSD 1D trend_pullback research candidate; informational only, no 15m runtime authority."
 }
