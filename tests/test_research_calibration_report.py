@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta, timezone
 
-from app.feature_validation import validate_feature_weight
+from app.feature_validation import atr_series_by_index, validate_feature_weight
 from app.historical_features import HistoricalFeatureSnapshot
 from app.models import Bar
 from app.research_report import build_strategy_research_report, report_to_dict
@@ -133,3 +133,54 @@ def test_no_validated_strategy_never_fabricates_probability():
     assert report.status == "NO_VALIDATED_STRATEGY"
     assert report.setup_probability is None
     assert report.selected_strategy is None
+
+
+
+def test_cached_atr_series_matches_analysis_and_validation_result():
+    from app.analysis import atr
+
+    bars = _bars(520)
+    cached = atr_series_by_index(bars, 14)
+    for index in (260, 333, 419, 519):
+        assert cached[index] == atr(bars[: index + 1], 14)
+
+    snapshots = {
+        i: HistoricalFeatureSnapshot(
+            symbol="TEST:X",
+            timeframe="15",
+            timestamp=bars[i].timestamp,
+            values={"bos": 0.9},
+            observations=(),
+        )
+        for i in range(260, len(bars))
+    }
+    uncached = validate_feature_weight(
+        feature="bos",
+        symbol="TEST:X",
+        strategy_id="trend_pullback",
+        timeframe="15",
+        bars=bars,
+        snapshots=snapshots,
+        test_start=260,
+        test_end=420,
+        forward_end=520,
+        horizon_bars=4,
+        min_test_samples=40,
+        min_forward_samples=15,
+    )
+    cached_result = validate_feature_weight(
+        feature="bos",
+        symbol="TEST:X",
+        strategy_id="trend_pullback",
+        timeframe="15",
+        bars=bars,
+        snapshots=snapshots,
+        test_start=260,
+        test_end=420,
+        forward_end=520,
+        horizon_bars=4,
+        min_test_samples=40,
+        min_forward_samples=15,
+        atr_values=cached,
+    )
+    assert cached_result == uncached

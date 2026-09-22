@@ -11,6 +11,24 @@ from .models import Bar
 from .weight_calibration import CalibratedWeight, FeaturePerformance, calibrate_feature_reliability
 
 
+def atr_series_by_index(bars: list[Bar], period: int = 14) -> dict[int, float]:
+    """Return the exact Wilder ATR used by analysis.atr for every available bar index."""
+    if len(bars) < period + 1:
+        return {}
+    trs: list[float] = []
+    for i in range(1, len(bars)):
+        prev_close = bars[i - 1].close
+        bar = bars[i]
+        trs.append(max(bar.high - bar.low, abs(bar.high - prev_close), abs(bar.low - prev_close)))
+
+    value = fmean(trs[:period])
+    out: dict[int, float] = {period: value}
+    for bar_index, tr in enumerate(trs[period:], start=period + 1):
+        value = ((period - 1) * value + tr) / period
+        out[bar_index] = value
+    return out
+
+
 @dataclass(frozen=True)
 class FeatureValidation:
     feature: str
@@ -37,6 +55,7 @@ def _segment_performance(
     end_index: int,
     horizon_bars: int,
     activation_threshold: float,
+    atr_values: Mapping[int, float] | None = None,
 ) -> FeaturePerformance:
     outcomes: list[float] = []
     hits = 0
@@ -47,7 +66,8 @@ def _segment_performance(
         direction = float(snap.values.get(feature, 0.0))
         if abs(direction) < activation_threshold:
             continue
-        local_atr = max(atr(bars[: i + 1], 14), abs(bars[i].close) * 1e-8, 1e-9)
+        local_atr_raw = atr_values.get(i) if atr_values is not None else atr(bars[: i + 1], 14)
+        local_atr = max(float(local_atr_raw), abs(bars[i].close) * 1e-8, 1e-9)
         future = bars[i + horizon_bars].close
         signed_r = (1.0 if direction > 0 else -1.0) * (future - bars[i].close) / local_atr
         outcomes.append(signed_r)
@@ -76,7 +96,8 @@ def _segment_performance(
             direction = float(snap.values.get(feature, 0.0))
             if abs(direction) < activation_threshold:
                 continue
-            local_atr = max(atr(bars[: i + 1], 14), abs(bars[i].close) * 1e-8, 1e-9)
+            local_atr_raw = atr_values.get(i) if atr_values is not None else atr(bars[: i + 1], 14)
+            local_atr = max(float(local_atr_raw), abs(bars[i].close) * 1e-8, 1e-9)
             future = bars[i + horizon_bars].close
             seg.append((1.0 if direction > 0 else -1.0) * (future - bars[i].close) / local_atr)
         if len(seg) >= 3:
@@ -111,6 +132,7 @@ def validate_feature_weight(
     activation_threshold: float = 0.45,
     min_test_samples: int = 40,
     min_forward_samples: int = 15,
+    atr_values: Mapping[int, float] | None = None,
 ) -> FeatureValidation:
     test = _segment_performance(
         feature=feature,
@@ -123,6 +145,7 @@ def validate_feature_weight(
         end_index=test_end,
         horizon_bars=horizon_bars,
         activation_threshold=activation_threshold,
+        atr_values=atr_values,
     )
     forward = _segment_performance(
         feature=feature,
@@ -135,6 +158,7 @@ def validate_feature_weight(
         end_index=forward_end,
         horizon_bars=horizon_bars,
         activation_threshold=activation_threshold,
+        atr_values=atr_values,
     )
 
     calibrated = calibrate_feature_reliability(
