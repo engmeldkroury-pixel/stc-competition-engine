@@ -10,10 +10,10 @@ from .walkforward import (
     TradeOutcome,
     WalkForwardValidation,
     materialize_feature_series,
-    robust_trial_score,
     summarize_trades,
     walk_forward_validate,
 )
+from .strategy_lab import robust_trial_score
 
 
 REGIMES = ("BULL_TREND", "BEAR_TREND", "RANGE", "TRANSITION")
