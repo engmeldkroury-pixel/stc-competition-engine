@@ -1,8 +1,9 @@
 //@version=6
-indicator("STC AMP Core Feed B v0.3 Companion", overlay=true)
+indicator("STC AMP Core Feed B v0.4 A+ 1H Confirm", overlay=true)
 
 competitionId = input.string("amp-futures-sep-2026", "Competition ID", options=["amp-futures-sep-2026"], group="Production feed")
 feedTf = input.timeframe("15", "Production feed timeframe", group="Production feed")
+confirmTf = input.timeframe("60", "A+ confirmation timeframe", options=["60"], group="Production feed")
 feedEnabled = input.bool(true, "Enable webhook feed", group="Production feed")
 
 type FeedBar
@@ -14,6 +15,18 @@ type FeedBar
     float v
     float ema20
     float ema50
+    float rsi14
+    float atr14
+    float macd
+    float macdSignal
+    float volumeRatio
+
+type ConfirmBar
+    int t
+    float c
+    float ema20
+    float ema50
+    float ema200
     float rsi14
     float atr14
     float macd
@@ -43,6 +56,14 @@ makeFeedBar() =>
 feedBar(string symbol) =>
     request.security(symbol, feedTf, makeFeedBar(), gaps=barmerge.gaps_off, lookahead=barmerge.lookahead_off, ignore_invalid_symbol=false)
 
+makeConfirmBar() =>
+    [macdLine, signalLine, _] = ta.macd(close, 12, 26, 9)
+    volSma = ta.sma(volume, 20)
+    ConfirmBar.new(time[1], close[1], ta.ema(close, 20)[1], ta.ema(close, 50)[1], ta.ema(close, 200)[1], ta.rsi(close, 14)[1], ta.atr(14)[1], macdLine[1], signalLine[1], not na(volume[1]) and volSma[1] > 0 ? volume[1] / volSma[1] : 1.0)
+
+confirmBar(string symbol) =>
+    request.security(symbol, confirmTf, makeConfirmBar(), gaps=barmerge.gaps_off, lookahead=barmerge.lookahead_on, ignore_invalid_symbol=false)
+
 makeHistoryBar() =>
     m20 = close[21] != 0 ? close[1] / close[21] - 1.0 : 0.0
     m63 = close[64] != 0 ? close[1] / close[64] - 1.0 : 0.0
@@ -54,7 +75,7 @@ makeHistoryBar() =>
 historyBar(string symbol) =>
     request.security(symbol, "1D", makeHistoryBar(), gaps=barmerge.gaps_off, lookahead=barmerge.lookahead_on, ignore_invalid_symbol=false)
 
-buildMessage(string symbol, FeedBar d, HistoryBar h) =>
+buildMessage(string symbol, FeedBar d, ConfirmBar q, HistoryBar h) =>
     eventId = competitionId + "|" + symbol + "|" + feedTf + "|" + str.tostring(d.t)
     msg = (
         '{"event_id":"' + eventId + '",' +
@@ -75,6 +96,17 @@ buildMessage(string symbol, FeedBar d, HistoryBar h) =>
         '"macd":' + str.tostring(d.macd) + ',' +
         '"macd_signal":' + str.tostring(d.macdSignal) + ',' +
         '"volume_ratio":' + str.tostring(d.volumeRatio) + ',' +
+        '"confirm_timeframe":"' + confirmTf + '",' +
+        '"confirm_time":"' + str.format_time(q.t, "yyyy-MM-dd'T'HH:mm:ss'Z'", "UTC") + '",' +
+        '"confirm_close":' + str.tostring(q.c) + ',' +
+        '"confirm_ema20":' + str.tostring(q.ema20) + ',' +
+        '"confirm_ema50":' + str.tostring(q.ema50) + ',' +
+        '"confirm_ema200":' + str.tostring(q.ema200) + ',' +
+        '"confirm_rsi14":' + str.tostring(q.rsi14) + ',' +
+        '"confirm_atr14":' + str.tostring(q.atr14) + ',' +
+        '"confirm_macd":' + str.tostring(q.macd) + ',' +
+        '"confirm_macd_signal":' + str.tostring(q.macdSignal) + ',' +
+        '"confirm_volume_ratio":' + str.tostring(q.volumeRatio) + ',' +
         '"history_timeframe":"1D",' +
         '"history_time":"' + str.format_time(h.t, "yyyy-MM-dd'T'HH:mm:ss'Z'", "UTC") + '",' +
         '"history_close":' + str.tostring(h.c) + ',' +
@@ -94,20 +126,28 @@ buildMessage(string symbol, FeedBar d, HistoryBar h) =>
     msg
 
 m6e = feedBar("CME_MINI:M6E1!")
+m6eC = confirmBar("CME_MINI:M6E1!")
 m6eH = historyBar("CME_MINI:M6E1!")
 m6b = feedBar("CME_MINI:M6B1!")
+m6bC = confirmBar("CME_MINI:M6B1!")
 m6bH = historyBar("CME_MINI:M6B1!")
 mjy = feedBar("CME_MINI:MJY1!")
+mjyC = confirmBar("CME_MINI:MJY1!")
 mjyH = historyBar("CME_MINI:MJY1!")
 m6a = feedBar("CME_MINI:M6A1!")
+m6aC = confirmBar("CME_MINI:M6A1!")
 m6aH = historyBar("CME_MINI:M6A1!")
 mbt = feedBar("CME:MBT1!")
+mbtC = confirmBar("CME:MBT1!")
 mbtH = historyBar("CME:MBT1!")
 met = feedBar("CME:MET1!")
+metC = confirmBar("CME:MET1!")
 metH = historyBar("CME:MET1!")
 zn = feedBar("CBOT:ZN1!")
+znC = confirmBar("CBOT:ZN1!")
 znH = historyBar("CBOT:ZN1!")
 zb = feedBar("CBOT:ZB1!")
+zbC = confirmBar("CBOT:ZB1!")
 zbH = historyBar("CBOT:ZB1!")
 
 varip int lastM6E = na
@@ -122,27 +162,27 @@ varip int lastZB = na
 if feedEnabled and barstate.isconfirmed and barstate.isrealtime
     if not na(m6e.t) and not na(m6e.c) and (na(lastM6E) or m6e.t != lastM6E)
         lastM6E := m6e.t
-        alert(buildMessage("CME_MINI:M6E1!", m6e, m6eH), alert.freq_all)
+        alert(buildMessage("CME_MINI:M6E1!", m6e, m6eC, m6eH), alert.freq_all)
     if not na(m6b.t) and not na(m6b.c) and (na(lastM6B) or m6b.t != lastM6B)
         lastM6B := m6b.t
-        alert(buildMessage("CME_MINI:M6B1!", m6b, m6bH), alert.freq_all)
+        alert(buildMessage("CME_MINI:M6B1!", m6b, m6bC, m6bH), alert.freq_all)
     if not na(mjy.t) and not na(mjy.c) and (na(lastMJY) or mjy.t != lastMJY)
         lastMJY := mjy.t
-        alert(buildMessage("CME_MINI:MJY1!", mjy, mjyH), alert.freq_all)
+        alert(buildMessage("CME_MINI:MJY1!", mjy, mjyC, mjyH), alert.freq_all)
     if not na(m6a.t) and not na(m6a.c) and (na(lastM6A) or m6a.t != lastM6A)
         lastM6A := m6a.t
-        alert(buildMessage("CME_MINI:M6A1!", m6a, m6aH), alert.freq_all)
+        alert(buildMessage("CME_MINI:M6A1!", m6a, m6aC, m6aH), alert.freq_all)
     if not na(mbt.t) and not na(mbt.c) and (na(lastMBT) or mbt.t != lastMBT)
         lastMBT := mbt.t
-        alert(buildMessage("CME:MBT1!", mbt, mbtH), alert.freq_all)
+        alert(buildMessage("CME:MBT1!", mbt, mbtC, mbtH), alert.freq_all)
     if not na(met.t) and not na(met.c) and (na(lastMET) or met.t != lastMET)
         lastMET := met.t
-        alert(buildMessage("CME:MET1!", met, metH), alert.freq_all)
+        alert(buildMessage("CME:MET1!", met, metC, metH), alert.freq_all)
     if not na(zn.t) and not na(zn.c) and (na(lastZN) or zn.t != lastZN)
         lastZN := zn.t
-        alert(buildMessage("CBOT:ZN1!", zn, znH), alert.freq_all)
+        alert(buildMessage("CBOT:ZN1!", zn, znC, znH), alert.freq_all)
     if not na(zb.t) and not na(zb.c) and (na(lastZB) or zb.t != lastZB)
         lastZB := zb.t
-        alert(buildMessage("CBOT:ZB1!", zb, zbH), alert.freq_all)
+        alert(buildMessage("CBOT:ZB1!", zb, zbC, zbH), alert.freq_all)
 
 plot(na, title="STC AMP Feed B", display=display.none)
