@@ -1,0 +1,16 @@
+{
+  "symbol": "CME_MINI:MNQ1!",
+  "research_mode": "regime_pool_compare",
+  "source": "TradingView Official MCP exact-provider OHLCV",
+  "reused_dataset_from": "research/strategy-v2-xau-mnq-20260922",
+  "purpose": "Exploratory 15m regime-pool comparison; same historical data; fresh confirmation required for any apparent pass",
+  "captured_date": "2026-09-22",
+  "intervals": [
+    "5m",
+    "15m",
+    "30m",
+    "1h",
+    "4h",
+    "1D"
+  ]
+}
