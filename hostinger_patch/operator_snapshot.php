@@ -232,6 +232,7 @@ try {
             'setup_quality_score' => isset($signal['setup_quality_score']) ? (int)$signal['setup_quality_score'] : null,
             'setup_quality_label' => (string)($signal['setup_quality_label'] ?? ''),
             'timeframe_confirmation' => is_array($signal['timeframe_confirmation'] ?? null) ? $signal['timeframe_confirmation'] : null,
+            'live_family_evidence' => is_array($signal['live_family_evidence'] ?? null) ? $signal['live_family_evidence'] : null,
             'empirical_win_probability' => is_array($signal['empirical_win_probability'] ?? null) ? $signal['empirical_win_probability'] : [
                 'status' => 'NOT_ATTACHED_TO_LIVE_SIGNAL',
                 'estimated_probability' => null,
