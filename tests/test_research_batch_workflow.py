@@ -6,6 +6,15 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 
 
+def _load_candidate_printer():
+    path = ROOT / "scripts" / "print_calibration_candidate.py"
+    spec = importlib.util.spec_from_file_location("stc_candidate_printer", path)
+    module = importlib.util.module_from_spec(spec)
+    assert spec.loader is not None
+    spec.loader.exec_module(module)
+    return module
+
+
 def _load_runner():
     path = ROOT / "scripts" / "run_strategy_research_dir.py"
     spec = importlib.util.spec_from_file_location("stc_research_dir_runner", path)
@@ -86,3 +95,44 @@ def test_split_directory_loader_reads_optional_short_timeframes(tmp_path):
 
     payload = runner.load_series_dir(target)
     assert set(payload["series"]) == {"5m", "15m", "30m", "1h", "4h", "1D"}
+
+
+
+def test_calibration_candidate_defaults_to_live_entry_report():
+    printer = _load_candidate_printer()
+    base = {
+        "status": "VALIDATED",
+        "robust_score": 60.0,
+        "setup_probability": {
+            "status": "CALIBRATED",
+            "sample_size": 60,
+            "estimated_win_probability": 0.60,
+            "confidence_low": 0.50,
+            "confidence_high": 0.70,
+        },
+        "test_expectancy_r": 0.20,
+        "forward_expectancy_r": 0.10,
+        "test_profit_factor": 1.40,
+        "forward_profit_factor": 1.20,
+        "feature_participation_pct": {"bos": 60.0, "relative_volume": 40.0},
+    }
+    result = {
+        "symbol": "CAPITALCOM:XAUUSD",
+        "derived_timeframe_end_utc": {
+            "15": "2026-09-22T05:00:00Z",
+            "240": "2026-09-22T04:00:00Z",
+        },
+        "research_report": {
+            **base,
+            "selected_strategy": "breakout_expansion",
+            "selected_timeframe": "240",
+        },
+        "live_entry_research_report": {
+            **base,
+            "selected_strategy": "trend_pullback",
+            "selected_timeframe": "15",
+        },
+    }
+    candidate = printer.build_candidate(result)
+    assert candidate["timeframe"] == "15"
+    assert candidate["strategy_id"] == "trend_pullback"

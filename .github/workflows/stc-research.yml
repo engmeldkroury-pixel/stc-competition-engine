@@ -68,6 +68,8 @@ jobs:
               data = json.loads(path.read_text())
               report = data["research_report"]
               p = report.get("setup_probability") or {}
+              live = data.get("live_entry_research_report") or {}
+              live_p = live.get("setup_probability") or {}
               print("STC_RESEARCH_SUMMARY=" + json.dumps({
                   "symbol": data["symbol"],
                   "status": report["status"],
@@ -84,6 +86,14 @@ jobs:
                   "estimated_probability": p.get("estimated_win_probability"),
                   "probability_sample_size": p.get("sample_size"),
                   "deployable_features": report.get("deployable_feature_count"),
+                  "live_entry_timeframe": data.get("live_entry_timeframe"),
+                  "live_entry_status": live.get("status"),
+                  "live_entry_strategy": live.get("selected_strategy"),
+                  "live_entry_robust_score": live.get("robust_score"),
+                  "live_entry_probability_status": live_p.get("status"),
+                  "live_entry_estimated_probability": live_p.get("estimated_win_probability"),
+                  "live_entry_probability_sample_size": live_p.get("sample_size"),
+                  "live_entry_deployable_features": live.get("deployable_feature_count"),
               }, sort_keys=True))
               trials = sorted(
                   data.get("strategy_trials") or [],
@@ -121,6 +131,7 @@ jobs:
           set -euo pipefail
           for path in research_outputs/*.json; do
             python scripts/print_calibration_candidate.py "$path"
+            python scripts/print_calibration_candidate.py "$path" --overall
           done
 
       - name: Upload research outputs

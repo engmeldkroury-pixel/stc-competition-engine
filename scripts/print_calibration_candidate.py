@@ -23,8 +23,12 @@ def _parse_utc(value: str) -> datetime:
     return dt.astimezone(UTC)
 
 
-def build_candidate(result: dict) -> dict:
-    report = dict(result.get("research_report") or {})
+def build_candidate(
+    result: dict,
+    *,
+    report_key: str = "live_entry_research_report",
+) -> dict:
+    report = dict(result.get(report_key) or {})
     timeframe = str(report.get("selected_timeframe") or "")
     if report.get("status") != "VALIDATED" or not timeframe:
         raise ValueError("research_result_not_validated")
@@ -36,21 +40,32 @@ def build_candidate(result: dict) -> dict:
         result,
         data_end_utc=_parse_utc(str(end_raw)),
         generated_at_utc=datetime.now(UTC),
+        report_key=report_key,
     )
 
 
 def main() -> int:
-    if len(sys.argv) != 2:
-        print("Usage: print_calibration_candidate.py RESEARCH_RESULT.json", file=sys.stderr)
+    args = list(sys.argv[1:])
+    overall = False
+    if "--overall" in args:
+        args.remove("--overall")
+        overall = True
+    if len(args) != 1:
+        print(
+            "Usage: print_calibration_candidate.py RESEARCH_RESULT.json [--overall]",
+            file=sys.stderr,
+        )
         return 2
-    path = Path(sys.argv[1])
+    path = Path(args[0])
     result = json.loads(path.read_text(encoding="utf-8"))
+    report_key = "research_report" if overall else "live_entry_research_report"
+    prefix = "STC_OVERALL_RESEARCH_CANDIDATE" if overall else "STC_CALIBRATION_CANDIDATE"
     try:
-        candidate = build_candidate(result)
+        candidate = build_candidate(result, report_key=report_key)
     except ValueError as exc:
-        print("STC_CALIBRATION_CANDIDATE=NONE reason=" + str(exc))
+        print(prefix + "=NONE reason=" + str(exc))
         return 0
-    print("STC_CALIBRATION_CANDIDATE=" + json.dumps(candidate, sort_keys=True))
+    print(prefix + "=" + json.dumps(candidate, sort_keys=True))
     return 0
 
 

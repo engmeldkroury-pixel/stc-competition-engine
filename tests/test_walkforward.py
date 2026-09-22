@@ -214,3 +214,48 @@ def test_entry_window_expires_before_late_price_touch(monkeypatch):
     assert wf._entry_validity_bars("120") == 2
     assert trades == []
     assert stats.trades == 0
+
+
+
+def test_per_timeframe_selection_keeps_live_15m_candidate_separate():
+    from app.strategy_lab import StrategyTrial
+    from app.walkforward import BacktestStats, WalkForwardValidation, matrix_selections_by_timeframe
+
+    def row(strategy: str, timeframe: str, expectancy: float, pf: float):
+        test = BacktestStats(40, 24, 16, 0.60, expectancy * 40, expectancy, pf, 2.0)
+        forward = BacktestStats(20, 12, 8, 0.60, expectancy * 20, expectancy, pf, 1.5)
+        train = BacktestStats(80, 48, 32, 0.60, expectancy * 80, expectancy, pf, 3.0)
+        trial = StrategyTrial(
+            strategy_id=strategy,
+            symbol="TEST:X",
+            timeframe=timeframe,
+            train_trades=80,
+            test_trades=40,
+            forward_trades=20,
+            train_expectancy_r=expectancy,
+            test_expectancy_r=expectancy,
+            forward_expectancy_r=expectancy,
+            test_profit_factor=pf,
+            forward_profit_factor=pf,
+            test_win_rate=0.60,
+            max_drawdown_r=2.0,
+            parameter_stability=0.8,
+            regime_stability=0.8,
+        )
+        return WalkForwardValidation(
+            trial=trial,
+            selected_params=BacktestParams(0.62, LIVE_PLAN_STOP_ATR_MULTIPLE, LIVE_PLAN_FINAL_TARGET_RR, 12),
+            train_stats=train,
+            test_stats=test,
+            forward_stats=forward,
+        )
+
+    rows = [
+        row("breakout_expansion", "240", 0.30, 1.7),
+        row("trend_pullback", "15", 0.18, 1.4),
+    ]
+    selections = matrix_selections_by_timeframe("TEST:X", rows)
+    assert selections["240"].status == "VALIDATED"
+    assert selections["240"].strategy_id == "breakout_expansion"
+    assert selections["15"].status == "VALIDATED"
+    assert selections["15"].strategy_id == "trend_pullback"

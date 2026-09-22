@@ -548,6 +548,50 @@ def walk_forward_validate(
     )
 
 
+def select_matrix_timeframe(
+    symbol: str,
+    timeframe: str,
+    validations: list[WalkForwardValidation],
+) -> MatrixSelection:
+    rows = [row for row in validations if row.trial.timeframe == timeframe]
+    scored = [
+        (robust_trial_score(row.trial), row)
+        for row in rows
+        if robust_trial_score(row.trial) > 0
+    ]
+    if not scored:
+        return MatrixSelection(
+            status="NO_VALIDATED_STRATEGY",
+            symbol=symbol,
+            strategy_id=None,
+            timeframe=timeframe,
+            robust_score=None,
+            trial_count=len(rows),
+            reason="No strategy on this timeframe passed out-of-sample and forward robustness gates.",
+        )
+    score, best = max(scored, key=lambda item: item[0])
+    return MatrixSelection(
+        status="VALIDATED",
+        symbol=symbol,
+        strategy_id=best.trial.strategy_id,
+        timeframe=timeframe,
+        robust_score=score,
+        trial_count=len(rows),
+        reason="Selected within timeframe by out-of-sample and forward robustness.",
+    )
+
+
+def matrix_selections_by_timeframe(
+    symbol: str,
+    validations: list[WalkForwardValidation],
+) -> dict[str, MatrixSelection]:
+    timeframes = sorted({row.trial.timeframe for row in validations})
+    return {
+        timeframe: select_matrix_timeframe(symbol, timeframe, validations)
+        for timeframe in timeframes
+    }
+
+
 def strategy_matrix(
     symbol: str,
     asset_class: str,
