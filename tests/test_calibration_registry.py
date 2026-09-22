@@ -58,6 +58,10 @@ def test_candidate_registry_record_requires_calibrated_probability_and_forward_e
     assert record["sample_size"] == 80
     assert record["informational_only"] is True
     assert abs(sum(record["feature_weights"].values()) - 1.0) < 1e-12
+    assert abs(sum(record["family_weights"].values()) - 1.0) < 1e-12
+    assert record["family_weights"]["market_structure"] == pytest.approx(0.50)
+    assert record["family_weights"]["smc_liquidity"] == pytest.approx(0.34)
+    assert record["family_weights"]["volume"] == pytest.approx(0.16)
 
     bad = _research_result(sample_size=20)
     with pytest.raises(ValueError, match="sample is below 50"):
