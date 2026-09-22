@@ -596,12 +596,18 @@ def strategy_matrix(
     symbol: str,
     asset_class: str,
     bars_by_timeframe: Mapping[str, list[Bar]],
+    *,
+    snapshot_cache: dict[str, dict[int, HistoricalFeatureSnapshot]] | None = None,
 ) -> tuple[list[WalkForwardValidation], MatrixSelection]:
     results: list[WalkForwardValidation] = []
+    cache = snapshot_cache if snapshot_cache is not None else {}
     for timeframe, bars in bars_by_timeframe.items():
         if len(bars) < 900:
             continue
-        snapshots = materialize_feature_series(symbol, timeframe, bars)
+        snapshots = cache.get(timeframe)
+        if snapshots is None:
+            snapshots = materialize_feature_series(symbol, timeframe, bars)
+            cache[timeframe] = snapshots
         for spec in candidate_strategies(asset_class, timeframe):
             results.append(
                 walk_forward_validate(
