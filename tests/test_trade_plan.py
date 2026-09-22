@@ -5,6 +5,7 @@ from app.trade_plan import (
     LIVE_PLAN_FINAL_TARGET_RR,
     LIVE_PLAN_STOP_ATR_MULTIPLE,
     build_locked_trade_plan,
+    calculate_plan_levels,
     deterministic_plan_id,
 )
 
@@ -154,3 +155,18 @@ def test_live_plan_constants_define_single_final_tp_contract():
     assert plan is not None
     assert plan["target2_rr"] == LIVE_PLAN_FINAL_TARGET_RR == 2.50
     assert plan["risk_per_unit"] == 10.0 * LIVE_PLAN_STOP_ATR_MULTIPLE
+
+
+
+def test_shared_plan_level_calculation_matches_locked_plan_math():
+    levels = calculate_plan_levels(
+        "LONG",
+        entry_min=99.0,
+        entry_max=101.0,
+        reference_price=100.0,
+        atr=2.0,
+    )
+    assert levels["entry_mid"] == 100.0
+    assert levels["initial_stop"] == 99.0 - 2.0 * LIVE_PLAN_STOP_ATR_MULTIPLE
+    assert levels["risk_per_unit"] == 100.0 - levels["initial_stop"]
+    assert levels["target2"] == 100.0 + levels["risk_per_unit"] * LIVE_PLAN_FINAL_TARGET_RR

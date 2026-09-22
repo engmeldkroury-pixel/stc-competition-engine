@@ -7,30 +7,54 @@ from datetime import datetime, timedelta, timezone
 
 def timeframe_validity_minutes(timeframe: str) -> int:
     tf = str(timeframe).strip().lower()
-    table = {"1": 5, "1m": 5, "5": 15, "5m": 15, "15": 30, "15m": 30,
-             "30": 45, "30m": 45, "60": 90, "1h": 90, "240": 360, "4h": 360,
-             "1d": 720}
+    table = {
+        "1": 5, "1m": 5,
+        "5": 15, "5m": 15,
+        "15": 30, "15m": 30,
+        "30": 45, "30m": 45,
+        "60": 90, "1h": 90,
+        "120": 180, "2h": 180,
+        "240": 360, "4h": 360,
+        "1d": 720,
+    }
     return table.get(tf, 15)
 
 
-def _timeframe_duration(timeframe: str) -> timedelta:
+def timeframe_duration_minutes(timeframe: str) -> int:
     tf = str(timeframe).strip().lower()
     table = {
-        "1": timedelta(minutes=1),
-        "1m": timedelta(minutes=1),
-        "5": timedelta(minutes=5),
-        "5m": timedelta(minutes=5),
-        "15": timedelta(minutes=15),
-        "15m": timedelta(minutes=15),
-        "30": timedelta(minutes=30),
-        "30m": timedelta(minutes=30),
-        "60": timedelta(hours=1),
-        "1h": timedelta(hours=1),
-        "240": timedelta(hours=4),
-        "4h": timedelta(hours=4),
-        "1d": timedelta(days=1),
+        "1": 1, "1m": 1,
+        "5": 5, "5m": 5,
+        "15": 15, "15m": 15,
+        "30": 30, "30m": 30,
+        "60": 60, "1h": 60,
+        "120": 120, "2h": 120,
+        "240": 240, "4h": 240,
+        "1d": 1440,
     }
-    return table.get(tf, timedelta(0))
+    return table.get(tf, 0)
+
+
+def _timeframe_duration(timeframe: str) -> timedelta:
+    return timedelta(minutes=timeframe_duration_minutes(timeframe))
+
+
+def price_tolerance_fraction(reference_price: float, atr: float) -> float:
+    ref = float(reference_price)
+    atr_value = abs(float(atr))
+    if ref <= 0:
+        return 0.0
+    if atr_value <= 0:
+        return 0.002
+    return min(0.01, max(0.001, (0.5 * atr_value) / ref))
+
+
+def entry_price_bounds(reference_price: float, atr: float) -> tuple[float, float, float]:
+    ref = float(reference_price)
+    if ref <= 0:
+        return 0.0, 0.0, 0.0
+    pct = price_tolerance_fraction(ref, atr)
+    return ref * (1.0 - pct), ref * (1.0 + pct), pct
 
 
 def source_bar_close_time(payload: dict, fallback_now: datetime | None = None) -> datetime:
@@ -61,9 +85,7 @@ def build_approval_envelope(payload: dict, composite_score: float, rule_version:
     ref = float(payload.get("close") or 0.0)
     atr = abs(float(payload.get("atr14") or 0.0))
     # Dynamic price tolerance: half ATR, bounded to 0.10%..1.00% of reference price.
-    pct = 0.002
-    if ref > 0 and atr > 0:
-        pct = min(0.01, max(0.001, (0.5 * atr) / ref))
+    entry_min, entry_max, pct = entry_price_bounds(ref, atr)
     return {
         "issued_at": now.isoformat(),
         "source_bar_time": payload.get("time"),
@@ -73,8 +95,8 @@ def build_approval_envelope(payload: dict, composite_score: float, rule_version:
         "competition_id": payload.get("competition_id"),
         "symbol": payload.get("symbol"),
         "reference_price": ref,
-        "entry_min": ref * (1 - pct) if ref else 0.0,
-        "entry_max": ref * (1 + pct) if ref else 0.0,
+        "entry_min": entry_min,
+        "entry_max": entry_max,
         "price_tolerance_fraction": pct,
         "reference_signal_score": float(composite_score),
         "max_signal_score_drop": 0.15,

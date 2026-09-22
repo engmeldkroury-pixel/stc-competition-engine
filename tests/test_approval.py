@@ -2,15 +2,25 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from app import storage
-from app.approval import build_approval_envelope, market_state_hash, revalidate_envelope, source_bar_close_time
+from app.approval import (
+    build_approval_envelope,
+    entry_price_bounds,
+    market_state_hash,
+    revalidate_envelope,
+    source_bar_close_time,
+    timeframe_duration_minutes,
+)
 
 
 def test_dynamic_validity_depends_on_timeframe():
     base = {"competition_id":"capital-africa-sep-2026","symbol":"CAPITALCOM:XAUUSD","close":4000,"atr14":20,"ema20":3990,"ema50":3980,"rsi14":60,"macd":2,"macd_signal":1}
     e5 = build_approval_envelope({**base, "timeframe":"5"}, 0.7)
     e60 = build_approval_envelope({**base, "timeframe":"60"}, 0.7)
+    e120 = build_approval_envelope({**base, "timeframe":"120"}, 0.7)
     assert e5["validity_minutes"] == 15
     assert e60["validity_minutes"] == 90
+    assert e120["validity_minutes"] == 180
+    assert timeframe_duration_minutes("120") == 120
 
 
 def test_revalidation_accepts_fresh_unchanged_state():
@@ -82,3 +92,24 @@ def test_validity_is_anchored_to_confirmed_bar_close_not_worker_clock():
     assert envelope["source_bar_time"] == "2026-09-21T20:30:00Z"
     assert envelope["source_bar_close_time"] == "2026-09-21T20:45:00+00:00"
     assert envelope["valid_until"] == "2026-09-21T21:15:00+00:00"
+
+
+
+def test_entry_price_bounds_match_dynamic_approval_tolerance():
+    low, high, pct = entry_price_bounds(100.0, 2.0)
+    assert pct == 0.01
+    assert low == 99.0
+    assert high == 101.0
+
+    low2, high2, pct2 = entry_price_bounds(100.0, 0.01)
+    assert pct2 == 0.001
+    assert low2 == 99.9
+    assert high2 == 100.1
+
+
+def test_two_hour_source_bar_close_time_is_explicit():
+    payload = {
+        "timeframe": "120",
+        "time": "2026-09-22T08:00:00Z",
+    }
+    assert source_bar_close_time(payload).isoformat() == "2026-09-22T10:00:00+00:00"

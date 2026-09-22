@@ -21,6 +21,49 @@ def _finite_number(value: Any, *, minimum: float | None = None) -> float:
     return number
 
 
+def calculate_plan_levels(
+    direction: str,
+    *,
+    entry_min: float,
+    entry_max: float,
+    reference_price: float,
+    atr: float,
+    stop_atr_multiple: float = LIVE_PLAN_STOP_ATR_MULTIPLE,
+    target1_rr: float = LIVE_PLAN_TARGET1_RR,
+    target2_rr: float = LIVE_PLAN_FINAL_TARGET_RR,
+) -> dict[str, float]:
+    if direction not in {"LONG", "SHORT"}:
+        raise ValueError("invalid_trade_plan_direction")
+    entry_min = _finite_number(entry_min, minimum=0.0)
+    entry_max = _finite_number(entry_max, minimum=0.0)
+    reference_price = _finite_number(reference_price, minimum=0.0)
+    atr = abs(_finite_number(atr, minimum=0.0))
+    if not 0 < entry_min <= reference_price <= entry_max:
+        raise ValueError("invalid_trade_plan_entry_envelope")
+
+    entry_mid = (entry_min + entry_max) / 2.0
+    fallback_distance = reference_price * 0.002
+    stop_distance = max(atr * stop_atr_multiple, fallback_distance)
+    if direction == "LONG":
+        stop = max(1e-12, entry_min - stop_distance)
+        risk_per_unit = entry_mid - stop
+        target1 = entry_mid + risk_per_unit * target1_rr
+        target2 = entry_mid + risk_per_unit * target2_rr
+    else:
+        stop = entry_max + stop_distance
+        risk_per_unit = stop - entry_mid
+        target1 = max(1e-12, entry_mid - risk_per_unit * target1_rr)
+        target2 = max(1e-12, entry_mid - risk_per_unit * target2_rr)
+
+    return {
+        "entry_mid": entry_mid,
+        "initial_stop": stop,
+        "target1": target1,
+        "target2": target2,
+        "risk_per_unit": risk_per_unit,
+    }
+
+
 def deterministic_plan_id(event_id: str, signal_id: str, rule_version: str = "stc-plan-v1") -> str:
     raw = f"{event_id}|{signal_id}|{rule_version}".encode("utf-8")
     return "plan-" + hashlib.sha256(raw).hexdigest()[:32]
@@ -71,20 +114,21 @@ def build_locked_trade_plan(
     if not -1.0 <= score <= 1.0:
         raise ValueError("invalid_trade_plan_score")
 
-    entry_mid = (entry_min + entry_max) / 2.0
-    fallback_distance = reference_price * 0.002
-    stop_distance = max(atr * stop_atr_multiple, fallback_distance)
-
-    if recommendation == "LONG":
-        stop = max(1e-12, entry_min - stop_distance)
-        risk_per_unit = entry_mid - stop
-        target1 = entry_mid + risk_per_unit * target1_rr
-        target2 = entry_mid + risk_per_unit * target2_rr
-    else:
-        stop = entry_max + stop_distance
-        risk_per_unit = stop - entry_mid
-        target1 = max(1e-12, entry_mid - risk_per_unit * target1_rr)
-        target2 = max(1e-12, entry_mid - risk_per_unit * target2_rr)
+    levels = calculate_plan_levels(
+        recommendation,
+        entry_min=entry_min,
+        entry_max=entry_max,
+        reference_price=reference_price,
+        atr=atr,
+        stop_atr_multiple=stop_atr_multiple,
+        target1_rr=target1_rr,
+        target2_rr=target2_rr,
+    )
+    entry_mid = levels["entry_mid"]
+    stop = levels["initial_stop"]
+    target1 = levels["target1"]
+    target2 = levels["target2"]
+    risk_per_unit = levels["risk_per_unit"]
 
     return {
         "plan_id": deterministic_plan_id(event_id, signal_id, rule_version),
