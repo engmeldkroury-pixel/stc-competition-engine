@@ -3,6 +3,7 @@ from app.leverage import leverage_capacity
 from app.strategy_lab import (
     StrategyTrial,
     candidate_strategies,
+    classify_trial_status,
     select_strategy,
     trial_rejection_reasons,
 )
@@ -132,3 +133,36 @@ def test_trial_diagnostics_expose_rejection_reasons():
     assert "insufficient_out_of_sample_trades" in reasons
     assert "weak_out_of_sample_expectancy" in reasons
     assert "negative_forward_expectancy" in reasons
+
+
+
+def test_trial_research_class_distinguishes_sample_limit_from_forward_failure():
+    sample_limited = StrategyTrial(
+        strategy_id="trend_pullback",
+        symbol="CAPITALCOM:XAUUSD",
+        timeframe="120",
+        train_trades=90,
+        test_trades=18,
+        forward_trades=12,
+        train_expectancy_r=0.30,
+        test_expectancy_r=0.25,
+        forward_expectancy_r=0.20,
+        test_profit_factor=1.60,
+        forward_profit_factor=1.40,
+        test_win_rate=0.60,
+        max_drawdown_r=3.0,
+        parameter_stability=0.80,
+        regime_stability=0.75,
+    )
+    assert classify_trial_status(sample_limited) == "SAMPLE_LIMITED"
+
+    forward_failed = sample_limited.__class__(
+        **{
+            **sample_limited.__dict__,
+            "test_trades": 35,
+            "forward_trades": 20,
+            "forward_expectancy_r": -0.10,
+            "forward_profit_factor": 0.90,
+        }
+    )
+    assert classify_trial_status(forward_failed) == "FORWARD_FAILED"
