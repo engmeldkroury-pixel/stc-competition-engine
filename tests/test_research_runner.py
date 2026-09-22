@@ -86,7 +86,7 @@ def test_strategy_feature_scope_is_family_specific():
 def test_research_runner_adds_optional_5m_and_30m_to_matrix(monkeypatch):
     captured = {}
 
-    def fake_matrix(symbol, asset_class, bundle):
+    def fake_matrix(symbol, asset_class, bundle, **kwargs):
         captured["keys"] = set(bundle)
         return [], MatrixSelection(
             status="NO_VALIDATED_STRATEGY",
