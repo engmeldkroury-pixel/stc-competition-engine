@@ -5,6 +5,7 @@ import hashlib
 from pydantic import ValidationError
 
 from .approval import build_approval_envelope
+from .calibration_registry import calibration_to_public_dict, lookup_runtime_calibration
 from .competition_profiles import get_profile
 from .models import FactorScores, SignalEvaluationRequest, TradingViewWebhook
 from .pipeline_receipt import build_pipeline_receipt
@@ -182,15 +183,44 @@ def decide_bridge_event(event_id: str, payload: dict) -> dict:
         "1d_score": historical_regime,
         "1m_score": tv.trend_1m_score,
     }
-    result_dict["empirical_win_probability"] = {
-        "status": "NOT_ATTACHED_TO_LIVE_SIGNAL",
-        "estimated_probability": None,
-        "sample_size": 0,
-        "note": (
-            "Setup quality is not win probability. A probability may be displayed only "
-            "after the selected strategy/timeframe has a calibrated out-of-sample/forward research record."
-        ),
-    }
+    calibration, calibration_reasons = lookup_runtime_calibration(
+        tv.symbol,
+        as_of=tv.time,
+    )
+    if calibration is None:
+        result_dict["empirical_win_probability"] = {
+            "status": "NOT_CALIBRATED",
+            "estimated_probability": None,
+            "sample_size": 0,
+            "reasons": list(calibration_reasons),
+            "note": (
+                "Setup quality is not win probability. A probability is displayed only "
+                "after the selected strategy/timeframe has a current calibrated out-of-sample/forward record."
+            ),
+        }
+        result_dict["research_calibration"] = {
+            "status": "UNAVAILABLE",
+            "reasons": list(calibration_reasons),
+        }
+    else:
+        result_dict["empirical_win_probability"] = {
+            "status": "CALIBRATED_INFORMATIONAL",
+            "estimated_probability": calibration.estimated_probability,
+            "sample_size": calibration.sample_size,
+            "confidence_low": calibration.confidence_low,
+            "confidence_high": calibration.confidence_high,
+            "strategy_id": calibration.strategy_id,
+            "timeframe": calibration.timeframe,
+            "data_end_utc": calibration.data_end_utc.isoformat().replace("+00:00", "Z"),
+            "note": (
+                "Empirical out-of-sample/forward estimate for the calibrated research strategy/timeframe; "
+                "informational only and never a guarantee of this trade."
+            ),
+        }
+        result_dict["research_calibration"] = {
+            "status": "AVAILABLE_INFORMATIONAL",
+            **calibration_to_public_dict(calibration),
+        }
     envelope = build_approval_envelope(payload, result.composite_score)
     locked_plan = build_locked_trade_plan(event_id, payload, result_dict, envelope)
     status = "analyzed"
