@@ -83,7 +83,10 @@ def calibrate_feature_reliability(
 
     # Blend empirical value back toward the prior until the sample is mature.
     calibrated = prior * (1.0 - sample_confidence) + empirical * sample_confidence
-    calibrated = min(0.95, max(0.20, calibrated))
+    # The maximum attainable reliability also matures with sample size. Eight
+    # perfect observations cannot jump a strong prior straight to the global cap.
+    maturity_cap = prior + (0.95 - prior) * sample_confidence
+    calibrated = min(maturity_cap, max(0.20, calibrated))
 
     return CalibratedWeight(
         feature=performance.feature,
