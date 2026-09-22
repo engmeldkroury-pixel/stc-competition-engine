@@ -110,6 +110,45 @@ def historical_regime_from_tradingview(payload: TradingViewWebhook) -> float | N
     return max(-1.0, min(1.0, score))
 
 
+def confirmation_score_from_tradingview(payload: TradingViewWebhook) -> float | None:
+    fields = (
+        payload.confirm_timeframe,
+        payload.confirm_time,
+        payload.confirm_close,
+        payload.confirm_ema20,
+        payload.confirm_ema50,
+        payload.confirm_ema200,
+        payload.confirm_rsi14,
+        payload.confirm_atr14,
+        payload.confirm_macd,
+        payload.confirm_macd_signal,
+        payload.confirm_volume_ratio,
+    )
+    if any(value is None for value in fields):
+        return None
+
+    close = float(payload.confirm_close)
+    ema20 = float(payload.confirm_ema20)
+    ema50 = float(payload.confirm_ema50)
+    ema200 = float(payload.confirm_ema200)
+    rsi = float(payload.confirm_rsi14)
+    macd = float(payload.confirm_macd)
+    macd_signal = float(payload.confirm_macd_signal)
+    volume_ratio = float(payload.confirm_volume_ratio)
+
+    score = 0.0
+    score += 0.30 if close > ema20 > ema50 else -0.30 if close < ema20 < ema50 else 0.0
+    score += 0.20 if ema50 >= ema200 else -0.20
+    score += 0.20 if macd >= macd_signal else -0.20
+    if 50 <= rsi <= 68:
+        score += 0.15
+    elif 32 <= rsi < 50:
+        score -= 0.15
+    if volume_ratio >= 1.0:
+        score += 0.15 if close >= ema20 else -0.15
+    return max(-1.0, min(1.0, score))
+
+
 def high_conviction_assessment(
     *,
     recommendation: str,
@@ -119,6 +158,7 @@ def high_conviction_assessment(
     blended_technical: float,
     volatility_quality: float,
     liquidity_quality: float,
+    confirmation_score: float | None,
 ) -> tuple[bool, list[str]]:
     """Fail-closed A+ entry gate for competition alerts.
 
@@ -131,6 +171,8 @@ def high_conviction_assessment(
     sign = 1.0 if recommendation == "LONG" else -1.0
     checks: list[tuple[str, bool]] = [
         ("historical_context_present", historical_regime is not None),
+        ("confirmation_context_present", confirmation_score is not None),
+        ("confirmation_alignment", confirmation_score is not None and sign * confirmation_score >= 0.70),
         ("short_term_strength", sign * short_term_technical >= 0.75),
         ("historical_alignment", historical_regime is not None and sign * historical_regime >= 0.55),
         ("blended_technical_strength", sign * blended_technical >= 0.70),
