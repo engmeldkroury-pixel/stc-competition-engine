@@ -6,6 +6,7 @@ from typing import Any
 from .asset_classification import strategy_asset_class
 from .feature_validation import FeatureValidation, validate_feature_weight
 from .indicator_catalog import FEATURE_FAMILIES
+from .research_costs import research_cost_policy
 from .research_dataset import (
     bars_from_tradingview_ohlcv,
     data_quality_report,
@@ -144,6 +145,7 @@ def run_symbol_research(
         "schema_version": "stc-research-v1",
         "symbol": symbol,
         "asset_class": asset_class,
+        "research_cost_model": research_cost_policy(symbol),
         "data_quality": {
             key: asdict(value) for key, value in quality.items()
         },
