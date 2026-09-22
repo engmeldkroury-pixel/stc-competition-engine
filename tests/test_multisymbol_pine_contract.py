@@ -20,14 +20,18 @@ def test_multisymbol_feed_covers_exact_capital_profile_symbols():
     text = PINE.read_text(encoding="utf-8")
     present = {symbol for symbol in EXPECTED if f'"{symbol}"' in text}
     assert present == EXPECTED
-    assert "STC Capital Multi Feed v0.7.1 Historical Context" in text
+    assert "STC Capital Multi Feed v0.8 A+ 1H Confirm" in text
 
 
 def test_multisymbol_feed_uses_remote_security_and_all_alert_calls():
     text = PINE.read_text(encoding="utf-8")
     assert "request.security(" in text
     assert "makeFeedBar()" in text
-    assert 'alert(buildMessage("CAPITALCOM:BTCUSD", btc, btcH), alert.freq_all)' in text
+    assert 'alert(buildMessage("CAPITALCOM:BTCUSD", btc, btcC, btcH), alert.freq_all)' in text
+    assert 'confirmTf = input.timeframe("60"' in text
+    assert 'request.security(symbol, confirmTf, makeConfirmBar()' in text
+    assert '"confirm_ema200"' in text
+    assert '"confirm_macd_signal"' in text
     assert "barstate.isconfirmed" in text
     assert "barstate.isrealtime" in text
 
