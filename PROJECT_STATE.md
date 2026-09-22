@@ -1151,3 +1151,55 @@ Active screening batches:
 - At this checkpoint both batches are in the no-lookahead computation step with complete input sets and no active data-quality failure.
 
 Owner intervention required now: NO.
+
+
+### Metals + energy matrix screening — XAGUSD + MCL — 2026-09-22
+
+CAPITALCOM:XAGUSD:
+- Overall: NO_VALIDATED_STRATEGY.
+- Live-entry 15m: NO_VALIDATED_STRATEGY.
+- 15m best candidate range_rotation was negative in both test and forward and was rejected.
+- 30m smc_structure_liquidity looked strong in test (expectancy +0.457R, PF 2.213, 14 trades) but failed forward badly (expectancy -0.701R, PF 0.211, 8 trades), confirming the no-overfit rejection policy.
+- 4h SMC and volatility/momentum candidates also showed positive test metrics followed by negative forward performance or instability.
+- No calibration candidate was promoted.
+
+NYMEX:MCL1!:
+- Overall: NO_VALIDATED_STRATEGY.
+- Live-entry 15m: NO_VALIDATED_STRATEGY.
+- 15m smc_structure_liquidity: test expectancy -0.016R, PF 0.974; forward expectancy -0.606R, PF 0.325. Rejected as FORWARD_FAILED.
+- 1h breakout_expansion showed positive test expectancy +0.303R/PF 1.666 but only 5 test trades and near-flat forward performance; rejected for sample depth and instability.
+- 2h volatility_squeeze had positive forward metrics but weak test edge/sample/parameter stability, so it was not promoted.
+- No calibration candidate was promoted.
+
+Operational research workflow improvement:
+- main commit fdc781aad4db97711cba3acf1f6e97b75e3ba12f gates the research workflow on an explicit research_inputs/READY marker.
+- Individual OHLCV uploads no longer start incomplete research runs.
+- A research branch should upload all symbol/timeframe inputs first, then write/update research_inputs/READY exactly once to start the batch.
+- This is workflow hygiene only; no research formulas, validation gates or trading behavior changed.
+
+Owner intervention required now: NO.
+
+
+### Index matrix screening — NAS100 + MNQ — 2026-09-22
+
+CME_MINI:MNQ1!:
+- Overall: NO_VALIDATED_STRATEGY.
+- Live-entry 15m: NO_VALIDATED_STRATEGY.
+- 15m best candidate mean_reversion: test expectancy -0.039R, PF 0.917, 35 trades; forward expectancy -0.266R, PF 0.477, 26 trades. Rejected as FORWARD_FAILED.
+- 30m smc_structure_liquidity was the most encouraging research case: test expectancy +0.282R, PF 1.512, 17 trades; forward expectancy +0.132R, PF 1.230, 9 trades. Rejected for insufficient OOS sample and parameter instability.
+- No calibration candidate was promoted.
+
+CAPITALCOM:NAS100:
+- Overall: NO_VALIDATED_STRATEGY.
+- Live-entry 15m: NO_VALIDATED_STRATEGY.
+- 15m best candidate range_rotation: test expectancy +0.043R, PF 1.106, 20 trades; forward expectancy -0.547R, PF 0.220, 10 trades. Rejected.
+- 1h smc_structure_liquidity was positive in both test and forward (test +0.145R/PF 1.337, 11 trades; forward +0.170R/PF 1.326, 11 trades) but was rejected for insufficient sample depth and parameter instability.
+- No calibration candidate was promoted.
+
+Engineering conclusion after XAU/MES/BTC/EUR/XAG/MCL/NAS/MNQ screens:
+- Repeated 15m failures show that broad symbol scanning alone is not enough.
+- Current historical strategy evaluation is primarily single-timeframe, while the target live design explicitly requires entry-timeframe evidence confirmed by 1h/2h/4h/1D/month context.
+- Next engine phase is to add a separate no-lookahead Multi-Timeframe Research layer and test MTF-confirmed variants without overwriting the original single-timeframe baselines.
+- Validation gates must remain unchanged; MTF confirmation is intended to improve robustness, not manufacture passing results.
+
+Owner intervention required now: NO.
