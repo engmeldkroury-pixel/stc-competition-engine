@@ -270,7 +270,14 @@ def aggregate_evidence(
         weighted_total += family_score * effective_family_weight
         weight_total += effective_family_weight
 
-    score = 0.0 if weight_total == 0 else max(-1.0, min(1.0, weighted_total / weight_total))
+    direction_score = 0.0 if weight_total == 0 else max(-1.0, min(1.0, weighted_total / weight_total))
+    # Breadth matters: a single correlated family cannot earn the same overall
+    # evidence score as several independent families agreeing. 0.50 is the
+    # approximate family-weight coverage expected before evidence is considered
+    # broadly confirmed.
+    breadth = min(1.0, weight_total / 0.50) if weight_total > 0 else 0.0
+    breadth_multiplier = 0.45 + 0.55 * breadth
+    score = max(-1.0, min(1.0, direction_score * breadth_multiplier))
 
     positive_strength = sum(
         max(0.0, item.direction) * item.reliability * item.freshness for item in obs
@@ -289,7 +296,7 @@ def aggregate_evidence(
         if item.independence_group
         and sign != 0
         and sign * item.direction >= 0.45
-        and item.reliability >= 0.60
+        and item.reliability >= 0.55
     })
     hard_confirmations = sum(
         1
