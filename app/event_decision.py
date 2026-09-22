@@ -11,6 +11,7 @@ from .pipeline_receipt import build_pipeline_receipt
 from .signals import (
     evaluate,
     factors_from_tradingview,
+    confirmation_score_from_tradingview,
     historical_regime_from_tradingview,
     high_conviction_assessment,
     liquidity_quality_from_tradingview,
@@ -93,6 +94,7 @@ def decide_bridge_event(event_id: str, payload: dict) -> dict:
         }
 
     short_term_technical = short_term_score_from_tradingview(tv)
+    confirmation_score = confirmation_score_from_tradingview(tv)
     historical_regime = historical_regime_from_tradingview(tv)
     technical = factors_from_tradingview(tv)
     volatility_quality = volatility_quality_from_tradingview(tv, technical)
@@ -115,6 +117,7 @@ def decide_bridge_event(event_id: str, payload: dict) -> dict:
         blended_technical=technical,
         volatility_quality=volatility_quality,
         liquidity_quality=liquidity_quality,
+        confirmation_score=confirmation_score,
     )
 
     final_recommendation = base_result.recommendation if gate_passed else "WAIT"
@@ -126,6 +129,7 @@ def decide_bridge_event(event_id: str, payload: dict) -> dict:
     )
     extra_reasons = [
         f"short_term_technical={short_term_technical:+.2f}",
+        "confirmation_1h=unavailable" if confirmation_score is None else f"confirmation_1h={confirmation_score:+.2f}",
         "historical_regime=unavailable" if historical_regime is None else f"historical_regime={historical_regime:+.2f}",
         f"blended_technical={technical:+.2f}",
         f"volatility_quality_live={volatility_quality:+.2f}",
