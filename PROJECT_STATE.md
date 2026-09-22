@@ -1199,3 +1199,109 @@ Engineering note:
 - A separate XAGUSD + MGC screening run is active; XAGUSD is duplicate confirmation, while MGC is new evidence.
 
 Owner intervention required now: NO.
+
+## Strategy Lab v2 + no-lookahead MTF research checkpoint — 2026-09-22
+
+Status: ACTIVE RESEARCH. Owner intervention required now: NO.
+
+### Strategy research expansion merged
+- Commit 6c945612348ee5ddbccbc7c602cec4303a7469b6 expanded the research-only strategy matrix from 9 to 17 strategy families.
+- Added: adx_ema_trend, donchian_structure_breakout, bollinger_mean_reversion, vwap_reversion, liquidity_sweep_reversal, failed_breakout_reversal, fvg_displacement_continuation and volume_confirmed_breakout.
+- Existing SMC, trend pullback, breakout, mean reversion, VWAP intraday, scalping/microtrend, momentum, volatility squeeze and range rotation remain.
+- Strategy-specific family weights and hard-confirmation rules remain research-only until validated.
+- No validation gate, risk rule, Safe Mode, Kill Switch or manual execution rule was relaxed.
+
+### No-lookahead multi-timeframe research merged
+- Commit d724a5993aba3068b11848471d6cb9dc701343c0 added a research-only optional signal gate.
+- Confirmed higher-timeframe context is aligned without lookahead: a higher-TF bar is usable only after the next bar proves it closed.
+- Required confirmation research set: 1H, 2H, 4H, 1D and 1M.
+- Three alternative policies are tested rather than assuming one rule is best:
+  - MAJORITY
+  - TREND_WEIGHTED
+  - STRICT
+- Missing required higher-timeframe context fails closed.
+- MTF validation is evaluated with the same chronological train / OOS test / forward framework as baseline strategy trials.
+
+### Selective MTF comparison runner merged
+- Commit 61443ea8223c76b6767373f0c4f3e5314aba5be0 added research_mode=mtf_compare.
+- The runner first executes the normal strategy matrix.
+- Only the strongest adequately sampled 15m candidates are selected for MTF comparison.
+- Each selected candidate is compared under MAJORITY / TREND_WEIGHTED / STRICT.
+- Research diagnostics include test/forward expectancy, profit factor, trade retention, robust score and rejection reasons.
+- mtf_compare does not perform feature calibration and cannot create live authority.
+- Full feature calibration remains reserved for a genuinely validated same-entry-timeframe candidate.
+
+### Additional completed exact-provider screening evidence
+COMEX_MINI:MGC1!:
+- Overall: NO_VALIDATED_STRATEGY.
+- Live-entry 15m: NO_VALIDATED_STRATEGY.
+- 15m range_rotation showed positive test/forward tendencies but failed sample/stability gates.
+- 4h trend_pullback and other attractive test results failed forward or stability gates.
+- No calibration candidate promoted.
+
+CAPITALCOM:SPX500:
+- Overall: NO_VALIDATED_STRATEGY.
+- Live-entry 15m: NO_VALIDATED_STRATEGY.
+- 2h SMC produced strong-looking PF but only 4 test / 8 forward trades, therefore rejected as under-sampled.
+- No calibration candidate promoted.
+
+CME_MINI:M2K1!:
+- Overall: NO_VALIDATED_STRATEGY.
+- Live-entry 15m: NO_VALIDATED_STRATEGY.
+- Multiple candidates failed forward robustness or had materially insufficient samples.
+- No calibration candidate promoted.
+
+Research conclusion remains unchanged:
+- Do not lower sample, stability, OOS, forward or risk gates simply to manufacture trade frequency.
+- Attractive small-sample results remain research-only.
+- Setup Quality is not Win Probability.
+- A higher-timeframe research winner cannot silently authorize/reweight a 15m live entry.
+
+
+
+### ETHUSD + M6E completed screening — 2026-09-22
+CAPITALCOM:ETHUSD:
+- Overall: NO_VALIDATED_STRATEGY.
+- Live-entry 15m: NO_VALIDATED_STRATEGY.
+- 2h SMC looked strong numerically (test expectancy +0.495R, PF 4.05; forward +0.571R, PF 2.74) but had only 5 test / 4 forward trades and parameter instability, so it was rejected.
+- 15m VWAP intraday had positive test expectancy +0.254R but forward expectancy -0.268R and PF 0.634; rejected.
+- No calibration candidate promoted.
+
+CME_MINI:M6E1!:
+- Overall: NO_VALIDATED_STRATEGY.
+- Live-entry 15m: NO_VALIDATED_STRATEGY.
+- 2h SMC had positive test/forward but only 4 test / 6 forward trades plus instability; rejected.
+- 1h mean reversion had 54 test trades but weak OOS edge and strongly negative forward expectancy; rejected.
+- 15m range rotation and volatility squeeze remained weak/forward-negative.
+- No calibration candidate promoted.
+
+Interpretation:
+- Strong-looking PF/expectancy on tiny samples is not treated as confidence.
+- Neither ETHUSD nor M6E is eligible for runtime calibration from this screen.
+
+### Active research batches
+1. research/strategy-v2-xau-mnq-20260922
+   - CAPITALCOM:XAUUSD
+   - CME_MINI:MNQ1!
+   - exact same historical datasets reused for fair Strategy Lab v1 vs v2 comparison
+   - matrix_only with 17 strategies
+   - status at checkpoint: in progress
+
+2. research/strategy-v2-btc-mcl-20260922
+   - CAPITALCOM:BTCUSD
+   - NYMEX:MCL1!
+   - exact same historical datasets reused for fair comparison
+   - matrix_only with 17 strategies
+   - status at checkpoint: in progress
+
+### Immediate next execution sequence
+1. Read the three active batch results when complete.
+2. Identify any 15m candidate with meaningful OOS + forward evidence.
+3. For promising 15m candidates, launch research_mode=mtf_compare.
+4. Compare baseline vs MAJORITY / TREND_WEIGHTED / STRICT and reject policies that create insufficient sample depth.
+5. Run full feature calibration only if a same-entry-timeframe strategy actually passes robustness gates.
+6. Only after a validated 15m research candidate exists consider promotion to the runtime calibration registry.
+7. TradingView production alert migration to six v1.1 Family Breadth feeds remains a later owner-manual step; keep verified legacy alerts running until parallel acceptance.
+
+Owner intervention required now: NO.
+

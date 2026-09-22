@@ -3,40 +3,40 @@
 Updated: 2026-09-22
 
 ## Active objective
-Find evidence-backed strategy/timeframe candidates for the STC competition universe without weakening the current robustness gates.
+Find a robust same-entry-timeframe strategy for competition use without weakening sample, OOS, forward, stability or risk gates.
 
-## Current execution sequence
-1. Use TradingView exact-provider OHLCV.
-2. Run matrix-only screening first to reduce research cost.
-3. Review per-timeframe rejection diagnostics and sample coverage.
-4. Run full feature calibration only for a strategy/timeframe that passes out-of-sample + forward robustness.
-5. Permit runtime weighting only when the calibration timeframe exactly matches the live entry timeframe.
-6. Preserve manual approval/manual execution, Safe Mode and Kill Switch governance.
+## Current research architecture
+- 17 research strategy families.
+- Exact-provider TradingView OHLCV.
+- No-lookahead historical features.
+- Train / OOS test / forward validation.
+- Exact-timeframe runtime calibration only.
+- Research-only MTF confirmation layer across 1H / 2H / 4H / 1D / 1M.
+- MTF policies: MAJORITY, TREND_WEIGHTED, STRICT.
+- research_mode=mtf_compare selectively tests only the strongest adequately sampled 15m candidates.
 
-## Current evidence
-- CAPITALCOM:XAUUSD: no validated strategy; some positive under-sampled research candidates.
-- CME_MINI:MES1!: no validated strategy; some positive under-sampled research candidates.
-- CAPITALCOM:BTCUSD: overall 1D trend_pullback validated (robust score 44.59), but probability sample is 49 < 50 and live-entry 15m is not validated. Informational only; not promotable to 15m runtime.
-- CAPITALCOM:EURUSD: no validated strategy; several positive-test candidates failed forward robustness.
-- TradingView OHLCV max per request: 5000 bars; no time-pagination argument is exposed by the current connector.
-- Do not lower validation/sample gates to manufacture a recommendation.
+## Completed evidence
+- NO_VALIDATED_STRATEGY / no live 15m calibration: XAUUSD, MES, EURUSD, NAS100, MNQ, XAGUSD, MCL, MGC, SPX500, M2K, ETHUSD, M6E.
+- BTCUSD: 1D trend_pullback research is validated on the original strategy set, but n=49 is below probability-calibration floor and 15m is not validated. Informational only.
+- Do not promote any higher-TF result into 15m runtime.
 
-## Production migration gate
-The six v1.1 Family Breadth Pine feeds are code-ready on main but the active TradingView alerts are still the verified legacy production snapshots. Fresh indicator alerts must be created manually later and verified in parallel before old alerts are stopped.
+## Active batches
+- research/strategy-v2-xau-mnq-20260922 — 17-strategy re-screen of XAUUSD + MNQ.
+- research/strategy-v2-btc-mcl-20260922 — 17-strategy re-screen of BTCUSD + MCL.
 
-## Immediate next screen
-Finish COMEX_MINI:MGC1! screening, then continue remaining high-liquidity competition symbols. Do not repeat already-screened symbols unless used for reproducibility checks.
+## Next automatic actions
+1. Read each active run when complete.
+2. Extract per-timeframe diagnostics and 15m candidates.
+3. Launch mtf_compare only for promising 15m candidates.
+4. Compare MTF policies by OOS/forward robustness and trade-retention.
+5. Run full feature calibration only for a genuinely VALIDATED same-timeframe candidate.
+6. Update PROJECT_STATE.md after every accepted research result.
+
+## Production safeguards
+- Safe Mode and Kill Switch remain enabled.
+- Manual approval and manual execution remain mandatory.
+- Verified legacy TradingView production alerts remain the rollback baseline.
+- Six v1.1 MTF Family Breadth Pine feeds are code-ready but not yet the active TradingView alert snapshots.
 
 ## Owner dependency
-None for the current research-screening phase.
-
-
-## Screening status
-- Completed with NO_VALIDATED_STRATEGY: CAPITALCOM:NAS100, CME_MINI:MNQ1!, CAPITALCOM:XAGUSD, NYMEX:MCL1!.
-- Completed earlier with NO_VALIDATED_STRATEGY: CAPITALCOM:XAUUSD, CME_MINI:MES1!, CAPITALCOM:EURUSD.
-- CAPITALCOM:BTCUSD: 1D trend_pullback validated research with 19 deployable features, but not promotable to 15m; probability remains uncalibrated at n=49.
-- Active new evidence run: COMEX_MINI:MGC1! (with duplicate XAGUSD confirmation).
-- After MGC result: continue matrix-only screening across remaining competition symbols; full feature calibration only for a VALIDATED candidate, prioritizing exact 15m live-entry matches.
-
-## Research performance
-Historical feature materialization now passes only the exact latest-1000-bar window used by the extractor; regression tests prove semantic equivalence.
+None now. Owner intervention is required only when a later step needs fresh TradingView indicator alerts, private Telegram credentials, or verified manual competition position/trade input.
