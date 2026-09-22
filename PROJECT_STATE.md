@@ -989,3 +989,33 @@ Next production tasks:
 - backfill prior real competition trades from platform records/screenshots;
 - configure Telegram privately in Hostinger with `telegram_bot_token` and `telegram_chat_id`, then use the built-in notification test;
 - only after notification and ledger validation consider any runtime-control change. No automatic order execution is available.
+## Reliability-weighted evidence engine merged — 2026-09-22
+
+Merged PR #33 as commit 2dca9a35069842bd9a0559fd4a9e419815548273.
+Post-merge STC CI run 35684556356 completed successfully.
+
+New evidence architecture:
+- Technical price/structure evidence is the primary direction engine.
+- Indicators/features are not equal votes. Each feature has a reliability prior, family weight, freshness and independence group.
+- Structural confirmations such as BOS/CHoCH, liquidity sweep, break/retest and market-structure trend start with higher priors than standalone oscillators.
+- Correlated indicators (for example RSI/Stochastic/StochRSI/CCI) are discounted so they do not count as multiple independent confirmations.
+- Evidence breadth across multiple independent families is required before the aggregate score can become strong.
+- Conflicting evidence families are surfaced explicitly rather than silently averaged away.
+- Feature reliability can be calibrated per symbol/strategy/timeframe from sample size, directional hit rate, forward expectancy, profit factor and regime stability, with shrinkage to prevent small samples from creating fake certainty.
+- A transparent participation-percent utility converts calibrated raw weights to percentage contribution.
+
+News/macro policy:
+- Directional news and macro weights in the legacy composite were reduced to 5% each; technical/market-quality evidence remains dominant.
+- A separate news/macro overlay caps total directional influence at 10%.
+- Scheduled high-impact events can block new entries shortly before/after the event even when the technical thesis remains intact.
+- Unscheduled market shocks fail closed and block entry.
+- News/macro context can reduce size when it conflicts with technical evidence, but cannot independently create a large LONG/SHORT signal.
+
+Strategy-family naming was aligned with the feature catalog (`smc_liquidity`).
+
+Next strategy-engine work:
+- build the historical data/feature pipeline that materializes the >80 catalogued features for each symbol/timeframe;
+- run strategy x symbol x timeframe backtests, out-of-sample and walk-forward validation;
+- write calibrated feature/strategy weights back into the runtime decision engine;
+- expose family/feature participation and conflict breakdown in the Owner Console;
+- wire live news source context while keeping it as a risk/context overlay rather than the main directional vote.
