@@ -173,6 +173,92 @@ def _strategy_score(
             f["rsi_14"] + f["macd_histogram"] + f["roc"] + f["relative_strength_rank"]
         ) / 4.0
         score = _clamp(score * 0.65 + momentum * 0.35)
+    elif strategy_id == "adx_ema_trend":
+        if abs(f["adx"]) < 0.20:
+            return 0.0, summary
+        trend_vote = (
+            f["ema_9_20_50_100_200_alignment"]
+            + f["dmi_plus_minus"]
+            + f["supertrend"]
+            + f["ichimoku_cloud"]
+        ) / 4.0
+        score = _clamp(score * 0.45 + trend_vote * 0.55)
+    elif strategy_id == "donchian_structure_breakout":
+        structural_trigger = max(abs(f["bos"]), abs(f["displacement_candle"]))
+        if structural_trigger < 0.45:
+            return 0.0, summary
+        score = _clamp(
+            f["bos"] * 0.40
+            + f["donchian_width"] * 0.20
+            + f["volume_ratio"] * 0.15
+            + f["true_range_percentile"] * 0.15
+            + f["close_location_value"] * 0.10
+        )
+    elif strategy_id == "bollinger_mean_reversion":
+        if abs(f["market_structure_trend"]) > 0.45 or abs(f["adx"]) > 0.55:
+            return 0.0, summary
+        stretch = (
+            f["bollinger_percent_b"]
+            + f["vwap_band_location"]
+            + f["range_location"]
+        ) / 3.0
+        score = _clamp(-stretch * 0.75 - f["rsi_14"] * 0.25)
+    elif strategy_id == "vwap_reversion":
+        if abs(f["adx"]) > 0.50:
+            return 0.0, summary
+        stretch = (
+            f["session_vwap_distance"]
+            + f["anchored_vwap_distance"]
+            + f["vwap_band_location"]
+        ) / 3.0
+        score = _clamp(
+            -stretch * 0.70
+            - f["rsi_14"] * 0.15
+            + f["failed_breakout"] * 0.15
+        )
+    elif strategy_id == "liquidity_sweep_reversal":
+        if abs(f["liquidity_sweep"]) < 0.55:
+            return 0.0, summary
+        score = _clamp(
+            f["liquidity_sweep"] * 0.45
+            + f["failed_breakout"] * 0.20
+            + f["pin_bar"] * 0.15
+            + f["engulfing"] * 0.10
+            + f["relative_volume"] * 0.10
+        )
+    elif strategy_id == "failed_breakout_reversal":
+        if abs(f["failed_breakout"]) < 0.55:
+            return 0.0, summary
+        score = _clamp(
+            f["failed_breakout"] * 0.50
+            + f["liquidity_sweep"] * 0.20
+            + f["close_location_value"] * 0.15
+            + f["vwap_reclaim_reject"] * 0.15
+        )
+    elif strategy_id == "fvg_displacement_continuation":
+        if (
+            abs(f["fair_value_gap"]) < 0.55
+            or abs(f["displacement_candle"]) < 0.35
+            or f["fair_value_gap"] * f["displacement_candle"] <= 0
+        ):
+            return 0.0, summary
+        score = _clamp(
+            f["fair_value_gap"] * 0.35
+            + f["displacement_candle"] * 0.25
+            + f["market_structure_trend"] * 0.20
+            + f["volume_ratio"] * 0.10
+            + f["ema_9_20_50_100_200_alignment"] * 0.10
+        )
+    elif strategy_id == "volume_confirmed_breakout":
+        if abs(f["bos"]) < 0.55 or abs(f["volume_ratio"]) < 0.20:
+            return 0.0, summary
+        score = _clamp(
+            f["bos"] * 0.40
+            + f["volume_ratio"] * 0.25
+            + f["relative_volume"] * 0.15
+            + f["true_range_percentile"] * 0.10
+            + f["close_location_value"] * 0.10
+        )
 
     return score, summary
 
@@ -193,7 +279,15 @@ def _signal(
         return None
     if summary.independent_confirmations < params.min_independent_confirmations:
         return None
-    if strategy_id in {"smc_structure_liquidity", "breakout_expansion"}:
+    if strategy_id in {
+        "smc_structure_liquidity",
+        "breakout_expansion",
+        "donchian_structure_breakout",
+        "liquidity_sweep_reversal",
+        "failed_breakout_reversal",
+        "fvg_displacement_continuation",
+        "volume_confirmed_breakout",
+    }:
         if summary.hard_confirmations < params.min_hard_confirmations:
             return None
     if len(summary.conflicts) >= 3:
