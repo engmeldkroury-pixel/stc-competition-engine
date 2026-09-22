@@ -5,7 +5,7 @@ on:
     branches:
       - "research/**"
     paths:
-      - "research_inputs/**"
+      - "research_inputs/READY"
 
 permissions:
   contents: read

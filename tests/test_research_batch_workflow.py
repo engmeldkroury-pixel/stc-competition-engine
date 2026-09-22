@@ -51,7 +51,7 @@ def test_split_directory_loader_requires_all_exact_provider_series(tmp_path):
 def test_research_workflow_is_isolated_to_research_branches_and_inputs():
     text = (ROOT / ".github" / "workflows" / "stc-research.yml").read_text(encoding="utf-8")
     assert '"research/**"' in text
-    assert '"research_inputs/**"' in text
+    assert '"research_inputs/READY"' in text
     assert "run_strategy_research_dir.py" in text
     assert "actions/upload-artifact@v4" in text
     assert "print_calibration_candidate.py" in text
@@ -164,3 +164,10 @@ def test_research_workflow_prints_feature_participation():
     assert "feature_participation_pct" in text
     assert '"live_entry_research_report"' in text
     assert '"research_report"' in text
+
+
+
+def test_research_workflow_waits_for_explicit_ready_marker():
+    text = (ROOT / ".github" / "workflows" / "stc-research.yml").read_text(encoding="utf-8")
+    assert '"research_inputs/READY"' in text
+    assert '"research_inputs/**"' not in text
