@@ -147,6 +147,23 @@ class TradingViewWebhook(BaseModel):
     macd: float
     macd_signal: float
     volume_ratio: float = 1.0
+    confirm_timeframe: str | None = None
+    confirm_time: datetime | None = None
+    confirm_close: float | None = None
+    confirm_ema20: float | None = None
+    confirm_ema50: float | None = None
+    confirm_ema200: float | None = None
+    confirm_rsi14: float | None = None
+    confirm_atr14: float | None = None
+    confirm_macd: float | None = None
+    confirm_macd_signal: float | None = None
+    confirm_volume_ratio: float | None = None
+    trend_2h_time: datetime | None = None
+    trend_2h_score: float | None = None
+    trend_4h_time: datetime | None = None
+    trend_4h_score: float | None = None
+    trend_1m_time: datetime | None = None
+    trend_1m_score: float | None = None
     history_timeframe: str | None = None
     history_time: datetime | None = None
     history_close: float | None = None
@@ -161,6 +178,50 @@ class TradingViewWebhook(BaseModel):
     history_momentum_126: float | None = None
     history_momentum_252: float | None = None
     history_volatility_20: float | None = None
+
+    @model_validator(mode="after")
+    def validate_confirmation_context(self):
+        names = (
+            "confirm_timeframe",
+            "confirm_time",
+            "confirm_close",
+            "confirm_ema20",
+            "confirm_ema50",
+            "confirm_ema200",
+            "confirm_rsi14",
+            "confirm_atr14",
+            "confirm_macd",
+            "confirm_macd_signal",
+            "confirm_volume_ratio",
+        )
+        values = [getattr(self, name) for name in names]
+        present = [value is not None for value in values]
+        if any(present) and not all(present):
+            raise ValueError("confirmation context must be complete or absent")
+        if all(present):
+            if str(self.confirm_timeframe).lower() not in {"60", "1h"}:
+                raise ValueError("confirmation context timeframe must be 60/1h")
+            if not 0 <= self.confirm_rsi14 <= 100:
+                raise ValueError("confirm_rsi14 must be between 0 and 100")
+            if self.confirm_atr14 < 0 or self.confirm_volume_ratio < 0:
+                raise ValueError("confirmation quality values must be non-negative")
+        return self
+
+    @model_validator(mode="after")
+    def validate_multi_timeframe_trends(self):
+        pairs = (
+            ("trend_2h_time", "trend_2h_score"),
+            ("trend_4h_time", "trend_4h_score"),
+            ("trend_1m_time", "trend_1m_score"),
+        )
+        for time_name, score_name in pairs:
+            t = getattr(self, time_name)
+            s = getattr(self, score_name)
+            if (t is None) != (s is None):
+                raise ValueError(f"{time_name}/{score_name} must be both present or both absent")
+            if s is not None and not -1.0 <= float(s) <= 1.0:
+                raise ValueError(f"{score_name} must be between -1 and 1")
+        return self
 
     @model_validator(mode="after")
     def validate_history_context(self):

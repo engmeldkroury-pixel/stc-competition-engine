@@ -1,8 +1,9 @@
 //@version=6
-indicator("STC AMP Core Feed A v0.3 Stateful Visual", overlay=true, max_labels_count=20)
+indicator("STC AMP Core Feed A v0.4 A+ 1H Confirm", overlay=true, max_labels_count=20)
 
 competitionId = input.string("amp-futures-sep-2026", "Competition ID", options=["amp-futures-sep-2026"], group="Production feed")
 feedTf = input.timeframe("15", "Production feed timeframe", group="Production feed")
+confirmTf = input.timeframe("60", "A+ confirmation timeframe", options=["60"], group="Production feed")
 feedEnabled = input.bool(true, "Enable webhook feed", group="Production feed")
 
 // Visual analysis for the symbol currently open on the chart.
@@ -38,6 +39,18 @@ type FeedBar
     float macdSignal
     float volumeRatio
 
+type ConfirmBar
+    int t
+    float c
+    float ema20
+    float ema50
+    float ema200
+    float rsi14
+    float atr14
+    float macd
+    float macdSignal
+    float volumeRatio
+
 type HistoryBar
     int t
     float c
@@ -61,6 +74,14 @@ makeFeedBar() =>
 feedBar(string symbol) =>
     request.security(symbol, feedTf, makeFeedBar(), gaps=barmerge.gaps_off, lookahead=barmerge.lookahead_off, ignore_invalid_symbol=false)
 
+makeConfirmBar() =>
+    [macdLine, signalLine, _] = ta.macd(close, 12, 26, 9)
+    volSma = ta.sma(volume, 20)
+    ConfirmBar.new(time[1], close[1], ta.ema(close, 20)[1], ta.ema(close, 50)[1], ta.ema(close, 200)[1], ta.rsi(close, 14)[1], ta.atr(14)[1], macdLine[1], signalLine[1], not na(volume[1]) and volSma[1] > 0 ? volume[1] / volSma[1] : 1.0)
+
+confirmBar(string symbol) =>
+    request.security(symbol, confirmTf, makeConfirmBar(), gaps=barmerge.gaps_off, lookahead=barmerge.lookahead_on, ignore_invalid_symbol=false)
+
 makeHistoryBar() =>
     m20 = close[21] != 0 ? close[1] / close[21] - 1.0 : 0.0
     m63 = close[64] != 0 ? close[1] / close[64] - 1.0 : 0.0
@@ -72,7 +93,7 @@ makeHistoryBar() =>
 historyBar(string symbol) =>
     request.security(symbol, "1D", makeHistoryBar(), gaps=barmerge.gaps_off, lookahead=barmerge.lookahead_on, ignore_invalid_symbol=false)
 
-buildMessage(string symbol, FeedBar d, HistoryBar h) =>
+buildMessage(string symbol, FeedBar d, ConfirmBar q, HistoryBar h) =>
     eventId = competitionId + "|" + symbol + "|" + feedTf + "|" + str.tostring(d.t)
     msg = (
         '{"event_id":"' + eventId + '",' +
@@ -93,6 +114,17 @@ buildMessage(string symbol, FeedBar d, HistoryBar h) =>
         '"macd":' + str.tostring(d.macd) + ',' +
         '"macd_signal":' + str.tostring(d.macdSignal) + ',' +
         '"volume_ratio":' + str.tostring(d.volumeRatio) + ',' +
+        '"confirm_timeframe":"' + confirmTf + '",' +
+        '"confirm_time":"' + str.format_time(q.t, "yyyy-MM-dd'T'HH:mm:ss'Z'", "UTC") + '",' +
+        '"confirm_close":' + str.tostring(q.c) + ',' +
+        '"confirm_ema20":' + str.tostring(q.ema20) + ',' +
+        '"confirm_ema50":' + str.tostring(q.ema50) + ',' +
+        '"confirm_ema200":' + str.tostring(q.ema200) + ',' +
+        '"confirm_rsi14":' + str.tostring(q.rsi14) + ',' +
+        '"confirm_atr14":' + str.tostring(q.atr14) + ',' +
+        '"confirm_macd":' + str.tostring(q.macd) + ',' +
+        '"confirm_macd_signal":' + str.tostring(q.macdSignal) + ',' +
+        '"confirm_volume_ratio":' + str.tostring(q.volumeRatio) + ',' +
         '"history_timeframe":"1D",' +
         '"history_time":"' + str.format_time(h.t, "yyyy-MM-dd'T'HH:mm:ss'Z'", "UTC") + '",' +
         '"history_close":' + str.tostring(h.c) + ',' +
@@ -112,20 +144,28 @@ buildMessage(string symbol, FeedBar d, HistoryBar h) =>
     msg
 
 mes = feedBar("CME_MINI:MES1!")
+mesC = confirmBar("CME_MINI:MES1!")
 mesH = historyBar("CME_MINI:MES1!")
 mnq = feedBar("CME_MINI:MNQ1!")
+mnqC = confirmBar("CME_MINI:MNQ1!")
 mnqH = historyBar("CME_MINI:MNQ1!")
 mym = feedBar("CBOT_MINI:MYM1!")
+mymC = confirmBar("CBOT_MINI:MYM1!")
 mymH = historyBar("CBOT_MINI:MYM1!")
 m2k = feedBar("CME_MINI:M2K1!")
+m2kC = confirmBar("CME_MINI:M2K1!")
 m2kH = historyBar("CME_MINI:M2K1!")
 mcl = feedBar("NYMEX:MCL1!")
+mclC = confirmBar("NYMEX:MCL1!")
 mclH = historyBar("NYMEX:MCL1!")
 mng = feedBar("NYMEX:MNG1!")
+mngC = confirmBar("NYMEX:MNG1!")
 mngH = historyBar("NYMEX:MNG1!")
 mgc = feedBar("COMEX_MINI:MGC1!")
+mgcC = confirmBar("COMEX_MINI:MGC1!")
 mgcH = historyBar("COMEX_MINI:MGC1!")
 sil = feedBar("COMEX_MINI:SIL1!")
+silC = confirmBar("COMEX_MINI:SIL1!")
 silH = historyBar("COMEX_MINI:SIL1!")
 varip int lastMES = na
 varip int lastMNQ = na
@@ -140,28 +180,28 @@ varip int lastSIL = na
 if feedEnabled and barstate.isconfirmed and barstate.isrealtime
     if not na(mes.t) and not na(mes.c) and (na(lastMES) or mes.t != lastMES)
         lastMES := mes.t
-        alert(buildMessage("CME_MINI:MES1!", mes, mesH), alert.freq_all)
+        alert(buildMessage("CME_MINI:MES1!", mes, mesC, mesH), alert.freq_all)
     if not na(mnq.t) and not na(mnq.c) and (na(lastMNQ) or mnq.t != lastMNQ)
         lastMNQ := mnq.t
-        alert(buildMessage("CME_MINI:MNQ1!", mnq, mnqH), alert.freq_all)
+        alert(buildMessage("CME_MINI:MNQ1!", mnq, mnqC, mnqH), alert.freq_all)
     if not na(mym.t) and not na(mym.c) and (na(lastMYM) or mym.t != lastMYM)
         lastMYM := mym.t
-        alert(buildMessage("CBOT_MINI:MYM1!", mym, mymH), alert.freq_all)
+        alert(buildMessage("CBOT_MINI:MYM1!", mym, mymC, mymH), alert.freq_all)
     if not na(m2k.t) and not na(m2k.c) and (na(lastM2K) or m2k.t != lastM2K)
         lastM2K := m2k.t
-        alert(buildMessage("CME_MINI:M2K1!", m2k, m2kH), alert.freq_all)
+        alert(buildMessage("CME_MINI:M2K1!", m2k, m2kC, m2kH), alert.freq_all)
     if not na(mcl.t) and not na(mcl.c) and (na(lastMCL) or mcl.t != lastMCL)
         lastMCL := mcl.t
-        alert(buildMessage("NYMEX:MCL1!", mcl, mclH), alert.freq_all)
+        alert(buildMessage("NYMEX:MCL1!", mcl, mclC, mclH), alert.freq_all)
     if not na(mng.t) and not na(mng.c) and (na(lastMNG) or mng.t != lastMNG)
         lastMNG := mng.t
-        alert(buildMessage("NYMEX:MNG1!", mng, mngH), alert.freq_all)
+        alert(buildMessage("NYMEX:MNG1!", mng, mngC, mngH), alert.freq_all)
     if not na(mgc.t) and not na(mgc.c) and (na(lastMGC) or mgc.t != lastMGC)
         lastMGC := mgc.t
-        alert(buildMessage("COMEX_MINI:MGC1!", mgc, mgcH), alert.freq_all)
+        alert(buildMessage("COMEX_MINI:MGC1!", mgc, mgcC, mgcH), alert.freq_all)
     if not na(sil.t) and not na(sil.c) and (na(lastSIL) or sil.t != lastSIL)
         lastSIL := sil.t
-        alert(buildMessage("COMEX_MINI:SIL1!", sil, silH), alert.freq_all)
+        alert(buildMessage("COMEX_MINI:SIL1!", sil, silC, silH), alert.freq_all)
 
 
 

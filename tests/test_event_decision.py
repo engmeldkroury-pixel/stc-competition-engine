@@ -89,3 +89,135 @@ def test_event_decision_marks_live_quality_and_unavailable_news_macro_honestly()
     assert any(x.startswith("liquidity_quality_live=") for x in reasons)
     assert "news_factor=unavailable_live_source" in reasons
     assert "macro_factor=unavailable_live_source" in reasons
+
+def _strong_confirmation():
+    return {
+        "confirm_timeframe": "60",
+        "confirm_time": "2026-09-21T17:00:00Z",
+        "confirm_close": 3608,
+        "confirm_ema20": 3600,
+        "confirm_ema50": 3580,
+        "confirm_ema200": 3400,
+        "confirm_rsi14": 60,
+        "confirm_atr14": 20,
+        "confirm_macd": 8,
+        "confirm_macd_signal": 4,
+        "confirm_volume_ratio": 1.4,
+        "trend_2h_time": "2026-09-21T16:00:00Z",
+        "trend_2h_score": 0.85,
+        "trend_4h_time": "2026-09-21T16:00:00Z",
+        "trend_4h_score": 0.82,
+        "trend_1m_time": "2026-09-01T00:00:00Z",
+        "trend_1m_score": 0.72,
+    }
+
+
+def _strong_history():
+    return {
+        "history_timeframe": "1D",
+        "history_time": "2026-09-20T00:00:00Z",
+        "history_close": 3610,
+        "history_ema50": 3500,
+        "history_ema200": 3300,
+        "history_rsi14": 62,
+        "history_atr14": 80,
+        "history_high_252": 3650,
+        "history_low_252": 2500,
+        "history_momentum_20": 0.08,
+        "history_momentum_63": 0.15,
+        "history_momentum_126": 0.20,
+        "history_momentum_252": 0.35,
+        "history_volatility_20": 0.02,
+    }
+
+
+def test_high_conviction_gate_allows_only_a_plus_directional_plan():
+    payload = {
+        "event_id": "evt-a-plus",
+        "event": "bar_close",
+        "competition_id": "capital-africa-sep-2026",
+        "symbol": "CAPITALCOM:XAUUSD",
+        "timeframe": "15",
+        "time": "2026-09-21T18:00:00Z",
+        "open": 3600,
+        "high": 3615,
+        "low": 3605,
+        "close": 3610,
+        "volume": 1800,
+        "ema20": 3605,
+        "ema50": 3590,
+        "rsi14": 60,
+        "atr14": 10,
+        "macd": 5,
+        "macd_signal": 2,
+        "volume_ratio": 1.8,
+        **_strong_confirmation(),
+        **_strong_history(),
+    }
+    result = decide_bridge_event("evt-a-plus", payload)
+    signal = result["decision"]["signal"]
+    assert signal["recommendation"] == "LONG"
+    assert signal["quality_gate_passed"] is True
+    assert signal["setup_grade"] == "A_PLUS"
+    assert result["decision"]["locked_trade_plan"] is not None
+    assert "high_conviction_gate=PASSED" in signal["reasons"]
+
+
+def test_borderline_direction_is_downgraded_to_wait_and_has_no_plan():
+    payload = {
+        "event_id": "evt-borderline",
+        "event": "bar_close",
+        "competition_id": "amp-futures-sep-2026",
+        "symbol": "CBOT:ZN1!",
+        "timeframe": "15",
+        "time": "2026-09-21T18:00:00Z",
+        "open": 105.0,
+        "high": 105.2,
+        "low": 104.9,
+        "close": 105.0,
+        "volume": 1000,
+        "ema20": 105.05,
+        "ema50": 105.10,
+        "rsi14": 49,
+        "atr14": 0.25,
+        "macd": -0.01,
+        "macd_signal": 0.0,
+        "volume_ratio": 0.7,
+    }
+    result = decide_bridge_event("evt-borderline", payload)
+    signal = result["decision"]["signal"]
+    assert signal["recommendation"] == "WAIT"
+    assert signal["quality_gate_passed"] is False
+    assert signal["setup_grade"] == "MONITOR_ONLY"
+    assert result["decision"]["locked_trade_plan"] is None
+    assert "high_conviction_gate=BLOCKED" in signal["reasons"]
+
+def test_directional_candidate_without_1h_confirmation_fails_closed_to_wait():
+    payload = {
+        "event_id": "evt-missing-confirm",
+        "event": "bar_close",
+        "competition_id": "capital-africa-sep-2026",
+        "symbol": "CAPITALCOM:XAUUSD",
+        "timeframe": "15",
+        "time": "2026-09-21T18:00:00Z",
+        "open": 3600,
+        "high": 3615,
+        "low": 3605,
+        "close": 3610,
+        "volume": 1800,
+        "ema20": 3605,
+        "ema50": 3590,
+        "rsi14": 60,
+        "atr14": 10,
+        "macd": 5,
+        "macd_signal": 2,
+        "volume_ratio": 1.8,
+        **_strong_history(),
+    }
+    result = decide_bridge_event("evt-missing-confirm", payload)
+    signal = result["decision"]["signal"]
+    assert signal["recommendation"] == "WAIT"
+    assert signal["quality_gate_passed"] is False
+    assert "gate_block=confirmation_context_present" in signal["reasons"]
+    assert result["decision"]["locked_trade_plan"] is None
+

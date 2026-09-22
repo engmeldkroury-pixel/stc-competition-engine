@@ -221,6 +221,9 @@ function stc_notify_signal_event(PDO $pdo, array $config, string $eventId): arra
     if (!in_array($direction, ['LONG', 'SHORT'], true)) {
         return ['ok' => true, 'skipped' => true, 'reason' => 'wait_signal'];
     }
+    if (($signal['quality_gate_passed'] ?? false) !== true || ($signal['setup_grade'] ?? '') !== 'A_PLUS') {
+        return ['ok' => true, 'skipped' => true, 'reason' => 'high_conviction_gate_not_passed'];
+    }
 
     $validUntil = stc_parse_utc((string)($plan['valid_until'] ?? ''));
     $now = new DateTimeImmutable('now', new DateTimeZone('UTC'));
@@ -287,6 +290,7 @@ function stc_notify_signal_event(PDO $pdo, array $config, string $eventId): arra
         'Management checkpoint (no partial TP): ' . $plan['target1'],
         'Final take profit: ' . $plan['target2'],
         $sizingText,
+        'Setup grade: A+ (high-conviction gate passed)',
         'Signal score: ' . number_format((float)($signal['composite_score'] ?? 0.0), 2, '.', ''),
         'Single-TP mode: place only the final take-profit; STC uses the checkpoint for protection logic.',
         'Reconfirm the live price before approval.',
