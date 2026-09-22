@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from math import ceil, inf
-from typing import Mapping
+from typing import Callable, Mapping
 
 from .analysis import atr
 from .approval import entry_price_bounds, timeframe_duration_minutes, timeframe_validity_minutes
@@ -81,6 +81,12 @@ class MatrixSelection:
     robust_score: float | None
     trial_count: int
     reason: str
+
+
+SignalEvaluator = Callable[
+    [int, str, HistoricalFeatureSnapshot, BacktestParams],
+    tuple[int, float, EvidenceSummary] | None,
+]
 
 
 def materialize_feature_series(
@@ -246,6 +252,7 @@ def backtest_strategy(
     *,
     start_index: int,
     end_index: int,
+    signal_evaluator: SignalEvaluator | None = None,
 ) -> tuple[list[TradeOutcome], BacktestStats]:
     if start_index < 260:
         start_index = 260
@@ -257,7 +264,11 @@ def backtest_strategy(
         if snap is None:
             i += 1
             continue
-        signal = _signal(strategy_id, snap, params)
+        signal = (
+            signal_evaluator(i, strategy_id, snap, params)
+            if signal_evaluator is not None
+            else _signal(strategy_id, snap, params)
+        )
         if signal is None:
             i += 1
             continue
