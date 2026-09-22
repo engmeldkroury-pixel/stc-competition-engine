@@ -256,6 +256,6 @@ def test_live_signal_exposes_mtf_confirmation_and_separates_quality_from_probabi
     assert signal["timeframe_confirmation"]["4h_score"] == 0.82
     assert signal["timeframe_confirmation"]["1m_score"] == 0.72
     probability = signal["empirical_win_probability"]
-    assert probability["status"] == "NOT_ATTACHED_TO_LIVE_SIGNAL"
+    assert probability["status"] == "NOT_CALIBRATED"
     assert probability["estimated_probability"] is None
     assert "not win probability" in probability["note"].lower()
