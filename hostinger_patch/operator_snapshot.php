@@ -238,6 +238,9 @@ try {
                 'estimated_probability' => null,
                 'sample_size' => 0,
             ],
+            'research_calibration' => is_array($signal['research_calibration'] ?? null) ? $signal['research_calibration'] : [
+                'status' => 'UNAVAILABLE',
+            ],
             'pre_gate_recommendation' => (string)($signal['pre_gate_recommendation'] ?? ($signal['recommendation'] ?? 'WAIT')),
             'quality_gate_failures' => is_array($signal['quality_gate_failures'] ?? null) ? $signal['quality_gate_failures'] : [],
             'reasons' => is_array($signal['reasons'] ?? null) ? $signal['reasons'] : [],
