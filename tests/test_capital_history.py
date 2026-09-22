@@ -142,3 +142,34 @@ def test_capital_conversion_rejects_invalid_basis_and_ohlc():
             prices=[_price("2026-01-01T00:00:00", h=(99, 99))],
             price_basis="mid",
         )
+
+
+def test_capital_market_discovery_is_read_only_and_authenticated():
+    def handler(request: httpx.Request) -> httpx.Response:
+        if request.url.path == "/api/v1/session":
+            return httpx.Response(
+                200,
+                headers={"CST": "cst-token", "X-SECURITY-TOKEN": "security-token"},
+                json={},
+            )
+        if request.url.path == "/api/v1/markets":
+            assert request.url.params["searchTerm"] == "gold"
+            assert request.headers["CST"] == "cst-token"
+            return httpx.Response(
+                200,
+                json={"markets": [{"epic": "GOLD", "instrumentName": "Gold"}]},
+            )
+        return httpx.Response(404)
+
+    api = CapitalHistoryClient(
+        api_key="test-key",
+        identifier="user",
+        password="pass",
+        client=httpx.Client(
+            base_url="https://demo-api-capital.backend-capital.com",
+            transport=httpx.MockTransport(handler),
+        ),
+        min_request_interval_s=0,
+    )
+    rows = api.search_markets("gold")
+    assert rows == [{"epic": "GOLD", "instrumentName": "Gold"}]
