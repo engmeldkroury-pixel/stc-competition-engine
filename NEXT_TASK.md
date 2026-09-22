@@ -1,42 +1,50 @@
 # NEXT TASK
 
-Updated: 2026-09-22
+Updated: 2026-09-23
 
 ## Active objective
-Find a robust same-entry-timeframe strategy for competition use without weakening sample, OOS, forward, stability or risk gates.
+Increase genuinely unseen evidence depth for 15m competition research without weakening any validation or risk gate.
 
-## Current research architecture
-- 17 research strategy families.
-- Exact-provider TradingView OHLCV.
-- No-lookahead historical features.
-- Train / OOS test / forward validation.
-- Exact-timeframe runtime calibration only.
-- Research-only MTF confirmation layer across 1H / 2H / 4H / 1D / 1M.
-- MTF policies: MAJORITY, TREND_WEIGHTED, STRICT.
-- research_mode=mtf_compare selectively tests only the strongest adequately sampled 15m candidates.
+## Research stage just completed
+- Strategy Lab v2: completed.
+- No-lookahead MTF comparison: completed; no 15m rescue.
+- Single-regime comparison: completed; no 15m validation.
+- Bounded regime-pool comparison on MNQ and BTCUSD: completed; no 15m validation.
+- Same-dataset combinatorial tuning is now CLOSED for the strongest current candidates.
 
-## Completed evidence
-- NO_VALIDATED_STRATEGY / no live 15m calibration: XAUUSD, MES, EURUSD, NAS100, MNQ, XAGUSD, MCL, MGC, SPX500, M2K, ETHUSD, M6E.
-- BTCUSD: 1D trend_pullback research is validated on the original strategy set, but n=49 is below probability-calibration floor and 15m is not validated. Informational only.
-- Do not promote any higher-TF result into 15m runtime.
+## Confirmed research evidence
+- XAUUSD 4h adx_ema_trend: VALIDATED research-only; full feature calibration completed with 16 deployable / 17 blocked features.
+- XAUUSD 15m: NO_VALIDATED_STRATEGY.
+- BTCUSD 1D trend_pullback: VALIDATED research-only; 15m remains NO_VALIDATED_STRATEGY.
+- MNQ 15m: NO_VALIDATED_STRATEGY after baseline, single-regime and pool testing.
+- BTCUSD 15m: NO_VALIDATED_STRATEGY after baseline, single-regime and pool testing.
+- No higher-timeframe result authorizes 15m runtime.
 
-## Active batches
-- research/strategy-v2-xau-mnq-20260922 — 17-strategy re-screen of XAUUSD + MNQ.
-- research/strategy-v2-btc-mcl-20260922 — 17-strategy re-screen of BTCUSD + MCL.
+## Fresh-data status
+- MNQ has only about 6 new 15m bars beyond the development dataset at this checkpoint.
+- BTCUSD has only about 26 new 15m bars beyond the development dataset.
+- This is insufficient for confirmation.
+- Treat these as the beginning of the unseen-data accumulation window.
 
 ## Next automatic actions
-1. Read each active run when complete.
-2. Extract per-timeframe diagnostics and 15m candidates.
-3. Launch mtf_compare only for promising 15m candidates.
-4. Compare MTF policies by OOS/forward robustness and trade-retention.
-5. Run full feature calibration only for a genuinely VALIDATED same-timeframe candidate.
-6. Update PROJECT_STATE.md after every accepted research result.
+1. Use the exact-provider OHLCV archive merger on future TradingView pulls to accumulate bars beyond the current 5000-bar rolling window.
+2. Preserve source identity, timeframe, timestamp deduplication and revised-bar evidence.
+3. Do not retune regime/MTF/pool rules on each small update.
+4. Once a materially larger unseen window exists, run confirmatory evaluation using frozen candidate hypotheses and unchanged gates.
+5. If a candidate passes on genuinely unseen data, require a second confirmation decision before any runtime calibration proposal.
+6. Run full feature calibration only for a genuinely validated same-entry-timeframe candidate.
+7. Continue keeping higher-timeframe validated research informational only.
+
+## Historical-source constraint
+The connected TradingView Official MCP currently exposes OHLCV count up to 5000 bars and no date cursor/offset. It cannot backfill a full older 15m year window in chunks. Any alternate historical source or manual export must be explicitly verified and must not be silently mixed with exact-provider evidence.
 
 ## Production safeguards
 - Safe Mode and Kill Switch remain enabled.
 - Manual approval and manual execution remain mandatory.
+- Research outputs always have live_trading_authority=false.
+- Validation gates remain unchanged.
 - Verified legacy TradingView production alerts remain the rollback baseline.
-- Six v1.1 MTF Family Breadth Pine feeds are code-ready but not yet the active TradingView alert snapshots.
+- No current research result authorizes a 15m competition trade.
 
 ## Owner dependency
-None now. Owner intervention is required only when a later step needs fresh TradingView indicator alerts, private Telegram credentials, or verified manual competition position/trade input.
+None now. Owner intervention is required only if a later step genuinely needs a user-controlled historical export/alternate source, private Telegram credentials, or verified manual competition position/trade input.

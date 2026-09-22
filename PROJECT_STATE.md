@@ -1305,3 +1305,138 @@ Interpretation:
 
 Owner intervention required now: NO.
 
+## Strategy Lab v2 / regime research continuation checkpoint — 2026-09-23
+
+Status: ACTIVE RESEARCH. Owner intervention required now: NO.
+
+### Completed Strategy Lab v2 exact-provider runs
+CAPITALCOM:XAUUSD:
+- 4h adx_ema_trend is VALIDATED: 33 OOS trades, +0.219728R expectancy, PF 1.502719; 18 forward trades, +0.031997R expectancy, PF 1.066191; robust score 47.216.
+- Probability calibration is available for this 4h research result only: n=51, estimated win probability 0.450980.
+- 15m remains NO_VALIDATED_STRATEGY. The higher-timeframe result does not authorize 15m competition entry.
+
+CME_MINI:MNQ1!:
+- 15m remains NO_VALIDATED_STRATEGY.
+- vwap_reversion baseline: 46 OOS trades, +0.179866R, PF 1.476996; 31 forward trades, -0.192629R, PF 0.648403.
+- Rejected for parameter instability and forward failure.
+
+CAPITALCOM:BTCUSD:
+- 1D trend_pullback remains VALIDATED as research-only higher-timeframe evidence.
+- 15m remains NO_VALIDATED_STRATEGY.
+- 15m bollinger_mean_reversion: 41 OOS trades, +0.117741R, PF 1.248510; 26 forward trades, -0.043356R, PF 0.927128; rejected.
+
+NYMEX:MCL1!:
+- No validated 15m strategy. No promotion.
+
+### Completed MTF comparison evidence
+- ETHUSD MTF comparison did not rescue a 15m candidate; stricter policies often reduced trade count to near-zero.
+- XAUUSD MTF comparison did not rescue a 15m candidate. Some test slices improved, but forward performance and/or sample depth remained inadequate.
+- Conclusion: do not increase MTF strictness simply to manufacture backtest quality.
+
+### Completed single-regime comparison evidence
+XAUUSD:
+- No individual BULL_TREND / BEAR_TREND / RANGE / TRANSITION filter validated a 15m strategy.
+
+MNQ:
+- vwap_reversion in BEAR_TREND improved materially but still failed gates:
+  - OOS: 25 trades, +0.114414R, PF 1.312752.
+  - Forward: 16 trades, +0.011505R, PF 1.026927.
+  - Still rejected for insufficient OOS sample, parameter/regime instability and forward PF below 1.05.
+
+BTCUSD:
+- bollinger_mean_reversion in TRANSITION was the closest single-regime result:
+  - OOS: 33 trades, +0.070312R, PF 1.136974.
+  - Forward: 21 trades, +0.127331R, PF 1.277691.
+  - Still rejected because OOS expectancy/PF remain below gates and parameter stability is inadequate.
+
+### Regime-pool research guardrail merged
+- PR #76 merged to main as e0e083a068ffe4fc39b6f218b13a11a94b0ca22f.
+- Full CI on the latest PR head: 288 tests passed.
+- Added research_mode=regime_pool_compare for a bounded exploratory sweep over predefined symmetric regime pools.
+- Only the two strongest adequately sampled 15m candidates are evaluated.
+- A same-dataset apparent pass is explicitly tagged FRESH_CONFIRMATION_REQUIRED.
+- Pool research cannot change matrix_selection, live_entry_selection or live_trading_authority.
+- Existing OOS/forward/stability/drawdown gates remain unchanged.
+
+### XAUUSD full higher-timeframe feature calibration completed
+- Research mode full completed successfully on the same exact-provider XAU dataset.
+- 4h adx_ema_trend remains VALIDATED.
+- 16 features were deployable at the validated 4h research scope; 17 were blocked.
+- Leading participation included break_retest (~9.07%), BOS (~7.34%), PPO (~6.54%) plus EMA/SMA alignment, trend-efficiency and related structure/momentum features.
+- 15m live-entry scope remains NO_VALIDATED_STRATEGY with 0 deployable features.
+- This calibration is informational/higher-timeframe only.
+
+### Historical data depth control merged
+- TradingView Official MCP OHLCV currently exposes count up to 5000 bars and no historical date cursor in the connected schema.
+- PR #77 merged to main as 8faaa8eea3c3053fdb0b1465c73d0be5517b786a.
+- CI after archive addition: 295 tests passed.
+- Added exact-provider OHLCV archive merge utility:
+  - fails closed on symbol/timeframe mismatch,
+  - validates OHLCV structure,
+  - deduplicates timestamps,
+  - records revised overlapping bars,
+  - preserves coverage/provenance metadata.
+- This supports accumulation of deeper forward history across future exact-provider pulls; it does not falsely claim old backfill that the current MCP cannot retrieve.
+
+### Active research runs
+1. research/regime-pool-mnq-20260923
+   - run 35788119034
+   - same MNQ historical dataset
+   - research_mode=regime_pool_compare
+   - status at this checkpoint: in progress
+
+2. research/regime-pool-btcusd-20260923
+   - run 35788144497
+   - same BTCUSD historical dataset
+   - research_mode=regime_pool_compare
+   - status at this checkpoint: in progress
+
+### Current decision
+- Do not relax any validation threshold.
+- Do not promote XAU 4h or BTC 1D research into 15m runtime.
+- Do not treat a regime-pool winner on reused data as confirmation.
+- If a pool appears to pass, require genuinely fresh/unseen confirmation before any promotion discussion.
+- Safe Mode, Kill Switch, manual approval and manual execution remain unchanged.
+
+Owner intervention required now: NO.
+
+### Regime-pool comparison final results — 2026-09-23
+
+MNQ run 35788119034 — COMPLETED SUCCESS:
+- Overall live-entry 15m remains NO_VALIDATED_STRATEGY.
+- No tested regime pool produced a non-zero robust score or a VALIDATED 15m result.
+- vwap_reversion TREND_ONLY retained 40 OOS trades with strong OOS figures (+0.213297R, PF 1.566365) but forward remained negative (-0.060762R, PF 0.882527) and parameter stability failed.
+- vwap_reversion BEAR_OR_RANGE produced positive OOS/forward quality (22 OOS trades, +0.103418R, PF 1.221531; 15 forward trades, +0.219413R, PF 1.510963) but was rejected for insufficient OOS sample and parameter/regime instability.
+- Pools retaining 30+ OOS trades did not cure the forward failure.
+- Decision: stop same-dataset regime tuning for MNQ. No promotion and no full feature calibration.
+
+BTCUSD run 35788144497 — COMPLETED SUCCESS:
+- Higher-timeframe 1D trend_pullback remains VALIDATED research-only; live-entry 15m remains NO_VALIDATED_STRATEGY.
+- No tested regime pool produced a non-zero robust score or a VALIDATED 15m result.
+- bollinger_mean_reversion pools with 30+ OOS trades (EXCLUDE_BULL, EXCLUDE_BEAR, EXCLUDE_RANGE) had weak/negative OOS expectancy and/or PF despite some positive forward slices.
+- BULL_OR_RANGE showed +0.088015R / PF 1.199006 in OOS but only 17 OOS trades and negative forward expectancy, therefore rejected.
+- failed_breakout_reversal pool results were all under-sampled and/or OOS-negative.
+- Decision: stop same-dataset regime tuning for BTCUSD. No promotion and no 15m calibration.
+
+Cross-market research conclusion:
+- Strategy expansion, no-lookahead MTF confirmation, single-regime filtering and bounded regime-pool testing have now all failed to produce a validated 15m competition strategy on the strongest re-screened candidates.
+- Do not add more same-dataset combinatorial filters to chase a pass.
+- Do not reduce sample, expectancy, profit-factor, drawdown, stability or forward gates.
+- Next evidence priority is genuinely unseen data and deeper history, not further same-window parameter/filter search.
+
+Fresh-data clock at checkpoint:
+- MNQ stored research dataset last 15m timestamp: 1790104500.
+- TradingView current available last 15m timestamp observed at checkpoint: 1790109900.
+- Approximately 6 new 15m bars exist beyond the development dataset: insufficient for confirmation.
+- BTCUSD stored research dataset last 15m timestamp: 1790090100.
+- TradingView current available last 15m timestamp observed at checkpoint: 1790113500.
+- Approximately 26 new 15m bars exist beyond the development dataset: insufficient for confirmation.
+- These bars start the unseen-data accumulation clock; they are not enough to claim fresh validation.
+
+Final decision for this stage:
+- Same-dataset 15m tuning is CLOSED for MNQ/BTC/XAU until additional unseen evidence is available.
+- Historical OHLCV accumulation becomes the next automatic research activity.
+- Existing higher-timeframe validated findings remain informational only.
+- Safe Mode, Kill Switch, manual approval and manual execution remain unchanged.
+- Owner intervention required now: NO.
+
