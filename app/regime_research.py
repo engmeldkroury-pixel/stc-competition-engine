@@ -18,8 +18,8 @@ from .strategy_lab import robust_trial_score
 
 REGIMES = ("BULL_TREND", "BEAR_TREND", "RANGE", "TRANSITION")
 
-# Exploratory, pre-registered regime pools. These are intentionally symmetric
-# and generic rather than fitted to one symbol. A passing pool still requires
+# Exploratory, predefined regime pools for the next research stage. These are intentionally symmetric
+# and generic rather than fitted to one symbol. Because these pools are defined after the single-regime exploration, a passing pool requires
 # fresh confirmatory data before any calibration/promotion decision.
 REGIME_POOLS = (
     ("TREND_ONLY", ("BULL_TREND", "BEAR_TREND")),
