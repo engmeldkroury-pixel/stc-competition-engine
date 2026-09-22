@@ -7,6 +7,8 @@ import json
 from pathlib import Path
 from typing import Any, Mapping
 
+from .indicator_catalog import feature_family
+
 
 UTC = timezone.utc
 DEFAULT_REGISTRY_PATH = Path(__file__).resolve().parents[1] / "research" / "calibration_registry.json"
@@ -29,7 +31,22 @@ class RuntimeCalibration:
     test_profit_factor: float
     forward_profit_factor: float
     feature_weights: Mapping[str, float]
+    family_weights: Mapping[str, float]
     informational_only: bool = True
+
+
+def _family_weights_from_features(feature_weights: Mapping[str, float]) -> dict[str, float]:
+    grouped: dict[str, float] = {}
+    for feature, weight in feature_weights.items():
+        try:
+            family = feature_family(feature).name
+        except KeyError:
+            continue
+        grouped[family] = grouped.get(family, 0.0) + max(0.0, float(weight))
+    total = sum(grouped.values())
+    if total <= 0:
+        return {}
+    return {family: value / total for family, value in grouped.items()}
 
 
 def _parse_utc(value: str) -> datetime:
@@ -58,6 +75,16 @@ def _record_from_dict(row: Mapping[str, Any]) -> RuntimeCalibration:
         feature_weights={
             str(k): float(v)
             for k, v in dict(row.get("feature_weights") or {}).items()
+        },
+        family_weights={
+            str(k): float(v)
+            for k, v in dict(
+                row.get("family_weights")
+                or _family_weights_from_features({
+                    str(fk): float(fv)
+                    for fk, fv in dict(row.get("feature_weights") or {}).items()
+                })
+            ).items()
         },
         informational_only=bool(row.get("informational_only", True)),
     )
@@ -152,6 +179,7 @@ def candidate_record_from_research_result(
         for k, v in dict(report.get("feature_participation_pct") or {}).items()
         if float(v) > 0
     }
+    family_weights = _family_weights_from_features(feature_weights)
     forward_expectancy = report.get("forward_expectancy_r")
     forward_pf = report.get("forward_profit_factor")
     if forward_expectancy is None or float(forward_expectancy) <= 0:
@@ -175,6 +203,7 @@ def candidate_record_from_research_result(
         "test_profit_factor": float(report["test_profit_factor"]),
         "forward_profit_factor": float(forward_pf),
         "feature_weights": feature_weights,
+        "family_weights": family_weights,
         "informational_only": True,
     }
 
