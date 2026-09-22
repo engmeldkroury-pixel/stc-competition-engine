@@ -1257,6 +1257,28 @@ Research conclusion remains unchanged:
 - Setup Quality is not Win Probability.
 - A higher-timeframe research winner cannot silently authorize/reweight a 15m live entry.
 
+
+
+### ETHUSD + M6E completed screening — 2026-09-22
+CAPITALCOM:ETHUSD:
+- Overall: NO_VALIDATED_STRATEGY.
+- Live-entry 15m: NO_VALIDATED_STRATEGY.
+- 2h SMC looked strong numerically (test expectancy +0.495R, PF 4.05; forward +0.571R, PF 2.74) but had only 5 test / 4 forward trades and parameter instability, so it was rejected.
+- 15m VWAP intraday had positive test expectancy +0.254R but forward expectancy -0.268R and PF 0.634; rejected.
+- No calibration candidate promoted.
+
+CME_MINI:M6E1!:
+- Overall: NO_VALIDATED_STRATEGY.
+- Live-entry 15m: NO_VALIDATED_STRATEGY.
+- 2h SMC had positive test/forward but only 4 test / 6 forward trades plus instability; rejected.
+- 1h mean reversion had 54 test trades but weak OOS edge and strongly negative forward expectancy; rejected.
+- 15m range rotation and volatility squeeze remained weak/forward-negative.
+- No calibration candidate promoted.
+
+Interpretation:
+- Strong-looking PF/expectancy on tiny samples is not treated as confidence.
+- Neither ETHUSD nor M6E is eligible for runtime calibration from this screen.
+
 ### Active research batches
 1. research/strategy-v2-xau-mnq-20260922
    - CAPITALCOM:XAUUSD
@@ -1270,10 +1292,6 @@ Research conclusion remains unchanged:
    - NYMEX:MCL1!
    - exact same historical datasets reused for fair comparison
    - matrix_only with 17 strategies
-   - status at checkpoint: in progress
-
-3. research/eth-m6e-screen-e-20260922
-   - exact-provider ETHUSD + M6E batch
    - status at checkpoint: in progress
 
 ### Immediate next execution sequence
