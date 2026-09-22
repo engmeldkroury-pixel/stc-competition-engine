@@ -13,6 +13,7 @@ from .research_dataset import (
 )
 from .research_report import build_strategy_research_report, report_to_dict
 from .mtf_research import validate_mtf_policies
+from .regime_research import validate_strategy_by_regime
 from .strategy_lab import STRATEGIES, classify_trial_status, robust_trial_score, trial_rejection_reasons
 from .walkforward import MatrixSelection, materialize_feature_series, matrix_selections_by_timeframe, strategy_matrix
 
@@ -143,6 +144,7 @@ def run_symbol_research(
     *,
     calibrate_features: bool = True,
     compare_mtf: bool = False,
+    compare_regimes: bool = False,
 ) -> dict[str, Any]:
     symbol = str(payload.get("symbol") or "").strip()
     if not symbol:
@@ -286,6 +288,53 @@ def run_symbol_research(
                 ],
             })
 
+    regime_validation = []
+    if compare_regimes:
+        by_strategy = {
+            row.trial.strategy_id: row
+            for row in validations
+            if row.trial.timeframe == "15"
+        }
+        entry_bars = bundle.get("15") or []
+        snapshots = snapshot_cache.get("15")
+        if snapshots is None and len(entry_bars) >= 900:
+            snapshots = materialize_feature_series(symbol, "15", entry_bars)
+            snapshot_cache["15"] = snapshots
+        for strategy_id in _select_mtf_candidate_ids(validations):
+            baseline = by_strategy[strategy_id]
+            regimes = validate_strategy_by_regime(
+                symbol=symbol,
+                timeframe="15",
+                bars=entry_bars,
+                strategy_id=strategy_id,
+                snapshots=snapshots,
+            )
+            regime_validation.append({
+                "strategy_id": strategy_id,
+                "baseline": {
+                    "research_class": classify_trial_status(baseline.trial),
+                    "rejection_reasons": list(trial_rejection_reasons(baseline.trial)),
+                    "robust_score": robust_trial_score(baseline.trial),
+                    "trial": asdict(baseline.trial),
+                    "test": asdict(baseline.test_stats),
+                    "forward": asdict(baseline.forward_stats),
+                },
+                "regimes": [
+                    {
+                        "regime": item.regime,
+                        "research_class": classify_trial_status(item.validation.trial),
+                        "rejection_reasons": list(trial_rejection_reasons(item.validation.trial)),
+                        "robust_score": item.robust_score,
+                        "test_retention": item.test_retention,
+                        "forward_retention": item.forward_retention,
+                        "trial": asdict(item.validation.trial),
+                        "test": asdict(item.validation.test_stats),
+                        "forward": asdict(item.validation.forward_stats),
+                    }
+                    for item in regimes
+                ],
+            })
+
     return {
         "schema_version": "stc-research-v1",
         "symbol": symbol,
@@ -319,6 +368,7 @@ def run_symbol_research(
         "live_entry_timeframe": "15",
         "live_entry_selection": asdict(live_entry_selection),
         "mtf_validation": mtf_validation,
+        "regime_validation": regime_validation,
         "strategy_trials": [
             {
                 "trial": asdict(row.trial),
