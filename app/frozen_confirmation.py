@@ -209,9 +209,25 @@ def evaluate_frozen_hypothesis(
             f"expected {hypothesis.symbol} {expected_interval}, got {symbol} {interval}"
         )
 
+    archive_meta = archive_payload.get("archive")
+    if not isinstance(archive_meta, dict):
+        raise ValueError("Frozen confirmation requires a confirmed exact-provider archive")
+    if archive_meta.get("provider") != "TradingView Official MCP":
+        raise ValueError("Frozen confirmation requires TradingView Official MCP archive provenance")
+
     bars = bars_from_tradingview_ohlcv(archive_payload)
     timestamps = [int(bar.timestamp.timestamp()) for bar in bars]
     archive_last_t = timestamps[-1] if timestamps else None
+    metadata_last_t = archive_meta.get("coverage_last_t")
+    if archive_last_t is not None and int(metadata_last_t or 0) != archive_last_t:
+        raise ValueError("Frozen confirmation archive coverage metadata does not match bars")
+    withheld_t = archive_meta.get("withheld_unconfirmed_t")
+    if (
+        archive_last_t is not None
+        and withheld_t is not None
+        and archive_last_t >= int(withheld_t)
+    ):
+        raise ValueError("Frozen confirmation archive still contains an unconfirmed tail bar")
     start_index = next(
         (index for index, timestamp in enumerate(timestamps) if timestamp > hypothesis.freeze_t),
         len(bars),
