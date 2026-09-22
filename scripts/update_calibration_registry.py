@@ -36,8 +36,13 @@ def main() -> int:
     )
     parser.add_argument(
         "--data-end-utc",
-        required=True,
-        help="Latest confirmed OHLCV timestamp used in research, ISO UTC.",
+        default=None,
+        help="Optional latest confirmed OHLCV timestamp. Defaults to the selected report timeframe end in the research result.",
+    )
+    parser.add_argument(
+        "--overall",
+        action="store_true",
+        help="Promote the overall best research report instead of the live-entry 15m report. Informational use only.",
     )
     parser.add_argument(
         "--generated-at-utc",
@@ -47,12 +52,21 @@ def main() -> int:
     args = parser.parse_args()
 
     result = json.loads(args.research_result.read_text(encoding="utf-8"))
-    data_end = _parse_utc(args.data_end_utc)
+    report_key = "research_report" if args.overall else "live_entry_research_report"
+    report = dict(result.get(report_key) or {})
+    selected_timeframe = str(report.get("selected_timeframe") or "")
+    if not selected_timeframe:
+        raise ValueError(f"{report_key} has no selected timeframe")
+    end_raw = args.data_end_utc or dict(result.get("derived_timeframe_end_utc") or {}).get(selected_timeframe)
+    if not end_raw:
+        raise ValueError("Selected timeframe data end is unavailable")
+    data_end = _parse_utc(str(end_raw))
     generated = _parse_utc(args.generated_at_utc) if args.generated_at_utc else datetime.now(UTC)
     record = candidate_record_from_research_result(
         result,
         data_end_utc=data_end,
         generated_at_utc=generated,
+        report_key=report_key,
     )
 
     registry = json.loads(args.registry.read_text(encoding="utf-8"))
