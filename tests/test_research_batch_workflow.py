@@ -136,3 +136,21 @@ def test_calibration_candidate_defaults_to_live_entry_report():
     candidate = printer.build_candidate(result)
     assert candidate["timeframe"] == "15"
     assert candidate["strategy_id"] == "trend_pullback"
+
+
+
+def test_split_directory_loader_supports_matrix_only_screening_mode(tmp_path):
+    runner = _load_runner()
+    target = tmp_path / "screen"
+    target.mkdir()
+    (target / "meta.json").write_text(
+        json.dumps({
+            "symbol": "CAPITALCOM:EURUSD",
+            "research_mode": "matrix_only",
+        }),
+        encoding="utf-8",
+    )
+    for filename in ("15m.json", "1h.json", "4h.json", "1D.json"):
+        (target / filename).write_text(json.dumps(_series()), encoding="utf-8")
+    payload = runner.load_series_dir(target)
+    assert payload["research_mode"] == "matrix_only"
