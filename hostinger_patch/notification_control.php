@@ -301,6 +301,14 @@ function stc_notify_signal_event(PDO $pdo, array $config, string $eventId): arra
         }
     }
     $probability = is_array($signal['empirical_win_probability'] ?? null) ? $signal['empirical_win_probability'] : [];
+    $family = is_array($signal['live_family_evidence'] ?? null) ? $signal['live_family_evidence'] : [];
+    $familyText = 'UNAVAILABLE';
+    if ($family !== []) {
+        $familyText = (isset($family['score']) ? number_format((float)$family['score'], 2, '.', '') : '-')
+            . ' | agreement ' . number_format((float)($family['agreement_ratio'] ?? 0.0) * 100.0, 0, '.', '') . '%'
+            . ' | aligned ' . (int)($family['aligned_families'] ?? 0) . '/9'
+            . ' | conflicts ' . (int)($family['conflicting_families'] ?? 0);
+    }
     $probabilityText = 'NOT CALIBRATED';
     if (isset($probability['estimated_probability']) && is_numeric($probability['estimated_probability'])) {
         $probabilityText = number_format((float)$probability['estimated_probability'] * 100.0, 1, '.', '')
@@ -319,6 +327,7 @@ function stc_notify_signal_event(PDO $pdo, array $config, string $eventId): arra
         'Setup quality: ' . ($qualityScore === null ? '-' : $qualityScore . '/100'),
         'Empirical win probability: ' . $probabilityText,
         'MTF: ' . implode(' | ', $tfParts),
+        'Evidence families: ' . $familyText,
         'Signal score: ' . number_format((float)($signal['composite_score'] ?? 0.0), 2, '.', ''),
         'Single-TP mode: place only the final take-profit; STC uses the checkpoint for protection logic.',
         'Reconfirm the live price before approval.',
