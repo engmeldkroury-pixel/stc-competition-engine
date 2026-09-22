@@ -12,6 +12,7 @@ from .signals import (
     evaluate,
     factors_from_tradingview,
     historical_regime_from_tradingview,
+    high_conviction_assessment,
     liquidity_quality_from_tradingview,
     short_term_score_from_tradingview,
     volatility_quality_from_tradingview,
@@ -105,7 +106,24 @@ def decide_bridge_event(event_id: str, payload: dict) -> dict:
             liquidity_quality=liquidity_quality,
         ),
     )
-    result = evaluate(req).model_copy(update={"signal_id": deterministic_signal_id(event_id)})
+    base_result = evaluate(req).model_copy(update={"signal_id": deterministic_signal_id(event_id)})
+    gate_passed, gate_failures = high_conviction_assessment(
+        recommendation=base_result.recommendation,
+        composite_score=base_result.composite_score,
+        short_term_technical=short_term_technical,
+        historical_regime=historical_regime,
+        blended_technical=technical,
+        volatility_quality=volatility_quality,
+        liquidity_quality=liquidity_quality,
+    )
+
+    final_recommendation = base_result.recommendation if gate_passed else "WAIT"
+    gate_reason = "high_conviction_gate=PASSED" if gate_passed else "high_conviction_gate=BLOCKED"
+    gate_details = (
+        ["setup_grade=A_PLUS"]
+        if gate_passed
+        else [f"gate_block={reason}" for reason in gate_failures]
+    )
     extra_reasons = [
         f"short_term_technical={short_term_technical:+.2f}",
         "historical_regime=unavailable" if historical_regime is None else f"historical_regime={historical_regime:+.2f}",
@@ -114,9 +132,18 @@ def decide_bridge_event(event_id: str, payload: dict) -> dict:
         f"liquidity_quality_live={liquidity_quality:+.2f}",
         "news_factor=unavailable_live_source",
         "macro_factor=unavailable_live_source",
+        gate_reason,
+        *gate_details,
     ]
-    result = result.model_copy(update={"reasons": extra_reasons + result.reasons})
+    result = base_result.model_copy(update={
+        "recommendation": final_recommendation,
+        "reasons": extra_reasons + base_result.reasons,
+    })
     result_dict = result.model_dump()
+    result_dict["quality_gate_passed"] = gate_passed
+    result_dict["setup_grade"] = "A_PLUS" if gate_passed else "MONITOR_ONLY"
+    result_dict["pre_gate_recommendation"] = base_result.recommendation
+    result_dict["quality_gate_failures"] = gate_failures
     envelope = build_approval_envelope(payload, result.composite_score)
     locked_plan = build_locked_trade_plan(event_id, payload, result_dict, envelope)
     status = "analyzed"
