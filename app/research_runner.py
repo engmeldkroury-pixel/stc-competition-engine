@@ -175,11 +175,20 @@ def run_symbol_research(
         bars = bars_from_tradingview_ohlcv(part)
         raw_bars[normalized_key] = bars
         quality[source_key] = data_quality_report(symbol, source_key, bars)
-        if not quality[source_key].quality_ok:
+        report = quality[source_key]
+        fatal_integrity_failure = (
+            report.bars == 0
+            or report.duplicate_timestamps > 0
+            or report.non_monotonic_pairs > 0
+        )
+        if fatal_integrity_failure:
             raise ValueError(
                 f"Research data quality failed for {symbol} {source_key}: "
-                + ",".join(quality[source_key].notes)
+                + ",".join(report.notes)
             )
+        # Short provider history is not an integrity failure. Keep the exact
+        # series in the bundle and let strategy_matrix skip any timeframe with
+        # fewer than the 900 bars required for walk-forward validation.
 
     bundle = research_timeframe_bundle(
         bars_15m=raw_bars["15"],
@@ -399,6 +408,11 @@ def run_symbol_research(
         "data_quality": {
             key: asdict(value) for key, value in quality.items()
         },
+        "insufficient_history_series": [
+            key
+            for key, value in quality.items()
+            if "insufficient_for_walk_forward_900_bar_minimum" in value.notes
+        ],
         "derived_timeframes": {
             key: len(value) for key, value in bundle.items()
         },
