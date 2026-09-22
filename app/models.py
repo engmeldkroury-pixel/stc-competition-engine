@@ -164,6 +164,15 @@ class TradingViewWebhook(BaseModel):
     trend_4h_score: float | None = None
     trend_1m_time: datetime | None = None
     trend_1m_score: float | None = None
+    family_trend: float | None = None
+    family_momentum: float | None = None
+    family_volatility: float | None = None
+    family_volume: float | None = None
+    family_vwap: float | None = None
+    family_market_structure: float | None = None
+    family_smc_liquidity: float | None = None
+    family_price_action: float | None = None
+    family_microstructure: float | None = None
     history_timeframe: str | None = None
     history_time: datetime | None = None
     history_close: float | None = None
@@ -221,6 +230,28 @@ class TradingViewWebhook(BaseModel):
                 raise ValueError(f"{time_name}/{score_name} must be both present or both absent")
             if s is not None and not -1.0 <= float(s) <= 1.0:
                 raise ValueError(f"{score_name} must be between -1 and 1")
+        return self
+
+    @model_validator(mode="after")
+    def validate_live_family_evidence(self):
+        names = (
+            "family_trend",
+            "family_momentum",
+            "family_volatility",
+            "family_volume",
+            "family_vwap",
+            "family_market_structure",
+            "family_smc_liquidity",
+            "family_price_action",
+            "family_microstructure",
+        )
+        values = [getattr(self, name) for name in names]
+        present = [value is not None for value in values]
+        if any(present) and not all(present):
+            raise ValueError("live family evidence must be complete or absent")
+        for name, value in zip(names, values):
+            if value is not None and not -1.0 <= float(value) <= 1.0:
+                raise ValueError(f"{name} must be between -1 and 1")
         return self
 
     @model_validator(mode="after")
