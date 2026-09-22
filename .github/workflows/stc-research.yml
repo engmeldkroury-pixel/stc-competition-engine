@@ -95,6 +95,25 @@ jobs:
                   "live_entry_probability_sample_size": live_p.get("sample_size"),
                   "live_entry_deployable_features": live.get("deployable_feature_count"),
               }, sort_keys=True))
+              for label, key in (
+                  ("overall", "research_report"),
+                  ("live_entry", "live_entry_research_report"),
+              ):
+                  report_for_features = data.get(key) or {}
+                  weights = report_for_features.get("feature_participation_pct") or {}
+                  top_features = sorted(
+                      ((str(name), float(value)) for name, value in weights.items()),
+                      key=lambda item: item[1],
+                      reverse=True,
+                  )[:12]
+                  print("STC_FEATURE_PARTICIPATION=" + json.dumps({
+                      "symbol": data["symbol"],
+                      "scope": label,
+                      "strategy": report_for_features.get("selected_strategy"),
+                      "timeframe": report_for_features.get("selected_timeframe"),
+                      "deployable_feature_count": report_for_features.get("deployable_feature_count"),
+                      "top_features_pct": dict(top_features),
+                  }, sort_keys=True))
               trials = sorted(
                   data.get("strategy_trials") or [],
                   key=lambda row: (
