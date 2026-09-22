@@ -47,7 +47,7 @@ STRATEGIES: tuple[StrategySpec, ...] = (
         "SMC",
         "Market structure, BOS/CHoCH, liquidity sweep, order-block/FVG confluence.",
         ("15", "60", "120", "240"),
-        ("market_structure", "liquidity", "price_action", "volatility"),
+        ("market_structure", "smc_liquidity", "price_action", "volatility"),
         ("forex", "crypto", "indices", "metals", "energy", "rates"),
     ),
     StrategySpec(
@@ -79,7 +79,7 @@ STRATEGIES: tuple[StrategySpec, ...] = (
         "INTRADAY",
         "VWAP/anchored-VWAP continuation or reversion with session structure.",
         ("5", "15", "60"),
-        ("vwap", "volume", "market_structure", "liquidity"),
+        ("vwap", "volume", "market_structure", "smc_liquidity"),
         ("indices", "metals", "energy", "forex", "crypto"),
     ),
     StrategySpec(
@@ -87,7 +87,7 @@ STRATEGIES: tuple[StrategySpec, ...] = (
         "SCALP",
         "Short-horizon momentum scalp requiring high liquidity and tight spread/volatility control.",
         ("1", "3", "5", "15"),
-        ("microstructure", "liquidity", "momentum", "volatility"),
+        ("microstructure", "smc_liquidity", "momentum", "volatility"),
         ("indices", "forex", "metals", "energy", "crypto"),
     ),
     StrategySpec(
@@ -103,7 +103,7 @@ STRATEGIES: tuple[StrategySpec, ...] = (
         "VOLATILITY",
         "Trade post-squeeze expansion only after direction and liquidity confirmation.",
         ("15", "60", "120", "240"),
-        ("volatility", "volume", "trend", "liquidity"),
+        ("volatility", "volume", "trend", "smc_liquidity"),
         ("forex", "crypto", "indices", "metals", "energy"),
     ),
     StrategySpec(
