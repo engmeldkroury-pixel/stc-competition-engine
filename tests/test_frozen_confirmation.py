@@ -135,6 +135,7 @@ def test_frozen_confirmation_passes_exact_params_and_never_grants_live_authority
     assert result.stats.expectancy_r > 0.08
     assert result.stats.profit_factor >= 1.15
     assert result.segment_stability == 1.0
+    assert result.segments_evaluated == 3
     assert result.optimization_locked is True
     assert result.second_confirmation_required is True
     assert result.live_calibration_authority is False
@@ -213,3 +214,25 @@ def test_frozen_confirmation_rejects_archive_that_still_contains_mutable_tail():
 
     with pytest.raises(ValueError, match="unconfirmed tail"):
         fc.evaluate_frozen_hypothesis(archive, hypothesis)
+
+
+def test_hypothesis_manifest_cannot_claim_live_calibration_authority():
+    raw = {
+        "hypothesis_id": "bad_live",
+        "symbol": "TEST:X",
+        "timeframe": "15",
+        "strategy_id": "vwap_reversion",
+        "archive_path": "unused.json",
+        "freeze_t": 1700000000,
+        "role": "BASELINE_COMPARATOR",
+        "development_status": "FORWARD_FAILED",
+        "live_calibration_authority": True,
+        "params": {
+            "threshold": 0.72,
+            "stop_atr": 1.2,
+            "target_r": 2.5,
+            "max_hold_bars": 16,
+        },
+    }
+    with pytest.raises(ValueError, match="cannot grant live calibration authority"):
+        fc.hypothesis_from_dict(raw)
