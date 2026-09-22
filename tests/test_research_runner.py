@@ -49,6 +49,8 @@ def test_research_runner_builds_quality_checked_standard_bundle(monkeypatch):
     assert captured["symbol"] == "CAPITALCOM:XAUUSD"
     assert captured["asset_class"] == "metals"
     assert captured["keys"] == {"15", "60", "120", "240", "1D", "1M"}
+    assert set(result["derived_timeframe_end_utc"]) == {"15", "60", "120", "240", "1D", "1M"}
+    assert result["derived_timeframe_end_utc"]["15"] is not None
     assert result["research_report"]["status"] == "NO_VALIDATED_STRATEGY"
     assert result["live_trading_authority"] is False
     assert all(q["quality_ok"] for q in result["data_quality"].values())

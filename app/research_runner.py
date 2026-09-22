@@ -133,6 +133,10 @@ def run_symbol_research(
         "derived_timeframes": {
             key: len(value) for key, value in bundle.items()
         },
+        "derived_timeframe_end_utc": {
+            key: (value[-1].timestamp.isoformat().replace("+00:00", "Z") if value else None)
+            for key, value in bundle.items()
+        },
         "matrix_selection": asdict(selection),
         "strategy_trials": [
             {
