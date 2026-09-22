@@ -68,7 +68,7 @@ jobs:
               data = json.loads(path.read_text())
               report = data["research_report"]
               p = report.get("setup_probability") or {}
-              print(json.dumps({
+              print("STC_RESEARCH_SUMMARY=" + json.dumps({
                   "symbol": data["symbol"],
                   "status": report["status"],
                   "strategy": report.get("selected_strategy"),
@@ -85,6 +85,34 @@ jobs:
                   "probability_sample_size": p.get("sample_size"),
                   "deployable_features": report.get("deployable_feature_count"),
               }, sort_keys=True))
+              trials = sorted(
+                  data.get("strategy_trials") or [],
+                  key=lambda row: (
+                      float(row.get("robust_score") or 0.0),
+                      float((row.get("test") or {}).get("expectancy_r") or 0.0),
+                      float((row.get("test") or {}).get("profit_factor") or 0.0),
+                  ),
+                  reverse=True,
+              )[:8]
+              for row in trials:
+                  trial = row.get("trial") or {}
+                  test = row.get("test") or {}
+                  forward = row.get("forward") or {}
+                  print("STC_TRIAL_DIAGNOSTIC=" + json.dumps({
+                      "symbol": data["symbol"],
+                      "strategy": trial.get("strategy_id"),
+                      "timeframe": trial.get("timeframe"),
+                      "robust_score": row.get("robust_score"),
+                      "rejection_reasons": row.get("rejection_reasons"),
+                      "test_trades": test.get("trades"),
+                      "test_expectancy_r": test.get("expectancy_r"),
+                      "test_profit_factor": test.get("profit_factor"),
+                      "test_win_rate": test.get("win_rate"),
+                      "forward_trades": forward.get("trades"),
+                      "forward_expectancy_r": forward.get("expectancy_r"),
+                      "forward_profit_factor": forward.get("profit_factor"),
+                      "max_drawdown_r": trial.get("max_drawdown_r"),
+                  }, sort_keys=True))
           PY
 
       - name: Print calibration candidates
