@@ -103,6 +103,9 @@ def decide_bridge_event(event_id: str, payload: dict) -> dict:
         tv.symbol,
         as_of=tv.time,
     )
+    calibration_matches_entry_timeframe = (
+        calibration is not None and str(calibration.timeframe) == str(tv.timeframe)
+    )
     family_evidence = aggregate_live_family_scores(
         {
             "trend": tv.family_trend,
@@ -115,8 +118,16 @@ def decide_bridge_event(event_id: str, payload: dict) -> dict:
             "price_action": tv.family_price_action,
             "microstructure": tv.family_microstructure,
         },
-        strategy_id=None if calibration is None else calibration.strategy_id,
-        family_weight_override=None if calibration is None else calibration.family_weights,
+        strategy_id=(
+            calibration.strategy_id
+            if calibration_matches_entry_timeframe and calibration is not None
+            else None
+        ),
+        family_weight_override=(
+            calibration.family_weights
+            if calibration_matches_entry_timeframe and calibration is not None
+            else None
+        ),
     )
     technical = factors_from_tradingview(tv)
     volatility_quality = volatility_quality_from_tradingview(tv, technical)
@@ -211,7 +222,9 @@ def decide_bridge_event(event_id: str, payload: dict) -> dict:
         "family_scores": dict(family_evidence.family_scores),
         "family_weights_used": dict(family_evidence.family_weights_used),
         "strategy_id": family_evidence.strategy_id,
-        "calibration_applied": calibration is not None,
+        "calibration_applied": calibration_matches_entry_timeframe,
+        "calibration_timeframe": None if calibration is None else calibration.timeframe,
+        "entry_timeframe": str(tv.timeframe),
     }
     result_dict["timeframe_confirmation"] = {
         "entry_timeframe": str(tv.timeframe),
