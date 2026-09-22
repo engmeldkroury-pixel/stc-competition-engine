@@ -4,7 +4,7 @@ from dataclasses import asdict
 from typing import Any
 
 from .asset_classification import strategy_asset_class
-from .feature_validation import FeatureValidation, validate_feature_weight
+from .feature_validation import FeatureValidation, atr_series_by_index, validate_feature_weight
 from .indicator_catalog import FEATURE_FAMILIES
 from .research_dataset import (
     bars_from_tradingview_ohlcv,
@@ -75,6 +75,7 @@ def _calibrate_selection_features(
     if snapshots is None:
         snapshots = materialize_feature_series(symbol, selection.timeframe, bars)
         cache[selection.timeframe] = snapshots
+    atr_values = atr_series_by_index(bars, 14)
     n = len(bars)
     train_end = max(520, int(n * 0.58))
     test_end = max(train_end + 120, int(n * 0.82))
@@ -92,6 +93,7 @@ def _calibrate_selection_features(
             test_end=test_end,
             forward_end=n - 1,
             horizon_bars=horizon,
+            atr_values=atr_values,
         )
         for feature in _strategy_feature_names(selection.strategy_id)
     ]
