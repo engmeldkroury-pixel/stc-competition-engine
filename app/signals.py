@@ -159,6 +159,9 @@ def high_conviction_assessment(
     volatility_quality: float,
     liquidity_quality: float,
     confirmation_score: float | None,
+    trend_2h_score: float | None,
+    trend_4h_score: float | None,
+    trend_1m_score: float | None,
 ) -> tuple[bool, list[str]]:
     """Fail-closed A+ entry gate for competition alerts.
 
@@ -172,7 +175,13 @@ def high_conviction_assessment(
     checks: list[tuple[str, bool]] = [
         ("historical_context_present", historical_regime is not None),
         ("confirmation_context_present", confirmation_score is not None),
-        ("confirmation_alignment", confirmation_score is not None and sign * confirmation_score >= 0.70),
+        ("confirmation_alignment_1h", confirmation_score is not None and sign * confirmation_score >= 0.70),
+        ("trend_2h_present", trend_2h_score is not None),
+        ("trend_2h_alignment", trend_2h_score is not None and sign * trend_2h_score >= 0.65),
+        ("trend_4h_present", trend_4h_score is not None),
+        ("trend_4h_alignment", trend_4h_score is not None and sign * trend_4h_score >= 0.65),
+        ("trend_1m_present", trend_1m_score is not None),
+        ("trend_1m_alignment", trend_1m_score is not None and sign * trend_1m_score >= 0.55),
         ("short_term_strength", sign * short_term_technical >= 0.75),
         ("historical_alignment", historical_regime is not None and sign * historical_regime >= 0.55),
         ("blended_technical_strength", sign * blended_technical >= 0.70),
@@ -182,6 +191,43 @@ def high_conviction_assessment(
     ]
     failed = [name for name, ok in checks if not ok]
     return failed == [], failed
+
+
+
+def setup_quality_score(
+    *,
+    recommendation: str,
+    short_term_technical: float,
+    confirmation_score: float | None,
+    trend_2h_score: float | None,
+    trend_4h_score: float | None,
+    historical_regime: float | None,
+    trend_1m_score: float | None,
+    blended_technical: float,
+    volatility_quality: float,
+    liquidity_quality: float,
+) -> int:
+    """Return a transparent 0-100 setup-quality score, not win probability."""
+    if recommendation not in {"LONG", "SHORT"}:
+        return 0
+    sign = 1.0 if recommendation == "LONG" else -1.0
+
+    components = [
+        (sign * short_term_technical, 0.16),
+        (sign * (confirmation_score or -1.0), 0.18),
+        (sign * (trend_2h_score or -1.0), 0.14),
+        (sign * (trend_4h_score or -1.0), 0.14),
+        (sign * (historical_regime or -1.0), 0.14),
+        (sign * (trend_1m_score or -1.0), 0.10),
+        (sign * blended_technical, 0.06),
+        (sign * volatility_quality, 0.04),
+        (sign * liquidity_quality, 0.04),
+    ]
+    raw = 0.0
+    for value, weight in components:
+        normalized = max(0.0, min(1.0, (float(value) + 1.0) / 2.0))
+        raw += normalized * weight
+    return int(round(max(0.0, min(1.0, raw)) * 100.0))
 
 
 def factors_from_tradingview(payload: TradingViewWebhook) -> float:
