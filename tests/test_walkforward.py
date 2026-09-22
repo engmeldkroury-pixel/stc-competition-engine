@@ -1,5 +1,6 @@
 
 from datetime import datetime, timedelta, timezone
+from types import SimpleNamespace
 
 import pytest
 
@@ -89,6 +90,11 @@ def test_backtest_enters_next_bar_and_treats_ambiguous_bar_conservatively(monkey
             "risk_per_unit": 10.0,
         },
     )
+    monkeypatch.setattr(
+        wf,
+        "estimate_research_cost_r",
+        lambda *args, **kwargs: SimpleNamespace(total_r=0.0),
+    )
 
     params = BacktestParams(
         threshold=0.5,
@@ -131,7 +137,7 @@ def test_parameter_grid_matches_live_single_tp_execution_contract():
 def test_walk_forward_engine_runs_on_chronological_synthetic_history():
     bars = _bars(930, slope=0.10)
     result = walk_forward_validate(
-        "TEST:X",
+        "CAPITALCOM:XAUUSD",
         "15",
         bars,
         "trend_pullback",
