@@ -91,6 +91,9 @@ try {
         if (($signal['recommendation'] ?? '') === 'WAIT') {
             $reasons[] = 'wait_is_not_an_order';
         }
+        if (($signal['quality_gate_passed'] ?? false) !== true || ($signal['setup_grade'] ?? '') !== 'A_PLUS') {
+            $reasons[] = 'high_conviction_gate_not_passed';
+        }
         $validUntil = stc_parse_utc((string)($envelope['valid_until'] ?? ''));
         $now = new DateTimeImmutable('now', new DateTimeZone('UTC'));
         if ($validUntil === null || $now >= $validUntil) {
