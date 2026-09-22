@@ -124,3 +124,45 @@ def test_runtime_registry_returns_only_current_robust_record(tmp_path):
     assert ok is True
     assert validation_reasons == ()
     assert found.strategy_id == "smc_structure_liquidity"
+
+
+
+def test_runtime_lookup_filters_by_exact_timeframe(tmp_path):
+    now = datetime(2026, 9, 22, tzinfo=UTC)
+    one_hour = candidate_record_from_research_result(
+        _research_result(),
+        data_end_utc=now - timedelta(hours=2),
+        generated_at_utc=now - timedelta(hours=1),
+    )
+    fifteen = dict(one_hour)
+    fifteen["timeframe"] = "15"
+    fifteen["strategy_id"] = "breakout_expansion"
+    path = tmp_path / "registry.json"
+    path.write_text(
+        json.dumps({
+            "schema_version": "stc-calibration-registry-v1",
+            "records": [one_hour, fifteen],
+        }),
+        encoding="utf-8",
+    )
+    load_registry.cache_clear()
+
+    found, reasons = lookup_runtime_calibration(
+        "CAPITALCOM:XAUUSD",
+        as_of=now,
+        timeframe="15",
+        path=str(path),
+    )
+    assert reasons == ()
+    assert found is not None
+    assert found.timeframe == "15"
+    assert found.strategy_id == "breakout_expansion"
+
+    missing, reasons = lookup_runtime_calibration(
+        "CAPITALCOM:XAUUSD",
+        as_of=now,
+        timeframe="30",
+        path=str(path),
+    )
+    assert missing is None
+    assert reasons == ("no_calibrated_research_record_for_timeframe",)
