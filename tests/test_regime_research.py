@@ -5,6 +5,8 @@ import pytest
 from app.evidence_engine import EvidenceObservation
 from app.historical_features import HistoricalFeatureSnapshot
 from app.regime_research import (
+    REGIME_POOLS,
+    RegimePoolValidationResult,
     classify_market_regime,
     make_regime_signal_gate,
 )
@@ -103,3 +105,43 @@ def test_regime_signal_gate_rejects_unknown_regime_name():
             snapshots={},
             allowed_regimes=("MAGIC_REGIME",),
         )
+
+
+def test_regime_pool_catalog_is_unique_and_uses_known_regimes():
+    names = [name for name, _ in REGIME_POOLS]
+    regime_sets = [frozenset(regimes) for _, regimes in REGIME_POOLS]
+    assert len(names) == len(set(names))
+    assert len(regime_sets) == len(set(regime_sets))
+    assert all(regimes for regimes in regime_sets)
+    assert all(regimes.issubset({"BULL_TREND", "BEAR_TREND", "RANGE", "TRANSITION"}) for regimes in regime_sets)
+
+
+def test_regime_signal_gate_supports_multi_regime_pool():
+    snapshots = {
+        10: _snapshot(
+            ema_9_20_50_100_200_alignment=0.8,
+            market_structure_trend=0.8,
+            dmi_plus_minus=0.8,
+            adx=0.8,
+            trend_efficiency_ratio=0.7,
+        ),
+        11: _snapshot(
+            ema_9_20_50_100_200_alignment=-0.8,
+            market_structure_trend=-0.8,
+            dmi_plus_minus=-0.8,
+            adx=-0.8,
+            trend_efficiency_ratio=-0.7,
+        ),
+    }
+    gate = make_regime_signal_gate(
+        snapshots=snapshots,
+        allowed_regimes=("BULL_TREND", "BEAR_TREND"),
+    )
+    assert gate(10, 1, 0.8, None) is True
+    assert gate(11, 1, 0.8, None) is True
+    assert gate(12, 1, 0.8, None) is False
+
+
+def test_regime_pool_results_default_to_fresh_confirmation_required():
+    result = RegimePoolValidationResult.__dataclass_fields__["fresh_confirmation_required"]
+    assert result.default is True
