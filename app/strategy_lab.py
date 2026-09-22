@@ -149,6 +149,11 @@ def _trial_reasons(trial: StrategyTrial) -> list[str]:
     return reasons
 
 
+def trial_rejection_reasons(trial: StrategyTrial) -> tuple[str, ...]:
+    """Public diagnostics for why a trial did not pass robustness gates."""
+    return tuple(_trial_reasons(trial))
+
+
 def robust_trial_score(trial: StrategyTrial) -> float:
     """Score robustness, not headline backtest return."""
     reasons = _trial_reasons(trial)
