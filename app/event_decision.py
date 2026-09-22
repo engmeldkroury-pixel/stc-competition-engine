@@ -137,12 +137,15 @@ def decide_bridge_event(event_id: str, payload: dict) -> dict:
         liquidity_quality=liquidity_quality,
     )
 
-    final_recommendation = base_result.recommendation if gate_passed else "WAIT"
-    gate_reason = "high_conviction_gate=PASSED" if gate_passed else "high_conviction_gate=BLOCKED"
+    final_gate_passed = gate_passed and quality_score >= 90
+    if gate_passed and quality_score < 90:
+        gate_failures = [*gate_failures, "setup_quality_below_90"]
+    final_recommendation = base_result.recommendation if final_gate_passed else "WAIT"
+    gate_reason = "high_conviction_gate=PASSED" if final_gate_passed else "high_conviction_gate=BLOCKED"
     gate_details = (
-        ["setup_grade=A_PLUS"]
-        if gate_passed
-        else [f"gate_block={reason}" for reason in gate_failures]
+        ["setup_grade=A_PLUS", f"setup_quality={quality_score}/100"]
+        if final_gate_passed
+        else [f"gate_block={reason}" for reason in gate_failures] + [f"setup_quality={quality_score}/100"]
     )
     extra_reasons = [
         f"short_term_technical={short_term_technical:+.2f}",
@@ -164,14 +167,10 @@ def decide_bridge_event(event_id: str, payload: dict) -> dict:
         "reasons": extra_reasons + base_result.reasons,
     })
     result_dict = result.model_dump()
-    result_dict["quality_gate_passed"] = gate_passed
+    result_dict["quality_gate_passed"] = final_gate_passed
     result_dict["setup_quality_score"] = quality_score
     result_dict["setup_quality_label"] = f"{quality_score}/100 setup quality; not a win probability"
-    result_dict["setup_grade"] = "A_PLUS" if gate_passed and quality_score >= 90 else "MONITOR_ONLY"
-    if result_dict["setup_grade"] != "A_PLUS":
-        result_dict["quality_gate_passed"] = False
-        result = result.model_copy(update={"recommendation": "WAIT"})
-        result_dict["recommendation"] = "WAIT"
+    result_dict["setup_grade"] = "A_PLUS" if final_gate_passed else "MONITOR_ONLY"
     result_dict["pre_gate_recommendation"] = base_result.recommendation
     result_dict["quality_gate_failures"] = gate_failures
     envelope = build_approval_envelope(payload, result.composite_score)
