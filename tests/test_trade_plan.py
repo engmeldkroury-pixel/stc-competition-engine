@@ -1,7 +1,12 @@
 from datetime import datetime, timezone
 
 from app.event_decision import decide_bridge_event
-from app.trade_plan import build_locked_trade_plan, deterministic_plan_id
+from app.trade_plan import (
+    LIVE_PLAN_FINAL_TARGET_RR,
+    LIVE_PLAN_STOP_ATR_MULTIPLE,
+    build_locked_trade_plan,
+    deterministic_plan_id,
+)
 
 
 
@@ -119,3 +124,33 @@ def test_wait_signal_has_no_locked_trade_plan():
     result = decide_bridge_event("evt-plan-wait", weak)
     assert result["decision"]["signal"]["recommendation"] == "WAIT"
     assert result["decision"]["locked_trade_plan"] is None
+
+
+
+def test_live_plan_constants_define_single_final_tp_contract():
+    signal = {
+        "recommendation": "LONG",
+        "competition_id": "capital-africa-sep-2026",
+        "symbol": "CAPITALCOM:XAUUSD",
+        "signal_id": "signal-test-plan-constants",
+        "composite_score": 0.8,
+    }
+    envelope = {
+        "competition_id": "capital-africa-sep-2026",
+        "symbol": "CAPITALCOM:XAUUSD",
+        "entry_min": 100.0,
+        "entry_max": 100.0,
+        "reference_price": 100.0,
+        "valid_until": "2026-09-22T00:30:00Z",
+    }
+    payload = {
+        "competition_id": "capital-africa-sep-2026",
+        "symbol": "CAPITALCOM:XAUUSD",
+        "timeframe": "15",
+        "time": "2026-09-22T00:00:00Z",
+        "atr14": 10.0,
+    }
+    plan = build_locked_trade_plan("evt-plan-constants", payload, signal, envelope)
+    assert plan is not None
+    assert plan["target2_rr"] == LIVE_PLAN_FINAL_TARGET_RR == 2.50
+    assert plan["risk_per_unit"] == 10.0 * LIVE_PLAN_STOP_ATR_MULTIPLE
