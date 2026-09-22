@@ -1151,3 +1151,30 @@ Active screening batches:
 - At this checkpoint both batches are in the no-lookahead computation step with complete input sets and no active data-quality failure.
 
 Owner intervention required now: NO.
+
+
+### Metals + energy matrix screening — XAGUSD + MCL — 2026-09-22
+
+CAPITALCOM:XAGUSD:
+- Overall: NO_VALIDATED_STRATEGY.
+- Live-entry 15m: NO_VALIDATED_STRATEGY.
+- 15m best candidate range_rotation was negative in both test and forward and was rejected.
+- 30m smc_structure_liquidity looked strong in test (expectancy +0.457R, PF 2.213, 14 trades) but failed forward badly (expectancy -0.701R, PF 0.211, 8 trades), confirming the no-overfit rejection policy.
+- 4h SMC and volatility/momentum candidates also showed positive test metrics followed by negative forward performance or instability.
+- No calibration candidate was promoted.
+
+NYMEX:MCL1!:
+- Overall: NO_VALIDATED_STRATEGY.
+- Live-entry 15m: NO_VALIDATED_STRATEGY.
+- 15m smc_structure_liquidity: test expectancy -0.016R, PF 0.974; forward expectancy -0.606R, PF 0.325. Rejected as FORWARD_FAILED.
+- 1h breakout_expansion showed positive test expectancy +0.303R/PF 1.666 but only 5 test trades and near-flat forward performance; rejected for sample depth and instability.
+- 2h volatility_squeeze had positive forward metrics but weak test edge/sample/parameter stability, so it was not promoted.
+- No calibration candidate was promoted.
+
+Operational research workflow improvement:
+- main commit fdc781aad4db97711cba3acf1f6e97b75e3ba12f gates the research workflow on an explicit research_inputs/READY marker.
+- Individual OHLCV uploads no longer start incomplete research runs.
+- A research branch should upload all symbol/timeframe inputs first, then write/update research_inputs/READY exactly once to start the batch.
+- This is workflow hygiene only; no research formulas, validation gates or trading behavior changed.
+
+Owner intervention required now: NO.
