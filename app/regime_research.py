@@ -18,6 +18,20 @@ from .strategy_lab import robust_trial_score
 
 REGIMES = ("BULL_TREND", "BEAR_TREND", "RANGE", "TRANSITION")
 
+# Exploratory, pre-registered regime pools. These are intentionally symmetric
+# and generic rather than fitted to one symbol. A passing pool still requires
+# fresh confirmatory data before any calibration/promotion decision.
+REGIME_POOLS = (
+    ("TREND_ONLY", ("BULL_TREND", "BEAR_TREND")),
+    ("NON_TREND", ("RANGE", "TRANSITION")),
+    ("EXCLUDE_BULL", ("BEAR_TREND", "RANGE", "TRANSITION")),
+    ("EXCLUDE_BEAR", ("BULL_TREND", "RANGE", "TRANSITION")),
+    ("EXCLUDE_RANGE", ("BULL_TREND", "BEAR_TREND", "TRANSITION")),
+    ("EXCLUDE_TRANSITION", ("BULL_TREND", "BEAR_TREND", "RANGE")),
+    ("BEAR_OR_RANGE", ("BEAR_TREND", "RANGE")),
+    ("BULL_OR_RANGE", ("BULL_TREND", "RANGE")),
+)
+
 
 @dataclass(frozen=True)
 class RegimeSnapshot:
@@ -40,6 +54,17 @@ class RegimeValidationResult:
     robust_score: float
     test_retention: float
     forward_retention: float
+
+
+@dataclass(frozen=True)
+class RegimePoolValidationResult:
+    pool: str
+    allowed_regimes: tuple[str, ...]
+    validation: WalkForwardValidation
+    robust_score: float
+    test_retention: float
+    forward_retention: float
+    fresh_confirmation_required: bool = True
 
 
 def classify_market_regime(snapshot: HistoricalFeatureSnapshot) -> RegimeSnapshot:
@@ -157,6 +182,71 @@ def validate_strategy_by_regime(
         results.append(
             RegimeValidationResult(
                 regime=regime,
+                validation=validation,
+                robust_score=robust_trial_score(validation.trial),
+                test_retention=test_retention,
+                forward_retention=forward_retention,
+            )
+        )
+    return tuple(results)
+
+
+def validate_strategy_by_regime_pools(
+    *,
+    symbol: str,
+    timeframe: str,
+    bars,
+    strategy_id: str,
+    snapshots: Mapping[int, HistoricalFeatureSnapshot] | None = None,
+    pools=REGIME_POOLS,
+) -> tuple[RegimePoolValidationResult, ...]:
+    """Exploratory pool comparison with unchanged walk-forward gates.
+
+    A pool can identify a promising exclusion/combination hypothesis, but any
+    apparent pass remains research-only and requires fresh confirmatory data.
+    """
+    snapshots = snapshots or materialize_feature_series(symbol, timeframe, bars)
+    baseline = walk_forward_validate(
+        symbol,
+        timeframe,
+        bars,
+        strategy_id,
+        snapshots=snapshots,
+    )
+
+    results = []
+    seen = set()
+    for pool_name, allowed_regimes in pools:
+        allowed = tuple(allowed_regimes)
+        key = frozenset(allowed)
+        if not allowed or key in seen:
+            continue
+        seen.add(key)
+        validation = walk_forward_validate(
+            symbol,
+            timeframe,
+            bars,
+            strategy_id,
+            snapshots=snapshots,
+            signal_gate=make_regime_signal_gate(
+                snapshots=snapshots,
+                allowed_regimes=allowed,
+            ),
+        )
+        test_retention = (
+            validation.test_stats.trades / baseline.test_stats.trades
+            if baseline.test_stats.trades
+            else 0.0
+        )
+        forward_retention = (
+            validation.forward_stats.trades / baseline.forward_stats.trades
+            if baseline.forward_stats.trades
+            else 0.0
+        )
+        results.append(
+            RegimePoolValidationResult(
+                pool=str(pool_name),
+                allowed_regimes=allowed,
                 validation=validation,
                 robust_score=robust_trial_score(validation.trial),
                 test_retention=test_retention,
