@@ -281,6 +281,31 @@ function stc_notify_signal_event(PDO $pdo, array $config, string $eventId): arra
 
     $label = $competitionId === 'amp-futures-sep-2026' ? 'AMP Futures' : 'Capital.com Africa';
     $title = 'STC NEW PLAN • ' . $label . ' • ' . $direction;
+    $qualityScore = isset($signal['setup_quality_score']) ? (int)$signal['setup_quality_score'] : null;
+    $tf = is_array($signal['timeframe_confirmation'] ?? null) ? $signal['timeframe_confirmation'] : [];
+    $tfParts = [];
+    foreach ([
+        ['15m', 'entry_score'],
+        ['1H', '1h_score'],
+        ['2H', '2h_score'],
+        ['4H', '4h_score'],
+        ['1D', '1d_score'],
+        ['1M', '1m_score'],
+    ] as $tfDef) {
+        [$tfLabel, $tfKey] = $tfDef;
+        if (array_key_exists($tfKey, $tf) && $tf[$tfKey] !== null) {
+            $value = (float)$tf[$tfKey];
+            $tfParts[] = $tfLabel . ' ' . ($value >= 0 ? '+' : '') . number_format($value, 2, '.', '');
+        } else {
+            $tfParts[] = $tfLabel . ' -';
+        }
+    }
+    $probability = is_array($signal['empirical_win_probability'] ?? null) ? $signal['empirical_win_probability'] : [];
+    $probabilityText = 'NOT CALIBRATED';
+    if (isset($probability['estimated_probability']) && is_numeric($probability['estimated_probability'])) {
+        $probabilityText = number_format((float)$probability['estimated_probability'] * 100.0, 1, '.', '')
+            . '% • n=' . (int)($probability['sample_size'] ?? 0);
+    }
     $body = implode("\n", [
         $symbol,
         'STATUS: ACTIVE • ' . $minutesLeft . ' min left',
@@ -291,6 +316,9 @@ function stc_notify_signal_event(PDO $pdo, array $config, string $eventId): arra
         'Final take profit: ' . $plan['target2'],
         $sizingText,
         'Setup grade: A+ (high-conviction gate passed)',
+        'Setup quality: ' . ($qualityScore === null ? '-' : $qualityScore . '/100'),
+        'Empirical win probability: ' . $probabilityText,
+        'MTF: ' . implode(' | ', $tfParts),
         'Signal score: ' . number_format((float)($signal['composite_score'] ?? 0.0), 2, '.', ''),
         'Single-TP mode: place only the final take-profit; STC uses the checkpoint for protection logic.',
         'Reconfirm the live price before approval.',

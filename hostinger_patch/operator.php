@@ -258,6 +258,30 @@ function macroHtml(m){
  return html;
 }
 
+function convictionHtml(c){
+ const q=Number(c.setup_quality_score);
+ const qText=Number.isFinite(q)?Math.round(q)+'/100':'not scored';
+ const p=c.empirical_win_probability||{};
+ let pText='NOT CALIBRATED';
+ if(p.estimated_probability!==null&&p.estimated_probability!==undefined&&Number.isFinite(Number(p.estimated_probability))){
+   pText=num(Number(p.estimated_probability)*100,1)+'% • n='+esc(p.sample_size||0);
+ }else if(p.sample_size){
+   pText='NOT CALIBRATED • n='+esc(p.sample_size);
+ }
+ const t=c.timeframe_confirmation||{};
+ function tf(label,key){
+   const v=t[key];
+   return '<span class="pill">'+esc(label)+' '+(v===null||v===undefined?'-':(Number(v)>=0?'+':'')+num(v,2))+'</span>';
+ }
+ const mtf=tf(String(t.entry_timeframe||'15')+'m','entry_score')
+   +tf('1H','1h_score')+tf('2H','2h_score')+tf('4H','4h_score')+tf('1D','1d_score')+tf('1M','1m_score');
+ return '<div class="orderbox"><div class="small">CONVICTION / VALIDATION</div>'
+   +'<div class="row"><span>Setup quality</span><span class="value">'+esc(qText)+' • '+esc(c.setup_grade||'MONITOR_ONLY')+'</span></div>'
+   +'<div class="row"><span>Empirical win probability</span><span class="value">'+esc(pText)+'</span></div>'
+   +'<div class="small">Setup Quality is not win probability. Probability is shown only after out-of-sample + forward calibration.</div>'
+   +'<div class="small" style="margin-top:6px">'+mtf+'</div></div>';
+}
+
 function cardHtml(c,i){
  const active=isOpportunityActive(c);
  const cls=c.recommendation==='LONG'?'long':c.recommendation==='SHORT'?'short':'wait';
@@ -284,6 +308,7 @@ function cardHtml(c,i){
   +'<div class="row"><span>Signal</span><span class="value '+cls+'">'+esc(c.recommendation)+' '+num(c.composite_score,2)+'</span></div>'
   +(c.recommendation==='WAIT'&&c.pre_gate_recommendation&&c.pre_gate_recommendation!=='WAIT'?'<div class="row"><span>Blocked candidate</span><span class="value wait">'+esc(c.pre_gate_recommendation)+' • failed A+ quality gate</span></div>':'')
   +'<div class="row"><span>Latest confirmed bar</span><span class="value">'+formatLocalTime(c.source_close_time||c.source_time)+' • '+formatAgeSeconds(c.source_age_seconds)+'</span></div>'
+  +convictionHtml(c)
   +planHtml(c.locked_trade_plan)
   +orderHtml(c,i)
   +sizingHtml(c.position_sizing,c)
@@ -311,7 +336,7 @@ function maybeNotify(cards){
    const key=String(c.locked_trade_plan.plan_id||c.signal_id);
    if(seenSignalPlans.has(key))continue;
    const oi=c.order_instruction||{};
-   const body=c.symbol+' • A+ '+c.recommendation+' • '+(oi.order_type||'ENTRY')+' • Entry '+num(c.locked_trade_plan.entry_min)+' - '+num(c.locked_trade_plan.entry_max)+' • SL '+num(c.locked_trade_plan.initial_stop)+' • Final TP '+num(c.locked_trade_plan.target2)+' • Expires '+formatLocalTime(c.locked_trade_plan.valid_until);
+   const body=c.symbol+' • A+ '+c.recommendation+' • Quality '+(Number.isFinite(Number(c.setup_quality_score))?Math.round(Number(c.setup_quality_score))+'/100':'-')+' • '+(oi.order_type||'ENTRY')+' • Entry '+num(c.locked_trade_plan.entry_min)+' - '+num(c.locked_trade_plan.entry_max)+' • SL '+num(c.locked_trade_plan.initial_stop)+' • Final TP '+num(c.locked_trade_plan.target2)+' • Expires '+formatLocalTime(c.locked_trade_plan.valid_until);
    document.title='A+ '+c.recommendation+' • '+c.symbol+' • STC';
    if('Notification' in window && Notification.permission==='granted'){
      new Notification('STC A+ HIGH-CONVICTION PLAN',{body,tag:key,requireInteraction:true});

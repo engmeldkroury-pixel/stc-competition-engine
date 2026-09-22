@@ -462,3 +462,21 @@ def test_high_conviction_gate_is_enforced_across_console_approval_notifications_
     assert "MONITOR ONLY" in ui
     assert "STC A+ HIGH-CONVICTION PLAN" in ui
 
+
+
+
+def test_owner_console_exposes_setup_quality_probability_status_and_multitimeframe_scores():
+    snapshot = (PATCH / "operator_snapshot.php").read_text(encoding="utf-8")
+    ui = (PATCH / "operator.php").read_text(encoding="utf-8")
+    notify = (PATCH / "notification_control.php").read_text(encoding="utf-8")
+    assert "setup_quality_score" in snapshot
+    assert "timeframe_confirmation" in snapshot
+    assert "empirical_win_probability" in snapshot
+    assert "Setup quality" in ui
+    assert "Empirical win probability" in ui
+    assert "Setup Quality is not win probability" in ui
+    for label in ("1H", "2H", "4H", "1D", "1M"):
+        assert label in ui
+    assert "'Setup quality: '" in notify
+    assert "'Empirical win probability: '" in notify
+    assert "'MTF: '" in notify

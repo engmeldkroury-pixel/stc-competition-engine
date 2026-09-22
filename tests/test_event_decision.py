@@ -221,3 +221,41 @@ def test_directional_candidate_without_1h_confirmation_fails_closed_to_wait():
     assert "gate_block=confirmation_context_present" in signal["reasons"]
     assert result["decision"]["locked_trade_plan"] is None
 
+
+
+
+def test_live_signal_exposes_mtf_confirmation_and_separates_quality_from_probability():
+    payload = {
+        "event_id": "evt-owner-visibility",
+        "event": "bar_close",
+        "competition_id": "capital-africa-sep-2026",
+        "symbol": "CAPITALCOM:XAUUSD",
+        "timeframe": "15",
+        "time": "2026-09-21T18:00:00Z",
+        "open": 3600,
+        "high": 3614,
+        "low": 3598,
+        "close": 3610,
+        "volume": 1800,
+        "ema20": 3605,
+        "ema50": 3590,
+        "rsi14": 60,
+        "atr14": 10,
+        "macd": 5,
+        "macd_signal": 2,
+        "volume_ratio": 1.8,
+        **_strong_confirmation(),
+        **_strong_history(),
+    }
+    result = decide_bridge_event("evt-owner-visibility", payload)
+    signal = result["decision"]["signal"]
+    assert signal["setup_quality_score"] >= 90
+    assert signal["timeframe_confirmation"]["entry_timeframe"] == "15"
+    assert signal["timeframe_confirmation"]["1h_score"] is not None
+    assert signal["timeframe_confirmation"]["2h_score"] == 0.85
+    assert signal["timeframe_confirmation"]["4h_score"] == 0.82
+    assert signal["timeframe_confirmation"]["1m_score"] == 0.72
+    probability = signal["empirical_win_probability"]
+    assert probability["status"] == "NOT_ATTACHED_TO_LIVE_SIGNAL"
+    assert probability["estimated_probability"] is None
+    assert "not win probability" in probability["note"].lower()
