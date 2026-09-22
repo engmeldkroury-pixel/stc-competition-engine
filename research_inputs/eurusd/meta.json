@@ -1,0 +1,15 @@
+{
+  "symbol": "CAPITALCOM:EURUSD",
+  "source": "TradingView Official MCP exact-provider OHLCV",
+  "purpose": "STC broad strategy/timeframe matrix screening",
+  "research_mode": "matrix_only",
+  "captured_date": "2026-09-22",
+  "intervals": [
+    "5m",
+    "15m",
+    "30m",
+    "1h",
+    "4h",
+    "1D"
+  ]
+}
