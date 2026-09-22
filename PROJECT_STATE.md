@@ -969,3 +969,23 @@ Next owner dependency:
 - deploy current main versions of hostinger_patch/operator.php, hostinger_patch/position.php, and hostinger_patch/portfolio_control.php to expose the historical closed-trade import UI/logic;
 - then backfill the owner's earlier competition trades using actual platform records/screenshots;
 - Telegram delivery remains pending private bot token + chat ID configuration on Hostinger. Secrets must not be committed to GitHub.
+## Production validation after historical-import deployment — 2026-09-22
+
+Owner screenshot and live page inspection confirm the latest Owner Console is deployed successfully:
+- Console connected with 30-second auto refresh.
+- Capital.com lane: 10 symbols monitored.
+- AMP Futures lane: 16 symbols monitored.
+- Macro calendar: CONNECTED.
+- Safe Mode: true.
+- Kill Switch: true.
+- At validation moment the Overview showed 1 ACTIVE opportunity, 0 manual-ready, and 0 tracked open positions.
+- Live page contains `Import a past closed trade` controls for both competition lanes.
+
+The active opportunity shown in the owner screenshot was AMP Futures `CBOT:ZN1!`, direction SHORT, with a 15-minute decision timeframe. Manual-ready correctly remained zero because Safe Mode and Kill Switch were still enabled.
+
+Post-merge STC CI run 35662614893 for historical trade import completed successfully.
+
+Next production tasks:
+- backfill prior real competition trades from platform records/screenshots;
+- configure Telegram privately in Hostinger with `telegram_bot_token` and `telegram_chat_id`, then use the built-in notification test;
+- only after notification and ledger validation consider any runtime-control change. No automatic order execution is available.
