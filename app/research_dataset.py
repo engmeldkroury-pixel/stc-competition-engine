@@ -124,3 +124,80 @@ def normalize_confirmed_bars(bars: list[Bar]) -> list[Bar]:
 def drop_latest_unconfirmed_bar(bars: list[Bar]) -> list[Bar]:
     """Research helper for delayed feeds whose latest bar may still mutate."""
     return bars[:-1] if bars else []
+
+
+
+def _aggregate_group(group: list[Bar]) -> Bar:
+    if not group:
+        raise ValueError("Cannot aggregate an empty bar group")
+    return Bar(
+        timestamp=group[0].timestamp,
+        open=group[0].open,
+        high=max(b.high for b in group),
+        low=min(b.low for b in group),
+        close=group[-1].close,
+        volume=sum(b.volume for b in group),
+    )
+
+
+def resample_hourly_to_two_hour(bars: list[Bar]) -> list[Bar]:
+    """Build deterministic 2h research bars from ordered 1h bars.
+
+    Bars are bucketed on even UTC hours. Missing hours are never invented;
+    partial buckets are dropped so a 2h bar always represents two source bars.
+    """
+    ordered = normalize_confirmed_bars(bars)
+    buckets: dict[tuple[int, int, int, int], list[Bar]] = {}
+    for bar in ordered:
+        ts = bar.timestamp.astimezone(UTC)
+        even_hour = ts.hour - (ts.hour % 2)
+        key = (ts.year, ts.month, ts.day, even_hour)
+        buckets.setdefault(key, []).append(bar)
+
+    out: list[Bar] = []
+    for key in sorted(buckets):
+        group = sorted(buckets[key], key=lambda b: b.timestamp)
+        if len(group) != 2:
+            continue
+        spacing = (group[1].timestamp - group[0].timestamp).total_seconds()
+        if spacing < 55 * 60 or spacing > 65 * 60:
+            continue
+        out.append(_aggregate_group(group))
+    return out
+
+
+def resample_daily_to_monthly(bars: list[Bar]) -> list[Bar]:
+    """Build calendar-month research bars from daily data without filling gaps."""
+    ordered = normalize_confirmed_bars(bars)
+    buckets: dict[tuple[int, int], list[Bar]] = {}
+    for bar in ordered:
+        ts = bar.timestamp.astimezone(UTC)
+        buckets.setdefault((ts.year, ts.month), []).append(bar)
+    return [
+        _aggregate_group(sorted(buckets[key], key=lambda b: b.timestamp))
+        for key in sorted(buckets)
+        if buckets[key]
+    ]
+
+
+def research_timeframe_bundle(
+    *,
+    bars_15m: list[Bar],
+    bars_1h: list[Bar],
+    bars_4h: list[Bar],
+    bars_1d: list[Bar],
+) -> dict[str, list[Bar]]:
+    """Create the standard STC research matrix timeframes.
+
+    2h is derived from exact-provider 1h bars because the verified TradingView
+    OHLCV connector does not expose a native 2h interval. Monthly is derived
+    from exact-provider daily bars. No cross-provider substitution is allowed.
+    """
+    return {
+        "15": drop_latest_unconfirmed_bar(normalize_confirmed_bars(bars_15m)),
+        "60": drop_latest_unconfirmed_bar(normalize_confirmed_bars(bars_1h)),
+        "120": drop_latest_unconfirmed_bar(resample_hourly_to_two_hour(bars_1h)),
+        "240": drop_latest_unconfirmed_bar(normalize_confirmed_bars(bars_4h)),
+        "1D": drop_latest_unconfirmed_bar(normalize_confirmed_bars(bars_1d)),
+        "1M": drop_latest_unconfirmed_bar(resample_daily_to_monthly(bars_1d)),
+    }
