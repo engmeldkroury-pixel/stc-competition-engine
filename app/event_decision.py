@@ -173,6 +173,24 @@ def decide_bridge_event(event_id: str, payload: dict) -> dict:
     result_dict["setup_grade"] = "A_PLUS" if final_gate_passed else "MONITOR_ONLY"
     result_dict["pre_gate_recommendation"] = base_result.recommendation
     result_dict["quality_gate_failures"] = gate_failures
+    result_dict["timeframe_confirmation"] = {
+        "entry_timeframe": str(tv.timeframe),
+        "entry_score": short_term_technical,
+        "1h_score": confirmation_score,
+        "2h_score": tv.trend_2h_score,
+        "4h_score": tv.trend_4h_score,
+        "1d_score": historical_regime,
+        "1m_score": tv.trend_1m_score,
+    }
+    result_dict["empirical_win_probability"] = {
+        "status": "NOT_ATTACHED_TO_LIVE_SIGNAL",
+        "estimated_probability": None,
+        "sample_size": 0,
+        "note": (
+            "Setup quality is not win probability. A probability may be displayed only "
+            "after the selected strategy/timeframe has a calibrated out-of-sample/forward research record."
+        ),
+    }
     envelope = build_approval_envelope(payload, result.composite_score)
     locked_plan = build_locked_trade_plan(event_id, payload, result_dict, envelope)
     status = "analyzed"
