@@ -148,3 +148,63 @@ def test_research_runner_passes_snapshot_cache_to_strategy_matrix(monkeypatch):
     }
     rr.run_symbol_research(payload, calibrate_features=False)
     assert isinstance(captured["cache"], dict)
+
+
+
+def test_research_runner_runs_mtf_only_when_explicitly_requested(monkeypatch):
+    captured = {"mtf_calls": 0}
+
+    def fake_matrix(symbol, asset_class, bundle, **kwargs):
+        return [], MatrixSelection(
+            status="NO_VALIDATED_STRATEGY",
+            symbol=symbol,
+            strategy_id=None,
+            timeframe=None,
+            robust_score=None,
+            trial_count=0,
+            reason="baseline fixture",
+        )
+
+    def fake_mtf(*, symbol, asset_class, bars_by_timeframe, snapshot_cache=None):
+        captured["mtf_calls"] += 1
+        assert "15" in bars_by_timeframe
+        return [], MatrixSelection(
+            status="NO_VALIDATED_STRATEGY",
+            symbol=symbol,
+            strategy_id=None,
+            timeframe="15",
+            robust_score=None,
+            trial_count=0,
+            reason="mtf fixture",
+        )
+
+    monkeypatch.setattr(rr, "strategy_matrix", fake_matrix)
+    monkeypatch.setattr(rr, "mtf_strategy_matrix", fake_mtf)
+    payload = {
+        "symbol": "CAPITALCOM:XAUUSD",
+        "series": {
+            "15m": _series(901, 900),
+            "1h": _series(901, 3600),
+            "4h": _series(901, 14400),
+            "1D": _series(901, 86400),
+        },
+    }
+
+    baseline = rr.run_symbol_research(
+        payload,
+        calibrate_features=False,
+        run_mtf=False,
+    )
+    assert captured["mtf_calls"] == 0
+    assert baseline["mtf_research_enabled"] is False
+    assert baseline["mtf_strategy_trials"] == []
+
+    mtf = rr.run_symbol_research(
+        payload,
+        calibrate_features=False,
+        run_mtf=True,
+    )
+    assert captured["mtf_calls"] == 1
+    assert mtf["mtf_research_enabled"] is True
+    assert mtf["mtf_selection"]["timeframe"] == "15"
+    assert mtf["live_trading_authority"] is False
