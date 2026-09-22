@@ -492,3 +492,18 @@ def test_owner_console_and_notifications_expose_live_family_evidence_breadth():
     assert "aligned '+esc(f.aligned_families||0)+'/9" in ui
     assert "Family evidence: unavailable" in ui
     assert "'Evidence families: ' . $familyText" in notify
+
+
+
+def test_owner_console_shows_same_timeframe_research_strategy_and_feature_participation():
+    snapshot = (PATCH / "operator_snapshot.php").read_text(encoding="utf-8")
+    ui = (PATCH / "operator.php").read_text(encoding="utf-8")
+    notify = (PATCH / "notification_control.php").read_text(encoding="utf-8")
+    assert "research_calibration" in snapshot
+    assert "Research strategy" in ui
+    assert "Validated feature participation" in ui
+    assert "family_weights_used" in ui
+    assert "CI " in ui
+    assert "same live entry timeframe" in ui
+    assert "'Research strategy: ' . $researchText" in notify
+    assert "'Top validated features: ' . $featureText" in notify

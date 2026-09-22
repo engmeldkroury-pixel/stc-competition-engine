@@ -314,6 +314,23 @@ function stc_notify_signal_event(PDO $pdo, array $config, string $eventId): arra
         $probabilityText = number_format((float)$probability['estimated_probability'] * 100.0, 1, '.', '')
             . '% • n=' . (int)($probability['sample_size'] ?? 0);
     }
+    $research = is_array($signal['research_calibration'] ?? null) ? $signal['research_calibration'] : [];
+    $researchText = 'NO MATCHING LIVE-TIMEFRAME CALIBRATION';
+    $featureText = 'NONE';
+    if (($research['status'] ?? '') === 'AVAILABLE_INFORMATIONAL' || isset($research['strategy_id'])) {
+        $researchText = (string)($research['strategy_id'] ?? '-')
+            . ' @ ' . (string)($research['timeframe'] ?? '-')
+            . ' | robust ' . number_format((float)($research['robust_score'] ?? 0.0), 2, '.', '');
+        $weights = is_array($research['feature_weights'] ?? null) ? $research['feature_weights'] : [];
+        arsort($weights, SORT_NUMERIC);
+        $top = [];
+        foreach (array_slice($weights, 0, 5, true) as $feature => $weight) {
+            $top[] = $feature . ' ' . number_format((float)$weight * 100.0, 1, '.', '') . '%';
+        }
+        if ($top !== []) {
+            $featureText = implode(' | ', $top);
+        }
+    }
     $body = implode("\n", [
         $symbol,
         'STATUS: ACTIVE • ' . $minutesLeft . ' min left',
@@ -326,6 +343,8 @@ function stc_notify_signal_event(PDO $pdo, array $config, string $eventId): arra
         'Setup grade: A+ (high-conviction gate passed)',
         'Setup quality: ' . ($qualityScore === null ? '-' : $qualityScore . '/100'),
         'Empirical win probability: ' . $probabilityText,
+        'Research strategy: ' . $researchText,
+        'Top validated features: ' . $featureText,
         'MTF: ' . implode(' | ', $tfParts),
         'Evidence families: ' . $familyText,
         'Signal score: ' . number_format((float)($signal['composite_score'] ?? 0.0), 2, '.', ''),
