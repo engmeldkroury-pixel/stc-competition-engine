@@ -145,6 +145,8 @@ jobs:
                           "forward_profit_factor": forward.get("profit_factor"),
                           "test_retention": policy.get("test_retention"),
                           "forward_retention": policy.get("forward_retention"),
+                          "test_trades_per_30d": policy.get("test_trades_per_30d"),
+                          "forward_trades_per_30d": policy.get("forward_trades_per_30d"),
                       }, sort_keys=True))
 
               for row in trials:

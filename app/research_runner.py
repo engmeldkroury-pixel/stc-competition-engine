@@ -276,6 +276,8 @@ def run_symbol_research(
                         "robust_score": item.robust_score,
                         "test_retention": item.test_retention,
                         "forward_retention": item.forward_retention,
+                        "test_trades_per_30d": item.test_trades_per_30d,
+                        "forward_trades_per_30d": item.forward_trades_per_30d,
                         "trial": asdict(item.validation.trial),
                         "test": asdict(item.validation.test_stats),
                         "forward": asdict(item.validation.forward_stats),

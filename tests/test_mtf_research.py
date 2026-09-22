@@ -3,6 +3,7 @@ from datetime import datetime, timedelta, timezone
 from app.evidence_engine import EvidenceSummary
 from app.models import Bar
 from app.mtf_research import (
+    _trade_rate_per_30d,
     POLICIES,
     ConfirmedTrendPoint,
     confirmed_trend_series,
@@ -116,3 +117,15 @@ def test_signal_gate_uses_next_entry_bar_timestamp_as_signal_close():
     assert gate(2, 1, 0.8, summary) is False
     # Signal index 3 closes when bar 4 opens at +60m: evidence is now confirmed.
     assert gate(3, 1, 0.8, summary) is True
+
+
+
+def test_trade_rate_per_30d_reports_opportunity_pace():
+    bars = _bars(31, step_minutes=24 * 60)
+    rate = _trade_rate_per_30d(
+        10,
+        bars,
+        start_index=0,
+        end_index=31,
+    )
+    assert rate == 10.0
