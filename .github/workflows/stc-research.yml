@@ -123,6 +123,30 @@ jobs:
                   ),
                   reverse=True,
               )[:8]
+              for regime_result in data.get("regime_validation") or []:
+                  strategy = regime_result.get("strategy_id")
+                  baseline = regime_result.get("baseline") or {}
+                  for item in regime_result.get("regimes") or []:
+                      test = item.get("test") or {}
+                      forward = item.get("forward") or {}
+                      print("STC_REGIME_DIAGNOSTIC=" + json.dumps({
+                          "symbol": data["symbol"],
+                          "strategy": strategy,
+                          "regime": item.get("regime"),
+                          "baseline_class": baseline.get("research_class"),
+                          "regime_class": item.get("research_class"),
+                          "robust_score": item.get("robust_score"),
+                          "rejection_reasons": item.get("rejection_reasons"),
+                          "test_trades": test.get("trades"),
+                          "test_expectancy_r": test.get("expectancy_r"),
+                          "test_profit_factor": test.get("profit_factor"),
+                          "forward_trades": forward.get("trades"),
+                          "forward_expectancy_r": forward.get("expectancy_r"),
+                          "forward_profit_factor": forward.get("profit_factor"),
+                          "test_retention": item.get("test_retention"),
+                          "forward_retention": item.get("forward_retention"),
+                      }, sort_keys=True))
+
               for mtf in data.get("mtf_validation") or []:
                   strategy = mtf.get("strategy_id")
                   baseline = mtf.get("baseline") or {}

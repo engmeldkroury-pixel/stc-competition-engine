@@ -190,3 +190,22 @@ def test_split_directory_loader_accepts_mtf_compare_mode(tmp_path):
 
     payload = runner.load_series_dir(target)
     assert payload["research_mode"] == "mtf_compare"
+
+
+
+def test_split_directory_loader_accepts_regime_compare_mode(tmp_path):
+    runner = _load_runner()
+    target = tmp_path / "regime"
+    target.mkdir()
+    (target / "meta.json").write_text(
+        json.dumps({
+            "symbol": "CAPITALCOM:XAUUSD",
+            "research_mode": "regime_compare",
+        }),
+        encoding="utf-8",
+    )
+    for filename in ("15m.json", "1h.json", "4h.json", "1D.json"):
+        (target / filename).write_text(json.dumps(_series()), encoding="utf-8")
+
+    payload = runner.load_series_dir(target)
+    assert payload["research_mode"] == "regime_compare"
