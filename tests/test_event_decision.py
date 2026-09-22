@@ -103,6 +103,12 @@ def _strong_confirmation():
         "confirm_macd": 8,
         "confirm_macd_signal": 4,
         "confirm_volume_ratio": 1.4,
+        "trend_2h_time": "2026-09-21T16:00:00Z",
+        "trend_2h_score": 0.85,
+        "trend_4h_time": "2026-09-21T16:00:00Z",
+        "trend_4h_score": 0.82,
+        "trend_1m_time": "2026-09-01T00:00:00Z",
+        "trend_1m_score": 0.72,
     }
 
 
