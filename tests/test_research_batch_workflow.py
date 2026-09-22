@@ -49,3 +49,23 @@ def test_research_workflow_is_isolated_to_research_branches_and_inputs():
     assert "contents: read" in text
     assert "STC_OWNER_TOKEN" not in text
     assert "HOSTINGER" not in text.upper()
+
+
+
+def test_research_scripts_are_directly_invocable_from_repo_root():
+    import subprocess
+    import sys
+
+    for script in (
+        "scripts/run_strategy_research_dir.py",
+        "scripts/run_strategy_research.py",
+        "scripts/update_calibration_registry.py",
+    ):
+        proc = subprocess.run(
+            [sys.executable, script, "--help"],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        assert proc.returncode == 0, proc.stderr
