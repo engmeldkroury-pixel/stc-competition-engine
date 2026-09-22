@@ -39,3 +39,12 @@ None for the current research-screening phase.
 
 ## Research performance
 Historical feature materialization now passes only the exact latest-1000-bar window used by the extractor; regression tests prove semantic equivalence.
+
+
+## Latest completed screen
+- CAPITALCOM:XAGUSD + NYMEX:MCL1!: screening completed; neither has a validated strategy and neither has a validated 15m live-entry strategy.
+- Do not full-calibrate these symbols from the current research snapshot.
+- NAS100 + MNQ screening remains the next pending result.
+
+## Research branch trigger rule
+Upload all exact-provider OHLCV files first, then create/update research_inputs/READY once. Do not trigger research on partial datasets.
