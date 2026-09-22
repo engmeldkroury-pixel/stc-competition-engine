@@ -29,3 +29,13 @@ Run matrix-only screening on highly liquid index/futures candidates, starting wi
 
 ## Owner dependency
 None for the current research-screening phase.
+
+
+## In-progress screening batches
+- CAPITALCOM:NAS100 + CME_MINI:MNQ1!: matrix-only six-timeframe screening in progress.
+- CAPITALCOM:XAGUSD + NYMEX:MCL1!: matrix-only six-timeframe screening in progress.
+- Once results complete: run full feature calibration only for any VALIDATED candidate, prioritizing an exact 15m live-entry match.
+- BTCUSD 1D trend_pullback is validated research with 19 deployable features, but is not promotable to 15m and probability remains uncalibrated at n=49.
+
+## Research performance
+Historical feature materialization now passes only the exact latest-1000-bar window used by the extractor; regression tests prove semantic equivalence.

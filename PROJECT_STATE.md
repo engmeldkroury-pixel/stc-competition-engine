@@ -1125,3 +1125,29 @@ Research interpretation:
 - Broad screening should continue with matrix-only mode, prioritizing highly liquid index/metals/energy symbols where 15m signal count may be sufficient.
 
 Owner intervention required now: NO.
+
+
+### BTCUSD full feature calibration + research performance checkpoint — 2026-09-22
+
+CAPITALCOM:BTCUSD full-mode follow-up:
+- Overall research remains VALIDATED only for trend_pullback on 1D.
+- Robust score remains 44.59.
+- Test: 30 trades, expectancy +0.194R, PF 1.357.
+- Forward: 19 trades, expectancy +0.105R, PF 1.194.
+- Full feature validation produced 19 deployable research features and blocked 25.
+- Empirical win probability remains intentionally withheld: 49 comparable OOS+forward outcomes is below the 50-sample calibration floor.
+- Live-entry 15m remains NO_VALIDATED_STRATEGY.
+- No runtime calibration candidate was promoted; the validated 1D result remains informational only for live 15m execution.
+
+Research performance improvement merged to main:
+- Commit 6d2d912497b806c910320cd1eb9d94593f27306d eliminates quadratic full-prefix list copies during historical feature materialization.
+- Each snapshot now receives the exact latest-1000-bar window that the feature extractor already consumed internally.
+- Regression testing proved timestamp, feature values and observations remain identical to the previous full-prefix semantics at multiple historical indices.
+- No formula, score, threshold, risk rule or execution behavior changed.
+
+Active screening batches:
+- research/index-screen-b-20260922: CAPITALCOM:NAS100 + CME_MINI:MNQ1!, matrix_only, full six input timeframes each.
+- research/metals-energy-screen-c-20260922: CAPITALCOM:XAGUSD + NYMEX:MCL1!, matrix_only, full six input timeframes each.
+- At this checkpoint both batches are in the no-lookahead computation step with complete input sets and no active data-quality failure.
+
+Owner intervention required now: NO.
