@@ -198,3 +198,27 @@ def test_live_family_conflicts_are_counted_and_reduce_agreement():
     assert result.conflicting_families == 2
     assert result.agreement_ratio < 1.0
     assert result.aligned_families >= 5
+
+
+
+def test_live_family_calibration_softly_reweights_without_erasing_priors():
+    scores = _family_bundle(0.20)
+    scores["market_structure"] = 0.95
+    scores["smc_liquidity"] = 0.90
+    scores["momentum"] = -0.60
+
+    baseline = aggregate_live_family_scores(scores, strategy_id="smc_structure_liquidity")
+    calibrated = aggregate_live_family_scores(
+        scores,
+        strategy_id="smc_structure_liquidity",
+        family_weight_override={
+            "market_structure": 0.55,
+            "smc_liquidity": 0.35,
+            "volume": 0.10,
+        },
+    )
+    assert baseline is not None and calibrated is not None
+    assert calibrated.score > baseline.score
+    assert calibrated.family_weights_used["market_structure"] > baseline.family_weights_used["market_structure"]
+    assert calibrated.family_weights_used["momentum"] > 0
+    assert calibrated.strategy_id == "smc_structure_liquidity"
