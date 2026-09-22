@@ -105,7 +105,7 @@ def test_frozen_confirmation_passes_exact_params_and_never_grants_live_authority
     freeze_t = archive["bars"][299]["t"]
     hypothesis = _hypothesis(freeze_t, threshold=0.72)
 
-    monkeypatch.setattr(fc, "materialize_feature_series", lambda *args, **kwargs: {})
+    monkeypatch.setattr(fc, "_materialize_confirmation_snapshots", lambda *args, **kwargs: {})
 
     def fake_backtest(symbol, timeframe, bars, snapshots, strategy_id, params, *, start_index, end_index, signal_gate=None):
         assert symbol == "TEST:X"
@@ -146,7 +146,7 @@ def test_frozen_confirmation_excludes_truncated_time_exit(monkeypatch):
     freeze_t = archive["bars"][299]["t"]
     hypothesis = _hypothesis(freeze_t)
 
-    monkeypatch.setattr(fc, "materialize_feature_series", lambda *args, **kwargs: {})
+    monkeypatch.setattr(fc, "_materialize_confirmation_snapshots", lambda *args, **kwargs: {})
 
     def fake_backtest(*args, **kwargs):
         start = kwargs["start_index"]
@@ -173,7 +173,7 @@ def test_frozen_confirmation_returns_no_unseen_data_without_running_backtest(mon
     def should_not_run(*args, **kwargs):
         raise AssertionError("No feature/backtest work should run without unseen bars")
 
-    monkeypatch.setattr(fc, "materialize_feature_series", should_not_run)
+    monkeypatch.setattr(fc, "_materialize_confirmation_snapshots", should_not_run)
     monkeypatch.setattr(fc, "backtest_strategy", should_not_run)
 
     result = fc.evaluate_frozen_hypothesis(archive, hypothesis)
@@ -236,3 +236,27 @@ def test_hypothesis_manifest_cannot_claim_live_calibration_authority():
     }
     with pytest.raises(ValueError, match="cannot grant live calibration authority"):
         fc.hypothesis_from_dict(raw)
+
+
+def test_confirmation_snapshot_materialization_starts_at_unseen_index(monkeypatch):
+    calls = []
+
+    def fake_extract(symbol, timeframe, window):
+        calls.append((symbol, timeframe, len(window), window[-1]))
+        return object()
+
+    monkeypatch.setattr(fc, "extract_feature_snapshot", fake_extract)
+    bars = list(range(1200))
+    snapshots = fc._materialize_confirmation_snapshots(
+        "TEST:X",
+        "15",
+        bars,
+        start_index=1190,
+    )
+
+    assert list(snapshots) == list(range(1190, 1200))
+    assert len(calls) == 10
+    assert all(call[0] == "TEST:X" and call[1] == "15" for call in calls)
+    assert all(call[2] == 1000 for call in calls)
+    assert calls[0][3] == 1190
+    assert calls[-1][3] == 1199
