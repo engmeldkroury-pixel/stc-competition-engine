@@ -12,7 +12,7 @@ from .research_dataset import (
     research_timeframe_bundle,
 )
 from .research_report import build_strategy_research_report, report_to_dict
-from .strategy_lab import STRATEGIES
+from .strategy_lab import STRATEGIES, robust_trial_score, trial_rejection_reasons
 from .walkforward import materialize_feature_series, strategy_matrix
 
 
@@ -158,6 +158,8 @@ def run_symbol_research(
         "strategy_trials": [
             {
                 "trial": asdict(row.trial),
+                "robust_score": robust_trial_score(row.trial),
+                "rejection_reasons": list(trial_rejection_reasons(row.trial)),
                 "selected_params": asdict(row.selected_params),
                 "train": asdict(row.train_stats),
                 "test": asdict(row.test_stats),
