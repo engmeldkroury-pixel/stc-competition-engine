@@ -105,3 +105,34 @@ def test_new_split_is_additive_so_existing_verified_feeds_remain_available_for_r
     assert (TV / "STC_MULTI_FEED.pine").exists()
     assert (TV / "STC_AMP_CORE_FEED.pine").exists()
     assert (TV / "STC_AMP_CORE_FEED_B.pine").exists()
+
+
+
+def test_mtf_feeds_emit_complete_nine_family_live_evidence_without_extra_requests():
+    fields = (
+        "family_trend",
+        "family_momentum",
+        "family_volatility",
+        "family_volume",
+        "family_vwap",
+        "family_market_structure",
+        "family_smc_liquidity",
+        "family_price_action",
+        "family_microstructure",
+    )
+    for path in CAPITAL_FILES + AMP_FILES:
+        text = _text(path)
+        for field in fields:
+            assert f'"{field}":' in text
+        assert "familyTrend" in text
+        assert "familySmcLiquidity" in text
+        assert "familyMarketStructure" in text
+        assert "v1.1 Family Breadth" in text
+        # Family calculations run inside the existing 15m request and add no
+        # request.security contexts beyond the verified split budget.
+        if path in CAPITAL_FILES:
+            assert text.count(" = feedBar(") == 5
+            assert 5 * 6 == 30
+        else:
+            assert text.count(" = feedBar(") == 4
+            assert 4 * 6 == 24
