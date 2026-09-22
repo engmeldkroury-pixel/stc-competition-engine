@@ -123,6 +123,30 @@ jobs:
                   ),
                   reverse=True,
               )[:8]
+              for mtf in data.get("mtf_validation") or []:
+                  strategy = mtf.get("strategy_id")
+                  baseline = mtf.get("baseline") or {}
+                  for policy in mtf.get("policies") or []:
+                      test = policy.get("test") or {}
+                      forward = policy.get("forward") or {}
+                      print("STC_MTF_DIAGNOSTIC=" + json.dumps({
+                          "symbol": data["symbol"],
+                          "strategy": strategy,
+                          "policy": policy.get("policy"),
+                          "baseline_class": baseline.get("research_class"),
+                          "policy_class": policy.get("research_class"),
+                          "robust_score": policy.get("robust_score"),
+                          "rejection_reasons": policy.get("rejection_reasons"),
+                          "test_trades": test.get("trades"),
+                          "test_expectancy_r": test.get("expectancy_r"),
+                          "test_profit_factor": test.get("profit_factor"),
+                          "forward_trades": forward.get("trades"),
+                          "forward_expectancy_r": forward.get("expectancy_r"),
+                          "forward_profit_factor": forward.get("profit_factor"),
+                          "test_retention": policy.get("test_retention"),
+                          "forward_retention": policy.get("forward_retention"),
+                      }, sort_keys=True))
+
               for row in trials:
                   trial = row.get("trial") or {}
                   test = row.get("test") or {}
