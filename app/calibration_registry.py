@@ -7,7 +7,7 @@ import json
 from pathlib import Path
 from typing import Any, Mapping
 
-from .indicator_catalog import feature_family
+from .indicator_catalog import FEATURE_FAMILIES
 
 
 UTC = timezone.utc
@@ -36,11 +36,15 @@ class RuntimeCalibration:
 
 
 def _family_weights_from_features(feature_weights: Mapping[str, float]) -> dict[str, float]:
+    feature_to_family = {
+        feature: family.name
+        for family in FEATURE_FAMILIES
+        for feature in family.features
+    }
     grouped: dict[str, float] = {}
     for feature, weight in feature_weights.items():
-        try:
-            family = feature_family(feature).name
-        except KeyError:
+        family = feature_to_family.get(feature)
+        if family is None:
             continue
         grouped[family] = grouped.get(family, 0.0) + max(0.0, float(weight))
     total = sum(grouped.values())
