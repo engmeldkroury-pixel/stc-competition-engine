@@ -212,8 +212,20 @@ def run_symbol_research(
         "derived_timeframes": {
             key: len(value) for key, value in bundle.items()
         },
+        "derived_timeframe_start_utc": {
+            key: (value[0].timestamp.isoformat().replace("+00:00", "Z") if value else None)
+            for key, value in bundle.items()
+        },
         "derived_timeframe_end_utc": {
             key: (value[-1].timestamp.isoformat().replace("+00:00", "Z") if value else None)
+            for key, value in bundle.items()
+        },
+        "derived_timeframe_span_days": {
+            key: (
+                round((value[-1].timestamp - value[0].timestamp).total_seconds() / 86400.0, 3)
+                if len(value) >= 2
+                else 0.0
+            )
             for key, value in bundle.items()
         },
         "matrix_selection": asdict(selection),
