@@ -2,15 +2,20 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from math import inf
+from math import ceil, inf
 from typing import Mapping
 
 from .analysis import atr
+from .approval import entry_price_bounds, timeframe_duration_minutes, timeframe_validity_minutes
 from .evidence_engine import EvidenceSummary, aggregate_evidence
 from .historical_features import HistoricalFeatureSnapshot, extract_feature_snapshot
 from .models import Bar
 from .strategy_lab import StrategyTrial, candidate_strategies, robust_trial_score
-from .trade_plan import LIVE_PLAN_FINAL_TARGET_RR, LIVE_PLAN_STOP_ATR_MULTIPLE
+from .trade_plan import (
+    LIVE_PLAN_FINAL_TARGET_RR,
+    LIVE_PLAN_STOP_ATR_MULTIPLE,
+    calculate_plan_levels,
+)
 
 
 @dataclass(frozen=True)
@@ -32,7 +37,11 @@ class TradeOutcome:
     entry_index: int
     exit_index: int
     side: str
+    reference_price: float
+    entry_min: float
+    entry_max: float
     entry_price: float
+    entry_wait_bars: int
     exit_price: float
     initial_stop: float
     target: float
@@ -184,6 +193,41 @@ def _signal(
     return (1 if score > 0 else -1, score, summary)
 
 
+def _entry_validity_bars(timeframe: str) -> int:
+    duration = timeframe_duration_minutes(timeframe)
+    if duration <= 0:
+        return 1
+    return max(1, int(ceil(timeframe_validity_minutes(timeframe) / duration)))
+
+
+def _find_conservative_entry(
+    bars: list[Bar],
+    *,
+    signal_index: int,
+    end_index: int,
+    timeframe: str,
+    side: int,
+    entry_min: float,
+    entry_max: float,
+) -> tuple[int, float] | None:
+    last_entry_index = min(
+        end_index,
+        signal_index + _entry_validity_bars(timeframe),
+    )
+    for entry_index in range(signal_index + 1, last_entry_index + 1):
+        bar = bars[entry_index]
+        if bar.high < entry_min or bar.low > entry_max:
+            continue
+        if side > 0:
+            # Pessimistic fill inside the portion of the approved zone that the
+            # bar actually traded through.
+            fill = min(entry_max, bar.high)
+        else:
+            fill = max(entry_min, bar.low)
+        return entry_index, fill
+    return None
+
+
 def backtest_strategy(
     symbol: str,
     timeframe: str,
@@ -211,12 +255,36 @@ def backtest_strategy(
             continue
 
         side, score, summary = signal
-        entry_i = i + 1
-        entry = bars[entry_i].open
-        local_atr = max(atr(bars[: i + 1], 14), abs(entry) * 1e-8, 1e-9)
-        risk = params.stop_atr * local_atr
-        stop = entry - side * risk
-        target = entry + side * risk * params.target_r
+        reference_price = bars[i].close
+        local_atr = max(atr(bars[: i + 1], 14), abs(reference_price) * 1e-8, 1e-9)
+        entry_min, entry_max, _ = entry_price_bounds(reference_price, local_atr)
+        direction = "LONG" if side > 0 else "SHORT"
+        levels = calculate_plan_levels(
+            direction,
+            entry_min=entry_min,
+            entry_max=entry_max,
+            reference_price=reference_price,
+            atr=local_atr,
+            stop_atr_multiple=params.stop_atr,
+            target2_rr=params.target_r,
+        )
+        entry_match = _find_conservative_entry(
+            bars,
+            signal_index=i,
+            end_index=end_index,
+            timeframe=timeframe,
+            side=side,
+            entry_min=entry_min,
+            entry_max=entry_max,
+        )
+        if entry_match is None:
+            i += 1
+            continue
+
+        entry_i, entry = entry_match
+        risk = levels["risk_per_unit"]
+        stop = levels["initial_stop"]
+        target = levels["target2"]
         last_i = min(end_index, entry_i + params.max_hold_bars)
 
         exit_i = last_i
@@ -256,8 +324,12 @@ def backtest_strategy(
                 signal_index=i,
                 entry_index=entry_i,
                 exit_index=exit_i,
-                side="LONG" if side > 0 else "SHORT",
+                side=direction,
+                reference_price=reference_price,
+                entry_min=entry_min,
+                entry_max=entry_max,
                 entry_price=entry,
+                entry_wait_bars=entry_i - i,
                 exit_price=exit_price,
                 initial_stop=stop,
                 target=target,
