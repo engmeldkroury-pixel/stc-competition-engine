@@ -4,6 +4,38 @@ from app.event_decision import decide_bridge_event
 from app.trade_plan import build_locked_trade_plan, deterministic_plan_id
 
 
+
+
+def _confirm_history():
+    return {
+        "confirm_timeframe": "60",
+        "confirm_time": "2026-09-21T09:00:00Z",
+        "confirm_close": 3608.0,
+        "confirm_ema20": 3600.0,
+        "confirm_ema50": 3580.0,
+        "confirm_ema200": 3400.0,
+        "confirm_rsi14": 60.0,
+        "confirm_atr14": 20.0,
+        "confirm_macd": 8.0,
+        "confirm_macd_signal": 4.0,
+        "confirm_volume_ratio": 1.4,
+        "history_timeframe": "1D",
+        "history_time": "2026-09-20T00:00:00Z",
+        "history_close": 3610.0,
+        "history_ema50": 3500.0,
+        "history_ema200": 3300.0,
+        "history_rsi14": 62.0,
+        "history_atr14": 80.0,
+        "history_high_252": 3650.0,
+        "history_low_252": 2500.0,
+        "history_momentum_20": 0.08,
+        "history_momentum_63": 0.15,
+        "history_momentum_126": 0.20,
+        "history_momentum_252": 0.35,
+        "history_volatility_20": 0.02,
+    }
+
+
 def _payload(**overrides):
     p = {
         "event_id": "evt-plan-1",
@@ -24,6 +56,7 @@ def _payload(**overrides):
         "macd": 5.0,
         "macd_signal": 2.0,
         "volume_ratio": 1.7,
+        **_confirm_history(),
     }
     p.update(overrides)
     return p
