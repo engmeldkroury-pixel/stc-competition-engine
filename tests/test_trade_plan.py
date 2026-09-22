@@ -45,8 +45,8 @@ def _payload(**overrides):
         "timeframe": "15",
         "time": "2026-09-21T10:00:00Z",
         "open": 3600.0,
-        "high": 3620.0,
-        "low": 3590.0,
+        "high": 3614.0,
+        "low": 3598.0,
         "close": 3610.0,
         "volume": 1000.0,
         "ema20": 3605.0,
@@ -82,7 +82,7 @@ def test_same_event_and_signal_produce_same_plan_id():
 
 def test_later_bar_produces_new_plan_without_repricing_old_one():
     a = decide_bridge_event("evt-plan-1", _payload(close=3610.0))
-    b = decide_bridge_event("evt-plan-2", _payload(event_id="evt-plan-2", time="2026-09-21T10:15:00Z", close=3635.0, high=3640.0))
+    b = decide_bridge_event("evt-plan-2", _payload(event_id="evt-plan-2", time="2026-09-21T10:15:00Z", close=3635.0, open=3626.0, high=3640.0, low=3624.0, ema20=3628.0, ema50=3605.0))
     pa = a["decision"]["locked_trade_plan"]
     pb = b["decision"]["locked_trade_plan"]
     assert pa["plan_id"] != pb["plan_id"]
