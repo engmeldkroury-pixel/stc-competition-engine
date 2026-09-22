@@ -4,6 +4,7 @@ from app.strategy_lab import (
     StrategyTrial,
     candidate_strategies,
     select_strategy,
+    trial_rejection_reasons,
 )
 
 
@@ -106,3 +107,28 @@ def test_capital_crypto_has_no_leverage_but_forex_has_25_to_1():
     )
     assert btc.official_leverage == 1.0
     assert eur.official_leverage == 25.0
+
+
+
+def test_trial_diagnostics_expose_rejection_reasons():
+    overfit = StrategyTrial(
+        strategy_id="breakout_expansion",
+        symbol="CME_MINI:MNQ1!",
+        timeframe="15",
+        train_trades=250,
+        test_trades=20,
+        forward_trades=20,
+        train_expectancy_r=0.8,
+        test_expectancy_r=0.01,
+        forward_expectancy_r=-0.05,
+        test_profit_factor=0.95,
+        forward_profit_factor=0.92,
+        test_win_rate=0.48,
+        max_drawdown_r=6.0,
+        parameter_stability=0.50,
+        regime_stability=0.40,
+    )
+    reasons = trial_rejection_reasons(overfit)
+    assert "insufficient_out_of_sample_trades" in reasons
+    assert "weak_out_of_sample_expectancy" in reasons
+    assert "negative_forward_expectancy" in reasons
