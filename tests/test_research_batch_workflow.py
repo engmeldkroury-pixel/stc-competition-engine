@@ -171,3 +171,10 @@ def test_research_workflow_waits_for_explicit_ready_marker():
     text = (ROOT / ".github" / "workflows" / "stc-research.yml").read_text(encoding="utf-8")
     assert '"research_inputs/READY"' in text
     assert '"research_inputs/**"' not in text
+
+
+
+def test_research_runner_records_engine_commit_provenance():
+    text = (ROOT / "scripts" / "run_strategy_research_dir.py").read_text(encoding="utf-8")
+    assert 'result["research_engine_git_sha"] = os.getenv("GITHUB_SHA")' in text
+    assert 'result["research_engine_ref"] = os.getenv("GITHUB_REF_NAME")' in text
