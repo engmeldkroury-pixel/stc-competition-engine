@@ -102,3 +102,62 @@ def test_unscheduled_shock_fails_closed():
     assert overlay.entry_blocked is True
     assert overlay.size_multiplier == 0.0
     assert "unscheduled_market_shock" in overlay.reasons
+
+
+from app.weight_calibration import (
+    FeaturePerformance,
+    calibrate_feature_reliability,
+    participation_percent,
+)
+
+
+def test_small_sample_cannot_turn_feature_into_near_certain_signal():
+    perf = FeaturePerformance(
+        feature="liquidity_sweep",
+        symbol="CAPITALCOM:XAUUSD",
+        strategy_id="smc_structure_liquidity",
+        timeframe="60",
+        sample_size=8,
+        directional_hits=8,
+        average_forward_r=0.8,
+        profit_factor_when_present=3.0,
+        regime_stability=1.0,
+    )
+    r = calibrate_feature_reliability(perf, prior_reliability=0.91)
+    assert r.calibrated_reliability < 0.95
+    assert r.sample_confidence < 0.25
+
+
+def test_negative_forward_expectancy_penalizes_indicator_weight():
+    good = FeaturePerformance(
+        feature="bos",
+        symbol="CME_MINI:MES1!",
+        strategy_id="trend_pullback",
+        timeframe="60",
+        sample_size=100,
+        directional_hits=65,
+        average_forward_r=0.25,
+        profit_factor_when_present=1.5,
+        regime_stability=0.8,
+    )
+    bad = FeaturePerformance(
+        feature="bos",
+        symbol="CME_MINI:MES1!",
+        strategy_id="trend_pullback",
+        timeframe="60",
+        sample_size=100,
+        directional_hits=65,
+        average_forward_r=-0.3,
+        profit_factor_when_present=0.8,
+        regime_stability=0.8,
+    )
+    rg = calibrate_feature_reliability(good, prior_reliability=0.92)
+    rb = calibrate_feature_reliability(bad, prior_reliability=0.92)
+    assert rg.calibrated_reliability > rb.calibrated_reliability
+
+
+def test_participation_percent_is_transparent_and_normalized():
+    p = participation_percent({"structure": 0.4, "trend": 0.3, "volume": 0.2, "news": 0.1})
+    assert round(sum(p.values()), 10) == 100.0
+    assert p["structure"] == 40.0
+    assert p["news"] == 10.0
