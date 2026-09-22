@@ -30,3 +30,13 @@ python scripts/fetch_capital_history.py \
 ```
 
 Verify the Capital.com epic using the authenticated market catalogue before any real backfill. Do not assume TradingView ticker text equals the Capital.com epic.
+
+
+## Cross-feed reconciliation
+Before using Capital.com REST backfill alongside TradingView `CAPITALCOM:` bars, compare a meaningful overlap window:
+
+```bash
+python scripts/reconcile_ohlcv_feeds.py tradingview_15m.json capital_15m.json
+```
+
+Without explicit acceptance thresholds the result is always `REVIEW_REQUIRED`. Even a threshold-qualified `CANDIDATE_MATCH` keeps `live_calibration_authority=false`. The reconciliation measures overlapping timestamps, close/overall OHLC differences in basis points and close-to-close return correlation.
