@@ -60,3 +60,92 @@ def test_drop_latest_unconfirmed_bar_is_explicit():
     }
     bars = bars_from_tradingview_ohlcv(payload)
     assert len(drop_latest_unconfirmed_bar(bars)) == 2
+
+
+
+from app.research_dataset import (
+    research_timeframe_bundle,
+    resample_daily_to_monthly,
+    resample_hourly_to_two_hour,
+)
+
+
+def test_hourly_to_two_hour_resample_uses_only_complete_even_utc_buckets():
+    t0 = datetime(2026, 1, 1, 0, 0, tzinfo=UTC)
+    bars = [
+        Bar(
+            timestamp=t0 + timedelta(hours=i),
+            open=100 + i,
+            high=101 + i,
+            low=99 + i,
+            close=100.5 + i,
+            volume=10 + i,
+        )
+        for i in range(6)
+    ]
+    out = resample_hourly_to_two_hour(bars)
+    assert len(out) == 3
+    assert [b.timestamp.hour for b in out] == [0, 2, 4]
+    assert out[0].open == bars[0].open
+    assert out[0].close == bars[1].close
+    assert out[0].high == max(bars[0].high, bars[1].high)
+    assert out[0].volume == bars[0].volume + bars[1].volume
+
+
+def test_hourly_resample_drops_partial_or_gapped_bucket_instead_of_inventing_bar():
+    t0 = datetime(2026, 1, 1, 0, 0, tzinfo=UTC)
+    bars = [
+        Bar(timestamp=t0, open=1, high=2, low=0.5, close=1.5, volume=10),
+        Bar(timestamp=t0 + timedelta(hours=2), open=2, high=3, low=1.5, close=2.5, volume=10),
+        Bar(timestamp=t0 + timedelta(hours=3), open=2.5, high=3.5, low=2, close=3, volume=10),
+    ]
+    out = resample_hourly_to_two_hour(bars)
+    assert len(out) == 1
+    assert out[0].timestamp.hour == 2
+
+
+def test_daily_to_monthly_resample_preserves_ohlcv_semantics():
+    t0 = datetime(2026, 1, 30, tzinfo=UTC)
+    bars = [
+        Bar(timestamp=t0, open=10, high=12, low=9, close=11, volume=100),
+        Bar(timestamp=t0 + timedelta(days=1), open=11, high=13, low=10, close=12, volume=110),
+        Bar(timestamp=datetime(2026, 2, 2, tzinfo=UTC), open=12, high=15, low=11, close=14, volume=120),
+    ]
+    out = resample_daily_to_monthly(bars)
+    assert len(out) == 2
+    assert out[0].open == 10
+    assert out[0].close == 12
+    assert out[0].high == 13
+    assert out[0].low == 9
+    assert out[0].volume == 210
+    assert out[1].timestamp.month == 2
+
+
+def test_standard_research_bundle_exposes_requested_multitimeframe_context():
+    base = datetime(2026, 1, 1, tzinfo=UTC)
+    bars15 = [
+        Bar(timestamp=base + timedelta(minutes=15 * i), open=1, high=2, low=0.5, close=1.5, volume=1)
+        for i in range(8)
+    ]
+    bars1h = [
+        Bar(timestamp=base + timedelta(hours=i), open=1, high=2, low=0.5, close=1.5, volume=1)
+        for i in range(8)
+    ]
+    bars4h = [
+        Bar(timestamp=base + timedelta(hours=4 * i), open=1, high=2, low=0.5, close=1.5, volume=1)
+        for i in range(4)
+    ]
+    bars1d = [
+        Bar(timestamp=base + timedelta(days=i), open=1, high=2, low=0.5, close=1.5, volume=1)
+        for i in range(40)
+    ]
+    bundle = research_timeframe_bundle(
+        bars_15m=bars15,
+        bars_1h=bars1h,
+        bars_4h=bars4h,
+        bars_1d=bars1d,
+    )
+    assert set(bundle) == {"15", "60", "120", "240", "1D", "1M"}
+    assert len(bundle["120"]) == 3
+    assert len(bundle["15"]) == 7
+    assert len(bundle["60"]) == 7
