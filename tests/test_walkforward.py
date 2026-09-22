@@ -259,3 +259,15 @@ def test_per_timeframe_selection_keeps_live_15m_candidate_separate():
     assert selections["240"].strategy_id == "breakout_expansion"
     assert selections["15"].status == "VALIDATED"
     assert selections["15"].strategy_id == "trend_pullback"
+
+
+
+def test_windowed_materialization_matches_full_prefix_semantics():
+    bars = _bars(1250, slope=0.06)
+    series = wf.materialize_feature_series("TEST:X", "15", bars)
+    for index in (259, 999, 1000, 1249):
+        expected = extract_feature_snapshot("TEST:X", "15", bars[: index + 1])
+        actual = series[index]
+        assert actual.timestamp == expected.timestamp
+        assert actual.values == expected.values
+        assert actual.observations == expected.observations
