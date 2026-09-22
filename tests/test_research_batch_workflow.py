@@ -45,6 +45,7 @@ def test_research_workflow_is_isolated_to_research_branches_and_inputs():
     assert '"research_inputs/**"' in text
     assert "run_strategy_research_dir.py" in text
     assert "actions/upload-artifact@v4" in text
+    assert "print_calibration_candidate.py" in text
     assert "timeout-minutes: 30" in text
     assert "contents: read" in text
     assert "STC_OWNER_TOKEN" not in text
