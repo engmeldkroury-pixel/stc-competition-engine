@@ -1,0 +1,229 @@
+//@version=6
+indicator("STC Capital MTF Feed B v1.0", overlay=true)
+
+competitionId = input.string("capital-africa-sep-2026", "Competition ID", options=["capital-africa-sep-2026"], group="Production feed")
+feedTf = input.timeframe("15", "Production feed timeframe", options=["15"], group="Production feed")
+feedEnabled = input.bool(true, "Enable webhook feed", group="Production feed")
+
+type FeedBar
+    int t
+    float o
+    float h
+    float l
+    float c
+    float v
+    float ema20
+    float ema50
+    float rsi14
+    float atr14
+    float macd
+    float macdSignal
+    float volumeRatio
+
+type ConfirmBar
+    int t
+    float c
+    float ema20
+    float ema50
+    float ema200
+    float rsi14
+    float atr14
+    float macd
+    float macdSignal
+    float volumeRatio
+
+type TrendBar
+    int t
+    float score
+
+type HistoryBar
+    int t
+    float c
+    float ema50
+    float ema200
+    float rsi14
+    float atr14
+    float high252
+    float low252
+    float momentum20
+    float momentum63
+    float momentum126
+    float momentum252
+    float volatility20
+
+makeFeedBar() =>
+    [macdLine, signalLine, _] = ta.macd(close, 12, 26, 9)
+    volSma = ta.sma(volume, 20)
+    FeedBar.new(time, open, high, low, close, volume, ta.ema(close, 20), ta.ema(close, 50), ta.rsi(close, 14), ta.atr(14), macdLine, signalLine, not na(volume) and volSma > 0 ? volume / volSma : 1.0)
+
+feedBar(string symbol) =>
+    request.security(symbol, feedTf, makeFeedBar(), gaps=barmerge.gaps_off, lookahead=barmerge.lookahead_off, ignore_invalid_symbol=false)
+
+makeConfirmBar() =>
+    [macdLine, signalLine, _] = ta.macd(close, 12, 26, 9)
+    volSma = ta.sma(volume, 20)
+    ConfirmBar.new(time[1], close[1], ta.ema(close, 20)[1], ta.ema(close, 50)[1], ta.ema(close, 200)[1], ta.rsi(close, 14)[1], ta.atr(14)[1], macdLine[1], signalLine[1], not na(volume[1]) and volSma[1] > 0 ? volume[1] / volSma[1] : 1.0)
+
+confirmBar(string symbol) =>
+    request.security(symbol, "60", makeConfirmBar(), gaps=barmerge.gaps_off, lookahead=barmerge.lookahead_on, ignore_invalid_symbol=false)
+
+makeTrendBar() =>
+    [macdLine, signalLine, _] = ta.macd(close, 12, 26, 9)
+    e20 = ta.ema(close, 20)
+    e50 = ta.ema(close, 50)
+    e200 = ta.ema(close, 200)
+    r = ta.rsi(close, 14)
+    volSma = ta.sma(volume, 20)
+    vr = not na(volume[1]) and volSma[1] > 0 ? volume[1] / volSma[1] : 1.0
+    s = 0.0
+    s += close[1] > e20[1] and e20[1] > e50[1] ? 0.30 : close[1] < e20[1] and e20[1] < e50[1] ? -0.30 : 0.0
+    s += e50[1] >= e200[1] ? 0.20 : -0.20
+    s += macdLine[1] >= signalLine[1] ? 0.20 : -0.20
+    s += r[1] >= 52 and r[1] <= 72 ? 0.15 : r[1] <= 48 and r[1] >= 28 ? -0.15 : 0.0
+    s += vr >= 1.0 ? (close[1] >= open[1] ? 0.15 : -0.15) : 0.0
+    TrendBar.new(time[1], math.max(-1.0, math.min(1.0, s)))
+
+trendBar(string symbol, string tf) =>
+    request.security(symbol, tf, makeTrendBar(), gaps=barmerge.gaps_off, lookahead=barmerge.lookahead_on, ignore_invalid_symbol=false)
+
+makeMonthlyTrendBar() =>
+    [macdLine, signalLine, _] = ta.macd(close, 6, 13, 5)
+    e6 = ta.ema(close, 6)
+    e12 = ta.ema(close, 12)
+    e24 = ta.ema(close, 24)
+    r = ta.rsi(close, 14)
+    s = 0.0
+    s += close[1] > e6[1] and e6[1] > e12[1] ? 0.35 : close[1] < e6[1] and e6[1] < e12[1] ? -0.35 : 0.0
+    s += e12[1] >= e24[1] ? 0.25 : -0.25
+    s += macdLine[1] >= signalLine[1] ? 0.20 : -0.20
+    s += r[1] >= 52 ? 0.20 : r[1] <= 48 ? -0.20 : 0.0
+    TrendBar.new(time[1], math.max(-1.0, math.min(1.0, s)))
+
+monthlyBar(string symbol) =>
+    request.security(symbol, "1M", makeMonthlyTrendBar(), gaps=barmerge.gaps_off, lookahead=barmerge.lookahead_on, ignore_invalid_symbol=false)
+
+makeHistoryBar() =>
+    m20 = close[21] != 0 ? close[1] / close[21] - 1.0 : 0.0
+    m63 = close[64] != 0 ? close[1] / close[64] - 1.0 : 0.0
+    m126 = close[127] != 0 ? close[1] / close[127] - 1.0 : 0.0
+    m252 = close[253] != 0 ? close[1] / close[253] - 1.0 : 0.0
+    vol20 = close[1] != 0 ? ta.atr(20)[1] / close[1] : 0.0
+    HistoryBar.new(time[1], close[1], ta.ema(close, 50)[1], ta.ema(close, 200)[1], ta.rsi(close, 14)[1], ta.atr(14)[1], ta.highest(high, 252)[1], ta.lowest(low, 252)[1], m20, m63, m126, m252, vol20)
+
+historyBar(string symbol) =>
+    request.security(symbol, "1D", makeHistoryBar(), gaps=barmerge.gaps_off, lookahead=barmerge.lookahead_on, ignore_invalid_symbol=false)
+
+buildMessage(string symbol, FeedBar d, ConfirmBar q, TrendBar t2, TrendBar t4, HistoryBar h, TrendBar m) =>
+    eventId = competitionId + "|" + symbol + "|" + feedTf + "|" + str.tostring(d.t)
+    msg = (
+        '{"event_id":"' + eventId + '",' +
+        '"event":"bar_close",' +
+        '"competition_id":"' + competitionId + '",' +
+        '"symbol":"' + symbol + '",' +
+        '"timeframe":"' + feedTf + '",' +
+        '"time":"' + str.format_time(d.t, "yyyy-MM-dd\'T\'HH:mm:ss\'Z\'", "UTC") + '",' +
+        '"open":' + str.tostring(d.o) + ',' +
+        '"high":' + str.tostring(d.h) + ',' +
+        '"low":' + str.tostring(d.l) + ',' +
+        '"close":' + str.tostring(d.c) + ',' +
+        '"volume":' + str.tostring(d.v) + ',' +
+        '"ema20":' + str.tostring(d.ema20) + ',' +
+        '"ema50":' + str.tostring(d.ema50) + ',' +
+        '"rsi14":' + str.tostring(d.rsi14) + ',' +
+        '"atr14":' + str.tostring(d.atr14) + ',' +
+        '"macd":' + str.tostring(d.macd) + ',' +
+        '"macd_signal":' + str.tostring(d.macdSignal) + ',' +
+        '"volume_ratio":' + str.tostring(d.volumeRatio) + ',' +
+        '"confirm_timeframe":"60",' +
+        '"confirm_time":"' + str.format_time(q.t, "yyyy-MM-dd\'T\'HH:mm:ss\'Z\'", "UTC") + '",' +
+        '"confirm_close":' + str.tostring(q.c) + ',' +
+        '"confirm_ema20":' + str.tostring(q.ema20) + ',' +
+        '"confirm_ema50":' + str.tostring(q.ema50) + ',' +
+        '"confirm_ema200":' + str.tostring(q.ema200) + ',' +
+        '"confirm_rsi14":' + str.tostring(q.rsi14) + ',' +
+        '"confirm_atr14":' + str.tostring(q.atr14) + ',' +
+        '"confirm_macd":' + str.tostring(q.macd) + ',' +
+        '"confirm_macd_signal":' + str.tostring(q.macdSignal) + ',' +
+        '"confirm_volume_ratio":' + str.tostring(q.volumeRatio) + ',' +
+        '"trend_2h_time":"' + str.format_time(t2.t, "yyyy-MM-dd\'T\'HH:mm:ss\'Z\'", "UTC") + '",' +
+        '"trend_2h_score":' + str.tostring(t2.score) + ',' +
+        '"trend_4h_time":"' + str.format_time(t4.t, "yyyy-MM-dd\'T\'HH:mm:ss\'Z\'", "UTC") + '",' +
+        '"trend_4h_score":' + str.tostring(t4.score) + ',' +
+        '"trend_1m_time":"' + str.format_time(m.t, "yyyy-MM-dd\'T\'HH:mm:ss\'Z\'", "UTC") + '",' +
+        '"trend_1m_score":' + str.tostring(m.score) + ',' +
+        '"history_timeframe":"1D",' +
+        '"history_time":"' + str.format_time(h.t, "yyyy-MM-dd\'T\'HH:mm:ss\'Z\'", "UTC") + '",' +
+        '"history_close":' + str.tostring(h.c) + ',' +
+        '"history_ema50":' + str.tostring(h.ema50) + ',' +
+        '"history_ema200":' + str.tostring(h.ema200) + ',' +
+        '"history_rsi14":' + str.tostring(h.rsi14) + ',' +
+        '"history_atr14":' + str.tostring(h.atr14) + ',' +
+        '"history_high_252":' + str.tostring(h.high252) + ',' +
+        '"history_low_252":' + str.tostring(h.low252) + ',' +
+        '"history_momentum_20":' + str.tostring(h.momentum20) + ',' +
+        '"history_momentum_63":' + str.tostring(h.momentum63) + ',' +
+        '"history_momentum_126":' + str.tostring(h.momentum126) + ',' +
+        '"history_momentum_252":' + str.tostring(h.momentum252) + ',' +
+        '"history_volatility_20":' + str.tostring(h.volatility20) +
+        '}'
+    )
+    msg
+
+zar = feedBar("CAPITALCOM:USDZAR")
+zarC = confirmBar("CAPITALCOM:USDZAR")
+zar2 = trendBar("CAPITALCOM:USDZAR", "120")
+zar4 = trendBar("CAPITALCOM:USDZAR", "240")
+zarH = historyBar("CAPITALCOM:USDZAR")
+zarM = monthlyBar("CAPITALCOM:USDZAR")
+varip int lastZAR = na
+
+xau = feedBar("CAPITALCOM:XAUUSD")
+xauC = confirmBar("CAPITALCOM:XAUUSD")
+xau2 = trendBar("CAPITALCOM:XAUUSD", "120")
+xau4 = trendBar("CAPITALCOM:XAUUSD", "240")
+xauH = historyBar("CAPITALCOM:XAUUSD")
+xauM = monthlyBar("CAPITALCOM:XAUUSD")
+varip int lastXAU = na
+
+xag = feedBar("CAPITALCOM:XAGUSD")
+xagC = confirmBar("CAPITALCOM:XAGUSD")
+xag2 = trendBar("CAPITALCOM:XAGUSD", "120")
+xag4 = trendBar("CAPITALCOM:XAGUSD", "240")
+xagH = historyBar("CAPITALCOM:XAGUSD")
+xagM = monthlyBar("CAPITALCOM:XAGUSD")
+varip int lastXAG = na
+
+spx = feedBar("CAPITALCOM:SPX500")
+spxC = confirmBar("CAPITALCOM:SPX500")
+spx2 = trendBar("CAPITALCOM:SPX500", "120")
+spx4 = trendBar("CAPITALCOM:SPX500", "240")
+spxH = historyBar("CAPITALCOM:SPX500")
+spxM = monthlyBar("CAPITALCOM:SPX500")
+varip int lastSPX = na
+
+nas = feedBar("CAPITALCOM:NAS100")
+nasC = confirmBar("CAPITALCOM:NAS100")
+nas2 = trendBar("CAPITALCOM:NAS100", "120")
+nas4 = trendBar("CAPITALCOM:NAS100", "240")
+nasH = historyBar("CAPITALCOM:NAS100")
+nasM = monthlyBar("CAPITALCOM:NAS100")
+varip int lastNAS = na
+
+if feedEnabled and barstate.isconfirmed and barstate.isrealtime
+    if not na(zar.t) and not na(zar.c) and not na(zarC.t) and not na(zar2.t) and not na(zar4.t) and not na(zarH.t) and not na(zarM.t) and (na(lastZAR) or zar.t != lastZAR)
+        lastZAR := zar.t
+        alert(buildMessage("CAPITALCOM:USDZAR", zar, zarC, zar2, zar4, zarH, zarM), alert.freq_all)
+    if not na(xau.t) and not na(xau.c) and not na(xauC.t) and not na(xau2.t) and not na(xau4.t) and not na(xauH.t) and not na(xauM.t) and (na(lastXAU) or xau.t != lastXAU)
+        lastXAU := xau.t
+        alert(buildMessage("CAPITALCOM:XAUUSD", xau, xauC, xau2, xau4, xauH, xauM), alert.freq_all)
+    if not na(xag.t) and not na(xag.c) and not na(xagC.t) and not na(xag2.t) and not na(xag4.t) and not na(xagH.t) and not na(xagM.t) and (na(lastXAG) or xag.t != lastXAG)
+        lastXAG := xag.t
+        alert(buildMessage("CAPITALCOM:XAGUSD", xag, xagC, xag2, xag4, xagH, xagM), alert.freq_all)
+    if not na(spx.t) and not na(spx.c) and not na(spxC.t) and not na(spx2.t) and not na(spx4.t) and not na(spxH.t) and not na(spxM.t) and (na(lastSPX) or spx.t != lastSPX)
+        lastSPX := spx.t
+        alert(buildMessage("CAPITALCOM:SPX500", spx, spxC, spx2, spx4, spxH, spxM), alert.freq_all)
+    if not na(nas.t) and not na(nas.c) and not na(nasC.t) and not na(nas2.t) and not na(nas4.t) and not na(nasH.t) and not na(nasM.t) and (na(lastNAS) or nas.t != lastNAS)
+        lastNAS := nas.t
+        alert(buildMessage("CAPITALCOM:NAS100", nas, nasC, nas2, nas4, nasH, nasM), alert.freq_all)
+
+plot(na, title="STC Capital MTF B", display=display.none)

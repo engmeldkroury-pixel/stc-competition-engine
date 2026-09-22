@@ -1,0 +1,218 @@
+//@version=6
+indicator("STC AMP MTF Feed B v1.0", overlay=true)
+
+competitionId = input.string("amp-futures-sep-2026", "Competition ID", options=["amp-futures-sep-2026"], group="Production feed")
+feedTf = input.timeframe("15", "Production feed timeframe", options=["15"], group="Production feed")
+feedEnabled = input.bool(true, "Enable webhook feed", group="Production feed")
+
+type FeedBar
+    int t
+    float o
+    float h
+    float l
+    float c
+    float v
+    float ema20
+    float ema50
+    float rsi14
+    float atr14
+    float macd
+    float macdSignal
+    float volumeRatio
+
+type ConfirmBar
+    int t
+    float c
+    float ema20
+    float ema50
+    float ema200
+    float rsi14
+    float atr14
+    float macd
+    float macdSignal
+    float volumeRatio
+
+type TrendBar
+    int t
+    float score
+
+type HistoryBar
+    int t
+    float c
+    float ema50
+    float ema200
+    float rsi14
+    float atr14
+    float high252
+    float low252
+    float momentum20
+    float momentum63
+    float momentum126
+    float momentum252
+    float volatility20
+
+makeFeedBar() =>
+    [macdLine, signalLine, _] = ta.macd(close, 12, 26, 9)
+    volSma = ta.sma(volume, 20)
+    FeedBar.new(time, open, high, low, close, volume, ta.ema(close, 20), ta.ema(close, 50), ta.rsi(close, 14), ta.atr(14), macdLine, signalLine, not na(volume) and volSma > 0 ? volume / volSma : 1.0)
+
+feedBar(string symbol) =>
+    request.security(symbol, feedTf, makeFeedBar(), gaps=barmerge.gaps_off, lookahead=barmerge.lookahead_off, ignore_invalid_symbol=false)
+
+makeConfirmBar() =>
+    [macdLine, signalLine, _] = ta.macd(close, 12, 26, 9)
+    volSma = ta.sma(volume, 20)
+    ConfirmBar.new(time[1], close[1], ta.ema(close, 20)[1], ta.ema(close, 50)[1], ta.ema(close, 200)[1], ta.rsi(close, 14)[1], ta.atr(14)[1], macdLine[1], signalLine[1], not na(volume[1]) and volSma[1] > 0 ? volume[1] / volSma[1] : 1.0)
+
+confirmBar(string symbol) =>
+    request.security(symbol, "60", makeConfirmBar(), gaps=barmerge.gaps_off, lookahead=barmerge.lookahead_on, ignore_invalid_symbol=false)
+
+makeTrendBar() =>
+    [macdLine, signalLine, _] = ta.macd(close, 12, 26, 9)
+    e20 = ta.ema(close, 20)
+    e50 = ta.ema(close, 50)
+    e200 = ta.ema(close, 200)
+    r = ta.rsi(close, 14)
+    volSma = ta.sma(volume, 20)
+    vr = not na(volume[1]) and volSma[1] > 0 ? volume[1] / volSma[1] : 1.0
+    s = 0.0
+    s += close[1] > e20[1] and e20[1] > e50[1] ? 0.30 : close[1] < e20[1] and e20[1] < e50[1] ? -0.30 : 0.0
+    s += e50[1] >= e200[1] ? 0.20 : -0.20
+    s += macdLine[1] >= signalLine[1] ? 0.20 : -0.20
+    s += r[1] >= 52 and r[1] <= 72 ? 0.15 : r[1] <= 48 and r[1] >= 28 ? -0.15 : 0.0
+    s += vr >= 1.0 ? (close[1] >= open[1] ? 0.15 : -0.15) : 0.0
+    TrendBar.new(time[1], math.max(-1.0, math.min(1.0, s)))
+
+trendBar(string symbol, string tf) =>
+    request.security(symbol, tf, makeTrendBar(), gaps=barmerge.gaps_off, lookahead=barmerge.lookahead_on, ignore_invalid_symbol=false)
+
+makeMonthlyTrendBar() =>
+    [macdLine, signalLine, _] = ta.macd(close, 6, 13, 5)
+    e6 = ta.ema(close, 6)
+    e12 = ta.ema(close, 12)
+    e24 = ta.ema(close, 24)
+    r = ta.rsi(close, 14)
+    s = 0.0
+    s += close[1] > e6[1] and e6[1] > e12[1] ? 0.35 : close[1] < e6[1] and e6[1] < e12[1] ? -0.35 : 0.0
+    s += e12[1] >= e24[1] ? 0.25 : -0.25
+    s += macdLine[1] >= signalLine[1] ? 0.20 : -0.20
+    s += r[1] >= 52 ? 0.20 : r[1] <= 48 ? -0.20 : 0.0
+    TrendBar.new(time[1], math.max(-1.0, math.min(1.0, s)))
+
+monthlyBar(string symbol) =>
+    request.security(symbol, "1M", makeMonthlyTrendBar(), gaps=barmerge.gaps_off, lookahead=barmerge.lookahead_on, ignore_invalid_symbol=false)
+
+makeHistoryBar() =>
+    m20 = close[21] != 0 ? close[1] / close[21] - 1.0 : 0.0
+    m63 = close[64] != 0 ? close[1] / close[64] - 1.0 : 0.0
+    m126 = close[127] != 0 ? close[1] / close[127] - 1.0 : 0.0
+    m252 = close[253] != 0 ? close[1] / close[253] - 1.0 : 0.0
+    vol20 = close[1] != 0 ? ta.atr(20)[1] / close[1] : 0.0
+    HistoryBar.new(time[1], close[1], ta.ema(close, 50)[1], ta.ema(close, 200)[1], ta.rsi(close, 14)[1], ta.atr(14)[1], ta.highest(high, 252)[1], ta.lowest(low, 252)[1], m20, m63, m126, m252, vol20)
+
+historyBar(string symbol) =>
+    request.security(symbol, "1D", makeHistoryBar(), gaps=barmerge.gaps_off, lookahead=barmerge.lookahead_on, ignore_invalid_symbol=false)
+
+buildMessage(string symbol, FeedBar d, ConfirmBar q, TrendBar t2, TrendBar t4, HistoryBar h, TrendBar m) =>
+    eventId = competitionId + "|" + symbol + "|" + feedTf + "|" + str.tostring(d.t)
+    msg = (
+        '{"event_id":"' + eventId + '",' +
+        '"event":"bar_close",' +
+        '"competition_id":"' + competitionId + '",' +
+        '"symbol":"' + symbol + '",' +
+        '"timeframe":"' + feedTf + '",' +
+        '"time":"' + str.format_time(d.t, "yyyy-MM-dd\'T\'HH:mm:ss\'Z\'", "UTC") + '",' +
+        '"open":' + str.tostring(d.o) + ',' +
+        '"high":' + str.tostring(d.h) + ',' +
+        '"low":' + str.tostring(d.l) + ',' +
+        '"close":' + str.tostring(d.c) + ',' +
+        '"volume":' + str.tostring(d.v) + ',' +
+        '"ema20":' + str.tostring(d.ema20) + ',' +
+        '"ema50":' + str.tostring(d.ema50) + ',' +
+        '"rsi14":' + str.tostring(d.rsi14) + ',' +
+        '"atr14":' + str.tostring(d.atr14) + ',' +
+        '"macd":' + str.tostring(d.macd) + ',' +
+        '"macd_signal":' + str.tostring(d.macdSignal) + ',' +
+        '"volume_ratio":' + str.tostring(d.volumeRatio) + ',' +
+        '"confirm_timeframe":"60",' +
+        '"confirm_time":"' + str.format_time(q.t, "yyyy-MM-dd\'T\'HH:mm:ss\'Z\'", "UTC") + '",' +
+        '"confirm_close":' + str.tostring(q.c) + ',' +
+        '"confirm_ema20":' + str.tostring(q.ema20) + ',' +
+        '"confirm_ema50":' + str.tostring(q.ema50) + ',' +
+        '"confirm_ema200":' + str.tostring(q.ema200) + ',' +
+        '"confirm_rsi14":' + str.tostring(q.rsi14) + ',' +
+        '"confirm_atr14":' + str.tostring(q.atr14) + ',' +
+        '"confirm_macd":' + str.tostring(q.macd) + ',' +
+        '"confirm_macd_signal":' + str.tostring(q.macdSignal) + ',' +
+        '"confirm_volume_ratio":' + str.tostring(q.volumeRatio) + ',' +
+        '"trend_2h_time":"' + str.format_time(t2.t, "yyyy-MM-dd\'T\'HH:mm:ss\'Z\'", "UTC") + '",' +
+        '"trend_2h_score":' + str.tostring(t2.score) + ',' +
+        '"trend_4h_time":"' + str.format_time(t4.t, "yyyy-MM-dd\'T\'HH:mm:ss\'Z\'", "UTC") + '",' +
+        '"trend_4h_score":' + str.tostring(t4.score) + ',' +
+        '"trend_1m_time":"' + str.format_time(m.t, "yyyy-MM-dd\'T\'HH:mm:ss\'Z\'", "UTC") + '",' +
+        '"trend_1m_score":' + str.tostring(m.score) + ',' +
+        '"history_timeframe":"1D",' +
+        '"history_time":"' + str.format_time(h.t, "yyyy-MM-dd\'T\'HH:mm:ss\'Z\'", "UTC") + '",' +
+        '"history_close":' + str.tostring(h.c) + ',' +
+        '"history_ema50":' + str.tostring(h.ema50) + ',' +
+        '"history_ema200":' + str.tostring(h.ema200) + ',' +
+        '"history_rsi14":' + str.tostring(h.rsi14) + ',' +
+        '"history_atr14":' + str.tostring(h.atr14) + ',' +
+        '"history_high_252":' + str.tostring(h.high252) + ',' +
+        '"history_low_252":' + str.tostring(h.low252) + ',' +
+        '"history_momentum_20":' + str.tostring(h.momentum20) + ',' +
+        '"history_momentum_63":' + str.tostring(h.momentum63) + ',' +
+        '"history_momentum_126":' + str.tostring(h.momentum126) + ',' +
+        '"history_momentum_252":' + str.tostring(h.momentum252) + ',' +
+        '"history_volatility_20":' + str.tostring(h.volatility20) +
+        '}'
+    )
+    msg
+
+mcl = feedBar("NYMEX:MCL1!")
+mclC = confirmBar("NYMEX:MCL1!")
+mcl2 = trendBar("NYMEX:MCL1!", "120")
+mcl4 = trendBar("NYMEX:MCL1!", "240")
+mclH = historyBar("NYMEX:MCL1!")
+mclM = monthlyBar("NYMEX:MCL1!")
+varip int lastMCL = na
+
+mng = feedBar("NYMEX:MNG1!")
+mngC = confirmBar("NYMEX:MNG1!")
+mng2 = trendBar("NYMEX:MNG1!", "120")
+mng4 = trendBar("NYMEX:MNG1!", "240")
+mngH = historyBar("NYMEX:MNG1!")
+mngM = monthlyBar("NYMEX:MNG1!")
+varip int lastMNG = na
+
+mgc = feedBar("COMEX_MINI:MGC1!")
+mgcC = confirmBar("COMEX_MINI:MGC1!")
+mgc2 = trendBar("COMEX_MINI:MGC1!", "120")
+mgc4 = trendBar("COMEX_MINI:MGC1!", "240")
+mgcH = historyBar("COMEX_MINI:MGC1!")
+mgcM = monthlyBar("COMEX_MINI:MGC1!")
+varip int lastMGC = na
+
+sil = feedBar("COMEX_MINI:SIL1!")
+silC = confirmBar("COMEX_MINI:SIL1!")
+sil2 = trendBar("COMEX_MINI:SIL1!", "120")
+sil4 = trendBar("COMEX_MINI:SIL1!", "240")
+silH = historyBar("COMEX_MINI:SIL1!")
+silM = monthlyBar("COMEX_MINI:SIL1!")
+varip int lastSIL = na
+
+if feedEnabled and barstate.isconfirmed and barstate.isrealtime
+    if not na(mcl.t) and not na(mcl.c) and not na(mclC.t) and not na(mcl2.t) and not na(mcl4.t) and not na(mclH.t) and not na(mclM.t) and (na(lastMCL) or mcl.t != lastMCL)
+        lastMCL := mcl.t
+        alert(buildMessage("NYMEX:MCL1!", mcl, mclC, mcl2, mcl4, mclH, mclM), alert.freq_all)
+    if not na(mng.t) and not na(mng.c) and not na(mngC.t) and not na(mng2.t) and not na(mng4.t) and not na(mngH.t) and not na(mngM.t) and (na(lastMNG) or mng.t != lastMNG)
+        lastMNG := mng.t
+        alert(buildMessage("NYMEX:MNG1!", mng, mngC, mng2, mng4, mngH, mngM), alert.freq_all)
+    if not na(mgc.t) and not na(mgc.c) and not na(mgcC.t) and not na(mgc2.t) and not na(mgc4.t) and not na(mgcH.t) and not na(mgcM.t) and (na(lastMGC) or mgc.t != lastMGC)
+        lastMGC := mgc.t
+        alert(buildMessage("COMEX_MINI:MGC1!", mgc, mgcC, mgc2, mgc4, mgcH, mgcM), alert.freq_all)
+    if not na(sil.t) and not na(sil.c) and not na(silC.t) and not na(sil2.t) and not na(sil4.t) and not na(silH.t) and not na(silM.t) and (na(lastSIL) or sil.t != lastSIL)
+        lastSIL := sil.t
+        alert(buildMessage("COMEX_MINI:SIL1!", sil, silC, sil2, sil4, silH, silM), alert.freq_all)
+
+plot(na, title="STC AMP MTF B", display=display.none)
