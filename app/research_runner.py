@@ -6,6 +6,7 @@ from typing import Any
 from .asset_classification import strategy_asset_class
 from .feature_validation import FeatureValidation, validate_feature_weight
 from .indicator_catalog import FEATURE_FAMILIES
+from .mtf_research import mtf_strategy_matrix
 from .research_dataset import (
     bars_from_tradingview_ohlcv,
     data_quality_report,
@@ -101,6 +102,7 @@ def run_symbol_research(
     payload: dict[str, Any],
     *,
     calibrate_features: bool = True,
+    run_mtf: bool = False,
 ) -> dict[str, Any]:
     symbol = str(payload.get("symbol") or "").strip()
     if not symbol:
@@ -202,6 +204,30 @@ def run_symbol_research(
         feature_validations=live_entry_feature_validations,
     )
 
+    mtf_validations = []
+    mtf_selection = MatrixSelection(
+        status="NOT_RUN",
+        symbol=symbol,
+        strategy_id=None,
+        timeframe="15",
+        robust_score=None,
+        trial_count=0,
+        reason="MTF research was not requested.",
+    )
+    mtf_report = None
+    if run_mtf:
+        mtf_validations, mtf_selection = mtf_strategy_matrix(
+            symbol=symbol,
+            asset_class=asset_class,
+            bars_by_timeframe=bundle,
+            snapshot_cache=snapshot_cache,
+        )
+        mtf_report = build_strategy_research_report(
+            selection=mtf_selection,
+            validations=mtf_validations,
+            feature_validations=(),
+        )
+
     return {
         "schema_version": "stc-research-v1",
         "symbol": symbol,
@@ -271,6 +297,26 @@ def run_symbol_research(
         ],
         "research_report": report_to_dict(report),
         "live_entry_research_report": report_to_dict(live_entry_report),
+        "mtf_research_enabled": bool(run_mtf),
+        "mtf_selection": asdict(mtf_selection),
+        "mtf_strategy_trials": [
+            {
+                "trial": asdict(row.trial),
+                "base_strategy_id": row.base_strategy_id,
+                "robust_score": robust_trial_score(row.trial),
+                "research_class": classify_trial_status(row.trial),
+                "rejection_reasons": list(trial_rejection_reasons(row.trial)),
+                "selected_params": asdict(row.selected_params),
+                "mtf_gate_params": asdict(row.gate_params),
+                "train": asdict(row.train_stats),
+                "test": asdict(row.test_stats),
+                "forward": asdict(row.forward_stats),
+            }
+            for row in mtf_validations
+        ],
+        "mtf_research_report": (
+            report_to_dict(mtf_report) if mtf_report is not None else None
+        ),
         "live_trading_authority": False,
         "note": (
             "Research output only. A strategy/feature is not live-authorized merely because "
