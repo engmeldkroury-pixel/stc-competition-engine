@@ -92,8 +92,16 @@ def materialize_feature_series(
 ) -> dict[int, HistoricalFeatureSnapshot]:
     if len(bars) <= warmup:
         raise ValueError("Not enough bars after feature warmup")
+    # extract_feature_snapshot itself only consumes the latest 1000 bars.
+    # Pass that same window directly instead of repeatedly copying the entire
+    # prefix (bars[:i+1]); this is semantically identical and avoids quadratic
+    # list-copy overhead on 5000-bar research series.
     return {
-        i: extract_feature_snapshot(symbol, timeframe, bars[: i + 1])
+        i: extract_feature_snapshot(
+            symbol,
+            timeframe,
+            bars[max(0, i - 999) : i + 1],
+        )
         for i in range(warmup - 1, len(bars))
     }
 
