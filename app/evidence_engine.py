@@ -34,6 +34,7 @@ class LiveFamilyEvidence:
     aligned_families: int
     conflicting_families: int
     family_scores: Mapping[str, float]
+    family_weights_used: Mapping[str, float]
     strategy_id: str | None
 
 
@@ -341,27 +342,47 @@ def aggregate_live_family_scores(
     scores: Mapping[str, float | None],
     *,
     strategy_id: str | None = None,
+    family_weight_override: Mapping[str, float] | None = None,
+    calibration_blend: float = 0.65,
 ) -> LiveFamilyEvidence | None:
     """Aggregate nine pre-computed live evidence families without equal voting.
 
     Returns None unless the full family bundle is present. Strategy family
     multipliers may reweight relevance, but cannot remove the breadth gate.
+    A validated research calibration may softly reweight families, but priors
+    retain a floor so one backtest cannot erase independent evidence families.
     """
     required = tuple(FAMILY_PRIOR_WEIGHT)
     if any(scores.get(name) is None for name in required):
         return None
 
     multipliers = STRATEGY_FAMILY_MULTIPLIER.get(strategy_id or "", {})
+    blend = max(0.0, min(0.80, float(calibration_blend)))
+    prior_total = sum(FAMILY_PRIOR_WEIGHT.values())
+    override_clean = {
+        family: max(0.0, float((family_weight_override or {}).get(family, 0.0)))
+        for family in required
+    }
+    override_total = sum(override_clean.values())
+
     weighted = 0.0
     total_weight = 0.0
     positive = 0.0
     negative = 0.0
     clean: dict[str, float] = {}
+    weights_used: dict[str, float] = {}
 
     for family in required:
         value = max(-1.0, min(1.0, float(scores[family])))
         clean[family] = value
-        weight = FAMILY_PRIOR_WEIGHT[family] * multipliers.get(family, 1.0)
+        prior_norm = FAMILY_PRIOR_WEIGHT[family] / prior_total
+        if override_total > 0:
+            calibrated_norm = override_clean[family] / override_total
+            base_weight = prior_norm * (1.0 - blend) + calibrated_norm * blend
+        else:
+            base_weight = prior_norm
+        weight = base_weight * multipliers.get(family, 1.0)
+        weights_used[family] = weight
         weighted += value * weight
         total_weight += weight
         if value > 0:
@@ -385,6 +406,7 @@ def aggregate_live_family_scores(
         aligned_families=aligned,
         conflicting_families=conflicting,
         family_scores=clean,
+        family_weights_used=weights_used,
         strategy_id=strategy_id,
     )
 

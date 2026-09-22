@@ -99,17 +99,25 @@ def decide_bridge_event(event_id: str, payload: dict) -> dict:
     short_term_technical = short_term_score_from_tradingview(tv)
     confirmation_score = confirmation_score_from_tradingview(tv)
     historical_regime = historical_regime_from_tradingview(tv)
-    family_evidence = aggregate_live_family_scores({
-        "trend": tv.family_trend,
-        "momentum": tv.family_momentum,
-        "volatility": tv.family_volatility,
-        "volume": tv.family_volume,
-        "vwap": tv.family_vwap,
-        "market_structure": tv.family_market_structure,
-        "smc_liquidity": tv.family_smc_liquidity,
-        "price_action": tv.family_price_action,
-        "microstructure": tv.family_microstructure,
-    })
+    calibration, calibration_reasons = lookup_runtime_calibration(
+        tv.symbol,
+        as_of=tv.time,
+    )
+    family_evidence = aggregate_live_family_scores(
+        {
+            "trend": tv.family_trend,
+            "momentum": tv.family_momentum,
+            "volatility": tv.family_volatility,
+            "volume": tv.family_volume,
+            "vwap": tv.family_vwap,
+            "market_structure": tv.family_market_structure,
+            "smc_liquidity": tv.family_smc_liquidity,
+            "price_action": tv.family_price_action,
+            "microstructure": tv.family_microstructure,
+        },
+        strategy_id=None if calibration is None else calibration.strategy_id,
+        family_weight_override=None if calibration is None else calibration.family_weights,
+    )
     technical = factors_from_tradingview(tv)
     volatility_quality = volatility_quality_from_tradingview(tv, technical)
     liquidity_quality = liquidity_quality_from_tradingview(tv, technical)
@@ -201,6 +209,9 @@ def decide_bridge_event(event_id: str, payload: dict) -> dict:
         "aligned_families": family_evidence.aligned_families,
         "conflicting_families": family_evidence.conflicting_families,
         "family_scores": dict(family_evidence.family_scores),
+        "family_weights_used": dict(family_evidence.family_weights_used),
+        "strategy_id": family_evidence.strategy_id,
+        "calibration_applied": calibration is not None,
     }
     result_dict["timeframe_confirmation"] = {
         "entry_timeframe": str(tv.timeframe),
@@ -211,10 +222,6 @@ def decide_bridge_event(event_id: str, payload: dict) -> dict:
         "1d_score": historical_regime,
         "1m_score": tv.trend_1m_score,
     }
-    calibration, calibration_reasons = lookup_runtime_calibration(
-        tv.symbol,
-        as_of=tv.time,
-    )
     if calibration is None:
         result_dict["empirical_win_probability"] = {
             "status": "NOT_CALIBRATED",
