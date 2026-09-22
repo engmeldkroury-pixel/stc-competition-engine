@@ -40,3 +40,48 @@ python scripts/reconcile_ohlcv_feeds.py tradingview_15m.json capital_15m.json
 ```
 
 Without explicit acceptance thresholds the result is always `REVIEW_REQUIRED`. Even a threshold-qualified `CANDIDATE_MATCH` keeps `live_calibration_authority=false`. The reconciliation measures overlapping timestamps, close/overall OHLC differences in basis points and close-to-close return correlation.
+
+
+## GitHub Actions orchestration
+A branch-triggered read-only workflow is available at `.github/workflows/stc-capital-backfill.yml`.
+
+Required repository Actions secrets:
+- `CAPITAL_API_KEY`
+- `CAPITAL_IDENTIFIER`
+- `CAPITAL_PASSWORD`
+
+Do not place these values in `request.json`, commits, issues, chat messages or logs.
+
+The workflow is triggered only on branches matching `capital-backfill/**` when either:
+- `capital_backfill_inputs/request.json` changes, or
+- `capital_backfill_inputs/READY` changes.
+
+### Discovery request
+Use this first to verify the Capital.com epic instead of guessing it:
+
+```json
+{
+  "mode": "discover",
+  "environment": "demo",
+  "search_term": "gold"
+}
+```
+
+### Backfill request
+After the epic is verified:
+
+```json
+{
+  "mode": "backfill",
+  "environment": "live",
+  "symbol": "CAPITALCOM:XAUUSD",
+  "epic": "VERIFIED_EPIC",
+  "resolution": "MINUTE_15",
+  "from": "2025-09-01T00:00:00Z",
+  "to": "2026-09-01T00:00:00Z",
+  "price_basis": "mid",
+  "reference_archive": "research_archive/xauusd/15m.json"
+}
+```
+
+The workflow uploads quarantined artifacts only. It never commits the alternate-provider history and never merges it into the exact-provider archive. If a reference archive is supplied, overlap reconciliation is informational and defaults to `REVIEW_REQUIRED` unless a later controlled acceptance policy is explicitly approved.

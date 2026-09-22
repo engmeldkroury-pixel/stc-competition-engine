@@ -1,0 +1,52 @@
+name: STC Capital Historical Backfill
+
+on:
+  push:
+    branches:
+      - "capital-backfill/**"
+    paths:
+      - "capital_backfill_inputs/READY"
+      - "capital_backfill_inputs/request.json"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: stc-capital-backfill-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      CAPITAL_API_KEY: ${{ secrets.CAPITAL_API_KEY }}
+      CAPITAL_IDENTIFIER: ${{ secrets.CAPITAL_IDENTIFIER }}
+      CAPITAL_PASSWORD: ${{ secrets.CAPITAL_PASSWORD }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run read-only Capital.com request
+        run: |
+          set -euo pipefail
+          python scripts/run_capital_backfill_request.py \
+            --request capital_backfill_inputs/request.json \
+            --output-dir capital_backfill_outputs
+
+      - name: Upload quarantined research outputs
+        uses: actions/upload-artifact@v4
+        with:
+          name: stc-capital-backfill-${{ github.run_id }}
+          path: capital_backfill_outputs/*
+          if-no-files-found: error
+          retention-days: 14
