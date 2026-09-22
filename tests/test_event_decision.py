@@ -90,6 +90,22 @@ def test_event_decision_marks_live_quality_and_unavailable_news_macro_honestly()
     assert "news_factor=unavailable_live_source" in reasons
     assert "macro_factor=unavailable_live_source" in reasons
 
+def _strong_confirmation():
+    return {
+        "confirm_timeframe": "60",
+        "confirm_time": "2026-09-21T17:00:00Z",
+        "confirm_close": 3608,
+        "confirm_ema20": 3600,
+        "confirm_ema50": 3580,
+        "confirm_ema200": 3400,
+        "confirm_rsi14": 60,
+        "confirm_atr14": 20,
+        "confirm_macd": 8,
+        "confirm_macd_signal": 4,
+        "confirm_volume_ratio": 1.4,
+    }
+
+
 def _strong_history():
     return {
         "history_timeframe": "1D",
@@ -129,6 +145,7 @@ def test_high_conviction_gate_allows_only_a_plus_directional_plan():
         "macd": 5,
         "macd_signal": 2,
         "volume_ratio": 1.8,
+        **_strong_confirmation(),
         **_strong_history(),
     }
     result = decide_bridge_event("evt-a-plus", payload)
@@ -168,4 +185,33 @@ def test_borderline_direction_is_downgraded_to_wait_and_has_no_plan():
     assert signal["setup_grade"] == "MONITOR_ONLY"
     assert result["decision"]["locked_trade_plan"] is None
     assert "high_conviction_gate=BLOCKED" in signal["reasons"]
+
+def test_directional_candidate_without_1h_confirmation_fails_closed_to_wait():
+    payload = {
+        "event_id": "evt-missing-confirm",
+        "event": "bar_close",
+        "competition_id": "capital-africa-sep-2026",
+        "symbol": "CAPITALCOM:XAUUSD",
+        "timeframe": "15",
+        "time": "2026-09-21T18:00:00Z",
+        "open": 3600,
+        "high": 3615,
+        "low": 3605,
+        "close": 3610,
+        "volume": 1800,
+        "ema20": 3605,
+        "ema50": 3590,
+        "rsi14": 60,
+        "atr14": 10,
+        "macd": 5,
+        "macd_signal": 2,
+        "volume_ratio": 1.8,
+        **_strong_history(),
+    }
+    result = decide_bridge_event("evt-missing-confirm", payload)
+    signal = result["decision"]["signal"]
+    assert signal["recommendation"] == "WAIT"
+    assert signal["quality_gate_passed"] is False
+    assert "gate_block=confirmation_context_present" in signal["reasons"]
+    assert result["decision"]["locked_trade_plan"] is None
 
