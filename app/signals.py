@@ -12,12 +12,15 @@ def evaluate(req: SignalEvaluationRequest) -> SignalEvaluationResult:
         raise ValueError("Symbol is not allowed in this competition")
 
     f = req.factors
+    # Direction comes primarily from price/structure evidence. News and macro
+    # are deliberately low-weight directional inputs; event risk is handled
+    # separately by the fail-closed news/macro overlay.
     weights = {
-        "technical": 0.45,
-        "news": 0.20,
-        "macro": 0.15,
-        "volatility_quality": 0.10,
-        "liquidity_quality": 0.10,
+        "technical": 0.60,
+        "news": 0.05,
+        "macro": 0.05,
+        "volatility_quality": 0.15,
+        "liquidity_quality": 0.15,
     }
     composite = (
         f.technical * weights["technical"]
