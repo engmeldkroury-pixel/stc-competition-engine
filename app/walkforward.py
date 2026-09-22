@@ -10,6 +10,7 @@ from .evidence_engine import EvidenceSummary, aggregate_evidence
 from .historical_features import HistoricalFeatureSnapshot, extract_feature_snapshot
 from .models import Bar
 from .strategy_lab import StrategyTrial, candidate_strategies, robust_trial_score
+from .trade_plan import LIVE_PLAN_FINAL_TARGET_RR, LIVE_PLAN_STOP_ATR_MULTIPLE
 
 
 @dataclass(frozen=True)
@@ -320,13 +321,11 @@ def parameter_grid(timeframe: str) -> tuple[BacktestParams, ...]:
     return tuple(
         BacktestParams(
             threshold=threshold,
-            stop_atr=stop_atr,
-            target_r=target_r,
+            stop_atr=LIVE_PLAN_STOP_ATR_MULTIPLE,
+            target_r=LIVE_PLAN_FINAL_TARGET_RR,
             max_hold_bars=hold,
         )
         for threshold in (0.50, 0.62, 0.72)
-        for stop_atr in (1.0, 1.5)
-        for target_r in (1.0, 1.5, 2.0)
     )
 
 
