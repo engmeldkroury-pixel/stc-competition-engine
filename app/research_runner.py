@@ -13,7 +13,7 @@ from .research_dataset import (
 )
 from .research_report import build_strategy_research_report, report_to_dict
 from .strategy_lab import STRATEGIES, robust_trial_score, trial_rejection_reasons
-from .walkforward import materialize_feature_series, strategy_matrix
+from .walkforward import MatrixSelection, materialize_feature_series, matrix_selections_by_timeframe, strategy_matrix
 
 
 RAW_SERIES_KEYS = {
@@ -52,6 +52,44 @@ def _feature_horizon(timeframe: str) -> int:
         "240": 3,
         "1D": 5,
     }.get(timeframe, 4)
+
+
+def _calibrate_selection_features(
+    *,
+    symbol: str,
+    selection: MatrixSelection,
+    bundle: dict[str, list],
+) -> list[FeatureValidation]:
+    if (
+        selection.status != "VALIDATED"
+        or selection.strategy_id is None
+        or selection.timeframe is None
+    ):
+        return []
+    bars = bundle.get(selection.timeframe) or []
+    if len(bars) < 900:
+        return []
+    snapshots = materialize_feature_series(symbol, selection.timeframe, bars)
+    n = len(bars)
+    train_end = max(520, int(n * 0.58))
+    test_end = max(train_end + 120, int(n * 0.82))
+    test_end = min(test_end, n - 80)
+    horizon = _feature_horizon(selection.timeframe)
+    return [
+        validate_feature_weight(
+            feature=feature,
+            symbol=symbol,
+            strategy_id=selection.strategy_id,
+            timeframe=selection.timeframe,
+            bars=bars,
+            snapshots=snapshots,
+            test_start=train_end,
+            test_end=test_end,
+            forward_end=n - 1,
+            horizon_bars=horizon,
+        )
+        for feature in _strategy_feature_names(selection.strategy_id)
+    ]
 
 
 def run_symbol_research(
@@ -103,41 +141,52 @@ def run_symbol_research(
     )
     asset_class = strategy_asset_class(symbol)
     validations, selection = strategy_matrix(symbol, asset_class, bundle)
+    timeframe_selections = matrix_selections_by_timeframe(symbol, validations)
+    live_entry_selection = timeframe_selections.get(
+        "15",
+        MatrixSelection(
+            status="NO_VALIDATED_STRATEGY",
+            symbol=symbol,
+            strategy_id=None,
+            timeframe="15",
+            robust_score=None,
+            trial_count=0,
+            reason="15m research timeframe unavailable.",
+        ),
+    )
 
     feature_validations: list[FeatureValidation] = []
-    if (
-        calibrate_features
-        and selection.status == "VALIDATED"
-        and selection.strategy_id is not None
-        and selection.timeframe is not None
-    ):
-        bars = bundle[selection.timeframe]
-        snapshots = materialize_feature_series(symbol, selection.timeframe, bars)
-        n = len(bars)
-        train_end = max(520, int(n * 0.58))
-        test_end = max(train_end + 120, int(n * 0.82))
-        test_end = min(test_end, n - 80)
-        horizon = _feature_horizon(selection.timeframe)
-        for feature in _strategy_feature_names(selection.strategy_id):
-            feature_validations.append(
-                validate_feature_weight(
-                    feature=feature,
-                    symbol=symbol,
-                    strategy_id=selection.strategy_id,
-                    timeframe=selection.timeframe,
-                    bars=bars,
-                    snapshots=snapshots,
-                    test_start=train_end,
-                    test_end=test_end,
-                    forward_end=n - 1,
-                    horizon_bars=horizon,
-                )
+    live_entry_feature_validations: list[FeatureValidation] = []
+    if calibrate_features:
+        feature_validations = _calibrate_selection_features(
+            symbol=symbol,
+            selection=selection,
+            bundle=bundle,
+        )
+        if (
+            live_entry_selection.status == "VALIDATED"
+            and (
+                selection.strategy_id != live_entry_selection.strategy_id
+                or selection.timeframe != live_entry_selection.timeframe
             )
+        ):
+            live_entry_feature_validations = _calibrate_selection_features(
+                symbol=symbol,
+                selection=live_entry_selection,
+                bundle=bundle,
+            )
+        else:
+            live_entry_feature_validations = list(feature_validations)
 
     report = build_strategy_research_report(
         selection=selection,
         validations=validations,
         feature_validations=feature_validations,
+    )
+    live_entry_report = build_strategy_research_report(
+        selection=live_entry_selection,
+        validations=validations,
+        feature_validations=live_entry_feature_validations,
     )
 
     return {
@@ -155,6 +204,11 @@ def run_symbol_research(
             for key, value in bundle.items()
         },
         "matrix_selection": asdict(selection),
+        "timeframe_selections": {
+            key: asdict(value) for key, value in timeframe_selections.items()
+        },
+        "live_entry_timeframe": "15",
+        "live_entry_selection": asdict(live_entry_selection),
         "strategy_trials": [
             {
                 "trial": asdict(row.trial),
@@ -178,7 +232,19 @@ def run_symbol_research(
             }
             for item in feature_validations
         ],
+        "live_entry_feature_validations": [
+            {
+                "feature": item.feature,
+                "deployable": item.deployable,
+                "reason": item.reason,
+                "test": asdict(item.test_performance),
+                "forward": asdict(item.forward_performance),
+                "calibration": asdict(item.calibrated_weight),
+            }
+            for item in live_entry_feature_validations
+        ],
         "research_report": report_to_dict(report),
+        "live_entry_research_report": report_to_dict(live_entry_report),
         "live_trading_authority": False,
         "note": (
             "Research output only. A strategy/feature is not live-authorized merely because "
