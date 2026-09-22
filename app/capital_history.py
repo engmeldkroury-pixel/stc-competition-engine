@@ -97,6 +97,22 @@ class CapitalHistoryClient:
             "X-SECURITY-TOKEN": self.session.security_token,
         }
 
+    def search_markets(self, search_term: str) -> list[dict[str, Any]]:
+        search_term = str(search_term or "").strip()
+        if not search_term:
+            raise ValueError("Capital.com market search term is required")
+        response = self.client.get(
+            "/api/v1/markets",
+            headers=self._auth_headers(),
+            params={"searchTerm": search_term},
+        )
+        response.raise_for_status()
+        payload = response.json()
+        markets = payload.get("markets") if isinstance(payload, dict) else None
+        if not isinstance(markets, list):
+            raise RuntimeError("Capital.com market search response missing markets list")
+        return [row for row in markets if isinstance(row, dict)]
+
     def historical_prices(
         self,
         *,
