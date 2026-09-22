@@ -25,17 +25,18 @@ Find evidence-backed strategy/timeframe candidates for the STC competition unive
 The six v1.1 Family Breadth Pine feeds are code-ready on main but the active TradingView alerts are still the verified legacy production snapshots. Fresh indicator alerts must be created manually later and verified in parallel before old alerts are stopped.
 
 ## Immediate next screen
-Run matrix-only screening on highly liquid index/futures candidates, starting with CAPITALCOM:NAS100 and CME_MINI:MNQ1!, then expand to metals/energy if no 15m candidate validates.
+Finish COMEX_MINI:MGC1! screening, then continue remaining high-liquidity competition symbols. Do not repeat already-screened symbols unless used for reproducibility checks.
 
 ## Owner dependency
 None for the current research-screening phase.
 
 
-## In-progress screening batches
-- CAPITALCOM:NAS100 + CME_MINI:MNQ1!: matrix-only six-timeframe screening in progress.
-- CAPITALCOM:XAGUSD + NYMEX:MCL1!: matrix-only six-timeframe screening in progress.
-- Once results complete: run full feature calibration only for any VALIDATED candidate, prioritizing an exact 15m live-entry match.
-- BTCUSD 1D trend_pullback is validated research with 19 deployable features, but is not promotable to 15m and probability remains uncalibrated at n=49.
+## Screening status
+- Completed with NO_VALIDATED_STRATEGY: CAPITALCOM:NAS100, CME_MINI:MNQ1!, CAPITALCOM:XAGUSD, NYMEX:MCL1!.
+- Completed earlier with NO_VALIDATED_STRATEGY: CAPITALCOM:XAUUSD, CME_MINI:MES1!, CAPITALCOM:EURUSD.
+- CAPITALCOM:BTCUSD: 1D trend_pullback validated research with 19 deployable features, but not promotable to 15m; probability remains uncalibrated at n=49.
+- Active new evidence run: COMEX_MINI:MGC1! (with duplicate XAGUSD confirmation).
+- After MGC result: continue matrix-only screening across remaining competition symbols; full feature calibration only for a VALIDATED candidate, prioritizing exact 15m live-entry matches.
 
 ## Research performance
 Historical feature materialization now passes only the exact latest-1000-bar window used by the extractor; regression tests prove semantic equivalence.
