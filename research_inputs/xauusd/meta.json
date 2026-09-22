@@ -2,5 +2,6 @@
   "symbol": "CAPITALCOM:XAUUSD",
   "source": "TradingView MCP exact-provider OHLCV",
   "captured_for": "STC offline research pilot",
-  "captured_date": "2026-09-22"
+  "captured_date": "2026-09-22",
+  "retry_after_runner_fix": "2026-09-22T04:52Z"
 }
