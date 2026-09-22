@@ -265,9 +265,32 @@ function convictionHtml(c){
  let pText='NOT CALIBRATED';
  if(p.estimated_probability!==null&&p.estimated_probability!==undefined&&Number.isFinite(Number(p.estimated_probability))){
    pText=num(Number(p.estimated_probability)*100,1)+'% • n='+esc(p.sample_size||0);
+   if(Number.isFinite(Number(p.confidence_low))&&Number.isFinite(Number(p.confidence_high))){
+     pText+=' • CI '+num(Number(p.confidence_low)*100,1)+'–'+num(Number(p.confidence_high)*100,1)+'%';
+   }
  }else if(p.sample_size){
    pText='NOT CALIBRATED • n='+esc(p.sample_size);
  }
+
+ const rc=c.research_calibration||{};
+ let calibrationText='No matching live-timeframe calibration';
+ let featureHtml='';
+ if(rc.status==='AVAILABLE_INFORMATIONAL'||rc.strategy_id){
+   calibrationText=esc(rc.strategy_id||'-')+' @ '+esc(rc.timeframe||'-')
+     +' • robust '+num(rc.robust_score,2)
+     +' • data '+(rc.data_end_utc?formatLocalTime(rc.data_end_utc):'-');
+   const fw=rc.feature_weights||{};
+   const features=Object.entries(fw)
+     .filter(([,v])=>Number.isFinite(Number(v))&&Number(v)>0)
+     .sort((a,b)=>Number(b[1])-Number(a[1]))
+     .slice(0,8)
+     .map(([k,v])=>'<span class="pill">'+esc(k)+' '+num(Number(v)*100,1)+'%</span>')
+     .join('');
+   if(features){
+     featureHtml='<div class="small" style="margin-top:6px"><b>Validated feature participation:</b> '+features+'</div>';
+   }
+ }
+
  const t=c.timeframe_confirmation||{};
  function tf(label,key){
    const v=t[key];
@@ -275,13 +298,18 @@ function convictionHtml(c){
  }
  const mtf=tf(String(t.entry_timeframe||'15')+'m','entry_score')
    +tf('1H','1h_score')+tf('2H','2h_score')+tf('4H','4h_score')+tf('1D','1d_score')+tf('1M','1m_score');
+
  const f=c.live_family_evidence||null;
  let familyHtml='<div class="small wait" style="margin-top:6px">Family evidence: unavailable — candidate cannot pass the A+ breadth gate.</div>';
  if(f){
    const fs=f.family_scores||{};
+   const fw=f.family_weights_used||{};
    function fam(label,key){
      const v=fs[key];
-     return '<span class="pill">'+esc(label)+' '+(v===null||v===undefined?'-':(Number(v)>=0?'+':'')+num(v,2))+'</span>';
+     const w=fw[key];
+     const scoreText=v===null||v===undefined?'-':(Number(v)>=0?'+':'')+num(v,2);
+     const weightText=Number.isFinite(Number(w))?' • w '+num(Number(w)*100,1)+'%':'';
+     return '<span class="pill">'+esc(label)+' '+scoreText+weightText+'</span>';
    }
    const familyPills=fam('Trend','trend')+fam('Momentum','momentum')+fam('Volatility','volatility')
      +fam('Volume','volume')+fam('VWAP','vwap')+fam('Structure','market_structure')
@@ -291,10 +319,13 @@ function convictionHtml(c){
      +'% • aligned '+esc(f.aligned_families||0)+'/9 • conflicts '+esc(f.conflicting_families||0)+'</span></div>'
      +'<div class="small" style="margin-top:6px">'+familyPills+'</div>';
  }
+
  return '<div class="orderbox"><div class="small">CONVICTION / VALIDATION</div>'
    +'<div class="row"><span>Setup quality</span><span class="value">'+esc(qText)+' • '+esc(c.setup_grade||'MONITOR_ONLY')+'</span></div>'
    +'<div class="row"><span>Empirical win probability</span><span class="value">'+esc(pText)+'</span></div>'
-   +'<div class="small">Setup Quality is not win probability. Probability is shown only after out-of-sample + forward calibration.</div>'
+   +'<div class="row"><span>Research strategy</span><span class="value">'+calibrationText+'</span></div>'
+   +'<div class="small">Setup Quality is not win probability. Probability is shown only after out-of-sample + forward calibration on the same live entry timeframe.</div>'
+   +featureHtml
    +'<div class="small" style="margin-top:6px">'+mtf+'</div>'
    +familyHtml+'</div>';
 }
