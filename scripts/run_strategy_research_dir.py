@@ -57,7 +57,15 @@ def load_series_dir(path: Path) -> dict:
     research_mode = str(meta.get("research_mode") or "full").strip().lower()
     if research_mode not in {"full", "matrix_only"}:
         raise ValueError("meta.json research_mode must be full or matrix_only")
-    return {"symbol": symbol, "series": series, "research_mode": research_mode}
+    mtf_research = meta.get("mtf_research", False)
+    if not isinstance(mtf_research, bool):
+        raise ValueError("meta.json mtf_research must be true or false")
+    return {
+        "symbol": symbol,
+        "series": series,
+        "research_mode": research_mode,
+        "mtf_research": mtf_research,
+    }
 
 
 def main() -> int:
@@ -81,8 +89,10 @@ def main() -> int:
     result = run_symbol_research(
         payload,
         calibrate_features=calibrate_features,
+        run_mtf=bool(payload.get("mtf_research", False)),
     )
     result["research_mode"] = payload.get("research_mode", "full")
+    result["mtf_research_requested"] = bool(payload.get("mtf_research", False))
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(
         json.dumps(result, indent=2, default=str, sort_keys=True) + "\n",
@@ -110,6 +120,10 @@ def main() -> int:
         "deployable_feature_count": report.get("deployable_feature_count"),
         "blocked_feature_count": report.get("blocked_feature_count"),
         "research_mode": result.get("research_mode", "full"),
+        "mtf_research_requested": result.get("mtf_research_requested", False),
+        "mtf_status": (result.get("mtf_research_report") or {}).get("status"),
+        "mtf_selected_strategy": (result.get("mtf_research_report") or {}).get("selected_strategy"),
+        "mtf_robust_score": (result.get("mtf_research_report") or {}).get("robust_score"),
     }
     print("STC_RESEARCH_SUMMARY=" + json.dumps(summary, sort_keys=True))
     print(f"Wrote {args.output}")
