@@ -1,5 +1,5 @@
 //@version=6
-indicator("STC AMP MTF Feed A v1.0", overlay=true)
+indicator("STC AMP MTF Feed A v1.1 Family Breadth", overlay=true)
 
 competitionId = input.string("amp-futures-sep-2026", "Competition ID", options=["amp-futures-sep-2026"], group="Production feed")
 feedTf = input.timeframe("15", "Production feed timeframe", options=["15"], group="Production feed")
@@ -19,6 +19,15 @@ type FeedBar
     float macd
     float macdSignal
     float volumeRatio
+    float familyTrend
+    float familyMomentum
+    float familyVolatility
+    float familyVolume
+    float familyVwap
+    float familyMarketStructure
+    float familySmcLiquidity
+    float familyPriceAction
+    float familyMicrostructure
 
 type ConfirmBar
     int t
@@ -51,10 +60,50 @@ type HistoryBar
     float momentum252
     float volatility20
 
+clampScore(float x) =>
+    math.max(-1.0, math.min(1.0, x))
+
 makeFeedBar() =>
     [macdLine, signalLine, _] = ta.macd(close, 12, 26, 9)
+    e20 = ta.ema(close, 20)
+    e50 = ta.ema(close, 50)
+    e200 = ta.ema(close, 200)
+    r = ta.rsi(close, 14)
+    a = ta.atr(14)
+    stoch = ta.stoch(close, high, low, 14)
     volSma = ta.sma(volume, 20)
-    FeedBar.new(time, open, high, low, close, volume, ta.ema(close, 20), ta.ema(close, 50), ta.rsi(close, 14), ta.atr(14), macdLine, signalLine, not na(volume) and volSma > 0 ? volume / volSma : 1.0)
+    vr = not na(volume) and volSma > 0 ? volume / volSma : 1.0
+    safeAtr = math.max(a, syminfo.mintick)
+    trendDir = close > e20 and e20 > e50 ? 1.0 : close < e20 and e20 < e50 ? -1.0 : close >= e50 ? 0.30 : -0.30
+    familyTrend = clampScore(trendDir * 0.55 + (e50 >= e200 ? 0.25 : -0.25) + (macdLine >= signalLine ? 0.20 : -0.20))
+    macdNorm = clampScore((macdLine - signalLine) / math.max(safeAtr * 0.35, syminfo.mintick))
+    familyMomentum = clampScore(clampScore((r - 50.0) / 25.0) * 0.40 + clampScore((stoch - 50.0) / 40.0) * 0.25 + macdNorm * 0.35)
+    rangeAtr = (high - low) / safeAtr
+    volQuality = rangeAtr >= 0.40 and rangeAtr <= 1.80 ? 0.60 : rangeAtr >= 0.20 and rangeAtr <= 2.50 ? 0.20 : rangeAtr > 3.00 ? -0.80 : -0.20
+    familyVolatility = clampScore(trendDir * volQuality)
+    barDir = close > open ? 1.0 : close < open ? -1.0 : trendDir
+    participation = math.max(0.0, math.min(1.0, (vr - 0.70) / 1.00))
+    familyVolume = clampScore(barDir * participation)
+    vw = ta.vwap(hlc3)
+    familyVwap = na(vw) ? 0.0 : clampScore((close - vw) / safeAtr)
+    priorHi = ta.highest(high, 20)[1]
+    priorLo = ta.lowest(low, 20)[1]
+    bos = close > priorHi ? 1.0 : close < priorLo ? -1.0 : 0.0
+    familyMarketStructure = clampScore(bos * 0.65 + trendDir * 0.35)
+    sweep = high > priorHi and close < priorHi ? -1.0 : low < priorLo and close > priorLo ? 1.0 : 0.0
+    fvg = low > high[2] ? 1.0 : high < low[2] ? -1.0 : 0.0
+    body = close - open
+    displacement = math.abs(body) >= 1.20 * safeAtr ? barDir : 0.0
+    familySmcLiquidity = clampScore(sweep * 0.50 + fvg * 0.20 + displacement * 0.30)
+    bullEngulf = close > open and close[1] < open[1] and close >= open[1] and open <= close[1]
+    bearEngulf = close < open and close[1] > open[1] and open >= close[1] and close <= open[1]
+    engulf = bullEngulf ? 1.0 : bearEngulf ? -1.0 : 0.0
+    barRange = math.max(high - low, syminfo.mintick)
+    clv = ((close - low) - (high - close)) / barRange
+    familyPriceAction = clampScore(engulf * 0.55 + clampScore(clv) * 0.45)
+    efficiency = math.abs(body) / barRange
+    familyMicrostructure = clampScore(barDir * (efficiency * 0.60 + participation * 0.40))
+    FeedBar.new(time, open, high, low, close, volume, e20, e50, r, a, macdLine, signalLine, vr, familyTrend, familyMomentum, familyVolatility, familyVolume, familyVwap, familyMarketStructure, familySmcLiquidity, familyPriceAction, familyMicrostructure)
 
 feedBar(string symbol) =>
     request.security(symbol, feedTf, makeFeedBar(), gaps=barmerge.gaps_off, lookahead=barmerge.lookahead_off, ignore_invalid_symbol=false)
@@ -134,6 +183,15 @@ buildMessage(string symbol, FeedBar d, ConfirmBar q, TrendBar t2, TrendBar t4, H
         '"macd":' + str.tostring(d.macd) + ',' +
         '"macd_signal":' + str.tostring(d.macdSignal) + ',' +
         '"volume_ratio":' + str.tostring(d.volumeRatio) + ',' +
+        '"family_trend":' + str.tostring(d.familyTrend) + ',' +
+        '"family_momentum":' + str.tostring(d.familyMomentum) + ',' +
+        '"family_volatility":' + str.tostring(d.familyVolatility) + ',' +
+        '"family_volume":' + str.tostring(d.familyVolume) + ',' +
+        '"family_vwap":' + str.tostring(d.familyVwap) + ',' +
+        '"family_market_structure":' + str.tostring(d.familyMarketStructure) + ',' +
+        '"family_smc_liquidity":' + str.tostring(d.familySmcLiquidity) + ',' +
+        '"family_price_action":' + str.tostring(d.familyPriceAction) + ',' +
+        '"family_microstructure":' + str.tostring(d.familyMicrostructure) + ',' +
         '"confirm_timeframe":"60",' +
         '"confirm_time":"' + str.format_time(q.t, "yyyy-MM-dd\'T\'HH:mm:ss\'Z\'", "UTC") + '",' +
         '"confirm_close":' + str.tostring(q.c) + ',' +
