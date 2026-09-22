@@ -109,6 +109,15 @@ def _strong_confirmation():
         "trend_4h_score": 0.82,
         "trend_1m_time": "2026-09-01T00:00:00Z",
         "trend_1m_score": 0.72,
+        "family_trend": 0.85,
+        "family_momentum": 0.78,
+        "family_volatility": 0.65,
+        "family_volume": 0.72,
+        "family_vwap": 0.70,
+        "family_market_structure": 0.88,
+        "family_smc_liquidity": 0.86,
+        "family_price_action": 0.75,
+        "family_microstructure": 0.68,
     }
 
 
