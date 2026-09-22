@@ -19,7 +19,19 @@ def _archive(symbol="TEST:X", interval="15m", count=400, start_t=1700000000):
             "c": close,
             "v": 1000 + i,
         })
-    return {"symbol": symbol, "interval": interval, "bars": bars}
+    last_t = bars[-1]["t"] if bars else None
+    return {
+        "symbol": symbol,
+        "interval": interval,
+        "bars": bars,
+        "archive": {
+            "schema_version": "stc-ohlcv-archive-v1",
+            "provider": "TradingView Official MCP",
+            "coverage_first_t": bars[0]["t"] if bars else None,
+            "coverage_last_t": last_t,
+            "withheld_unconfirmed_t": (last_t + 900) if last_t is not None else None,
+        },
+    }
 
 
 def _hypothesis(freeze_t, threshold=0.72):
@@ -183,3 +195,21 @@ def test_manifest_requires_optimization_lock():
             "optimization_locked": False,
             "hypotheses": [{}],
         })
+
+
+def test_frozen_confirmation_rejects_alternate_provider_backfill():
+    archive = _archive()
+    archive["archive"]["provider"] = "Capital.com REST API"
+    hypothesis = _hypothesis(archive["bars"][299]["t"])
+
+    with pytest.raises(ValueError, match="TradingView Official MCP"):
+        fc.evaluate_frozen_hypothesis(archive, hypothesis)
+
+
+def test_frozen_confirmation_rejects_archive_that_still_contains_mutable_tail():
+    archive = _archive()
+    archive["archive"]["withheld_unconfirmed_t"] = archive["bars"][-1]["t"]
+    hypothesis = _hypothesis(archive["bars"][299]["t"])
+
+    with pytest.raises(ValueError, match="unconfirmed tail"):
+        fc.evaluate_frozen_hypothesis(archive, hypothesis)
