@@ -1440,3 +1440,127 @@ Final decision for this stage:
 - Safe Mode, Kill Switch, manual approval and manual execution remain unchanged.
 - Owner intervention required now: NO.
 
+
+
+## Confirmed-history, alternate-backfill and frozen-confirmation checkpoint — 2026-09-23
+
+Status: IMPLEMENTATION COMPLETE TO OWNER DATA-ACCESS GATE.
+
+### Exact-provider archive integrity
+- PR #84 merged as commit 16d6c93d04f541bbf1a4242ce560c7d42a6e2dfc.
+- Root cause found from live evidence: TradingView states its returned final bar may still change, but the first archive implementation stored that mutable tail.
+- The archive merger now withholds a mutable final bar until a later snapshot proves it is no longer the tail.
+- If an older seed already contains the current mutable tail, that copy is removed.
+- Stale snapshots cannot delete a bar already confirmed by later history.
+- CI for the final fix: 314 passed, 2 warnings.
+- PR #85 merged as commit 4ce3fc0d13fc5d895ae238bd1c9b3f9b7deb3eb2 to apply the confirmed-only rule to the seeded archives.
+
+Current confirmed 15m archive state after PR #85:
+- CME_MINI:MNQ1!: 4,999 confirmed bars.
+  - freeze/development research end actually used by the engine: 1790103600 / 2026-09-22T19:00:00Z.
+  - archive confirmed-through: 1790109000.
+  - genuinely unseen confirmed bars after the research freeze: 6.
+  - current mutable tail 1790109900 is withheld.
+- CAPITALCOM:BTCUSD: 5,000 confirmed bars.
+  - freeze/development research end actually used by the engine: 1790089200 / 2026-09-22T15:00:00Z.
+  - archive confirmed-through: 1790113500.
+  - genuinely unseen confirmed bars after the research freeze: 27.
+  - the previously mutable bar at 1790113500 was confirmed on the next snapshot and its final observed values replaced the provisional seed copy.
+  - current mutable tail 1790114400 is withheld.
+- CI for the confirmed-archive data refresh: 314 passed, 2 warnings.
+
+### Capital.com older-history path
+- PR #82 merged as commit c3f623b42221bd953845092f54eaf02c1c7648ea.
+- CI: 310 passed, 2 warnings.
+- Added read-only Capital.com REST historical adapter:
+  - authenticated market discovery;
+  - historical from/to pagination;
+  - explicit bid / ask / mid conversion;
+  - no committed credentials;
+  - no order/trading endpoint;
+  - alternate feed quarantined from exact-provider evidence.
+- Added cross-feed reconciliation:
+  - identical-timestamp overlap;
+  - median/p95 close difference in basis points;
+  - median OHLC difference;
+  - close-return correlation.
+- Capital.com REST history is NOT assumed identical to TradingView CAPITALCOM chart bars.
+- Even a future CANDIDATE_MATCH reconciliation keeps live_calibration_authority=false and cannot silently merge into the TradingView archive.
+- PR #88 merged as commit e4b11980d6010ba9be467f9d9a8547e9dd806f28.
+- CI for PR #88: 331 passed, 2 warnings.
+- Added secure branch-triggered GitHub Actions orchestration:
+  - discovery and backfill requests contain no credentials;
+  - credentials are read only from repository Actions secrets;
+  - outputs are quarantined artifacts only;
+  - no automatic commit/merge into exact-provider history.
+
+### Frozen unseen-data confirmation
+- PR #86 merged as commit 19e30bfa93c832f13d95d5a9971ce3c27e9dd25c.
+- CI: 323 passed, 2 warnings.
+- Added a locked manifest at research_hypotheses/frozen_15m_v1.json.
+- The initial frozen baseline comparators are:
+  1. CME_MINI:MNQ1! / vwap_reversion / 15m
+     - threshold 0.72
+     - stop 1.2 ATR
+     - target 2.5R
+     - max hold 16 bars
+     - freeze timestamp 1790103600
+     - source run 35781036628
+  2. CAPITALCOM:BTCUSD / bollinger_mean_reversion / 15m
+     - threshold 0.50
+     - stop 1.2 ATR
+     - target 2.5R
+     - max hold 16 bars
+     - freeze timestamp 1790089200
+     - source run 35781933861
+- Frozen confirmation does not optimize any parameter on unseen data.
+- It accepts only confirmed TradingView Official MCP archives.
+- Alternate-provider history and mutable-tail archives fail closed.
+- Truncated open/time-exit trades at the archive edge are excluded.
+- UNSEEN_SUPPORT requires at least 30 completed unseen trades plus unchanged performance gates and at least two usable unseen time segments.
+- UNSEEN_SUPPORT is still not validation; it only opens a second confirmation decision.
+- live_calibration_authority is always false.
+
+First real frozen-confirmation smoke run 35791259901:
+- COMPLETED SUCCESS.
+- MNQ:
+  - unseen confirmed bars: 6
+  - completed unseen trades: 0
+  - status: ACCUMULATING
+- BTCUSD:
+  - unseen confirmed bars: 27
+  - completed unseen trades: 1
+  - trade result: -0.32121976097584065R
+  - status: ACCUMULATING
+- These are deliberately not judged as pass/fail because the 30-completed-trade floor has not been reached.
+
+### Frozen-confirmation performance improvement
+- PR #87 merged as commit 3d74ddbe8be49fd964b532259879e3e6dd769557.
+- CI: 324 passed, 2 warnings.
+- Confirmation feature snapshots are now materialized only at/after the unseen start index while preserving the identical latest-1000-bar history window for each snapshot.
+- Reference smoke run 35791259901 workflow duration: approximately 156 seconds.
+- Optimized smoke run 35791585192 workflow duration: approximately 20 seconds.
+- MNQ and BTCUSD confirmation outputs were identical between the reference and optimized runs.
+- This is an observed workflow-duration reduction of about 87% with no evidence/result change.
+
+### Current research decision
+- Same-dataset strategy / MTF / regime / pool tuning remains CLOSED.
+- Exact-provider archives are confirmed-bar only.
+- Frozen candidates are locked; no retuning is allowed during unseen accumulation.
+- Current unseen depth remains insufficient for 15m confirmation.
+- No current research result authorizes a 15m competition trade.
+- XAUUSD 4h and BTCUSD 1D validated research remain informational only.
+- Safe Mode, Kill Switch, manual approval and manual execution remain unchanged.
+
+### Owner data-access gate reached
+For immediate deeper history rather than waiting for future TradingView bars:
+- CAPITALCOM symbols:
+  - the code and secure workflow are ready;
+  - repository Actions secrets CAPITAL_API_KEY, CAPITAL_IDENTIFIER and CAPITAL_PASSWORD are now required to execute authenticated Capital.com discovery/backfill;
+  - these values must NOT be pasted into chat or committed to the repository.
+- CME_MINI:MNQ1!:
+  - the connected TradingView MCP cannot page backward beyond its 5000-bar window;
+  - immediate older 15m history requires a user-controlled TradingView CSV export with deeper loaded chart history, or authorized CME DataMine historical access/entitlement.
+- Without one of those owner-controlled sources, the only exact-provider path is future-bar accumulation.
+
+Owner intervention required now: YES — only for historical-data access, not for strategy decisions or code execution.
