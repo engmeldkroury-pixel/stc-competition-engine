@@ -23,6 +23,11 @@ RAW_SERIES_KEYS = {
     "1D": "1D",
 }
 
+OPTIONAL_RAW_SERIES_KEYS = {
+    "5m": "5",
+    "30m": "30",
+}
+
 
 def _strategy_feature_names(strategy_id: str) -> tuple[str, ...]:
     spec = next((s for s in STRATEGIES if s.strategy_id == strategy_id), None)
@@ -39,7 +44,9 @@ def _strategy_feature_names(strategy_id: str) -> tuple[str, ...]:
 
 def _feature_horizon(timeframe: str) -> int:
     return {
+        "5": 12,
         "15": 8,
+        "30": 7,
         "60": 6,
         "120": 4,
         "240": 3,
@@ -65,7 +72,15 @@ def run_symbol_research(
 
     raw_bars = {}
     quality = {}
-    for source_key, normalized_key in RAW_SERIES_KEYS.items():
+    requested_series = {
+        **RAW_SERIES_KEYS,
+        **{
+            source_key: normalized_key
+            for source_key, normalized_key in OPTIONAL_RAW_SERIES_KEYS.items()
+            if source_key in series
+        },
+    }
+    for source_key, normalized_key in requested_series.items():
         part = series[source_key]
         if not isinstance(part, dict):
             raise ValueError(f"Series {source_key} must be an OHLCV object")
@@ -83,6 +98,8 @@ def run_symbol_research(
         bars_1h=raw_bars["60"],
         bars_4h=raw_bars["240"],
         bars_1d=raw_bars["1D"],
+        bars_5m=raw_bars.get("5"),
+        bars_30m=raw_bars.get("30"),
     )
     asset_class = strategy_asset_class(symbol)
     validations, selection = strategy_matrix(symbol, asset_class, bundle)

@@ -7,7 +7,7 @@ from .competition_profiles import AMP_CORE_FEED_SYMBOLS, CAPITAL_AFRICA_LIMITS
 from .strategy_lab import candidate_strategies
 
 
-RESEARCH_TIMEFRAMES = ("15", "60", "120", "240", "1D")
+RESEARCH_TIMEFRAMES = ("5", "15", "30", "60", "120", "240", "1D")
 
 
 @dataclass(frozen=True)

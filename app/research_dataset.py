@@ -186,14 +186,17 @@ def research_timeframe_bundle(
     bars_1h: list[Bar],
     bars_4h: list[Bar],
     bars_1d: list[Bar],
+    bars_5m: list[Bar] | None = None,
+    bars_30m: list[Bar] | None = None,
 ) -> dict[str, list[Bar]]:
     """Create the standard STC research matrix timeframes.
 
     2h is derived from exact-provider 1h bars because the verified TradingView
     OHLCV connector does not expose a native 2h interval. Monthly is derived
-    from exact-provider daily bars. No cross-provider substitution is allowed.
+    from exact-provider daily bars. Native 5m/30m series are included when
+    supplied. No cross-provider substitution is allowed.
     """
-    return {
+    bundle = {
         "15": drop_latest_unconfirmed_bar(normalize_confirmed_bars(bars_15m)),
         "60": drop_latest_unconfirmed_bar(normalize_confirmed_bars(bars_1h)),
         "120": drop_latest_unconfirmed_bar(resample_hourly_to_two_hour(bars_1h)),
@@ -201,3 +204,8 @@ def research_timeframe_bundle(
         "1D": drop_latest_unconfirmed_bar(normalize_confirmed_bars(bars_1d)),
         "1M": drop_latest_unconfirmed_bar(resample_daily_to_monthly(bars_1d)),
     }
+    if bars_5m is not None:
+        bundle["5"] = drop_latest_unconfirmed_bar(normalize_confirmed_bars(bars_5m))
+    if bars_30m is not None:
+        bundle["30"] = drop_latest_unconfirmed_bar(normalize_confirmed_bars(bars_30m))
+    return bundle

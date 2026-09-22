@@ -149,3 +149,34 @@ def test_standard_research_bundle_exposes_requested_multitimeframe_context():
     assert len(bundle["120"]) == 3
     assert len(bundle["15"]) == 7
     assert len(bundle["60"]) == 7
+
+
+
+def test_optional_native_5m_and_30m_are_added_without_resampling():
+    base = datetime(2026, 1, 1, tzinfo=UTC)
+    def bars(step_minutes, count):
+        return [
+            Bar(
+                timestamp=base + timedelta(minutes=step_minutes * i),
+                open=1,
+                high=2,
+                low=0.5,
+                close=1.5,
+                volume=1,
+            )
+            for i in range(count)
+        ]
+
+    bundle = research_timeframe_bundle(
+        bars_5m=bars(5, 12),
+        bars_15m=bars(15, 8),
+        bars_30m=bars(30, 10),
+        bars_1h=bars(60, 8),
+        bars_4h=bars(240, 4),
+        bars_1d=bars(1440, 40),
+    )
+    assert {"5", "30"}.issubset(bundle)
+    assert len(bundle["5"]) == 11
+    assert len(bundle["30"]) == 9
+    assert bundle["5"][0].timestamp == base
+    assert bundle["30"][1].timestamp == base + timedelta(minutes=30)

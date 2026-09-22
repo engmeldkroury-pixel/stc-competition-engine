@@ -70,3 +70,19 @@ def test_research_scripts_are_directly_invocable_from_repo_root():
             check=False,
         )
         assert proc.returncode == 0, proc.stderr
+
+
+
+def test_split_directory_loader_reads_optional_short_timeframes(tmp_path):
+    runner = _load_runner()
+    target = tmp_path / "xau-short"
+    target.mkdir()
+    (target / "meta.json").write_text(
+        json.dumps({"symbol": "CAPITALCOM:XAUUSD"}),
+        encoding="utf-8",
+    )
+    for filename in ("15m.json", "1h.json", "4h.json", "1D.json", "5m.json", "30m.json"):
+        (target / filename).write_text(json.dumps(_series()), encoding="utf-8")
+
+    payload = runner.load_series_dir(target)
+    assert set(payload["series"]) == {"5m", "15m", "30m", "1h", "4h", "1D"}

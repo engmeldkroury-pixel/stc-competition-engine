@@ -35,6 +35,8 @@ def test_research_plan_is_exhaustive_not_one_strategy_for_every_market():
     assert any(x.strategy_id == "vwap_intraday" for x in mes)
     assert any(x.strategy_id == "mean_reversion" for x in zn)
     assert not any(x.strategy_id == "microtrend_scalp" for x in zn)
+    assert any(x.timeframe == "5" and x.strategy_id == "microtrend_scalp" for x in xau)
+    assert any(x.timeframe == "30" and x.strategy_id == "smc_structure_liquidity" for x in xau)
 
 
 def test_research_matrix_has_no_duplicate_experiments():
@@ -51,5 +53,5 @@ def test_research_plan_summary_counts_all_symbols_and_experiments():
     assert summary["symbols"] == 26
     assert summary["experiments"] == len(research_experiments())
     assert summary["experiments"] > 100
-    assert set(summary["timeframes"]) == {"15", "60", "120", "240", "1D"}
+    assert set(summary["timeframes"]) == {"5", "15", "30", "60", "120", "240", "1D"}
     assert sum(summary["by_competition"].values()) == summary["experiments"]
