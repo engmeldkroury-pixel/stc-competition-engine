@@ -110,6 +110,38 @@ def historical_regime_from_tradingview(payload: TradingViewWebhook) -> float | N
     return max(-1.0, min(1.0, score))
 
 
+def high_conviction_assessment(
+    *,
+    recommendation: str,
+    composite_score: float,
+    short_term_technical: float,
+    historical_regime: float | None,
+    blended_technical: float,
+    volatility_quality: float,
+    liquidity_quality: float,
+) -> tuple[bool, list[str]]:
+    """Fail-closed A+ entry gate for competition alerts.
+
+    This gate deliberately prefers missed trades over low-quality entries.
+    It does not claim certainty or probability of profit.
+    """
+    if recommendation not in {"LONG", "SHORT"}:
+        return False, ["base_recommendation_not_directional"]
+
+    sign = 1.0 if recommendation == "LONG" else -1.0
+    checks: list[tuple[str, bool]] = [
+        ("historical_context_present", historical_regime is not None),
+        ("short_term_strength", sign * short_term_technical >= 0.75),
+        ("historical_alignment", historical_regime is not None and sign * historical_regime >= 0.55),
+        ("blended_technical_strength", sign * blended_technical >= 0.70),
+        ("composite_strength", sign * composite_score >= 0.45),
+        ("volatility_quality", sign * volatility_quality >= 0.20),
+        ("liquidity_quality", sign * liquidity_quality >= 0.30),
+    ]
+    failed = [name for name, ok in checks if not ok]
+    return failed == [], failed
+
+
 def factors_from_tradingview(payload: TradingViewWebhook) -> float:
     short_term = short_term_score_from_tradingview(payload)
     historical = historical_regime_from_tradingview(payload)
