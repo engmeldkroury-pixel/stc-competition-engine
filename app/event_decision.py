@@ -7,6 +7,7 @@ from pydantic import ValidationError
 from .approval import build_approval_envelope
 from .calibration_registry import calibration_to_public_dict, lookup_runtime_calibration
 from .competition_profiles import get_profile
+from .evidence_engine import aggregate_live_family_scores
 from .models import FactorScores, SignalEvaluationRequest, TradingViewWebhook
 from .pipeline_receipt import build_pipeline_receipt
 from .signals import (
@@ -98,6 +99,17 @@ def decide_bridge_event(event_id: str, payload: dict) -> dict:
     short_term_technical = short_term_score_from_tradingview(tv)
     confirmation_score = confirmation_score_from_tradingview(tv)
     historical_regime = historical_regime_from_tradingview(tv)
+    family_evidence = aggregate_live_family_scores({
+        "trend": tv.family_trend,
+        "momentum": tv.family_momentum,
+        "volatility": tv.family_volatility,
+        "volume": tv.family_volume,
+        "vwap": tv.family_vwap,
+        "market_structure": tv.family_market_structure,
+        "smc_liquidity": tv.family_smc_liquidity,
+        "price_action": tv.family_price_action,
+        "microstructure": tv.family_microstructure,
+    })
     technical = factors_from_tradingview(tv)
     volatility_quality = volatility_quality_from_tradingview(tv, technical)
     liquidity_quality = liquidity_quality_from_tradingview(tv, technical)
@@ -123,6 +135,10 @@ def decide_bridge_event(event_id: str, payload: dict) -> dict:
         trend_2h_score=tv.trend_2h_score,
         trend_4h_score=tv.trend_4h_score,
         trend_1m_score=tv.trend_1m_score,
+        family_evidence_score=None if family_evidence is None else family_evidence.score,
+        family_agreement_ratio=None if family_evidence is None else family_evidence.agreement_ratio,
+        family_aligned_count=None if family_evidence is None else family_evidence.aligned_families,
+        family_conflict_count=None if family_evidence is None else family_evidence.conflicting_families,
     )
 
     quality_score = setup_quality_score(
@@ -136,6 +152,7 @@ def decide_bridge_event(event_id: str, payload: dict) -> dict:
         blended_technical=technical,
         volatility_quality=volatility_quality,
         liquidity_quality=liquidity_quality,
+        family_evidence_score=None if family_evidence is None else family_evidence.score,
     )
 
     final_gate_passed = gate_passed and quality_score >= 90
@@ -155,6 +172,10 @@ def decide_bridge_event(event_id: str, payload: dict) -> dict:
         "trend_4h=unavailable" if tv.trend_4h_score is None else f"trend_4h={tv.trend_4h_score:+.2f}",
         "historical_regime=unavailable" if historical_regime is None else f"historical_regime={historical_regime:+.2f}",
         "trend_1m=unavailable" if tv.trend_1m_score is None else f"trend_1m={tv.trend_1m_score:+.2f}",
+        "family_evidence=unavailable" if family_evidence is None else f"family_evidence={family_evidence.score:+.2f}",
+        "family_agreement=unavailable" if family_evidence is None else f"family_agreement={family_evidence.agreement_ratio:.2f}",
+        "family_breadth=unavailable" if family_evidence is None else f"family_breadth={family_evidence.aligned_families}/9",
+        "family_conflicts=unavailable" if family_evidence is None else f"family_conflicts={family_evidence.conflicting_families}",
         f"blended_technical={technical:+.2f}",
         f"volatility_quality_live={volatility_quality:+.2f}",
         f"liquidity_quality_live={liquidity_quality:+.2f}",
@@ -174,6 +195,13 @@ def decide_bridge_event(event_id: str, payload: dict) -> dict:
     result_dict["setup_grade"] = "A_PLUS" if final_gate_passed else "MONITOR_ONLY"
     result_dict["pre_gate_recommendation"] = base_result.recommendation
     result_dict["quality_gate_failures"] = gate_failures
+    result_dict["live_family_evidence"] = None if family_evidence is None else {
+        "score": family_evidence.score,
+        "agreement_ratio": family_evidence.agreement_ratio,
+        "aligned_families": family_evidence.aligned_families,
+        "conflicting_families": family_evidence.conflicting_families,
+        "family_scores": dict(family_evidence.family_scores),
+    }
     result_dict["timeframe_confirmation"] = {
         "entry_timeframe": str(tv.timeframe),
         "entry_score": short_term_technical,
