@@ -15,6 +15,7 @@ from .signals import (
     historical_regime_from_tradingview,
     high_conviction_assessment,
     liquidity_quality_from_tradingview,
+    setup_quality_score,
     short_term_score_from_tradingview,
     volatility_quality_from_tradingview,
 )
@@ -118,6 +119,22 @@ def decide_bridge_event(event_id: str, payload: dict) -> dict:
         volatility_quality=volatility_quality,
         liquidity_quality=liquidity_quality,
         confirmation_score=confirmation_score,
+        trend_2h_score=tv.trend_2h_score,
+        trend_4h_score=tv.trend_4h_score,
+        trend_1m_score=tv.trend_1m_score,
+    )
+
+    quality_score = setup_quality_score(
+        recommendation=base_result.recommendation,
+        short_term_technical=short_term_technical,
+        confirmation_score=confirmation_score,
+        trend_2h_score=tv.trend_2h_score,
+        trend_4h_score=tv.trend_4h_score,
+        historical_regime=historical_regime,
+        trend_1m_score=tv.trend_1m_score,
+        blended_technical=technical,
+        volatility_quality=volatility_quality,
+        liquidity_quality=liquidity_quality,
     )
 
     final_recommendation = base_result.recommendation if gate_passed else "WAIT"
@@ -130,7 +147,10 @@ def decide_bridge_event(event_id: str, payload: dict) -> dict:
     extra_reasons = [
         f"short_term_technical={short_term_technical:+.2f}",
         "confirmation_1h=unavailable" if confirmation_score is None else f"confirmation_1h={confirmation_score:+.2f}",
+        "trend_2h=unavailable" if tv.trend_2h_score is None else f"trend_2h={tv.trend_2h_score:+.2f}",
+        "trend_4h=unavailable" if tv.trend_4h_score is None else f"trend_4h={tv.trend_4h_score:+.2f}",
         "historical_regime=unavailable" if historical_regime is None else f"historical_regime={historical_regime:+.2f}",
+        "trend_1m=unavailable" if tv.trend_1m_score is None else f"trend_1m={tv.trend_1m_score:+.2f}",
         f"blended_technical={technical:+.2f}",
         f"volatility_quality_live={volatility_quality:+.2f}",
         f"liquidity_quality_live={liquidity_quality:+.2f}",
@@ -145,7 +165,13 @@ def decide_bridge_event(event_id: str, payload: dict) -> dict:
     })
     result_dict = result.model_dump()
     result_dict["quality_gate_passed"] = gate_passed
-    result_dict["setup_grade"] = "A_PLUS" if gate_passed else "MONITOR_ONLY"
+    result_dict["setup_quality_score"] = quality_score
+    result_dict["setup_quality_label"] = f"{quality_score}/100 setup quality; not a win probability"
+    result_dict["setup_grade"] = "A_PLUS" if gate_passed and quality_score >= 90 else "MONITOR_ONLY"
+    if result_dict["setup_grade"] != "A_PLUS":
+        result_dict["quality_gate_passed"] = False
+        result = result.model_copy(update={"recommendation": "WAIT"})
+        result_dict["recommendation"] = "WAIT"
     result_dict["pre_gate_recommendation"] = base_result.recommendation
     result_dict["quality_gate_failures"] = gate_failures
     envelope = build_approval_envelope(payload, result.composite_score)
