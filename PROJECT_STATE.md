@@ -1096,3 +1096,32 @@ Do not stop the verified old production alerts until the new v1.1 alerts have co
 6. After a useful validated 15m candidate exists, owner intervention will be required to create the six fresh TradingView v1.1 indicator alerts and later configure private Telegram credentials if not already configured.
 
 Owner intervention required now: NO.
+
+
+### Matrix-only screening expansion — BTCUSD + EURUSD — 2026-09-22
+
+CAPITALCOM:BTCUSD:
+- Overall research status: VALIDATED.
+- Selected overall strategy/timeframe: trend_pullback on 1D.
+- Robust score: 44.59.
+- Test: 30 trades, expectancy +0.194R, PF 1.357.
+- Forward: 19 trades, expectancy +0.105R, PF 1.194.
+- Empirical probability status: INSUFFICIENT_DATA because total comparable OOS+forward sample is 49, below the 50-sample calibration floor.
+- Live-entry 15m status: NO_VALIDATED_STRATEGY.
+- Therefore this 1D result remains informational research only and is not eligible to reweight the 15m live decision engine.
+- No calibration candidate was promoted.
+
+CAPITALCOM:EURUSD:
+- Overall status: NO_VALIDATED_STRATEGY.
+- Live-entry 15m status: NO_VALIDATED_STRATEGY.
+- 1h mean_reversion produced 51 test trades with positive test PF 1.336, but forward expectancy was -0.250R with PF 0.269 and parameter instability, so it was rejected.
+- 2h mean_reversion and 4h volatility_squeeze also showed positive test metrics but negative forward performance, so they were rejected.
+- No calibration candidate was promoted.
+
+Research interpretation:
+- The engine is correctly distinguishing an overall research winner from a live-entry winner.
+- A validated higher-timeframe strategy does not authorize or weight a 15m entry.
+- The current 5000-bar TradingView connector cap materially limits low-timeframe sample depth; validation gates remain unchanged rather than being relaxed.
+- Broad screening should continue with matrix-only mode, prioritizing highly liquid index/metals/energy symbols where 15m signal count may be sufficient.
+
+Owner intervention required now: NO.
