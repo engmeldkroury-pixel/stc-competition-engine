@@ -20,6 +20,11 @@ SERIES_FILES = {
     "1D": "1D.json",
 }
 
+OPTIONAL_SERIES_FILES = {
+    "5m": "5m.json",
+    "30m": "30m.json",
+}
+
 
 def load_series_dir(path: Path) -> dict:
     meta_path = path / "meta.json"
@@ -35,6 +40,15 @@ def load_series_dir(path: Path) -> dict:
         source = path / filename
         if not source.exists():
             raise ValueError(f"Missing required series file: {source}")
+        payload = json.loads(source.read_text(encoding="utf-8"))
+        if not isinstance(payload, dict) or not isinstance(payload.get("bars"), list):
+            raise ValueError(f"{source} must contain TradingView OHLCV bars")
+        series[key] = payload
+
+    for key, filename in OPTIONAL_SERIES_FILES.items():
+        source = path / filename
+        if not source.exists():
+            continue
         payload = json.loads(source.read_text(encoding="utf-8"))
         if not isinstance(payload, dict) or not isinstance(payload.get("bars"), list):
             raise ValueError(f"{source} must contain TradingView OHLCV bars")
