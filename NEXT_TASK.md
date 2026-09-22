@@ -46,5 +46,12 @@ The connected TradingView Official MCP currently exposes OHLCV count up to 5000 
 - Verified legacy TradingView production alerts remain the rollback baseline.
 - No current research result authorizes a 15m competition trade.
 
+## Automated continuation
+- Exact-provider MNQ and BTCUSD 15m archives are seeded in research_archive/.
+- A daily condition-based fresh-data watch is enabled.
+- Archive updates are research-data-only and CI-gated.
+- No same-dataset retuning is allowed while unseen evidence accumulates.
+- Notify the owner only for meaningful validation change, confirmatory readiness/completion, or a genuine blocker.
+
 ## Owner dependency
 None now. Owner intervention is required only if a later step genuinely needs a user-controlled historical export/alternate source, private Telegram credentials, or verified manual competition position/trade input.
