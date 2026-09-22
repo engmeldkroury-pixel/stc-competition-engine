@@ -16,14 +16,13 @@ Find a robust same-entry-timeframe strategy for competition use without weakenin
 - research_mode=mtf_compare selectively tests only the strongest adequately sampled 15m candidates.
 
 ## Completed evidence
-- NO_VALIDATED_STRATEGY / no live 15m calibration: XAUUSD, MES, EURUSD, NAS100, MNQ, XAGUSD, MCL, MGC, SPX500, M2K.
+- NO_VALIDATED_STRATEGY / no live 15m calibration: XAUUSD, MES, EURUSD, NAS100, MNQ, XAGUSD, MCL, MGC, SPX500, M2K, ETHUSD, M6E.
 - BTCUSD: 1D trend_pullback research is validated on the original strategy set, but n=49 is below probability-calibration floor and 15m is not validated. Informational only.
 - Do not promote any higher-TF result into 15m runtime.
 
 ## Active batches
 - research/strategy-v2-xau-mnq-20260922 — 17-strategy re-screen of XAUUSD + MNQ.
 - research/strategy-v2-btc-mcl-20260922 — 17-strategy re-screen of BTCUSD + MCL.
-- research/eth-m6e-screen-e-20260922 — ETHUSD + M6E screening.
 
 ## Next automatic actions
 1. Read each active run when complete.
