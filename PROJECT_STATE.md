@@ -1019,3 +1019,80 @@ Next strategy-engine work:
 - write calibrated feature/strategy weights back into the runtime decision engine;
 - expose family/feature participation and conflict breakdown in the Owner Console;
 - wire live news source context while keeping it as a risk/context overlay rather than the main directional vote.
+
+
+## Historical research + timeframe-safe calibration checkpoint — 2026-09-22
+
+Status: CODE COMPLETE FOR CURRENT PHASE; broad research screening in progress. No automatic execution authority.
+
+### Research engine now on main
+- Full >80-feature historical feature materialization from confirmed OHLCV.
+- Strict no-lookahead historical evaluation.
+- Conservative next-bar/approved-entry-zone fill logic aligned with the live approval envelope.
+- Live-aligned risk model: 1.20 ATR initial stop and one final 2.50R take-profit; TP1 is management checkpoint only.
+- Chronological train / out-of-sample test / forward validation.
+- Strategy x symbol x timeframe matrix with explicit rejection reasons.
+- Exact-provider research timeframes: native 5m, 15m, 30m, 1h, 4h, 1D where supplied; deterministic 2h from complete 1h pairs and calendar month from daily bars.
+- Latest potentially mutable source bar is dropped from research series.
+- Feature reliability/participation calibration is permitted only after strategy/timeframe robustness passes.
+- Runtime research calibration lookup is exact-timeframe specific. A 4h/1h research winner cannot silently reweight a 15m live entry.
+- Matrix-only screening mode exists for broad universe discovery; it cannot be promoted into runtime calibration without validated feature participation.
+- Historical feature snapshots are cached/reused across the strategy matrix and calibration to reduce repeated >80-feature computation.
+- Owner Console code now exposes matching research strategy/timeframe, empirical probability confidence interval, validated feature participation, family weights actually used and MTF scores.
+
+### Real exact-provider pilot results
+TradingView Official MCP was used with provider-exact symbols and up to 5000 bars per request. The connector does not expose time pagination beyond the 5000-bar maximum.
+
+CAPITALCOM:XAUUSD full multi-timeframe pilot:
+- Overall status: NO_VALIDATED_STRATEGY.
+- Live-entry 15m status: NO_VALIDATED_STRATEGY.
+- No calibration candidate was promoted.
+- Strongest encouraging but rejected examples:
+  - 2h trend_pullback: test expectancy +0.418R, PF 2.61, 16 test trades; forward expectancy +0.267R, PF 1.97, 12 forward trades. Rejected for insufficient out-of-sample sample depth.
+  - 1D trend_pullback: test expectancy +0.376R, PF 2.07, 17 test trades; forward expectancy +0.579R, PF 2.42, 20 forward trades. Rejected for insufficient out-of-sample sample depth.
+  - 4h breakout_expansion had positive test results but forward expectancy turned negative, so it was rejected rather than promoted.
+- Conclusion: promising research candidates exist, but no strategy currently satisfies all robustness/sample gates.
+
+CME_MINI:MES1! full multi-timeframe pilot:
+- Overall status: NO_VALIDATED_STRATEGY.
+- Live-entry 15m status: NO_VALIDATED_STRATEGY.
+- No calibration candidate was promoted.
+- Strongest encouraging but rejected examples:
+  - 30m breakout_expansion: test expectancy +0.439R, PF 2.56, 8 test trades; forward expectancy +0.441R, PF 2.60, 7 forward trades. Rejected for insufficient sample depth and parameter instability.
+  - 15m smc_structure_liquidity: test expectancy +0.130R, PF 1.68, 9 test trades; forward expectancy -0.021R, PF 0.95, 15 forward trades. Rejected for insufficient sample depth, regime instability and negative/weak forward performance.
+- Conclusion: no MES strategy/timeframe is currently permitted to become a calibrated live strategy.
+
+Research policy:
+- Do NOT lower validation gates merely to create a trade signal.
+- Setup Quality remains separate from empirical win probability.
+- No percentage win probability is displayed as calibrated unless the comparable out-of-sample + forward sample passes the probability gate.
+- Positive-looking but under-sampled candidates remain research-only.
+
+### Production feed status vs code-ready feed
+Current TradingView production alerts remain active on the previously verified feeds:
+- Capital.com: STC CAPITAL 10-SYMBOL 15m PROD v0.7.1.
+- AMP Feed A: STC AMP A 8-SYMBOL 15m PROD v0.3 FIX.
+- AMP Feed B: STC AMP B 8-SYMBOL 15m PROD v0.3.
+These remain the production ingestion rollback baseline.
+
+The repository main branch also contains the newer six-way multi-timeframe Family Breadth feed set:
+- STC_CAPITAL_MTF_FEED_A.pine v1.1
+- STC_CAPITAL_MTF_FEED_B.pine v1.1
+- STC_AMP_MTF_FEED_A.pine v1.1
+- STC_AMP_MTF_FEED_B.pine v1.1
+- STC_AMP_MTF_FEED_C.pine v1.1
+- STC_AMP_MTF_FEED_D.pine v1.1
+
+The v1.1 feeds add confirmed 1h/2h/4h/1D/monthly context plus nine live evidence-family scores. They are code-ready but are not yet the active TradingView alert snapshots. Indicator-alert conditions cannot be replaced through the available TradingView MCP; fresh Pine alerts must eventually be created manually from the current v1.1 scripts.
+
+Do not stop the verified old production alerts until the new v1.1 alerts have completed a full parallel-cycle acceptance test with HTTP 200 and correct symbol counts.
+
+### Immediate engineering next action
+1. Run matrix-only exact-provider screening across representative and then full competition universe symbols.
+2. Use the per-timeframe diagnostics to identify candidates that genuinely pass OOS + forward gates.
+3. Run full feature calibration only for validated candidates.
+4. Promote only same-entry-timeframe calibration records.
+5. Keep Safe Mode / Kill Switch and manual execution governance unchanged.
+6. After a useful validated 15m candidate exists, owner intervention will be required to create the six fresh TradingView v1.1 indicator alerts and later configure private Telegram credentials if not already configured.
+
+Owner intervention required now: NO.
