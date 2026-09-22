@@ -7,6 +7,7 @@ from .asset_classification import strategy_asset_class
 from .feature_validation import FeatureValidation, atr_series_by_index, validate_feature_weight
 from .indicator_catalog import FEATURE_FAMILIES
 from .research_dataset import (
+    bars_fingerprint,
     bars_from_tradingview_ohlcv,
     data_quality_report,
     research_timeframe_bundle,
@@ -210,6 +211,10 @@ def run_symbol_research(
         "asset_class": asset_class,
         "data_quality": {
             key: asdict(value) for key, value in quality.items()
+        },
+        "source_fingerprints": {
+            source_key: bars_fingerprint(raw_bars[normalized_key])
+            for source_key, normalized_key in requested_series.items()
         },
         "derived_timeframes": {
             key: len(value) for key, value in bundle.items()
