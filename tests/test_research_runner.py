@@ -211,3 +211,59 @@ def test_select_mtf_candidates_prefers_supported_15m_edge():
     ]
     selected = _select_mtf_candidate_ids(rows, limit=3)
     assert selected == ("supported",)
+
+
+
+def test_research_runner_skips_short_daily_history_without_aborting_symbol(monkeypatch):
+    captured = {}
+
+    def fake_matrix(symbol, asset_class, bundle, **kwargs):
+        captured["lengths"] = {key: len(value) for key, value in bundle.items()}
+        return [], MatrixSelection(
+            status="NO_VALIDATED_STRATEGY",
+            symbol=symbol,
+            strategy_id=None,
+            timeframe=None,
+            robust_score=None,
+            trial_count=0,
+            reason="fixture",
+        )
+
+    monkeypatch.setattr(rr, "strategy_matrix", fake_matrix)
+    payload = {
+        "symbol": "NYMEX:MNG1!",
+        "series": {
+            "5m": _series(901, 300),
+            "15m": _series(901, 900),
+            "30m": _series(901, 1800),
+            "1h": _series(901, 3600),
+            "4h": _series(901, 14400),
+            "1D": _series(722, 86400),
+        },
+    }
+    result = rr.run_symbol_research(payload, calibrate_features=False)
+    assert result["data_quality"]["1D"]["quality_ok"] is False
+    assert result["insufficient_history_series"] == ["1D"]
+    assert captured["lengths"]["15"] >= 900
+    assert captured["lengths"]["1D"] < 900
+    assert result["research_report"]["status"] == "NO_VALIDATED_STRATEGY"
+
+
+def test_research_runner_still_rejects_duplicate_timestamps_even_with_enough_other_data():
+    duplicate_daily = _series(901, 86400)
+    duplicate_daily["bars"][1]["t"] = duplicate_daily["bars"][0]["t"]
+    payload = {
+        "symbol": "NYMEX:MNG1!",
+        "series": {
+            "15m": _series(901, 900),
+            "1h": _series(901, 3600),
+            "4h": _series(901, 14400),
+            "1D": duplicate_daily,
+        },
+    }
+    try:
+        rr.run_symbol_research(payload, calibrate_features=False)
+    except ValueError as exc:
+        assert "Research data quality failed" in str(exc)
+    else:
+        raise AssertionError("Expected duplicate-timestamp integrity failure")
