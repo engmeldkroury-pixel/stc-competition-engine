@@ -126,8 +126,11 @@ try {
         $recommendation = (string)($signal['recommendation'] ?? 'WAIT');
         $hasOpenPosition = (float)($openQty[$seenKey] ?? 0.0) > 0.0;
         $macroContext = stc_macro_risk_context($config, $symbol, $now, $macroCalendar);
+        $qualityGatePassed = ($signal['quality_gate_passed'] ?? false) === true
+            && ($signal['setup_grade'] ?? '') === 'A_PLUS';
         $lockedPlan = $decision['locked_trade_plan'] ?? null;
-        $planValid = is_array($lockedPlan)
+        $planValid = $qualityGatePassed
+            && is_array($lockedPlan)
             && ($lockedPlan['levels_locked'] ?? false) === true
             && ($lockedPlan['execution'] ?? '') === 'manual_only';
 
@@ -224,6 +227,10 @@ try {
             'recommendation' => $recommendation,
             'composite_score' => (float)($signal['composite_score'] ?? 0.0),
             'confidence' => (float)($signal['confidence'] ?? 0.0),
+            'quality_gate_passed' => $qualityGatePassed,
+            'setup_grade' => (string)($signal['setup_grade'] ?? 'MONITOR_ONLY'),
+            'pre_gate_recommendation' => (string)($signal['pre_gate_recommendation'] ?? ($signal['recommendation'] ?? 'WAIT')),
+            'quality_gate_failures' => is_array($signal['quality_gate_failures'] ?? null) ? $signal['quality_gate_failures'] : [],
             'reasons' => is_array($signal['reasons'] ?? null) ? $signal['reasons'] : [],
             'envelope' => $envelope,
             'locked_trade_plan' => $planValid ? $lockedPlan : null,
