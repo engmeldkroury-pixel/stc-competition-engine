@@ -104,7 +104,9 @@ def decide_bridge_event(event_id: str, payload: dict) -> dict:
         as_of=tv.time,
         timeframe=str(tv.timeframe),
     )
-    calibration_matches_entry_timeframe = calibration is not None
+    calibration_matches_entry_timeframe = (
+        calibration is not None and str(calibration.timeframe) == str(tv.timeframe)
+    )
     family_evidence = aggregate_live_family_scores(
         {
             "trend": tv.family_trend,
