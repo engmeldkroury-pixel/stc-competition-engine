@@ -1,0 +1,96 @@
+name: STC Research Pilot
+
+on:
+  push:
+    branches:
+      - "research/**"
+    paths:
+      - "research_inputs/**"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: stc-research-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  research:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Discover research inputs
+        id: inputs
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -t dirs < <(find research_inputs -mindepth 1 -maxdepth 1 -type d | sort)
+          if [ "${#dirs[@]}" -eq 0 ]; then
+            echo "No research input directories found."
+            exit 1
+          fi
+          printf '%s\n' "${dirs[@]}" > /tmp/stc-research-dirs.txt
+          echo "count=${#dirs[@]}" >> "$GITHUB_OUTPUT"
+          cat /tmp/stc-research-dirs.txt
+
+      - name: Run no-lookahead research
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p research_outputs
+          while IFS= read -r dir; do
+            name="$(basename "$dir")"
+            echo "::group::Research $name"
+            python scripts/run_strategy_research_dir.py "$dir" --output "research_outputs/${name}.json"
+            echo "::endgroup::"
+          done < /tmp/stc-research-dirs.txt
+
+      - name: Print compact results
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          for path in sorted(Path("research_outputs").glob("*.json")):
+              data = json.loads(path.read_text())
+              report = data["research_report"]
+              p = report.get("setup_probability") or {}
+              print(json.dumps({
+                  "symbol": data["symbol"],
+                  "status": report["status"],
+                  "strategy": report.get("selected_strategy"),
+                  "timeframe": report.get("selected_timeframe"),
+                  "robust_score": report.get("robust_score"),
+                  "test_trades": report.get("test_trades"),
+                  "forward_trades": report.get("forward_trades"),
+                  "test_expectancy_r": report.get("test_expectancy_r"),
+                  "forward_expectancy_r": report.get("forward_expectancy_r"),
+                  "test_profit_factor": report.get("test_profit_factor"),
+                  "forward_profit_factor": report.get("forward_profit_factor"),
+                  "probability_status": p.get("status"),
+                  "estimated_probability": p.get("estimated_win_probability"),
+                  "probability_sample_size": p.get("sample_size"),
+                  "deployable_features": report.get("deployable_feature_count"),
+              }, sort_keys=True))
+          PY
+
+      - name: Upload research outputs
+        uses: actions/upload-artifact@v4
+        with:
+          name: stc-research-${{ github.run_id }}
+          path: research_outputs/*.json
+          if-no-files-found: error
+          retention-days: 7
