@@ -132,3 +132,25 @@ def test_previous_tail_becomes_confirmed_when_new_tail_arrives():
     assert report.latest_input_t == 400
     assert report.confirmed_through_t == 300
     assert refreshed["archive"]["withheld_unconfirmed_t"] == 400
+
+
+def test_stale_snapshot_does_not_remove_bar_already_confirmed_by_later_history():
+    existing = _payload(bars=[
+        _bar(100),
+        _bar(200),
+        _bar(300),
+        _bar(400),
+    ])
+    stale = _payload(bars=[
+        _bar(100),
+        _bar(200),
+        _bar(300, c=101.5),
+    ])
+    stale["notice"] = _mutable_notice()
+
+    merged, report = merge_ohlcv_payloads(existing, stale)
+
+    assert [row["t"] for row in merged["bars"]] == [100, 200, 300, 400]
+    assert report.removed_existing_unconfirmed_bars == 0
+    assert merged["bars"][2]["c"] == 101
+    assert merged["bars"][-1]["t"] == 400
