@@ -9,6 +9,7 @@ from typing import Mapping
 
 from .analysis import ema, rsi
 from .approval import timeframe_duration_minutes
+from .evidence_engine import EvidenceSummary
 from .historical_features import HistoricalFeatureSnapshot
 from .models import Bar
 from .strategy_lab import StrategyTrial, candidate_strategies, robust_trial_score
@@ -220,7 +221,7 @@ def build_mtf_contexts(
 
 
 def apply_mtf_gate(
-    base_signal: tuple[int, float, object] | None,
+    base_signal: tuple[int, float, EvidenceSummary] | None,
     context: MTFContext | None,
     gate: MTFGateParams,
 ):
