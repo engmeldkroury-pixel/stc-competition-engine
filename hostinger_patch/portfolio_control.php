@@ -140,6 +140,9 @@ function stc_validate_stc_plan_position(PDO $pdo, array $body): array {
     if (!is_array($plan) || !is_array($signal)) {
         stc_json(['ok' => false, 'error' => 'source_plan_invalid'], 409);
     }
+    if (($signal['quality_gate_passed'] ?? false) !== true || ($signal['setup_grade'] ?? '') !== 'A_PLUS') {
+        stc_json(['ok' => false, 'error' => 'source_plan_not_high_conviction'], 409);
+    }
 
     $competitionId = (string)($body['competition_id'] ?? '');
     $symbol = (string)($body['symbol'] ?? '');
