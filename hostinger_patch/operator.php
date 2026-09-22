@@ -273,14 +273,16 @@ function cardHtml(c,i){
    :(active?'<span class="badge active">ACTIVE NOW</span>':'<span class="badge expired">EXPIRED</span>');
  let blockReason='';
  if(c.has_open_position)blockReason='An executed position is already tracked for this symbol. New signals are used to manage that position, not to create a replacement trade.';
+ else if(c.quality_gate_passed===false&&c.pre_gate_recommendation&&c.pre_gate_recommendation!=='WAIT')blockReason='MONITOR ONLY: this directional candidate failed the A+ high-conviction gate and cannot be approved or notified as a trade.';
  else if(!active&&c.recommendation!=='WAIT')blockReason='Expired opportunities are removed automatically from opportunity lists.';
  else if(!controlOpen)blockReason='SAFE MODE / KILL SWITCH is ON. Enable manual approval mode before approving.';
  else if(!sizingAllowed)blockReason='New entry blocked by sizing / risk capacity.';
  else if(!macroAllowed)blockReason='New entry blocked by macro-risk gate.';
  return '<div class="card" data-card-index="'+i+'">'
-  +'<div class="statusline">'+statusBadge+'<span class="pill">'+esc(competitionLabel)+'</span></div>'
+  +'<div class="statusline">'+statusBadge+'<span class="pill">'+esc(competitionLabel)+'</span><span class="pill">'+esc(c.setup_grade||'MONITOR_ONLY')+'</span></div>'
   +'<div class="row"><span>Symbol</span><span class="value">'+esc(c.symbol)+'</span></div>'
   +'<div class="row"><span>Signal</span><span class="value '+cls+'">'+esc(c.recommendation)+' '+num(c.composite_score,2)+'</span></div>'
+  +(c.recommendation==='WAIT'&&c.pre_gate_recommendation&&c.pre_gate_recommendation!=='WAIT'?'<div class="row"><span>Blocked candidate</span><span class="value wait">'+esc(c.pre_gate_recommendation)+' • failed A+ quality gate</span></div>':'')
   +'<div class="row"><span>Latest confirmed bar</span><span class="value">'+formatLocalTime(c.source_close_time||c.source_time)+' • '+formatAgeSeconds(c.source_age_seconds)+'</span></div>'
   +planHtml(c.locked_trade_plan)
   +orderHtml(c,i)
@@ -309,10 +311,10 @@ function maybeNotify(cards){
    const key=String(c.locked_trade_plan.plan_id||c.signal_id);
    if(seenSignalPlans.has(key))continue;
    const oi=c.order_instruction||{};
-   const body=c.symbol+' • '+c.recommendation+' • '+(oi.order_type||'ENTRY')+' • Entry '+num(c.locked_trade_plan.entry_min)+' - '+num(c.locked_trade_plan.entry_max)+' • SL '+num(c.locked_trade_plan.initial_stop)+' • TP1 '+num(c.locked_trade_plan.target1)+' • Expires '+formatLocalTime(c.locked_trade_plan.valid_until);
-   document.title='NEW '+c.recommendation+' • '+c.symbol+' • STC';
+   const body=c.symbol+' • A+ '+c.recommendation+' • '+(oi.order_type||'ENTRY')+' • Entry '+num(c.locked_trade_plan.entry_min)+' - '+num(c.locked_trade_plan.entry_max)+' • SL '+num(c.locked_trade_plan.initial_stop)+' • Final TP '+num(c.locked_trade_plan.target2)+' • Expires '+formatLocalTime(c.locked_trade_plan.valid_until);
+   document.title='A+ '+c.recommendation+' • '+c.symbol+' • STC';
    if('Notification' in window && Notification.permission==='granted'){
-     new Notification('STC NEW ACTIVE TRADE PLAN',{body,tag:key,requireInteraction:true});
+     new Notification('STC A+ HIGH-CONVICTION PLAN',{body,tag:key,requireInteraction:true});
      seenSignalPlans.add(key);
      persistSeenSet('stc_seen_signal_plans',seenSignalPlans);
    }
