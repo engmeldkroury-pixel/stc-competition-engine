@@ -56,6 +56,9 @@ def test_research_runner_builds_quality_checked_standard_bundle(monkeypatch):
     assert result["derived_timeframe_start_utc"]["15"] is not None
     assert result["derived_timeframe_span_days"]["15"] > 0
     assert result["research_report"]["status"] == "NO_VALIDATED_STRATEGY"
+    assert result["strategy_catalog_count"] == len(result["strategy_catalog_ids"])
+    assert result["strategy_catalog_count"] >= 9
+    assert "trend_pullback" in result["strategy_catalog_ids"]
     assert result["live_trading_authority"] is False
     assert all(q["quality_ok"] for q in result["data_quality"].values())
     assert set(result["source_fingerprints"]) == {"15m", "1h", "4h", "1D"}
