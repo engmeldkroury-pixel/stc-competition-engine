@@ -209,6 +209,8 @@ def run_symbol_research(
         "schema_version": "stc-research-v1",
         "symbol": symbol,
         "asset_class": asset_class,
+        "strategy_catalog_count": len(STRATEGIES),
+        "strategy_catalog_ids": [spec.strategy_id for spec in STRATEGIES],
         "data_quality": {
             key: asdict(value) for key, value in quality.items()
         },
