@@ -32,8 +32,8 @@ GROUP_B = {
 def test_amp_split_covers_exact_verified_core_universe():
     a = PINE_A.read_text(encoding="utf-8")
     b = PINE_B.read_text(encoding="utf-8")
-    assert "STC AMP Core Feed A v0.3 Stateful Visual" in a
-    assert "STC AMP Core Feed B v0.3 Companion" in b
+    assert "STC AMP Core Feed A v0.4 A+ 1H Confirm" in a
+    assert "STC AMP Core Feed B v0.4 A+ 1H Confirm" in b
     assert GROUP_A.isdisjoint(GROUP_B)
     assert GROUP_A | GROUP_B == set(AMP_CORE_FEED_SYMBOLS)
     for symbol in GROUP_A:
@@ -42,11 +42,15 @@ def test_amp_split_covers_exact_verified_core_universe():
         assert f'"{symbol}"' in b
 
 
-def test_amp_split_uses_15m_plus_confirmed_daily_history():
+def test_amp_split_uses_15m_plus_confirmed_1h_and_daily_history():
     for path in (PINE_A, PINE_B):
         text = path.read_text(encoding="utf-8")
         assert 'competitionId = input.string("amp-futures-sep-2026"' in text
         assert 'feedTf = input.timeframe("15"' in text
+        assert 'confirmTf = input.timeframe("60"' in text
+        assert 'request.security(symbol, confirmTf, makeConfirmBar()' in text
+        assert '"confirm_ema200"' in text
+        assert '"confirm_macd_signal"' in text
         assert 'request.security(symbol, "1D", makeHistoryBar()' in text
         assert "close[1]" in text
         assert "history_momentum_252" in text
@@ -67,14 +71,16 @@ def test_amp_split_stays_under_standard_unique_request_budget():
     a = PINE_A.read_text(encoding="utf-8")
     b = PINE_B.read_text(encoding="utf-8")
     assert a.count(" = feedBar(") == 8
+    assert a.count(" = confirmBar(") == 8
     assert a.count(" = historyBar(") == 8
     assert b.count(" = feedBar(") == 8
+    assert b.count(" = confirmBar(") == 8
     assert b.count(" = historyBar(") == 8
     # Feed A also has two current-chart higher-timeframe visual requests.
-    assert 8 * 2 + 2 == 18
-    assert 18 < 40
-    assert 8 * 2 == 16
-    assert 16 < 40
+    assert 8 * 3 + 2 == 26
+    assert 26 < 40
+    assert 8 * 3 == 24
+    assert 24 < 40
 
 
 def test_amp_split_has_per_symbol_realtime_deduplication():
