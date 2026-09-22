@@ -315,3 +315,46 @@ def test_new_structural_research_strategies_require_hard_confirmation(monkeypatc
     signal = wf._signal("liquidity_sweep_reversal", snap, params)
     assert signal is not None
     assert signal[0] == 1
+
+
+
+def test_optional_signal_gate_can_block_an_otherwise_valid_signal(monkeypatch):
+    bars = _bars(300, slope=0.0)
+    dummy = HistoricalFeatureSnapshot(
+        symbol="TEST:X",
+        timeframe="15",
+        timestamp=bars[260].timestamp,
+        values={},
+        observations=(),
+    )
+    summary = EvidenceSummary(
+        score=0.9,
+        agreement_ratio=1.0,
+        independent_confirmations=8,
+        hard_confirmations=3,
+        family_scores={},
+        family_weights_used={},
+        conflicts=(),
+        strongest_features=(),
+    )
+    monkeypatch.setattr(wf, "_signal", lambda *args, **kwargs: (1, 0.9, summary))
+    params = BacktestParams(
+        threshold=0.5,
+        stop_atr=1.2,
+        target_r=2.5,
+        max_hold_bars=3,
+        round_turn_cost_r=0.0,
+    )
+    trades, stats = backtest_strategy(
+        "TEST:X",
+        "15",
+        bars,
+        {260: dummy},
+        "trend_pullback",
+        params,
+        start_index=260,
+        end_index=270,
+        signal_gate=lambda *args: False,
+    )
+    assert trades == []
+    assert stats.trades == 0
