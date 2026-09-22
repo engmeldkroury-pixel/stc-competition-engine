@@ -147,11 +147,18 @@ def lookup_runtime_calibration(
     symbol: str,
     *,
     as_of: datetime,
+    timeframe: str | None = None,
     path: str | None = None,
 ) -> tuple[RuntimeCalibration | None, tuple[str, ...]]:
     matches = [row for row in load_registry(path) if row.symbol == symbol]
+    if timeframe is not None:
+        matches = [row for row in matches if str(row.timeframe) == str(timeframe)]
     if not matches:
-        return None, ("no_calibrated_research_record",)
+        return None, (
+            "no_calibrated_research_record_for_timeframe"
+            if timeframe is not None
+            else "no_calibrated_research_record",
+        )
     matches.sort(key=lambda row: row.data_end_utc, reverse=True)
     for row in matches:
         ok, reasons = runtime_calibration_usable(row, as_of=as_of)
@@ -166,8 +173,9 @@ def candidate_record_from_research_result(
     *,
     data_end_utc: datetime,
     generated_at_utc: datetime,
+    report_key: str = "research_report",
 ) -> dict[str, Any]:
-    report = dict(result.get("research_report") or {})
+    report = dict(result.get(report_key) or {})
     probability = dict(report.get("setup_probability") or {})
     if report.get("status") != "VALIDATED":
         raise ValueError("Research result has no validated strategy")
