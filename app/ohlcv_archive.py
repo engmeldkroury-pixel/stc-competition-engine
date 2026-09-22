@@ -131,8 +131,13 @@ def merge_ohlcv_payloads(
         previous_archive = existing.get("archive") if isinstance(existing.get("archive"), dict) else {}
 
     merged = {int(row["t"]): row for row in existing_bars}
+    existing_latest_t = max(merged) if merged else None
     removed_existing_unconfirmed_bars = 0
-    if pending_t is not None and pending_t in merged:
+    if (
+        pending_t is not None
+        and pending_t in merged
+        and existing_latest_t == pending_t
+    ):
         merged.pop(pending_t)
         removed_existing_unconfirmed_bars = 1
 
