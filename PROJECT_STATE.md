@@ -1440,3 +1440,35 @@ Final decision for this stage:
 - Safe Mode, Kill Switch, manual approval and manual execution remain unchanged.
 - Owner intervention required now: NO.
 
+## Fresh-data accumulation activation — 2026-09-23
+
+Status: ACTIVE MONITORING. Owner intervention required now: NO.
+
+### Exact-provider archives seeded
+- PR #81 merged to main after CI success (297 tests passed).
+- Main merge commit: d479817eded54b2df70bb148aefc41895e5d61fe.
+- Seeded research_archive/mnq/15m.json from TradingView Official MCP:
+  - 5000 validated 15m bars.
+  - coverage first_t 1783501200.
+  - coverage last_t 1790109900.
+- Seeded research_archive/btcusd/15m.json from TradingView Official MCP:
+  - 5000 validated 15m bars.
+  - coverage first_t 1785556800.
+  - coverage last_t 1790113500.
+- Both snapshots were checked for strictly ordered unique timestamps and valid OHLCV envelopes before commit.
+- This is evidence accumulation only. No strategy, risk, validation, calibration or live-authority rule changed.
+
+### Automated unseen-data watch
+- A daily condition-based STC fresh-data watch is enabled.
+- It may update only exact-provider research archives/state through CI-gated GitHub changes.
+- It must not retune strategies, thresholds, MTF/regime rules, validation gates or production safeguards.
+- Frozen development endpoints remain:
+  - MNQ 15m: 1790104500.
+  - BTCUSD 15m: 1790090100.
+- New bars beyond those endpoints remain unseen confirmation evidence.
+- Notification is reserved for a meaningful validation-status change, confirmatory evaluation readiness/completion, or a genuine blocker requiring owner input.
+
+Current stage boundary:
+- There is no additional same-dataset tuning authorized.
+- The next substantive research decision must be supported by materially larger genuinely unseen data.
+
