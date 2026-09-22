@@ -1,0 +1,47 @@
+name: STC Frozen Confirmation
+
+on:
+  push:
+    branches:
+      - "confirmation/**"
+    paths:
+      - "confirmation_inputs/READY"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: stc-frozen-confirmation-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  confirm:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run frozen unseen-data confirmation
+        run: |
+          set -euo pipefail
+          python scripts/run_frozen_confirmation.py \
+            --manifest research_hypotheses/frozen_15m_v1.json \
+            --output confirmation_outputs/frozen_15m_v1.json
+
+      - name: Upload confirmation output
+        uses: actions/upload-artifact@v4
+        with:
+          name: stc-frozen-confirmation-${{ github.run_id }}
+          path: confirmation_outputs/frozen_15m_v1.json
+          if-no-files-found: error
+          retention-days: 14
