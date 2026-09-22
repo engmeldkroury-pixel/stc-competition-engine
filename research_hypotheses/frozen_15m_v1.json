@@ -1,0 +1,78 @@
+{
+  "schema_version": "stc-frozen-confirmation-v1",
+  "frozen_at_utc": "2026-09-22T22:07:24Z",
+  "optimization_locked": true,
+  "purpose": "Evaluate pre-frozen 15m hypotheses only on bars that were unseen by the development research. No parameter or regime retuning is allowed.",
+  "hypotheses": [
+    {
+      "hypothesis_id": "mnq_vwap_reversion_baseline_15m_v1",
+      "symbol": "CME_MINI:MNQ1!",
+      "timeframe": "15",
+      "strategy_id": "vwap_reversion",
+      "archive_path": "research_archive/mnq/15m.json",
+      "freeze_t": 1790103600,
+      "freeze_utc": "2026-09-22T19:00:00Z",
+      "role": "BASELINE_COMPARATOR",
+      "development_status": "FORWARD_FAILED",
+      "source_run_id": 35781036628,
+      "source_artifact": "stc-research-35781036628/mnq.json",
+      "allowed_regimes": [],
+      "params": {
+        "threshold": 0.72,
+        "stop_atr": 1.2,
+        "target_r": 2.5,
+        "max_hold_bars": 16,
+        "min_agreement": 0.62,
+        "min_independent_confirmations": 4,
+        "min_hard_confirmations": 1,
+        "round_turn_cost_r": 0.02
+      },
+      "development_evidence": {
+        "test_trades": 46,
+        "test_expectancy_r": 0.17986566781170552,
+        "test_profit_factor": 1.4769959206345418,
+        "forward_trades": 31,
+        "forward_expectancy_r": -0.19262861640176912,
+        "forward_profit_factor": 0.648403071486748,
+        "parameter_stability": 0.0,
+        "regime_stability": 1.0
+      },
+      "live_calibration_authority": false
+    },
+    {
+      "hypothesis_id": "btcusd_bollinger_mean_reversion_baseline_15m_v1",
+      "symbol": "CAPITALCOM:BTCUSD",
+      "timeframe": "15",
+      "strategy_id": "bollinger_mean_reversion",
+      "archive_path": "research_archive/btcusd/15m.json",
+      "freeze_t": 1790089200,
+      "freeze_utc": "2026-09-22T15:00:00Z",
+      "role": "BASELINE_COMPARATOR",
+      "development_status": "FORWARD_FAILED",
+      "source_run_id": 35781933861,
+      "source_artifact": "stc-research-35781933861/btcusd.json",
+      "allowed_regimes": [],
+      "params": {
+        "threshold": 0.5,
+        "stop_atr": 1.2,
+        "target_r": 2.5,
+        "max_hold_bars": 16,
+        "min_agreement": 0.62,
+        "min_independent_confirmations": 4,
+        "min_hard_confirmations": 1,
+        "round_turn_cost_r": 0.02
+      },
+      "development_evidence": {
+        "test_trades": 41,
+        "test_expectancy_r": 0.11761186685208844,
+        "test_profit_factor": 1.2489605410790054,
+        "forward_trades": 26,
+        "forward_expectancy_r": -0.04319995860806807,
+        "forward_profit_factor": 0.9271113205493828,
+        "parameter_stability": 0.0,
+        "regime_stability": 0.6666666666666666
+      },
+      "live_calibration_authority": false
+    }
+  ]
+}
