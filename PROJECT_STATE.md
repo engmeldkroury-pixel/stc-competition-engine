@@ -1400,3 +1400,43 @@ BTCUSD:
 
 Owner intervention required now: NO.
 
+### Regime-pool comparison final results — 2026-09-23
+
+MNQ run 35788119034 — COMPLETED SUCCESS:
+- Overall live-entry 15m remains NO_VALIDATED_STRATEGY.
+- No tested regime pool produced a non-zero robust score or a VALIDATED 15m result.
+- vwap_reversion TREND_ONLY retained 40 OOS trades with strong OOS figures (+0.213297R, PF 1.566365) but forward remained negative (-0.060762R, PF 0.882527) and parameter stability failed.
+- vwap_reversion BEAR_OR_RANGE produced positive OOS/forward quality (22 OOS trades, +0.103418R, PF 1.221531; 15 forward trades, +0.219413R, PF 1.510963) but was rejected for insufficient OOS sample and parameter/regime instability.
+- Pools retaining 30+ OOS trades did not cure the forward failure.
+- Decision: stop same-dataset regime tuning for MNQ. No promotion and no full feature calibration.
+
+BTCUSD run 35788144497 — COMPLETED SUCCESS:
+- Higher-timeframe 1D trend_pullback remains VALIDATED research-only; live-entry 15m remains NO_VALIDATED_STRATEGY.
+- No tested regime pool produced a non-zero robust score or a VALIDATED 15m result.
+- bollinger_mean_reversion pools with 30+ OOS trades (EXCLUDE_BULL, EXCLUDE_BEAR, EXCLUDE_RANGE) had weak/negative OOS expectancy and/or PF despite some positive forward slices.
+- BULL_OR_RANGE showed +0.088015R / PF 1.199006 in OOS but only 17 OOS trades and negative forward expectancy, therefore rejected.
+- failed_breakout_reversal pool results were all under-sampled and/or OOS-negative.
+- Decision: stop same-dataset regime tuning for BTCUSD. No promotion and no 15m calibration.
+
+Cross-market research conclusion:
+- Strategy expansion, no-lookahead MTF confirmation, single-regime filtering and bounded regime-pool testing have now all failed to produce a validated 15m competition strategy on the strongest re-screened candidates.
+- Do not add more same-dataset combinatorial filters to chase a pass.
+- Do not reduce sample, expectancy, profit-factor, drawdown, stability or forward gates.
+- Next evidence priority is genuinely unseen data and deeper history, not further same-window parameter/filter search.
+
+Fresh-data clock at checkpoint:
+- MNQ stored research dataset last 15m timestamp: 1790104500.
+- TradingView current available last 15m timestamp observed at checkpoint: 1790109900.
+- Approximately 6 new 15m bars exist beyond the development dataset: insufficient for confirmation.
+- BTCUSD stored research dataset last 15m timestamp: 1790090100.
+- TradingView current available last 15m timestamp observed at checkpoint: 1790113500.
+- Approximately 26 new 15m bars exist beyond the development dataset: insufficient for confirmation.
+- These bars start the unseen-data accumulation clock; they are not enough to claim fresh validation.
+
+Final decision for this stage:
+- Same-dataset 15m tuning is CLOSED for MNQ/BTC/XAU until additional unseen evidence is available.
+- Historical OHLCV accumulation becomes the next automatic research activity.
+- Existing higher-timeframe validated findings remain informational only.
+- Safe Mode, Kill Switch, manual approval and manual execution remain unchanged.
+- Owner intervention required now: NO.
+
