@@ -48,3 +48,14 @@ Historical feature materialization now passes only the exact latest-1000-bar win
 
 ## Research branch trigger rule
 Upload all exact-provider OHLCV files first, then create/update research_inputs/READY once. Do not trigger research on partial datasets.
+
+
+## Strategy-engine next phase: MTF research
+The latest NAS100/MNQ screen also found no validated 15m strategy. Stop broadening the universe blindly.
+Build a separate no-lookahead MTF research layer that:
+1. keeps the existing single-timeframe trials as baselines;
+2. aligns only confirmed 1h/2h/4h/1D/month context to each 15m signal;
+3. tests MTF-confirmed variants of SMC, trend-pullback, breakout and intraday/VWAP families;
+4. tunes MTF gate parameters on train only, then applies them unchanged to test and forward;
+5. does not lower sample, expectancy, PF, drawdown, parameter-stability or forward gates;
+6. promotes nothing to live unless the exact 15m MTF variant passes robustness and later full feature calibration.
