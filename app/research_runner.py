@@ -12,6 +12,7 @@ from .research_dataset import (
     research_timeframe_bundle,
 )
 from .research_report import build_strategy_research_report, report_to_dict
+from .mtf_research import validate_mtf_policies
 from .strategy_lab import STRATEGIES, classify_trial_status, robust_trial_score, trial_rejection_reasons
 from .walkforward import MatrixSelection, materialize_feature_series, matrix_selections_by_timeframe, strategy_matrix
 
@@ -99,10 +100,49 @@ def _calibrate_selection_features(
     ]
 
 
+def _select_mtf_candidate_ids(validations, *, limit: int = 3) -> tuple[str, ...]:
+    candidates = []
+    for row in validations:
+        trial = row.trial
+        if trial.timeframe != "15":
+            continue
+        if trial.test_trades < 8 or trial.forward_trades < 5:
+            continue
+        if trial.max_drawdown_r > 12.0:
+            continue
+        forward_expectancy = (
+            float(trial.forward_expectancy_r)
+            if trial.forward_expectancy_r is not None
+            else -999.0
+        )
+        if trial.test_expectancy_r <= 0 and forward_expectancy <= 0:
+            continue
+        heuristic = (
+            max(0.0, float(trial.test_expectancy_r)) * 10.0
+            + max(0.0, forward_expectancy) * 12.0
+            + min(float(trial.test_profit_factor), 3.0)
+            + min(float(trial.forward_profit_factor or 0.0), 3.0)
+            + min(trial.test_trades + trial.forward_trades, 80) / 80.0
+        )
+        candidates.append((heuristic, trial.strategy_id))
+    candidates.sort(reverse=True)
+    seen = set()
+    selected = []
+    for _, strategy_id in candidates:
+        if strategy_id in seen:
+            continue
+        seen.add(strategy_id)
+        selected.append(strategy_id)
+        if len(selected) >= limit:
+            break
+    return tuple(selected)
+
+
 def run_symbol_research(
     payload: dict[str, Any],
     *,
     calibrate_features: bool = True,
+    compare_mtf: bool = False,
 ) -> dict[str, Any]:
     symbol = str(payload.get("symbol") or "").strip()
     if not symbol:
@@ -204,6 +244,46 @@ def run_symbol_research(
         feature_validations=live_entry_feature_validations,
     )
 
+    mtf_validation = []
+    if compare_mtf:
+        by_strategy = {
+            row.trial.strategy_id: row
+            for row in validations
+            if row.trial.timeframe == "15"
+        }
+        for strategy_id in _select_mtf_candidate_ids(validations):
+            baseline = by_strategy[strategy_id]
+            policies = validate_mtf_policies(
+                symbol=symbol,
+                strategy_id=strategy_id,
+                bundle=bundle,
+            )
+            mtf_validation.append({
+                "strategy_id": strategy_id,
+                "baseline": {
+                    "research_class": classify_trial_status(baseline.trial),
+                    "rejection_reasons": list(trial_rejection_reasons(baseline.trial)),
+                    "robust_score": robust_trial_score(baseline.trial),
+                    "trial": asdict(baseline.trial),
+                    "test": asdict(baseline.test_stats),
+                    "forward": asdict(baseline.forward_stats),
+                },
+                "policies": [
+                    {
+                        "policy": item.policy,
+                        "research_class": classify_trial_status(item.validation.trial),
+                        "rejection_reasons": list(trial_rejection_reasons(item.validation.trial)),
+                        "robust_score": item.robust_score,
+                        "test_retention": item.test_retention,
+                        "forward_retention": item.forward_retention,
+                        "trial": asdict(item.validation.trial),
+                        "test": asdict(item.validation.test_stats),
+                        "forward": asdict(item.validation.forward_stats),
+                    }
+                    for item in policies
+                ],
+            })
+
     return {
         "schema_version": "stc-research-v1",
         "symbol": symbol,
@@ -236,6 +316,7 @@ def run_symbol_research(
         },
         "live_entry_timeframe": "15",
         "live_entry_selection": asdict(live_entry_selection),
+        "mtf_validation": mtf_validation,
         "strategy_trials": [
             {
                 "trial": asdict(row.trial),

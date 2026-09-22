@@ -148,3 +148,66 @@ def test_research_runner_passes_snapshot_cache_to_strategy_matrix(monkeypatch):
     }
     rr.run_symbol_research(payload, calibrate_features=False)
     assert isinstance(captured["cache"], dict)
+
+
+
+def test_select_mtf_candidates_prefers_supported_15m_edge():
+    from app.research_runner import _select_mtf_candidate_ids
+    from app.strategy_lab import StrategyTrial
+    from app.walkforward import BacktestParams, BacktestStats, WalkForwardValidation
+
+    def row(strategy_id, timeframe, test_trades, forward_trades, test_exp, forward_exp, dd=3.0):
+        test = BacktestStats(
+            test_trades,
+            max(0, test_trades // 2),
+            test_trades - max(0, test_trades // 2),
+            0.5 if test_trades else 0.0,
+            test_exp * test_trades,
+            test_exp,
+            1.4 if test_exp > 0 else 0.8,
+            dd,
+        )
+        forward = BacktestStats(
+            forward_trades,
+            max(0, forward_trades // 2),
+            forward_trades - max(0, forward_trades // 2),
+            0.5 if forward_trades else 0.0,
+            forward_exp * forward_trades,
+            forward_exp,
+            1.3 if forward_exp > 0 else 0.7,
+            dd,
+        )
+        train = BacktestStats(50, 30, 20, 0.6, 10.0, 0.2, 1.5, dd)
+        trial = StrategyTrial(
+            strategy_id=strategy_id,
+            symbol="TEST:X",
+            timeframe=timeframe,
+            train_trades=train.trades,
+            test_trades=test.trades,
+            forward_trades=forward.trades,
+            train_expectancy_r=train.expectancy_r,
+            test_expectancy_r=test.expectancy_r,
+            forward_expectancy_r=forward.expectancy_r,
+            test_profit_factor=test.profit_factor,
+            forward_profit_factor=forward.profit_factor,
+            test_win_rate=test.win_rate,
+            max_drawdown_r=dd,
+            parameter_stability=0.8,
+            regime_stability=0.8,
+        )
+        return WalkForwardValidation(
+            trial=trial,
+            selected_params=BacktestParams(0.62, 1.2, 2.5, 16),
+            train_stats=train,
+            test_stats=test,
+            forward_stats=forward,
+        )
+
+    rows = [
+        row("supported", "15", 32, 18, 0.18, 0.12),
+        row("tiny_sample", "15", 4, 3, 0.90, 0.80),
+        row("other_tf", "60", 40, 20, 0.30, 0.20),
+        row("hopeless", "15", 40, 20, -0.20, -0.10),
+    ]
+    selected = _select_mtf_candidate_ids(rows, limit=3)
+    assert selected == ("supported",)

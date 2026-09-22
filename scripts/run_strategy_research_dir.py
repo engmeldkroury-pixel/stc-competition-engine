@@ -55,8 +55,8 @@ def load_series_dir(path: Path) -> dict:
         series[key] = payload
 
     research_mode = str(meta.get("research_mode") or "full").strip().lower()
-    if research_mode not in {"full", "matrix_only"}:
-        raise ValueError("meta.json research_mode must be full or matrix_only")
+    if research_mode not in {"full", "matrix_only", "mtf_compare"}:
+        raise ValueError("meta.json research_mode must be full, matrix_only, or mtf_compare")
     return {"symbol": symbol, "series": series, "research_mode": research_mode}
 
 
@@ -74,13 +74,15 @@ def main() -> int:
     args = parser.parse_args()
 
     payload = load_series_dir(args.input_dir)
+    research_mode = payload.get("research_mode", "full")
     calibrate_features = (
         not args.skip_feature_calibration
-        and payload.get("research_mode") != "matrix_only"
+        and research_mode == "full"
     )
     result = run_symbol_research(
         payload,
         calibrate_features=calibrate_features,
+        compare_mtf=(research_mode == "mtf_compare"),
     )
     result["research_mode"] = payload.get("research_mode", "full")
     args.output.parent.mkdir(parents=True, exist_ok=True)

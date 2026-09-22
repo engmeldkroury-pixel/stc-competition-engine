@@ -171,3 +171,22 @@ def test_research_workflow_waits_for_explicit_ready_marker():
     text = (ROOT / ".github" / "workflows" / "stc-research.yml").read_text(encoding="utf-8")
     assert '"research_inputs/READY"' in text
     assert '"research_inputs/**"' not in text
+
+
+
+def test_split_directory_loader_accepts_mtf_compare_mode(tmp_path):
+    runner = _load_runner()
+    target = tmp_path / "mtf"
+    target.mkdir()
+    (target / "meta.json").write_text(
+        json.dumps({
+            "symbol": "CAPITALCOM:XAUUSD",
+            "research_mode": "mtf_compare",
+        }),
+        encoding="utf-8",
+    )
+    for filename in ("15m.json", "1h.json", "4h.json", "1D.json"):
+        (target / filename).write_text(json.dumps(_series()), encoding="utf-8")
+
+    payload = runner.load_series_dir(target)
+    assert payload["research_mode"] == "mtf_compare"
