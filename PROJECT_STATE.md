@@ -1151,3 +1151,51 @@ Active screening batches:
 - At this checkpoint both batches are in the no-lookahead computation step with complete input sets and no active data-quality failure.
 
 Owner intervention required now: NO.
+
+
+## Broad screening checkpoint — NAS100 / MNQ / XAGUSD / MCL — 2026-09-22
+
+All results below are from exact-provider TradingView OHLCV, no-lookahead matrix-only screening with unchanged robustness gates.
+
+CAPITALCOM:NAS100:
+- Overall status: NO_VALIDATED_STRATEGY.
+- Live-entry 15m status: NO_VALIDATED_STRATEGY.
+- 15m best candidate was range_rotation: test expectancy +0.043R, PF 1.106, 20 trades; forward expectancy -0.547R, PF 0.220, 10 trades.
+- 1h SMC showed test expectancy +0.145R and forward +0.170R but only 11 test / 11 forward trades and parameter instability; research-only.
+- No calibration candidate promoted.
+
+CME_MINI:MNQ1!:
+- Overall status: NO_VALIDATED_STRATEGY.
+- Live-entry 15m status: NO_VALIDATED_STRATEGY.
+- 15m best candidate was mean_reversion and failed forward: test expectancy -0.039R, PF 0.917; forward expectancy -0.266R, PF 0.477.
+- 30m SMC was the strongest encouraging candidate: test expectancy +0.282R, PF 1.512, 17 trades; forward expectancy +0.132R, PF 1.230, 9 trades. Rejected for insufficient sample depth and parameter instability.
+- No calibration candidate promoted.
+
+CAPITALCOM:XAGUSD:
+- Overall status: NO_VALIDATED_STRATEGY.
+- Live-entry 15m status: NO_VALIDATED_STRATEGY.
+- 15m best candidate range_rotation failed forward: test expectancy -0.137R, PF 0.768; forward expectancy -0.375R, PF 0.528.
+- 30m SMC showed test expectancy +0.457R, PF 2.213, 14 trades, but forward expectancy -0.701R, PF 0.211.
+- 4h SMC and volatility_squeeze had positive test results but negative forward results.
+- No calibration candidate promoted.
+
+NYMEX:MCL1!:
+- Overall status: NO_VALIDATED_STRATEGY.
+- Live-entry 15m status: NO_VALIDATED_STRATEGY.
+- 15m SMC failed forward: test expectancy -0.016R, PF 0.974; forward expectancy -0.606R, PF 0.325.
+- 2h volatility_squeeze was the strongest positive-forward research candidate: test expectancy +0.046R, PF 1.100, 21 trades; forward expectancy +0.364R, PF 2.478, 16 trades. Rejected for insufficient sample depth / weak OOS expectancy / parameter instability.
+- No calibration candidate promoted.
+
+Cross-symbol conclusion:
+- The current strict gate is correctly rejecting attractive in-sample results when forward performance or sample robustness is inadequate.
+- No 15m live-entry research calibration has been validated across XAUUSD, MES, BTCUSD, EURUSD, NAS100, MNQ, XAGUSD or MCL.
+- Do not relax gates to manufacture a 15m signal.
+- Continue broad matrix-only screening across remaining competition symbols.
+- Full feature calibration remains reserved for a robust validated strategy/timeframe only.
+
+Engineering note:
+- ATR feature-calibration caching was merged to main as commit 582d9d4f836c18f3f0ae8648c5e11342f9da34ea after successful CI.
+- Duplicate re-screening of NAS100/MNQ was accidentally launched during state reconciliation; its result is non-authoritative unless it reveals a reproducibility mismatch. The earlier completed documented run remains the baseline.
+- A separate XAGUSD + MGC screening run is active; XAGUSD is duplicate confirmation, while MGC is new evidence.
+
+Owner intervention required now: NO.
