@@ -75,7 +75,7 @@ def test_owner_console_auto_refresh_and_actionable_browser_notifications():
     ui = (PATCH / "operator.php").read_text(encoding="utf-8")
     assert "setInterval(()=>{secondsToRefresh=30;refresh()},30000)" in ui
     assert "Notification.requestPermission()" in ui
-    assert "STC NEW ACTIVE TRADE PLAN" in ui
+    assert "STC A+ HIGH-CONVICTION PLAN" in ui
     assert "LONG" in ui and "SHORT" in ui
     assert "WAIT" in ui
     assert "Decision timeframe" in ui
@@ -333,7 +333,7 @@ def test_browser_notifications_do_not_suppress_active_plan_on_first_load():
     ui = (PATCH / "operator.php").read_text(encoding="utf-8")
     assert "stc_seen_signal_plans" in ui
     assert "persistSeenSet('stc_seen_signal_plans'" in ui
-    assert "STC NEW ACTIVE TRADE PLAN" in ui
+    assert "STC A+ HIGH-CONVICTION PLAN" in ui
     assert "if(!initializedSignals)" not in ui
     assert "if(snapshot)maybeNotify(snapshot.cards||[])" in ui
 
