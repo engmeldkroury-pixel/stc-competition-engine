@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass
 from typing import Any
 
+from .historical_features import extract_feature_snapshot
 from .regime_research import make_regime_signal_gate
 from .research_dataset import bars_from_tradingview_ohlcv
 from .walkforward import (
@@ -10,7 +11,6 @@ from .walkforward import (
     BacktestStats,
     TradeOutcome,
     backtest_strategy,
-    materialize_feature_series,
     summarize_trades,
 )
 
@@ -136,6 +136,33 @@ def load_frozen_hypotheses(manifest: dict[str, Any]) -> tuple[FrozenHypothesis, 
         raise ValueError("Frozen hypothesis IDs must be unique")
     return hypotheses
 
+
+
+def _materialize_confirmation_snapshots(
+    symbol: str,
+    timeframe: str,
+    bars,
+    *,
+    start_index: int,
+):
+    """Materialize only snapshots that can generate unseen signals.
+
+    Semantics match walkforward.materialize_feature_series: every snapshot uses
+    the same latest-1000-bar window ending at its own index. Development-history
+    bars are still available as warm-up context; snapshots before the unseen
+    start are simply not recomputed.
+    """
+    if len(bars) <= 260:
+        raise ValueError("Not enough bars after feature warmup")
+    begin = max(259, int(start_index))
+    return {
+        i: extract_feature_snapshot(
+            symbol,
+            timeframe,
+            bars[max(0, i - 999) : i + 1],
+        )
+        for i in range(begin, len(bars))
+    }
 
 def _completed_trades(
     trades: list[TradeOutcome],
@@ -274,10 +301,11 @@ def evaluate_frozen_hypothesis(
             live_calibration_authority=False,
         )
 
-    snapshots = materialize_feature_series(
+    snapshots = _materialize_confirmation_snapshots(
         hypothesis.symbol,
         hypothesis.timeframe,
         bars,
+        start_index=start_index,
     )
     signal_gate = None
     if hypothesis.allowed_regimes:
