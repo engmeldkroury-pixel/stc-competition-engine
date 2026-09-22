@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from math import ceil, inf
-from typing import Mapping
+from typing import Callable, Mapping
 
 from .analysis import atr
 from .approval import entry_price_bounds, timeframe_duration_minutes, timeframe_validity_minutes
@@ -17,6 +17,10 @@ from .trade_plan import (
     calculate_plan_levels,
 )
 
+
+
+
+SignalGate = Callable[[int, int, float, EvidenceSummary], bool]
 
 @dataclass(frozen=True)
 class BacktestParams:
@@ -340,6 +344,7 @@ def backtest_strategy(
     *,
     start_index: int,
     end_index: int,
+    signal_gate: SignalGate | None = None,
 ) -> tuple[list[TradeOutcome], BacktestStats]:
     if start_index < 260:
         start_index = 260
@@ -357,6 +362,9 @@ def backtest_strategy(
             continue
 
         side, score, summary = signal
+        if signal_gate is not None and not signal_gate(i, side, score, summary):
+            i += 1
+            continue
         reference_price = bars[i].close
         local_atr = max(atr(bars[: i + 1], 14), abs(reference_price) * 1e-8, 1e-9)
         entry_min, entry_max, _ = entry_price_bounds(reference_price, local_atr)
@@ -523,6 +531,7 @@ def _segment_stability(
     params: BacktestParams,
     start: int,
     end: int,
+    signal_gate: SignalGate | None = None,
 ) -> float:
     width = max(1, (end - start) // 3)
     positive = 0
@@ -539,6 +548,7 @@ def _segment_stability(
             params,
             start_index=a,
             end_index=b,
+            signal_gate=signal_gate,
         )
         if stats.trades >= 3:
             used += 1
@@ -554,6 +564,7 @@ def walk_forward_validate(
     strategy_id: str,
     *,
     snapshots: Mapping[int, HistoricalFeatureSnapshot] | None = None,
+    signal_gate: SignalGate | None = None,
 ) -> WalkForwardValidation:
     if len(bars) < 900:
         raise ValueError("Need at least 900 bars for train/test/forward validation")
@@ -575,6 +586,7 @@ def walk_forward_validate(
             params,
             start_index=260,
             end_index=train_end,
+            signal_gate=signal_gate,
         )
         candidates.append((_objective(stats), params, stats))
 
@@ -594,6 +606,7 @@ def walk_forward_validate(
         best_params,
         start_index=train_end,
         end_index=test_end,
+        signal_gate=signal_gate,
     )
     _, forward_stats = backtest_strategy(
         symbol,
@@ -604,6 +617,7 @@ def walk_forward_validate(
         best_params,
         start_index=test_end,
         end_index=n - 1,
+        signal_gate=signal_gate,
     )
 
     valid_candidates = [x for x in candidates if x[2].trades >= 8]
@@ -622,6 +636,7 @@ def walk_forward_validate(
         best_params,
         train_end,
         test_end,
+        signal_gate=signal_gate,
     )
 
     trial = StrategyTrial(
