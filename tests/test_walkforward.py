@@ -271,3 +271,47 @@ def test_windowed_materialization_matches_full_prefix_semantics():
         assert actual.timestamp == expected.timestamp
         assert actual.values == expected.values
         assert actual.observations == expected.observations
+
+
+
+def test_new_structural_research_strategies_require_hard_confirmation(monkeypatch):
+    weak = EvidenceSummary(
+        score=0.90,
+        agreement_ratio=0.90,
+        independent_confirmations=8,
+        hard_confirmations=0,
+        family_scores={},
+        family_weights_used={},
+        conflicts=(),
+        strongest_features=(),
+    )
+    strong = EvidenceSummary(
+        score=0.90,
+        agreement_ratio=0.90,
+        independent_confirmations=8,
+        hard_confirmations=1,
+        family_scores={},
+        family_weights_used={},
+        conflicts=(),
+        strongest_features=(),
+    )
+    snap = HistoricalFeatureSnapshot(
+        symbol="TEST:X",
+        timeframe="15",
+        timestamp=datetime(2026, 1, 1, tzinfo=UTC),
+        values={},
+        observations=(),
+    )
+    params = BacktestParams(
+        threshold=0.50,
+        stop_atr=LIVE_PLAN_STOP_ATR_MULTIPLE,
+        target_r=LIVE_PLAN_FINAL_TARGET_RR,
+        max_hold_bars=16,
+    )
+    monkeypatch.setattr(wf, "_strategy_score", lambda *args, **kwargs: (0.90, weak))
+    assert wf._signal("liquidity_sweep_reversal", snap, params) is None
+
+    monkeypatch.setattr(wf, "_strategy_score", lambda *args, **kwargs: (0.90, strong))
+    signal = wf._signal("liquidity_sweep_reversal", snap, params)
+    assert signal is not None
+    assert signal[0] == 1

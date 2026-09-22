@@ -1,6 +1,7 @@
 from app.indicator_catalog import family_weight_total, feature_count, feature_family
 from app.leverage import leverage_capacity
 from app.strategy_lab import (
+    STRATEGIES,
     StrategyTrial,
     candidate_strategies,
     classify_trial_status,
@@ -166,3 +167,27 @@ def test_trial_research_class_distinguishes_sample_limit_from_forward_failure():
         }
     )
     assert classify_trial_status(forward_failed) == "FORWARD_FAILED"
+
+
+
+def test_strategy_lab_v2_has_distinct_research_families():
+    ids = [spec.strategy_id for spec in STRATEGIES]
+    assert len(ids) >= 17
+    assert len(ids) == len(set(ids))
+    for required in {
+        "adx_ema_trend",
+        "donchian_structure_breakout",
+        "bollinger_mean_reversion",
+        "vwap_reversion",
+        "liquidity_sweep_reversal",
+        "failed_breakout_reversal",
+        "fvg_displacement_continuation",
+        "volume_confirmed_breakout",
+    }:
+        assert required in ids
+
+    metals_60 = {spec.strategy_id for spec in candidate_strategies("metals", "60")}
+    assert "adx_ema_trend" in metals_60
+    assert "donchian_structure_breakout" in metals_60
+    assert "bollinger_mean_reversion" in metals_60
+    assert "liquidity_sweep_reversal" in metals_60
