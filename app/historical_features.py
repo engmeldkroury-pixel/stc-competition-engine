@@ -228,7 +228,8 @@ def extract_feature_snapshot(symbol: str, timeframe: str, bars: list[Bar]) -> Hi
     uo_proxy = _clamp((stoch - 50.0) / 35.0 * 0.6 + (r14 - 50.0) / 30.0 * 0.4)
     ppo = 100.0 * _safe(ema(c, 12) - ema(c, 26), ema(c, 26))
     rs20 = [_safe(c[i], c[i - 20], 1.0) - 1.0 for i in range(20, len(c))]
-    rs_rank = _rank(rs20[-252:], rs20[-1])
+    rs_mag_rank = _rank([abs(x) for x in rs20[-252:]], abs(rs20[-1]))
+    rs_rank_directional = _sign(rs20[-1]) * (0.5 + 0.5 * rs_mag_rank)
 
     rng = max(last.high - last.low, 1e-9)
     tr = max(last.high - last.low, abs(last.high - prev.close), abs(last.low - prev.close))
@@ -356,7 +357,7 @@ def extract_feature_snapshot(symbol: str, timeframe: str, bars: list[Bar]) -> Hi
         "tsi": tsi_proxy,
         "ultimate_oscillator": uo_proxy,
         "ppo": _clamp(ppo / 2.5),
-        "relative_strength_rank": _clamp((rs_rank - 0.5) * 2.0),
+        "relative_strength_rank": _clamp(rs_rank_directional),
         "atr": trend * vol_quality,
         "normalized_atr": trend * vol_quality,
         "bollinger_width": trend * vol_quality,
