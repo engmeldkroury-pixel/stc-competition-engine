@@ -78,3 +78,57 @@ def test_archive_merge_rejects_invalid_ohlc_envelope():
     incoming = _payload(bars=[_bar(100, o=100, h=99, l=98, c=101)])
     with pytest.raises(ValueError, match="Invalid OHLC envelope"):
         merge_ohlcv_payloads(None, incoming)
+
+
+def _mutable_notice():
+    return (
+        "Market data notice: bars are delayed 15+ minutes depending on the exchange — "
+        "the last bar is not a live price and may still change."
+    )
+
+
+def test_archive_withholds_provider_tail_when_notice_marks_last_bar_mutable():
+    incoming = _payload(bars=[_bar(100), _bar(200), _bar(300)])
+    incoming["notice"] = _mutable_notice()
+
+    merged, report = merge_ohlcv_payloads(None, incoming)
+
+    assert [row["t"] for row in merged["bars"]] == [100, 200]
+    assert report.withheld_unconfirmed_bars == 1
+    assert report.removed_existing_unconfirmed_bars == 0
+    assert report.latest_input_t == 300
+    assert report.confirmed_through_t == 200
+    assert merged["archive"]["withheld_unconfirmed_t"] == 300
+    assert merged["archive"]["coverage_last_t"] == 200
+
+
+def test_archive_removes_existing_copy_of_same_mutable_tail():
+    existing = _payload(bars=[_bar(100), _bar(200), _bar(300)])
+    incoming = _payload(bars=[_bar(100), _bar(200), _bar(300, c=101.5, v=20)])
+    incoming["notice"] = _mutable_notice()
+
+    merged, report = merge_ohlcv_payloads(existing, incoming)
+
+    assert [row["t"] for row in merged["bars"]] == [100, 200]
+    assert report.withheld_unconfirmed_bars == 1
+    assert report.removed_existing_unconfirmed_bars == 1
+    assert report.replaced_bars == 0
+
+
+def test_previous_tail_becomes_confirmed_when_new_tail_arrives():
+    first = _payload(bars=[_bar(100), _bar(200), _bar(300)])
+    first["notice"] = _mutable_notice()
+    archive, first_report = merge_ohlcv_payloads(None, first)
+    assert first_report.confirmed_through_t == 200
+
+    second = _payload(bars=[_bar(100), _bar(200), _bar(300, c=101.5), _bar(400)])
+    second["notice"] = _mutable_notice()
+    refreshed, report = merge_ohlcv_payloads(archive, second)
+
+    assert [row["t"] for row in refreshed["bars"]] == [100, 200, 300]
+    assert refreshed["bars"][-1]["c"] == 101.5
+    assert report.added_bars == 1
+    assert report.withheld_unconfirmed_bars == 1
+    assert report.latest_input_t == 400
+    assert report.confirmed_through_t == 300
+    assert refreshed["archive"]["withheld_unconfirmed_t"] == 400
