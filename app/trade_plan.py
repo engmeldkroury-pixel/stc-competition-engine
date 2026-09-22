@@ -5,6 +5,11 @@ import math
 from typing import Any
 
 
+LIVE_PLAN_STOP_ATR_MULTIPLE = 1.20
+LIVE_PLAN_TARGET1_RR = 1.50
+LIVE_PLAN_FINAL_TARGET_RR = 2.50
+
+
 def _finite_number(value: Any, *, minimum: float | None = None) -> float:
     if isinstance(value, bool) or not isinstance(value, (int, float)):
         raise ValueError("invalid_numeric_trade_plan_input")
@@ -28,9 +33,9 @@ def build_locked_trade_plan(
     envelope: dict[str, Any],
     *,
     rule_version: str = "stc-plan-v1",
-    stop_atr_multiple: float = 1.20,
-    target1_rr: float = 1.50,
-    target2_rr: float = 2.50,
+    stop_atr_multiple: float = LIVE_PLAN_STOP_ATR_MULTIPLE,
+    target1_rr: float = LIVE_PLAN_TARGET1_RR,
+    target2_rr: float = LIVE_PLAN_FINAL_TARGET_RR,
 ) -> dict[str, Any] | None:
     """Build a frozen candidate plan from one analyzed signal.
 

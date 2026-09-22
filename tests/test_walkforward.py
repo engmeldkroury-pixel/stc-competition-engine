@@ -8,6 +8,7 @@ from app.evidence_engine import EvidenceSummary
 from app.historical_features import HistoricalFeatureSnapshot, extract_feature_snapshot
 from app.models import Bar
 from app.walkforward import BacktestParams, backtest_strategy, parameter_grid, walk_forward_validate
+from app.trade_plan import LIVE_PLAN_FINAL_TARGET_RR, LIVE_PLAN_STOP_ATR_MULTIPLE
 
 
 UTC = timezone.utc
@@ -103,10 +104,11 @@ def test_backtest_enters_next_bar_and_treats_ambiguous_bar_conservatively(monkey
     assert stats.losses == 1
 
 
-def test_parameter_grid_is_bounded_and_contains_no_zero_risk_configs():
+def test_parameter_grid_matches_live_single_tp_execution_contract():
     grid = parameter_grid("15")
-    assert 10 <= len(grid) <= 30
-    assert all(p.stop_atr > 0 and p.target_r > 0 for p in grid)
+    assert len(grid) == 3
+    assert all(p.stop_atr == LIVE_PLAN_STOP_ATR_MULTIPLE for p in grid)
+    assert all(p.target_r == LIVE_PLAN_FINAL_TARGET_RR for p in grid)
     assert all(0.4 <= p.threshold <= 0.8 for p in grid)
 
 
