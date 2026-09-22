@@ -21,7 +21,7 @@ def _series(count: int, step_seconds: int) -> dict:
 def test_research_runner_builds_quality_checked_standard_bundle(monkeypatch):
     captured = {}
 
-    def fake_matrix(symbol, asset_class, bundle):
+    def fake_matrix(symbol, asset_class, bundle, **kwargs):
         captured["symbol"] = symbol
         captured["asset_class"] = asset_class
         captured["keys"] = set(bundle)
@@ -86,7 +86,7 @@ def test_strategy_feature_scope_is_family_specific():
 def test_research_runner_adds_optional_5m_and_30m_to_matrix(monkeypatch):
     captured = {}
 
-    def fake_matrix(symbol, asset_class, bundle):
+    def fake_matrix(symbol, asset_class, bundle, **kwargs):
         captured["keys"] = set(bundle)
         return [], MatrixSelection(
             status="NO_VALIDATED_STRATEGY",
@@ -114,3 +114,33 @@ def test_research_runner_adds_optional_5m_and_30m_to_matrix(monkeypatch):
     assert {"5", "30"}.issubset(captured["keys"])
     assert result["data_quality"]["5m"]["quality_ok"] is True
     assert result["data_quality"]["30m"]["quality_ok"] is True
+
+
+
+def test_research_runner_passes_snapshot_cache_to_strategy_matrix(monkeypatch):
+    captured = {}
+
+    def fake_matrix(symbol, asset_class, bundle, **kwargs):
+        captured["cache"] = kwargs.get("snapshot_cache")
+        return [], MatrixSelection(
+            status="NO_VALIDATED_STRATEGY",
+            symbol=symbol,
+            strategy_id=None,
+            timeframe=None,
+            robust_score=None,
+            trial_count=0,
+            reason="fixture",
+        )
+
+    monkeypatch.setattr(rr, "strategy_matrix", fake_matrix)
+    payload = {
+        "symbol": "CAPITALCOM:XAUUSD",
+        "series": {
+            "15m": _series(901, 900),
+            "1h": _series(901, 3600),
+            "4h": _series(901, 14400),
+            "1D": _series(901, 86400),
+        },
+    }
+    rr.run_symbol_research(payload, calibrate_features=False)
+    assert isinstance(captured["cache"], dict)

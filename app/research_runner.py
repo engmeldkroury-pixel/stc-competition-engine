@@ -59,6 +59,7 @@ def _calibrate_selection_features(
     symbol: str,
     selection: MatrixSelection,
     bundle: dict[str, list],
+    snapshot_cache: dict[str, dict] | None = None,
 ) -> list[FeatureValidation]:
     if (
         selection.status != "VALIDATED"
@@ -69,7 +70,11 @@ def _calibrate_selection_features(
     bars = bundle.get(selection.timeframe) or []
     if len(bars) < 900:
         return []
-    snapshots = materialize_feature_series(symbol, selection.timeframe, bars)
+    cache = snapshot_cache if snapshot_cache is not None else {}
+    snapshots = cache.get(selection.timeframe)
+    if snapshots is None:
+        snapshots = materialize_feature_series(symbol, selection.timeframe, bars)
+        cache[selection.timeframe] = snapshots
     n = len(bars)
     train_end = max(520, int(n * 0.58))
     test_end = max(train_end + 120, int(n * 0.82))
@@ -140,7 +145,13 @@ def run_symbol_research(
         bars_30m=raw_bars.get("30"),
     )
     asset_class = strategy_asset_class(symbol)
-    validations, selection = strategy_matrix(symbol, asset_class, bundle)
+    snapshot_cache: dict[str, dict] = {}
+    validations, selection = strategy_matrix(
+        symbol,
+        asset_class,
+        bundle,
+        snapshot_cache=snapshot_cache,
+    )
     timeframe_selections = matrix_selections_by_timeframe(symbol, validations)
     live_entry_selection = timeframe_selections.get(
         "15",
@@ -162,6 +173,7 @@ def run_symbol_research(
             symbol=symbol,
             selection=selection,
             bundle=bundle,
+            snapshot_cache=snapshot_cache,
         )
         if (
             live_entry_selection.status == "VALIDATED"
@@ -174,6 +186,7 @@ def run_symbol_research(
                 symbol=symbol,
                 selection=live_entry_selection,
                 bundle=bundle,
+                snapshot_cache=snapshot_cache,
             )
         else:
             live_entry_feature_validations = list(feature_validations)
