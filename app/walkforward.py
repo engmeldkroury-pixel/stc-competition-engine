@@ -10,6 +10,7 @@ from .approval import entry_price_bounds, timeframe_duration_minutes, timeframe_
 from .evidence_engine import EvidenceSummary, aggregate_evidence
 from .historical_features import HistoricalFeatureSnapshot, extract_feature_snapshot
 from .models import Bar
+from .research_costs import estimate_research_cost_r
 from .strategy_lab import StrategyTrial, candidate_strategies, robust_trial_score
 from .trade_plan import (
     LIVE_PLAN_FINAL_TARGET_RR,
@@ -27,7 +28,7 @@ class BacktestParams:
     min_agreement: float = 0.62
     min_independent_confirmations: int = 4
     min_hard_confirmations: int = 1
-    round_turn_cost_r: float = 0.02
+    round_turn_cost_r: float = 0.0
 
 
 @dataclass(frozen=True)
@@ -45,6 +46,7 @@ class TradeOutcome:
     exit_price: float
     initial_stop: float
     target: float
+    estimated_cost_r: float
     result_r: float
     exit_reason: str
     evidence_score: float
@@ -317,7 +319,14 @@ def backtest_strategy(
                 break
 
         gross_r = side * (exit_price - entry) / risk
-        result_r = gross_r - params.round_turn_cost_r
+        estimated_cost = estimate_research_cost_r(
+            symbol,
+            reference_price=reference_price,
+            atr=local_atr,
+            planned_risk_per_unit=risk,
+        )
+        total_cost_r = estimated_cost.total_r + params.round_turn_cost_r
+        result_r = gross_r - total_cost_r
         trades.append(
             TradeOutcome(
                 strategy_id=strategy_id,
@@ -333,6 +342,7 @@ def backtest_strategy(
                 exit_price=exit_price,
                 initial_stop=stop,
                 target=target,
+                estimated_cost_r=total_cost_r,
                 result_r=result_r,
                 exit_reason=reason,
                 evidence_score=score,
