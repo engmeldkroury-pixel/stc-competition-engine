@@ -7,6 +7,7 @@ from .asset_classification import strategy_asset_class
 from .feature_validation import FeatureValidation, atr_series_by_index, validate_feature_weight
 from .indicator_catalog import FEATURE_FAMILIES
 from .research_dataset import (
+    bars_fingerprint,
     bars_from_tradingview_ohlcv,
     data_quality_report,
     research_timeframe_bundle,
@@ -208,8 +209,14 @@ def run_symbol_research(
         "schema_version": "stc-research-v1",
         "symbol": symbol,
         "asset_class": asset_class,
+        "strategy_catalog_count": len(STRATEGIES),
+        "strategy_catalog_ids": [spec.strategy_id for spec in STRATEGIES],
         "data_quality": {
             key: asdict(value) for key, value in quality.items()
+        },
+        "source_fingerprints": {
+            source_key: bars_fingerprint(raw_bars[normalized_key])
+            for source_key, normalized_key in requested_series.items()
         },
         "derived_timeframes": {
             key: len(value) for key, value in bundle.items()

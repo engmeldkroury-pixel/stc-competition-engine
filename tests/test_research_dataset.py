@@ -3,6 +3,7 @@ from datetime import datetime, timedelta, timezone
 
 from app.models import Bar
 from app.research_dataset import (
+    bars_fingerprint,
     bars_from_tradingview_ohlcv,
     data_quality_report,
     drop_latest_unconfirmed_bar,
@@ -180,3 +181,28 @@ def test_optional_native_5m_and_30m_are_added_without_resampling():
     assert len(bundle["30"]) == 9
     assert bundle["5"][0].timestamp == base
     assert bundle["30"][1].timestamp == base + timedelta(minutes=30)
+
+
+
+def test_ohlcv_fingerprint_is_stable_and_data_sensitive():
+    base = datetime(2026, 1, 1, tzinfo=UTC)
+    bars = [
+        Bar(
+            timestamp=base + timedelta(minutes=15 * i),
+            open=100 + i,
+            high=101 + i,
+            low=99 + i,
+            close=100.5 + i,
+            volume=1000 + i,
+        )
+        for i in range(10)
+    ]
+    a = bars_fingerprint(bars)
+    b = bars_fingerprint(list(bars))
+    changed = list(bars)
+    changed[-1] = changed[-1].model_copy(update={"close": changed[-1].close + 0.01})
+    c = bars_fingerprint(changed)
+
+    assert a == b
+    assert a != c
+    assert len(a) == 64

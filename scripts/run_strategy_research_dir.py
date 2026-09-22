@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 from pathlib import Path
 import sys
 
@@ -83,6 +84,8 @@ def main() -> int:
         calibrate_features=calibrate_features,
     )
     result["research_mode"] = payload.get("research_mode", "full")
+    result["research_engine_git_sha"] = os.getenv("GITHUB_SHA")
+    result["research_engine_ref"] = os.getenv("GITHUB_REF_NAME")
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(
         json.dumps(result, indent=2, default=str, sort_keys=True) + "\n",

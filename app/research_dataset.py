@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from hashlib import sha256
 from datetime import datetime, timezone
 from statistics import median
 from typing import Any
@@ -26,6 +27,20 @@ class DataQualityReport:
     zero_volume_fraction: float
     quality_ok: bool
     notes: tuple[str, ...]
+
+
+def bars_fingerprint(bars: list[Bar]) -> str:
+    """Return a deterministic SHA-256 fingerprint for an exact OHLCV series."""
+    digest = sha256()
+    for bar in bars:
+        ts = int(bar.timestamp.timestamp())
+        digest.update(
+            (
+                f"{ts}|{bar.open:.12g}|{bar.high:.12g}|{bar.low:.12g}|"
+                f"{bar.close:.12g}|{bar.volume:.12g}\n"
+            ).encode("utf-8")
+        )
+    return digest.hexdigest()
 
 
 def bars_from_tradingview_ohlcv(payload: dict[str, Any]) -> list[Bar]:
