@@ -53,6 +53,8 @@ class MTFValidationResult:
     robust_score: float
     test_retention: float
     forward_retention: float
+    test_trades_per_30d: float
+    forward_trades_per_30d: float
 
 
 POLICIES: tuple[MTFPolicy, ...] = (
@@ -282,6 +284,21 @@ def make_mtf_signal_gate(
     return gate
 
 
+def _trade_rate_per_30d(
+    trades: int,
+    bars: list[Bar],
+    *,
+    start_index: int,
+    end_index: int,
+) -> float:
+    if trades <= 0 or end_index <= start_index or not bars:
+        return 0.0
+    start = bars[max(0, min(start_index, len(bars) - 1))].timestamp
+    end = bars[max(0, min(end_index - 1, len(bars) - 1))].timestamp
+    span_days = max((end - start).total_seconds() / 86400.0, 1.0 / 24.0)
+    return trades * 30.0 / span_days
+
+
 def validate_mtf_policies(
     *,
     symbol: str,
@@ -304,6 +321,11 @@ def validate_mtf_policies(
         strategy_id,
         snapshots=snapshots,
     )
+
+    n = len(entry_bars)
+    train_end = max(520, int(n * 0.58))
+    test_end = max(train_end + 120, int(n * 0.82))
+    test_end = min(test_end, n - 80)
 
     results: list[MTFValidationResult] = []
     for policy in policies:
@@ -336,6 +358,18 @@ def validate_mtf_policies(
                 robust_score=robust_trial_score(validation.trial),
                 test_retention=test_retention,
                 forward_retention=forward_retention,
+                test_trades_per_30d=_trade_rate_per_30d(
+                    validation.test_stats.trades,
+                    entry_bars,
+                    start_index=train_end,
+                    end_index=test_end,
+                ),
+                forward_trades_per_30d=_trade_rate_per_30d(
+                    validation.forward_stats.trades,
+                    entry_bars,
+                    start_index=test_end,
+                    end_index=n - 1,
+                ),
             )
         )
     return tuple(results)
