@@ -87,6 +87,14 @@ jobs:
               }, sort_keys=True))
           PY
 
+      - name: Print calibration candidates
+        shell: bash
+        run: |
+          set -euo pipefail
+          for path in research_outputs/*.json; do
+            python scripts/print_calibration_candidate.py "$path"
+          done
+
       - name: Upload research outputs
         uses: actions/upload-artifact@v4
         with:
