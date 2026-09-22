@@ -192,6 +192,8 @@ def candidate_record_from_research_result(
         if float(v) > 0
     }
     family_weights = _family_weights_from_features(feature_weights)
+    if not feature_weights or not family_weights:
+        raise ValueError("Validated feature participation is required for runtime calibration")
     forward_expectancy = report.get("forward_expectancy_r")
     forward_pf = report.get("forward_profit_factor")
     if forward_expectancy is None or float(forward_expectancy) <= 0:
