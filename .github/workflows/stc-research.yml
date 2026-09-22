@@ -123,6 +123,47 @@ jobs:
                       "forward_profit_factor": forward.get("profit_factor"),
                       "max_drawdown_r": trial.get("max_drawdown_r"),
                   }, sort_keys=True))
+
+              all_trials = data.get("strategy_trials") or []
+              timeframe_keys = sorted(
+                  {str((row.get("trial") or {}).get("timeframe")) for row in all_trials},
+                  key=lambda x: (x == "1D", int(x) if x.isdigit() else 999999),
+              )
+              for timeframe in timeframe_keys:
+                  rows = [
+                      row for row in all_trials
+                      if str((row.get("trial") or {}).get("timeframe")) == timeframe
+                  ]
+                  if not rows:
+                      continue
+                  best = max(
+                      rows,
+                      key=lambda row: (
+                          float(row.get("robust_score") or 0.0),
+                          float((row.get("test") or {}).get("expectancy_r") or -999.0),
+                          float((row.get("forward") or {}).get("expectancy_r") or -999.0),
+                      ),
+                  )
+                  trial = best.get("trial") or {}
+                  test = best.get("test") or {}
+                  forward = best.get("forward") or {}
+                  print("STC_TIMEFRAME_DIAGNOSTIC=" + json.dumps({
+                      "symbol": data["symbol"],
+                      "timeframe": timeframe,
+                      "coverage_days": (data.get("derived_timeframe_span_days") or {}).get(timeframe),
+                      "bars": (data.get("derived_timeframes") or {}).get(timeframe),
+                      "selection_status": (data.get("timeframe_selections") or {}).get(timeframe, {}).get("status"),
+                      "selected_strategy": (data.get("timeframe_selections") or {}).get(timeframe, {}).get("strategy_id"),
+                      "best_candidate_strategy": trial.get("strategy_id"),
+                      "robust_score": best.get("robust_score"),
+                      "rejection_reasons": best.get("rejection_reasons"),
+                      "test_trades": test.get("trades"),
+                      "test_expectancy_r": test.get("expectancy_r"),
+                      "test_profit_factor": test.get("profit_factor"),
+                      "forward_trades": forward.get("trades"),
+                      "forward_expectancy_r": forward.get("expectancy_r"),
+                      "forward_profit_factor": forward.get("profit_factor"),
+                  }, sort_keys=True))
           PY
 
       - name: Print calibration candidates
