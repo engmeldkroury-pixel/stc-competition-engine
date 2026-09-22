@@ -320,3 +320,44 @@ def test_three_strongly_conflicting_evidence_families_block_a_plus_plan():
     assert signal["live_family_evidence"]["conflicting_families"] >= 3
     assert "gate_block=family_conflicts" in signal["reasons"]
     assert result["decision"]["locked_trade_plan"] is None
+
+
+
+def test_runtime_calibration_reweights_live_family_evidence(monkeypatch):
+    from datetime import datetime, timezone
+
+    import app.event_decision as event_decision
+    from app.calibration_registry import RuntimeCalibration
+
+    calibration = RuntimeCalibration(
+        symbol="CAPITALCOM:XAUUSD",
+        strategy_id="smc_structure_liquidity",
+        timeframe="60",
+        generated_at_utc=datetime(2026, 9, 21, 17, 0, tzinfo=timezone.utc),
+        data_end_utc=datetime(2026, 9, 21, 17, 0, tzinfo=timezone.utc),
+        robust_score=70.0,
+        sample_size=80,
+        estimated_probability=0.70,
+        confidence_low=0.60,
+        confidence_high=0.78,
+        test_expectancy_r=0.30,
+        forward_expectancy_r=0.20,
+        test_profit_factor=1.50,
+        forward_profit_factor=1.30,
+        feature_weights={"liquidity_sweep": 0.35, "choch": 0.35, "relative_volume": 0.30},
+        family_weights={"smc_liquidity": 0.35, "market_structure": 0.35, "volume": 0.30},
+        informational_only=True,
+    )
+    monkeypatch.setattr(
+        event_decision,
+        "lookup_runtime_calibration",
+        lambda *args, **kwargs: (calibration, ()),
+    )
+
+    payload = _strong_directional_payload("evt-calibrated-families")
+    result = event_decision.decide_bridge_event("evt-calibrated-families", payload)
+    evidence = result["decision"]["signal"]["live_family_evidence"]
+    assert evidence["calibration_applied"] is True
+    assert evidence["strategy_id"] == "smc_structure_liquidity"
+    assert evidence["family_weights_used"]["smc_liquidity"] > 0
+    assert result["decision"]["signal"]["research_calibration"]["status"] == "AVAILABLE_INFORMATIONAL"
