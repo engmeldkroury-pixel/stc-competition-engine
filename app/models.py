@@ -147,6 +147,17 @@ class TradingViewWebhook(BaseModel):
     macd: float
     macd_signal: float
     volume_ratio: float = 1.0
+    confirm_timeframe: str | None = None
+    confirm_time: datetime | None = None
+    confirm_close: float | None = None
+    confirm_ema20: float | None = None
+    confirm_ema50: float | None = None
+    confirm_ema200: float | None = None
+    confirm_rsi14: float | None = None
+    confirm_atr14: float | None = None
+    confirm_macd: float | None = None
+    confirm_macd_signal: float | None = None
+    confirm_volume_ratio: float | None = None
     history_timeframe: str | None = None
     history_time: datetime | None = None
     history_close: float | None = None
@@ -161,6 +172,34 @@ class TradingViewWebhook(BaseModel):
     history_momentum_126: float | None = None
     history_momentum_252: float | None = None
     history_volatility_20: float | None = None
+
+    @model_validator(mode="after")
+    def validate_confirmation_context(self):
+        names = (
+            "confirm_timeframe",
+            "confirm_time",
+            "confirm_close",
+            "confirm_ema20",
+            "confirm_ema50",
+            "confirm_ema200",
+            "confirm_rsi14",
+            "confirm_atr14",
+            "confirm_macd",
+            "confirm_macd_signal",
+            "confirm_volume_ratio",
+        )
+        values = [getattr(self, name) for name in names]
+        present = [value is not None for value in values]
+        if any(present) and not all(present):
+            raise ValueError("confirmation context must be complete or absent")
+        if all(present):
+            if str(self.confirm_timeframe).lower() not in {"60", "1h"}:
+                raise ValueError("confirmation context timeframe must be 60/1h")
+            if not 0 <= self.confirm_rsi14 <= 100:
+                raise ValueError("confirm_rsi14 must be between 0 and 100")
+            if self.confirm_atr14 < 0 or self.confirm_volume_ratio < 0:
+                raise ValueError("confirmation quality values must be non-negative")
+        return self
 
     @model_validator(mode="after")
     def validate_history_context(self):
