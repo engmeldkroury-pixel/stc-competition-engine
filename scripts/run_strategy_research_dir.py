@@ -54,7 +54,10 @@ def load_series_dir(path: Path) -> dict:
             raise ValueError(f"{source} must contain TradingView OHLCV bars")
         series[key] = payload
 
-    return {"symbol": symbol, "series": series}
+    research_mode = str(meta.get("research_mode") or "full").strip().lower()
+    if research_mode not in {"full", "matrix_only"}:
+        raise ValueError("meta.json research_mode must be full or matrix_only")
+    return {"symbol": symbol, "series": series, "research_mode": research_mode}
 
 
 def main() -> int:
@@ -71,10 +74,15 @@ def main() -> int:
     args = parser.parse_args()
 
     payload = load_series_dir(args.input_dir)
+    calibrate_features = (
+        not args.skip_feature_calibration
+        and payload.get("research_mode") != "matrix_only"
+    )
     result = run_symbol_research(
         payload,
-        calibrate_features=not args.skip_feature_calibration,
+        calibrate_features=calibrate_features,
     )
+    result["research_mode"] = payload.get("research_mode", "full")
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(
         json.dumps(result, indent=2, default=str, sort_keys=True) + "\n",
@@ -101,6 +109,7 @@ def main() -> int:
         "probability_sample_size": probability.get("sample_size"),
         "deployable_feature_count": report.get("deployable_feature_count"),
         "blocked_feature_count": report.get("blocked_feature_count"),
+        "research_mode": result.get("research_mode", "full"),
     }
     print("STC_RESEARCH_SUMMARY=" + json.dumps(summary, sort_keys=True))
     print(f"Wrote {args.output}")

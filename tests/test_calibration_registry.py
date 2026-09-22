@@ -166,3 +166,16 @@ def test_runtime_lookup_filters_by_exact_timeframe(tmp_path):
     )
     assert missing is None
     assert reasons == ("no_calibrated_research_record_for_timeframe",)
+
+
+
+def test_runtime_candidate_requires_validated_feature_participation():
+    now = datetime(2026, 9, 22, tzinfo=UTC)
+    result = _research_result()
+    result["research_report"]["feature_participation_pct"] = {}
+    with pytest.raises(ValueError, match="Validated feature participation"):
+        candidate_record_from_research_result(
+            result,
+            data_end_utc=now,
+            generated_at_utc=now,
+        )
