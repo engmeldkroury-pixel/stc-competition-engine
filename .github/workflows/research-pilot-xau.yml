@@ -1,0 +1,52 @@
+name: STC Research Pilot XAU
+on:
+  push:
+    branches:
+      - research/pilot-xau-20260922
+    paths:
+      - research_data/RUN_XAU
+
+permissions:
+  contents: read
+
+jobs:
+  research:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+      - name: Run XAUUSD research
+        run: |
+          python scripts/run_strategy_research.py research_data/CAPITALCOM_XAUUSD.json --output /tmp/xau_result.json
+      - name: Print compact research summary
+        run: |
+          python - <<'PY'
+          import json
+          r=json.load(open("/tmp/xau_result.json"))
+          report=r["research_report"]
+          fv=r.get("feature_validations",[])
+          compact={
+            "symbol":r["symbol"],
+            "asset_class":r["asset_class"],
+            "data_quality":{k:{"bars":v["bars"],"quality_ok":v["quality_ok"],"notes":v["notes"]} for k,v in r["data_quality"].items()},
+            "derived_timeframes":r["derived_timeframes"],
+            "matrix_selection":r["matrix_selection"],
+            "research_report":report,
+            "deployable_features":[
+              {"feature":x["feature"],"calibrated_reliability":x["calibration"]["calibrated_reliability"],"reason":x["reason"]}
+              for x in fv if x["deployable"]
+            ],
+            "blocked_feature_count":sum(1 for x in fv if not x["deployable"]),
+          }
+          print("STC_RESEARCH_SUMMARY="+json.dumps(compact,separators=(",",":"),default=str))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: xau-research-result
+          path: /tmp/xau_result.json
+          retention-days: 7
