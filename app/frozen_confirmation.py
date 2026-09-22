@@ -57,6 +57,7 @@ class FrozenConfirmationResult:
     completed_trades: int
     incomplete_open_trades: int
     segment_stability: float
+    segments_evaluated: int
     stats: BacktestStats
     status: str
     rejection_reasons: tuple[str, ...]
@@ -82,6 +83,9 @@ def hypothesis_from_dict(raw: dict[str, Any]) -> FrozenHypothesis:
     missing = [key for key in required if key not in raw]
     if missing:
         raise ValueError(f"Frozen hypothesis missing fields: {missing}")
+
+    if raw.get("live_calibration_authority") not in (None, False):
+        raise ValueError("Frozen hypotheses cannot grant live calibration authority")
 
     params_raw = raw.get("params")
     if not isinstance(params_raw, dict):
@@ -156,9 +160,9 @@ def _segment_stability(
     *,
     start_index: int,
     end_index: int,
-) -> float:
+) -> tuple[float, int]:
     if end_index <= start_index:
-        return 0.0
+        return 0.0, 0
     width = max(1, (end_index - start_index + 1) // 3)
     positive = 0
     used = 0
@@ -172,13 +176,14 @@ def _segment_stability(
         stats = summarize_trades(segment)
         if stats.expectancy_r >= 0 and stats.profit_factor >= 1.0:
             positive += 1
-    return 0.0 if used == 0 else positive / used
+    return (0.0 if used == 0 else positive / used), used
 
 
 def _confirmation_reasons(
     stats: BacktestStats,
     *,
     segment_stability: float,
+    segments_evaluated: int,
 ) -> tuple[str, ...]:
     reasons: list[str] = []
     if stats.trades < 30:
@@ -189,6 +194,8 @@ def _confirmation_reasons(
         reasons.append("weak_unseen_profit_factor")
     if stats.max_drawdown_r > 10.0:
         reasons.append("unseen_drawdown_too_large")
+    if segments_evaluated < 2:
+        reasons.append("insufficient_unseen_segment_coverage")
     if segment_stability < 0.60:
         reasons.append("unseen_segment_instability")
     return tuple(reasons)
@@ -258,6 +265,7 @@ def evaluate_frozen_hypothesis(
             completed_trades=0,
             incomplete_open_trades=0,
             segment_stability=0.0,
+            segments_evaluated=0,
             stats=empty,
             status="NO_UNSEEN_DATA",
             rejection_reasons=("no_unseen_data",),
@@ -291,12 +299,16 @@ def evaluate_frozen_hypothesis(
     )
     completed, incomplete = _completed_trades(trades, hypothesis.params)
     stats = summarize_trades(completed)
-    stability = _segment_stability(
+    stability, segments_evaluated = _segment_stability(
         completed,
         start_index=start_index,
         end_index=len(bars) - 1,
     )
-    reasons = _confirmation_reasons(stats, segment_stability=stability)
+    reasons = _confirmation_reasons(
+        stats,
+        segment_stability=stability,
+        segments_evaluated=segments_evaluated,
+    )
 
     if stats.trades < 30:
         status = "ACCUMULATING"
@@ -318,6 +330,7 @@ def evaluate_frozen_hypothesis(
         completed_trades=stats.trades,
         incomplete_open_trades=incomplete,
         segment_stability=stability,
+        segments_evaluated=segments_evaluated,
         stats=stats,
         status=status,
         rejection_reasons=reasons,
