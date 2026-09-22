@@ -85,3 +85,21 @@ def test_liquidity_quality_boosts_or_dampens_without_directional_bias():
 def test_missing_volume_keeps_liquidity_quality_neutral():
     tv = _tv(volume=0, volume_ratio=0)
     assert liquidity_quality_from_tradingview(tv, 1.0) == 0.0
+
+def test_news_and_macro_are_context_not_primary_direction_drivers():
+    r = evaluate(
+        SignalEvaluationRequest(
+            competition_id="capital-africa-sep-2026",
+            symbol="CAPITALCOM:XAUUSD",
+            factors=FactorScores(
+                technical=-0.8,
+                news=1.0,
+                macro=1.0,
+                volatility_quality=-0.4,
+                liquidity_quality=-0.4,
+            ),
+        )
+    )
+    assert r.recommendation == "SHORT"
+    assert r.composite_score < 0
+
