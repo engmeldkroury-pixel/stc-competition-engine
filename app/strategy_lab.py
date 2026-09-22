@@ -154,6 +154,26 @@ def trial_rejection_reasons(trial: StrategyTrial) -> tuple[str, ...]:
     return tuple(_trial_reasons(trial))
 
 
+def classify_trial_status(trial: StrategyTrial) -> str:
+    """Explain *why* a trial is not deployable without weakening any gate."""
+    reasons = set(_trial_reasons(trial))
+    if not reasons:
+        return "VALIDATED"
+    if "negative_forward_expectancy" in reasons or "weak_forward_profit_factor" in reasons:
+        return "FORWARD_FAILED"
+    if "drawdown_too_large" in reasons:
+        return "RISK_FAILED"
+    if "weak_out_of_sample_expectancy" in reasons or "weak_out_of_sample_profit_factor" in reasons:
+        return "WEAK_EDGE"
+    if "parameter_instability" in reasons or "regime_instability" in reasons:
+        return "UNSTABLE"
+    if "train_test_degradation" in reasons:
+        return "OVERFIT_RISK"
+    if reasons == {"insufficient_out_of_sample_trades"}:
+        return "SAMPLE_LIMITED"
+    return "REJECTED"
+
+
 def robust_trial_score(trial: StrategyTrial) -> float:
     """Score robustness, not headline backtest return."""
     reasons = _trial_reasons(trial)
