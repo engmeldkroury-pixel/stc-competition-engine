@@ -1841,3 +1841,27 @@ Owner intervention required now: YES — only for historical-data access, not fo
 - Research execution branch created: research/community-frozen-15m-20260924.
 - It reuses the 26 exact-provider 5,000-bar 15m datasets from the completed native-community benchmark and includes the merged frozen-confirmation code.
 - GitHub Actions frozen-confirmation run id 35919916518 started for all 26 symbols.
+
+
+## Final unseen 15m confirmation completed — 2026-09-24 00:10 EEST
+- WU-109 workflow run 35919916518 completed successfully.
+- 26/26 symbol confirmation jobs succeeded and combined artifact was produced.
+- Exact split for every symbol: 4,250 development bars + 750 untouched final holdout bars.
+- Frozen survivors existed on 5/26 symbols, totaling 6 component-symbol candidates:
+  - CAPITALCOM:USDZAR — SuperTrend.
+  - CAPITALCOM:XAUUSD — Range Filter.
+  - CBOT:ZB1! — Range Filter.
+  - CME_MINI:MJY1! — AlphaTrend.
+  - CME_MINI:MJY1! — Waddah Attar Explosion.
+  - NYMEX:MCL1! — SSL Hybrid.
+- Component pass counts:
+  - Range Filter 2;
+  - SuperTrend 1;
+  - AlphaTrend 1;
+  - Waddah Attar Explosion 1;
+  - SSL Hybrid 1.
+- 21/26 symbols had no final frozen survivor.
+- Durable evidence archived:
+  - research_benchmarks/community_frozen_15m_run1_summary_20260924.json
+  - docs/COMMUNITY_FROZEN_15M_RUN1_20260924.md
+- live_authority remains false. No live A+ gate, risk rule, competition rule, or execution behavior changed.
