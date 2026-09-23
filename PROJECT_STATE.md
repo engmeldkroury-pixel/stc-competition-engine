@@ -1803,3 +1803,14 @@ Owner intervention required now: YES — only for historical-data access, not fo
 - Native-vs-community exact-data benchmark is now the active work unit on branch research/native-community-15m-20260923.
 - General Lab controlling requirement is explicit: every newly added Lab symbol must automatically run the same asset classification -> native matrix -> community matrix -> OOS/forward comparison -> symbol/timeframe weight profile process. It inherits process, never weights.
 - Weight-learning rule is explicit: every live outcome may be stored, but recalibration is batch/window based and frozen; never change weight after one isolated trade.
+
+
+## Adaptive research progress update — 2026-09-23 23:35 EEST
+- PR #103 merged: General Lab research routing endpoints, discovery wave 2, AlphaTrend + OTT causal adapters, redundancy-aware family weighting.
+- PR #104 merged: first 26-symbol exact-provider 15m community benchmark evidence archived in main.
+- PR #105 merged: QQE MOD, SSL Hybrid baseline adapter, Waddah Attar Explosion, and QQE+SSL+WAE composite research adapters.
+- PR #105 CI: 359 passed, 1 warning.
+- Implemented community research pool is now 14 components before native strategy comparison.
+- Controlling native-vs-community benchmark is GitHub Actions run #5 on branch research/native-community-15m-20260923; older benchmark runs are superseded/cancelled.
+- General Lab rule is now both documented and exposed through API: new Lab symbols use the same research process and never inherit weights from another symbol.
+- Live competition authority remains unchanged: human approval/manual execution only; community_indicator_live_authority=false.
