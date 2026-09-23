@@ -638,6 +638,320 @@ def optimized_trend_tracker_signals(
     return out
 
 
+
+def _qqe_state(
+    bars: list[Bar],
+    *,
+    rsi_period: int = 6,
+    smoothing: int = 5,
+    factor: float = 3.0,
+) -> tuple[list[float | None], list[float | None], list[int]]:
+    """Return smoothed RSI, QQE trailing line and directional trend state."""
+    closes = [bar.close for bar in bars]
+    rsi = _rsi_full(closes, rsi_period)
+    rsi_clean = [50.0 if value is None else float(value) for value in rsi]
+    rsi_ma = _ema_full(rsi_clean, smoothing)
+    delta = [0.0] * len(bars)
+    for i in range(1, len(bars)):
+        if rsi_ma[i] is not None and rsi_ma[i - 1] is not None:
+            delta[i] = abs(float(rsi_ma[i]) - float(rsi_ma[i - 1]))
+
+    wilders = max(1, rsi_period * 2 - 1)
+    atr_rsi = _ema_full(delta, wilders)
+    atr_clean = [0.0 if value is None else float(value) for value in atr_rsi]
+    smooth_atr = _ema_full(atr_clean, wilders)
+
+    long_band: list[float | None] = [None] * len(bars)
+    short_band: list[float | None] = [None] * len(bars)
+    trail: list[float | None] = [None] * len(bars)
+    trend = [0] * len(bars)
+
+    for i in range(len(bars)):
+        if rsi_ma[i] is None or smooth_atr[i] is None:
+            continue
+        value = float(rsi_ma[i])
+        dar = float(smooth_atr[i]) * factor
+        new_long = value - dar
+        new_short = value + dar
+
+        if i == 0 or long_band[i - 1] is None or short_band[i - 1] is None or rsi_ma[i - 1] is None:
+            long_band[i] = new_long
+            short_band[i] = new_short
+            trend[i] = 1
+            trail[i] = new_long
+            continue
+
+        prev_value = float(rsi_ma[i - 1])
+        prev_long = float(long_band[i - 1])
+        prev_short = float(short_band[i - 1])
+        long_band[i] = max(prev_long, new_long) if prev_value > prev_long and value > prev_long else new_long
+        short_band[i] = min(prev_short, new_short) if prev_value < prev_short and value < prev_short else new_short
+
+        prev_trend = trend[i - 1] if trend[i - 1] else 1
+        if prev_value <= prev_short and value > prev_short:
+            trend[i] = 1
+        elif prev_value >= prev_long and value < prev_long:
+            trend[i] = -1
+        else:
+            trend[i] = prev_trend
+        trail[i] = float(long_band[i]) if trend[i] > 0 else float(short_band[i])
+
+    return rsi_ma, trail, trend
+
+
+def qqe_mod_signals(
+    bars: list[Bar],
+    *,
+    rsi_period: int = 6,
+    smoothing: int = 5,
+    fast_factor: float = 3.0,
+    slow_factor: float = 1.61,
+    threshold: float = 3.0,
+    bb_length: int = 50,
+    bb_mult: float = 0.35,
+) -> dict[int, float]:
+    """Independent causal QQE MOD-style agreement adapter.
+
+    Two QQE states must agree. The slower/secondary momentum must clear a
+    threshold and the primary QQE must clear a Bollinger-style zero-line band.
+    """
+    primary_rsi, primary_trail, primary_trend = _qqe_state(
+        bars, rsi_period=rsi_period, smoothing=smoothing, factor=fast_factor
+    )
+    secondary_rsi, _, secondary_trend = _qqe_state(
+        bars, rsi_period=rsi_period, smoothing=smoothing, factor=slow_factor
+    )
+    primary_delta = [
+        0.0 if primary_rsi[i] is None or primary_trail[i] is None
+        else float(primary_rsi[i]) - float(primary_trail[i])
+        for i in range(len(bars))
+    ]
+    out: dict[int, float] = {}
+    state = 0
+    for i in range(len(bars)):
+        if primary_rsi[i] is None or secondary_rsi[i] is None:
+            continue
+        basis = _sma_at(primary_delta, i, bb_length)
+        dev = _stddev_at(primary_delta, i, bb_length)
+        if basis is None or dev is None:
+            continue
+        upper = basis + bb_mult * dev
+        lower = basis - bb_mult * dev
+        primary_momentum = float(primary_rsi[i]) - 50.0
+        secondary_momentum = float(secondary_rsi[i]) - 50.0
+
+        bullish = (
+            primary_trend[i] > 0
+            and secondary_trend[i] > 0
+            and secondary_momentum > threshold
+            and primary_delta[i] > upper
+            and primary_momentum > 0
+        )
+        bearish = (
+            primary_trend[i] < 0
+            and secondary_trend[i] < 0
+            and secondary_momentum < -threshold
+            and primary_delta[i] < lower
+            and primary_momentum < 0
+        )
+        current = 1 if bullish else -1 if bearish else 0
+        if current != 0 and current != state:
+            out[i] = float(current)
+        if current != 0:
+            state = current
+    return out
+
+
+def _ssl_hybrid_state(
+    bars: list[Bar],
+    *,
+    baseline_length: int = 60,
+    ssl_length: int = 15,
+) -> tuple[list[float | None], list[int]]:
+    """Simplified causal SSL-Hybrid baseline/SSL1 state for research."""
+    closes = [bar.close for bar in bars]
+    highs = [bar.high for bar in bars]
+    lows = [bar.low for bar in bars]
+    baseline = _ema_full(closes, baseline_length)
+    high_ma = _ema_full(highs, ssl_length)
+    low_ma = _ema_full(lows, ssl_length)
+    state = [0] * len(bars)
+    for i in range(len(bars)):
+        if baseline[i] is None or high_ma[i] is None or low_ma[i] is None:
+            continue
+        prev = state[i - 1] if i > 0 else 0
+        if closes[i] > float(high_ma[i]) and closes[i] > float(baseline[i]):
+            state[i] = 1
+        elif closes[i] < float(low_ma[i]) and closes[i] < float(baseline[i]):
+            state[i] = -1
+        else:
+            state[i] = prev
+    return baseline, state
+
+
+def ssl_hybrid_signals(
+    bars: list[Bar],
+    *,
+    baseline_length: int = 60,
+    ssl_length: int = 15,
+) -> dict[int, float]:
+    """Baseline/SSL1 entry adapter inspired by the public SSL Hybrid strategy."""
+    _, state = _ssl_hybrid_state(
+        bars, baseline_length=baseline_length, ssl_length=ssl_length
+    )
+    out: dict[int, float] = {}
+    for i in range(1, len(bars)):
+        if state[i] != 0 and state[i] != state[i - 1]:
+            out[i] = float(state[i])
+    return out
+
+
+def _macd_full(
+    values: list[float],
+    fast_length: int,
+    slow_length: int,
+    signal_length: int = 9,
+) -> tuple[list[float | None], list[float | None], list[float | None]]:
+    fast = _ema_full(values, fast_length)
+    slow = _ema_full(values, slow_length)
+    line: list[float | None] = [None] * len(values)
+    for i in range(len(values)):
+        if fast[i] is not None and slow[i] is not None:
+            line[i] = float(fast[i]) - float(slow[i])
+    clean = [0.0 if value is None else float(value) for value in line]
+    signal = _ema_full(clean, signal_length)
+    hist: list[float | None] = [None] * len(values)
+    for i in range(len(values)):
+        if line[i] is not None and signal[i] is not None:
+            hist[i] = float(line[i]) - float(signal[i])
+    return line, signal, hist
+
+
+def _waddah_attar_state(
+    bars: list[Bar],
+    *,
+    fast_length: int = 20,
+    slow_length: int = 40,
+    bb_length: int = 20,
+    bb_mult: float = 2.0,
+    sensitivity: float = 150.0,
+    dead_zone_atr_period: int = 100,
+    dead_zone_mult: float = 3.7,
+) -> tuple[list[int], list[float | None], list[float | None]]:
+    closes = [bar.close for bar in bars]
+    macd, _, _ = _macd_full(closes, fast_length, slow_length)
+    atr = _atr_full(bars, dead_zone_atr_period)
+    direction = [0] * len(bars)
+    trend_power: list[float | None] = [None] * len(bars)
+    explosion: list[float | None] = [None] * len(bars)
+
+    for i in range(1, len(bars)):
+        if macd[i] is None or macd[i - 1] is None or atr[i] is None:
+            continue
+        basis = _sma_at(closes, i, bb_length)
+        dev = _stddev_at(closes, i, bb_length)
+        if basis is None or dev is None:
+            continue
+        explosion_line = (basis + bb_mult * dev) - (basis - bb_mult * dev)
+        power_signed = (float(macd[i]) - float(macd[i - 1])) * sensitivity
+        power = abs(power_signed)
+        dead_zone = float(atr[i]) * dead_zone_mult
+        trend_power[i] = power
+        explosion[i] = explosion_line
+        if power > explosion_line and explosion_line > dead_zone:
+            direction[i] = 1 if power_signed > 0 else -1 if power_signed < 0 else 0
+    return direction, trend_power, explosion
+
+
+def waddah_attar_explosion_signals(
+    bars: list[Bar],
+    *,
+    fast_length: int = 20,
+    slow_length: int = 40,
+    bb_length: int = 20,
+    bb_mult: float = 2.0,
+    sensitivity: float = 150.0,
+    dead_zone_atr_period: int = 100,
+    dead_zone_mult: float = 3.7,
+) -> dict[int, float]:
+    """Confirmed Waddah Attar Explosion-style momentum/explosion entries."""
+    direction, power, explosion = _waddah_attar_state(
+        bars,
+        fast_length=fast_length,
+        slow_length=slow_length,
+        bb_length=bb_length,
+        bb_mult=bb_mult,
+        sensitivity=sensitivity,
+        dead_zone_atr_period=dead_zone_atr_period,
+        dead_zone_mult=dead_zone_mult,
+    )
+    out: dict[int, float] = {}
+    state = 0
+    for i in range(2, len(bars)):
+        current = direction[i]
+        if current == 0 or power[i] is None or power[i - 1] is None or explosion[i] is None or explosion[i - 1] is None:
+            continue
+        strengthening = float(power[i]) > float(power[i - 1]) and float(explosion[i]) >= float(explosion[i - 1])
+        if strengthening and current != state:
+            out[i] = float(current)
+            state = current
+    return out
+
+
+def qqe_ssl_wae_composite_signals(
+    bars: list[Bar],
+    *,
+    qqe_rsi_period: int = 6,
+    qqe_smoothing: int = 5,
+    qqe_fast_factor: float = 3.0,
+    qqe_slow_factor: float = 1.61,
+    qqe_threshold: float = 3.0,
+    ssl_baseline_length: int = 60,
+    ssl_length: int = 15,
+    wae_fast_length: int = 20,
+    wae_slow_length: int = 40,
+    wae_sensitivity: float = 150.0,
+) -> dict[int, float]:
+    """Causal composite based on the public QQE+SSL+WAE entry specification.
+
+    QQE supplies the leading direction change. Entry is emitted only when SSL
+    baseline state and WAE momentum/explosion direction agree on the same
+    confirmed bar.
+    """
+    qqe = qqe_mod_signals(
+        bars,
+        rsi_period=qqe_rsi_period,
+        smoothing=qqe_smoothing,
+        fast_factor=qqe_fast_factor,
+        slow_factor=qqe_slow_factor,
+        threshold=qqe_threshold,
+    )
+    _, ssl_state = _ssl_hybrid_state(
+        bars,
+        baseline_length=ssl_baseline_length,
+        ssl_length=ssl_length,
+    )
+    wae_state, power, explosion = _waddah_attar_state(
+        bars,
+        fast_length=wae_fast_length,
+        slow_length=wae_slow_length,
+        sensitivity=wae_sensitivity,
+    )
+
+    out: dict[int, float] = {}
+    for i, qqe_direction in qqe.items():
+        d = 1 if qqe_direction > 0 else -1
+        if (
+            i < len(ssl_state)
+            and ssl_state[i] == d
+            and wae_state[i] == d
+            and power[i] is not None
+            and explosion[i] is not None
+        ):
+            out[i] = float(d)
+    return out
+
+
 def indicator_signal_series(
     indicator_id: str,
     bars: list[Bar],
@@ -665,4 +979,12 @@ def indicator_signal_series(
         return alphatrend_signals(bars, **params)
     if indicator_id == "optimized_trend_tracker":
         return optimized_trend_tracker_signals(bars, **params)
+    if indicator_id == "qqe_mod":
+        return qqe_mod_signals(bars, **params)
+    if indicator_id == "ssl_hybrid":
+        return ssl_hybrid_signals(bars, **params)
+    if indicator_id == "waddah_attar_explosion":
+        return waddah_attar_explosion_signals(bars, **params)
+    if indicator_id == "qqe_ssl_wae_composite":
+        return qqe_ssl_wae_composite_signals(bars, **params)
     raise KeyError(f"Community indicator is not implemented for causal benchmarking: {indicator_id}")
