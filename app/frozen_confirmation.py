@@ -40,6 +40,7 @@ class FrozenHypothesis:
     allowed_regimes: tuple[str, ...]
     role: str
     development_status: str
+    context_path: str | None = None
     source_run_id: int | None = None
 
 
@@ -54,6 +55,8 @@ class FrozenConfirmationResult:
     freeze_t: int
     archive_last_t: int | None
     unseen_bars: int
+    historical_context_locked: bool
+    frozen_context_bars: int
     completed_trades: int
     incomplete_open_trades: int
     segment_stability: float
@@ -104,6 +107,8 @@ def hypothesis_from_dict(raw: dict[str, Any]) -> FrozenHypothesis:
         round_turn_cost_r=float(params_raw.get("round_turn_cost_r", 0.02)),
     )
     allowed = tuple(str(value) for value in (raw.get("allowed_regimes") or ()))
+    context_raw = raw.get("context_path")
+    context_path = str(context_raw).strip() if context_raw else None
     source_run_id = raw.get("source_run_id")
     return FrozenHypothesis(
         hypothesis_id=str(raw["hypothesis_id"]),
@@ -116,6 +121,7 @@ def hypothesis_from_dict(raw: dict[str, Any]) -> FrozenHypothesis:
         allowed_regimes=allowed,
         role=str(raw["role"]),
         development_status=str(raw["development_status"]),
+        context_path=context_path,
         source_run_id=int(source_run_id) if source_run_id is not None else None,
     )
 
@@ -123,7 +129,11 @@ def hypothesis_from_dict(raw: dict[str, Any]) -> FrozenHypothesis:
 def load_frozen_hypotheses(manifest: dict[str, Any]) -> tuple[FrozenHypothesis, ...]:
     if not isinstance(manifest, dict):
         raise ValueError("Frozen hypothesis manifest must be an object")
-    if manifest.get("schema_version") != "stc-frozen-confirmation-v1":
+    schema_version = manifest.get("schema_version")
+    if schema_version not in (
+        "stc-frozen-confirmation-v1",
+        "stc-frozen-confirmation-v2",
+    ):
         raise ValueError("Unsupported frozen hypothesis manifest schema")
     if manifest.get("optimization_locked") is not True:
         raise ValueError("Frozen hypothesis manifest must set optimization_locked=true")
@@ -134,8 +144,60 @@ def load_frozen_hypotheses(manifest: dict[str, Any]) -> tuple[FrozenHypothesis, 
     ids = [item.hypothesis_id for item in hypotheses]
     if len(ids) != len(set(ids)):
         raise ValueError("Frozen hypothesis IDs must be unique")
+    if schema_version == "stc-frozen-confirmation-v2":
+        missing_context = [
+            item.hypothesis_id for item in hypotheses if not item.context_path
+        ]
+        if missing_context:
+            raise ValueError(
+                "Frozen confirmation v2 requires context_path for: "
+                + ",".join(missing_context)
+            )
     return hypotheses
 
+
+def _validated_frozen_context_bars(
+    context_payload: dict[str, Any],
+    hypothesis: FrozenHypothesis,
+    expected_interval: str,
+):
+    symbol = str(context_payload.get("symbol") or "").strip()
+    interval = str(context_payload.get("interval") or "").strip()
+    if symbol != hypothesis.symbol or interval != expected_interval:
+        raise ValueError(
+            "Frozen context identity mismatch: "
+            f"expected {hypothesis.symbol} {expected_interval}, got {symbol} {interval}"
+        )
+
+    context_meta = context_payload.get("frozen_context")
+    if not isinstance(context_meta, dict):
+        raise ValueError("Frozen context metadata is required")
+    if context_meta.get("schema_version") != "stc-frozen-context-v1":
+        raise ValueError("Unsupported frozen context schema")
+    if context_meta.get("provider") != "TradingView Official MCP":
+        raise ValueError("Frozen context requires TradingView Official MCP provenance")
+    if context_meta.get("hypothesis_id") != hypothesis.hypothesis_id:
+        raise ValueError("Frozen context hypothesis_id mismatch")
+    if int(context_meta.get("freeze_t") or 0) != hypothesis.freeze_t:
+        raise ValueError("Frozen context freeze_t mismatch")
+
+    context_bars = bars_from_tradingview_ohlcv(context_payload)
+    timestamps = [int(bar.timestamp.timestamp()) for bar in context_bars]
+    if len(context_bars) < 1000:
+        raise ValueError("Frozen context requires at least 1000 development bars")
+    if len(timestamps) != len(set(timestamps)) or any(
+        timestamps[i] <= timestamps[i - 1] for i in range(1, len(timestamps))
+    ):
+        raise ValueError("Frozen context timestamps must be strictly increasing")
+    if not timestamps or timestamps[-1] != hypothesis.freeze_t:
+        raise ValueError("Frozen context must end exactly at freeze_t")
+    if any(timestamp > hypothesis.freeze_t for timestamp in timestamps):
+        raise ValueError("Frozen context cannot contain post-freeze bars")
+    if int(context_meta.get("coverage_last_t") or 0) != hypothesis.freeze_t:
+        raise ValueError("Frozen context coverage metadata does not end at freeze_t")
+    if int(context_meta.get("context_bars") or 0) != len(context_bars):
+        raise ValueError("Frozen context count metadata does not match bars")
+    return context_bars
 
 
 def _materialize_confirmation_snapshots(
@@ -231,6 +293,8 @@ def _confirmation_reasons(
 def evaluate_frozen_hypothesis(
     archive_payload: dict[str, Any],
     hypothesis: FrozenHypothesis,
+    *,
+    frozen_context_payload: dict[str, Any] | None = None,
 ) -> FrozenConfirmationResult:
     symbol = str(archive_payload.get("symbol") or "").strip()
     interval = str(archive_payload.get("interval") or "").strip()
@@ -249,9 +313,11 @@ def evaluate_frozen_hypothesis(
     if archive_meta.get("provider") != "TradingView Official MCP":
         raise ValueError("Frozen confirmation requires TradingView Official MCP archive provenance")
 
-    bars = bars_from_tradingview_ohlcv(archive_payload)
-    timestamps = [int(bar.timestamp.timestamp()) for bar in bars]
-    archive_last_t = timestamps[-1] if timestamps else None
+    archive_bars = bars_from_tradingview_ohlcv(archive_payload)
+    archive_timestamps = [
+        int(bar.timestamp.timestamp()) for bar in archive_bars
+    ]
+    archive_last_t = archive_timestamps[-1] if archive_timestamps else None
     metadata_last_t = archive_meta.get("coverage_last_t")
     if archive_last_t is not None and int(metadata_last_t or 0) != archive_last_t:
         raise ValueError("Frozen confirmation archive coverage metadata does not match bars")
@@ -262,11 +328,33 @@ def evaluate_frozen_hypothesis(
         and archive_last_t >= int(withheld_t)
     ):
         raise ValueError("Frozen confirmation archive still contains an unconfirmed tail bar")
-    start_index = next(
-        (index for index, timestamp in enumerate(timestamps) if timestamp > hypothesis.freeze_t),
-        len(bars),
+
+    archive_start_index = next(
+        (
+            index
+            for index, timestamp in enumerate(archive_timestamps)
+            if timestamp > hypothesis.freeze_t
+        ),
+        len(archive_bars),
     )
-    unseen_bars = max(0, len(bars) - start_index)
+    unseen_archive_bars = archive_bars[archive_start_index:]
+    unseen_bars = len(unseen_archive_bars)
+
+    historical_context_locked = False
+    frozen_context_bars = 0
+    if frozen_context_payload is not None:
+        context_bars = _validated_frozen_context_bars(
+            frozen_context_payload,
+            hypothesis,
+            expected_interval,
+        )
+        bars = [*context_bars, *unseen_archive_bars]
+        start_index = len(context_bars)
+        historical_context_locked = True
+        frozen_context_bars = len(context_bars)
+    else:
+        bars = archive_bars
+        start_index = archive_start_index
 
     empty = BacktestStats(
         trades=0,
@@ -289,6 +377,8 @@ def evaluate_frozen_hypothesis(
             freeze_t=hypothesis.freeze_t,
             archive_last_t=archive_last_t,
             unseen_bars=0,
+            historical_context_locked=historical_context_locked,
+            frozen_context_bars=frozen_context_bars,
             completed_trades=0,
             incomplete_open_trades=0,
             segment_stability=0.0,
@@ -355,6 +445,8 @@ def evaluate_frozen_hypothesis(
         freeze_t=hypothesis.freeze_t,
         archive_last_t=archive_last_t,
         unseen_bars=unseen_bars,
+        historical_context_locked=historical_context_locked,
+        frozen_context_bars=frozen_context_bars,
         completed_trades=stats.trades,
         incomplete_open_trades=incomplete,
         segment_stability=stability,
