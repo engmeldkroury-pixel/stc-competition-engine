@@ -46,8 +46,8 @@ def _bars(count: int = 700) -> list[Bar]:
 
 def test_community_catalog_separates_research_popularity_from_live_weighting():
     summary = catalog_summary()
-    assert summary["total"] >= 10
-    assert summary["implemented_or_proxy"] >= 5
+    assert summary["total"] >= 20
+    assert summary["implemented_or_proxy"] >= 9
     assert "never become trading weights" in summary["rule"]
 
     ids = {x.indicator_id for x in eligible_indicators("rates", "15", implemented_only=True)}
@@ -59,7 +59,16 @@ def test_community_catalog_separates_research_popularity_from_live_weighting():
 
 @pytest.mark.parametrize(
     "indicator_id",
-    ("ut_bot_alerts", "squeeze_momentum_lazybear", "wavetrend_crosses", "hull_suite"),
+    (
+        "ut_bot_alerts",
+        "squeeze_momentum_lazybear",
+        "wavetrend_crosses",
+        "hull_suite",
+        "supertrend_kivanc",
+        "chandelier_exit_everget",
+        "schaff_trend_cycle",
+        "range_filter_guikroth",
+    ),
 )
 def test_community_indicator_adapters_are_causal(indicator_id: str):
     bars = _bars()
@@ -81,7 +90,16 @@ def test_symbol_benchmark_runs_each_implemented_indicator_independently():
         bars=_bars(),
     )
     ids = {trial.indicator_id for trial in trials}
-    assert {"ut_bot_alerts", "squeeze_momentum_lazybear", "wavetrend_crosses", "hull_suite"} <= ids
+    assert {
+        "ut_bot_alerts",
+        "squeeze_momentum_lazybear",
+        "wavetrend_crosses",
+        "hull_suite",
+        "supertrend_kivanc",
+        "chandelier_exit_everget",
+        "schaff_trend_cycle",
+        "range_filter_guikroth",
+    } <= ids
     assert all(trial.symbol == "CBOT:ZN1!" for trial in trials)
     assert all(trial.timeframe == "15" for trial in trials)
     assert all(trial.train.trades >= 0 and trial.test.trades >= 0 and trial.forward.trades >= 0 for trial in trials)
@@ -119,6 +137,7 @@ def test_better_validated_community_component_can_outweigh_core_for_same_symbol(
         symbol="CBOT:ZN1!",
         timeframe="15",
         family="atr_trend",
+        selected_parameters={"atr_period": 10, "key_value": 1.5},
         train=stats,
         test=stats,
         forward=stats,
