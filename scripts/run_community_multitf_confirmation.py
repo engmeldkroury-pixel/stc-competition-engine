@@ -50,13 +50,27 @@ def main() -> int:
     reports = {}
     for timeframe in ("5", "30", "60", "120", "240", "1D"):
         bars = series[timeframe]
-        report = confirm_community_symbol(
-            symbol=symbol,
-            asset_class=asset_class,
-            timeframe=timeframe,
-            bars=bars,
-        )
-        reports[timeframe] = asdict(report)
+        try:
+            report = confirm_community_symbol(
+                symbol=symbol,
+                asset_class=asset_class,
+                timeframe=timeframe,
+                bars=bars,
+            )
+            reports[timeframe] = asdict(report)
+        except ValueError as exc:
+            reports[timeframe] = {
+                "symbol": symbol,
+                "timeframe": timeframe,
+                "development_bars": 0,
+                "confirmation_bars": 0,
+                "components": [],
+                "promotion_candidates": [],
+                "status": "INSUFFICIENT_HISTORY",
+                "live_authority": False,
+                "notes": [str(exc)],
+                "available_bars": len(bars),
+            }
 
     result = {
         "symbol": symbol,
@@ -77,7 +91,9 @@ def main() -> int:
             tf: report["promotion_candidates"] for tf, report in reports.items()
         },
         "bars_by_timeframe": {
-            tf: report["development_bars"] + report["confirmation_bars"]
+            tf: int(report.get("available_bars") or (
+                report.get("development_bars", 0) + report.get("confirmation_bars", 0)
+            ))
             for tf, report in reports.items()
         },
         "live_authority": False,
