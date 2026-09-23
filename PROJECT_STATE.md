@@ -1603,3 +1603,18 @@ Owner intervention required now: YES — only for historical-data access, not fo
 - The 30-completed-unseen-trade judgment floor remains unchanged.
 - Same-dataset tuning remains CLOSED.
 - No 15m competition trade is authorized.
+
+
+## Exact-provider accumulation refresh — 2026-09-23
+- PR #93 merged to main as 5e3fb864b03ffe152a2808f2919f30ad469da4c4.
+- PR #93 CI: 335 passed, 2 warnings.
+- One additional confirmed TradingView Official MCP 15m bar was archived for each active frozen hypothesis; current mutable tails remained withheld.
+- Confirmed archive state after merge:
+  - MNQ confirmed through t=1790130600; mutable t=1790131500 withheld.
+  - BTCUSD confirmed through t=1790131500; mutable t=1790132400 withheld.
+- Context-locked frozen confirmation run 35813263594 completed successfully:
+  - MNQ: 26 unseen bars, 0 completed trades, 1 incomplete open trade, ACCUMULATING.
+  - BTCUSD: 47 unseen bars, 1 completed trade, -0.32121976097584065R, ACCUMULATING.
+  - historical_context_locked=true and frozen_context_bars=1000 for both.
+  - optimization_locked=true; live_calibration_authority=false.
+- No 15m competition trade is authorized.
