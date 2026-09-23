@@ -1,0 +1,110 @@
+name: STC Community Multi-Timeframe Frozen Confirmation
+
+on:
+  push:
+    branches:
+      - "research/community-multitf-frozen-*"
+    paths:
+      - "research_multitf_inputs/READY"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: stc-community-multitf-frozen-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  discover:
+    runs-on: ubuntu-latest
+    outputs:
+      dirs: ${{ steps.matrix.outputs.dirs }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: matrix
+        shell: bash
+        run: |
+          set -euo pipefail
+          dirs="$(find research_multitf_inputs -mindepth 1 -maxdepth 1 -type d -printf '%f\n' | sort | jq -R -s -c 'split("\n")[:-1]')"
+          echo "dirs=$dirs" >> "$GITHUB_OUTPUT"
+          echo "$dirs"
+
+  confirm:
+    needs: discover
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      max-parallel: 6
+      matrix:
+        dir: ${{ fromJson(needs.discover.outputs.dirs) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Run multi-timeframe frozen confirmation
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p research_multitf_outputs
+          python scripts/run_community_multitf_confirmation.py             "research_multitf_inputs/${{ matrix.dir }}"             --output "research_multitf_outputs/${{ matrix.dir }}.json"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: stc-multitf-${{ matrix.dir }}
+          path: research_multitf_outputs/*.json
+          if-no-files-found: error
+          retention-days: 14
+
+  combine:
+    needs: confirm
+    if: always() && needs.confirm.result == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: stc-multitf-*
+          merge-multiple: true
+          path: research_multitf_outputs
+      - name: Build combined summary
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from collections import Counter
+          from pathlib import Path
+
+          symbols=[]
+          counts=Counter()
+          for path in sorted(Path("research_multitf_outputs").glob("*.json")):
+              d=json.loads(path.read_text())
+              row={"symbol":d["symbol"],"timeframes":{}}
+              for tf, report in (d.get("reports") or {}).items():
+                  c=list(report.get("promotion_candidates") or [])
+                  row["timeframes"][tf]=c
+                  for component in c:
+                      counts[(tf,component)] += 1
+              symbols.append(row)
+
+          summary={
+              "symbol_count":len(symbols),
+              "symbols":symbols,
+              "component_timeframe_pass_counts":{
+                  f"{tf}:{component}":count
+                  for (tf,component),count in sorted(counts.items())
+              },
+              "live_authority":False,
+          }
+          Path("research_multitf_outputs/combined_multitf_summary.json").write_text(
+              json.dumps(summary,indent=2,sort_keys=True)+"\n"
+          )
+          print("STC_MULTITF_FROZEN_SUMMARY="+json.dumps(summary,sort_keys=True))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: stc-community-multitf-combined-${{ github.run_id }}
+          path: research_multitf_outputs/*.json
+          if-no-files-found: error
+          retention-days: 14
