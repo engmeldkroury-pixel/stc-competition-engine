@@ -1,0 +1,200 @@
+{
+  "schema_version": "stc-community-shadow-registry-v1",
+  "generated_at_utc": "2026-09-23T21:04:01Z",
+  "source_run_id": 35919916518,
+  "live_authority": false,
+  "rule": "Frozen-pass records are shadow research candidates only. No record in this registry grants live trade authority.",
+  "promotion_ladder": [
+    "FROZEN_PASS",
+    "SHADOW",
+    "MULTITF_CONFIRMED",
+    "ELIGIBLE_FOR_OWNER_PROMOTION"
+  ],
+  "records": [
+    {
+      "symbol": "CAPITALCOM:USDZAR",
+      "timeframe": "15",
+      "component_id": "supertrend_kivanc",
+      "family": "atr_trend",
+      "state": "FROZEN_PASS",
+      "selected_parameters": {
+        "atr_period": 14,
+        "multiplier": 3
+      },
+      "development_test_trades": 22,
+      "development_test_expectancy_r": 0.114,
+      "development_test_profit_factor": 1.23,
+      "development_forward_trades": 22,
+      "development_forward_expectancy_r": 0.057,
+      "development_forward_profit_factor": 1.13,
+      "frozen_trades": 20,
+      "frozen_expectancy_r": 0.372,
+      "frozen_profit_factor": 2.06,
+      "frozen_max_drawdown_r": 2.49,
+      "source_run_id": 35919916518,
+      "source_date": "2026-09-24",
+      "live_authority": false,
+      "shadow_observations": 0,
+      "supporting_timeframes": [],
+      "notes": [
+        "Final 15% unseen holdout passed.",
+        "Requires shadow observation and independent supporting-timeframe evidence before owner promotion eligibility."
+      ]
+    },
+    {
+      "symbol": "CAPITALCOM:XAUUSD",
+      "timeframe": "15",
+      "component_id": "range_filter_guikroth",
+      "family": "adaptive_range_trend",
+      "state": "FROZEN_PASS",
+      "selected_parameters": {
+        "sampling_period": 100,
+        "range_multiplier": 2
+      },
+      "development_test_trades": 40,
+      "development_test_expectancy_r": 0.055,
+      "development_test_profit_factor": 1.11,
+      "development_forward_trades": 34,
+      "development_forward_expectancy_r": 0.089,
+      "development_forward_profit_factor": 1.19,
+      "frozen_trades": 29,
+      "frozen_expectancy_r": 0.233,
+      "frozen_profit_factor": 1.55,
+      "frozen_max_drawdown_r": 2.44,
+      "source_run_id": 35919916518,
+      "source_date": "2026-09-24",
+      "live_authority": false,
+      "shadow_observations": 0,
+      "supporting_timeframes": [],
+      "notes": [
+        "Final 15% unseen holdout passed.",
+        "Different split from run-5 full-window result; treat as new shadow candidate only."
+      ]
+    },
+    {
+      "symbol": "CBOT:ZB1!",
+      "timeframe": "15",
+      "component_id": "range_filter_guikroth",
+      "family": "adaptive_range_trend",
+      "state": "FROZEN_PASS",
+      "selected_parameters": {
+        "sampling_period": 100,
+        "range_multiplier": 3
+      },
+      "development_test_trades": 24,
+      "development_test_expectancy_r": 0.187,
+      "development_test_profit_factor": 1.37,
+      "development_forward_trades": 25,
+      "development_forward_expectancy_r": 0.484,
+      "development_forward_profit_factor": 2.36,
+      "frozen_trades": 19,
+      "frozen_expectancy_r": 0.458,
+      "frozen_profit_factor": 2.09,
+      "frozen_max_drawdown_r": 2.35,
+      "source_run_id": 35919916518,
+      "source_date": "2026-09-24",
+      "live_authority": false,
+      "shadow_observations": 0,
+      "supporting_timeframes": [],
+      "notes": [
+        "Final 15% unseen holdout passed.",
+        "Requires multi-timeframe evidence before any promotion discussion."
+      ]
+    },
+    {
+      "symbol": "CME_MINI:MJY1!",
+      "timeframe": "15",
+      "component_id": "alphatrend",
+      "family": "composite_trend",
+      "state": "FROZEN_PASS",
+      "selected_parameters": {
+        "period": 20,
+        "coefficient": 1
+      },
+      "development_test_trades": 51,
+      "development_test_expectancy_r": 0.158,
+      "development_test_profit_factor": 1.27,
+      "development_forward_trades": 64,
+      "development_forward_expectancy_r": 0.061,
+      "development_forward_profit_factor": 1.1,
+      "frozen_trades": 54,
+      "frozen_expectancy_r": 0.067,
+      "frozen_profit_factor": 1.11,
+      "frozen_max_drawdown_r": 9.05,
+      "source_run_id": 35919916518,
+      "source_date": "2026-09-24",
+      "live_authority": false,
+      "shadow_observations": 0,
+      "supporting_timeframes": [],
+      "notes": [
+        "Final 15% unseen holdout passed.",
+        "Holdout edge is positive but thin; keep strict shadow status."
+      ]
+    },
+    {
+      "symbol": "CME_MINI:MJY1!",
+      "timeframe": "15",
+      "component_id": "waddah_attar_explosion",
+      "family": "volatility_momentum",
+      "state": "FROZEN_PASS",
+      "selected_parameters": {
+        "fast_length": 12,
+        "slow_length": 26,
+        "sensitivity": 100,
+        "bb_length": 20,
+        "bb_mult": 2,
+        "atr_length": 100,
+        "dead_zone_mult": 3
+      },
+      "development_test_trades": 28,
+      "development_test_expectancy_r": 0.124,
+      "development_test_profit_factor": 1.23,
+      "development_forward_trades": 38,
+      "development_forward_expectancy_r": 0.073,
+      "development_forward_profit_factor": 1.12,
+      "frozen_trades": 30,
+      "frozen_expectancy_r": 0.307,
+      "frozen_profit_factor": 1.6,
+      "frozen_max_drawdown_r": 5.03,
+      "source_run_id": 35919916518,
+      "source_date": "2026-09-24",
+      "live_authority": false,
+      "shadow_observations": 0,
+      "supporting_timeframes": [],
+      "notes": [
+        "Final 15% unseen holdout passed.",
+        "Independent family from AlphaTrend; both still require shadow/multi-timeframe confirmation."
+      ]
+    },
+    {
+      "symbol": "NYMEX:MCL1!",
+      "timeframe": "15",
+      "component_id": "ssl_hybrid",
+      "family": "composite_trend",
+      "state": "FROZEN_PASS",
+      "selected_parameters": {
+        "baseline_length": 100,
+        "ssl_length": 20
+      },
+      "development_test_trades": 24,
+      "development_test_expectancy_r": 0.076,
+      "development_test_profit_factor": 1.13,
+      "development_forward_trades": 15,
+      "development_forward_expectancy_r": 0.556,
+      "development_forward_profit_factor": 2.31,
+      "frozen_trades": 14,
+      "frozen_expectancy_r": 0.712,
+      "frozen_profit_factor": 3.05,
+      "frozen_max_drawdown_r": 2.08,
+      "source_run_id": 35919916518,
+      "source_date": "2026-09-24",
+      "live_authority": false,
+      "shadow_observations": 0,
+      "supporting_timeframes": [],
+      "notes": [
+        "Final 15% unseen holdout passed.",
+        "Frozen trade sample is still modest; no live authority."
+      ]
+    }
+  ]
+}
