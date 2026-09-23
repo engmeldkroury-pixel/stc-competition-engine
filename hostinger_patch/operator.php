@@ -76,7 +76,7 @@ input{width:100%}button{cursor:pointer}.primary{background:#1d4ed8}.danger{backg
 <div id="general-panel" class="hidden">
   <div class="bar">
     <div class="sectiontitle">General Lab</div>
-    <div class="small">Separate research/sandbox area. Adding a symbol creates a research-only STC request and never affects either competition account.</div>
+    <div class="small">Separate research/sandbox area. Adding a symbol creates a research-only STC request and does not affect either competition account.</div>
     <div class="generalbox" style="margin-top:12px">
       <div><label class="small">Research capital</label><input id="general-capital" type="number" min="0" step="any" placeholder="Example: 10000"></div>
       <div><label class="small">Preferred base currency</label><select id="general-currency"><option>USD</option><option>EUR</option><option>GBP</option><option>EGP</option></select></div>
