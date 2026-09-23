@@ -183,8 +183,6 @@ def squeeze_momentum_signals(
         highest = max(highs[start : i + 1])
         lowest = min(lows[start : i + 1])
         baseline = (highest + lowest) / 4.0 + mid / 2.0
-        detrended = closes.copy()
-        detrended[i] = closes[i] - baseline
         # Build the exact causal detrended window rather than using any future bars.
         window: list[float] = []
         for j in range(start, i + 1):
