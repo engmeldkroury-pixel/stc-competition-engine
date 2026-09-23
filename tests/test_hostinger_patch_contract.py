@@ -507,3 +507,27 @@ def test_owner_console_shows_same_timeframe_research_strategy_and_feature_partic
     assert "same live entry timeframe" in ui
     assert "'Research strategy: ' . $researchText" in notify
     assert "'Top validated features: ' . $featureText" in notify
+
+def test_owner_console_exposes_verified_competition_rules_and_sources():
+    control = (PATCH / "portfolio_control.php").read_text(encoding="utf-8")
+    snapshot = (PATCH / "operator_snapshot.php").read_text(encoding="utf-8")
+    ui = (PATCH / "operator.php").read_text(encoding="utf-8")
+    assert "function stc_competition_rule_summary" in control
+    assert "The Leap by Capital.com Africa" in control
+    assert "The Leap by AMP Futures" in control
+    assert "'competition_rules' => [" in snapshot
+    for label in (
+        "COMPETITION RULES",
+        "Initial balance",
+        "First prize",
+        "Competition window",
+        "Minimum trading days",
+        "Scoring",
+        "Leverage",
+        "Commission",
+        "STC production feed",
+        "Open official competition rules",
+    ):
+        assert label in ui
+    assert "rulesHtml(competitionId)" in ui
+

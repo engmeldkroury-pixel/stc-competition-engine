@@ -407,6 +407,25 @@ function riskSummaryFor(competitionId){
  const s=snapshot&&snapshot.portfolio&&snapshot.portfolio.summary?snapshot.portfolio.summary[competitionId]:null;
  return s||{open_positions:0,initial_risk_usd:0,clusters:{}};
 }
+function rulesHtml(competitionId){
+ const r=snapshot&&snapshot.competition_rules?snapshot.competition_rules[competitionId]:null;
+ if(!r)return '';
+ const leverage=Object.entries(r.leverage||{}).map(([k,v])=>esc(k)+' '+num(v,0)+':1').join(' • ');
+ const scoring=r.scoring_basis==='realized_pnl_closed_positions'?'Realized P/L on closed positions':esc(r.scoring_basis||'-');
+ return '<div class="orderbox"><div class="small">COMPETITION RULES</div>'
+  +'<div class="row"><span>Competition</span><span class="value">'+esc(r.name||competitionId)+'</span></div>'
+  +'<div class="row"><span>Initial balance</span><span class="value">$'+num(r.initial_balance_usd,2)+'</span></div>'
+  +'<div class="row"><span>First prize</span><span class="value">$'+num(r.first_prize_usd,2)+'</span></div>'
+  +'<div class="row"><span>Competition window</span><span class="value">'+esc(formatLocalTime(r.start_utc))+' → '+esc(formatLocalTime(r.end_utc))+'</span></div>'
+  +'<div class="row"><span>Minimum trading days</span><span class="value">'+esc(r.min_trading_days)+'</span></div>'
+  +'<div class="row"><span>Scoring</span><span class="value">'+scoring+'</span></div>'
+  +'<div class="row"><span>Leverage</span><span class="value">'+esc(leverage||'-')+'</span></div>'
+  +'<div class="row"><span>Commission</span><span class="value">'+num(Number(r.commission_rate||0)*100,3)+'%</span></div>'
+  +'<div class="row"><span>STC production feed</span><span class="value">'+esc(r.production_feed_symbols)+' symbols monitored</span></div>'
+  +'<div class="small"><a href="'+esc(r.official_rules_url||'#')+'" target="_blank" rel="noopener">Open official competition rules</a></div>'
+  +'</div>';
+}
+
 function progressHtml(competitionId){
  const p=snapshot&&snapshot.competition_progress?snapshot.competition_progress[competitionId]:null;
  if(!p)return '';
@@ -428,7 +447,8 @@ function accountHtml(account,competitionId){
  const clusterHtml=clusters.length
    ?clusters.map(([name,v])=>'<span class="pill">'+esc(name)+': $'+num(v.initial_risk_usd,2)+'</span>').join('')
    :'<span class="small">No open risk clusters.</span>';
- return progressHtml(competitionId)
+ return rulesHtml(competitionId)
+  +progressHtml(competitionId)
   +'<div class="row"><span>Owner-synced equity</span><span class="value">$'+num(account.equity_usd,2)+'</span></div>'
   +'<div class="row"><span>STC risk budget / trade</span><span class="value">'+num(Number(account.risk_fraction)*100,2)+'% • $'+num(tradeRisk,2)+'</span></div>'
   +'<div class="row"><span>Open initial risk</span><span class="value">$'+num(s.initial_risk_usd,2)+' / $'+num(portfolioCap,2)+'</span></div>'
