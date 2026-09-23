@@ -65,8 +65,19 @@ def _cutoff(
             "for community frozen confirmation"
         )
     cut = int(len(bars) * development_fraction)
-    cut = max(min_development_bars, cut)
-    cut = min(cut, len(bars) - min_confirmation_bars)
+    development_bars = cut
+    confirmation_bars = len(bars) - cut
+    if development_bars < min_development_bars:
+        raise ValueError(
+            f"Requested development split yields {development_bars} bars; "
+            f"need at least {min_development_bars}"
+        )
+    if confirmation_bars < min_confirmation_bars:
+        raise ValueError(
+            f"Requested frozen confirmation split yields {confirmation_bars} bars; "
+            f"need at least {min_confirmation_bars}. Increase history rather than "
+            "silently changing the frozen percentage."
+        )
     return cut
 
 
