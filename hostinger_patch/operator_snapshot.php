@@ -378,6 +378,10 @@ try {
             'cache_age_seconds' => $macroCalendar['cache_age_seconds'] ?? null,
         ],
         'account_states' => array_values($accounts),
+        'competition_rules' => [
+            'capital-africa-sep-2026' => stc_competition_rule_summary('capital-africa-sep-2026'),
+            'amp-futures-sep-2026' => stc_competition_rule_summary('amp-futures-sep-2026'),
+        ],
         'competition_progress' => [
             'capital-africa-sep-2026' => stc_competition_progress($pdo, 'capital-africa-sep-2026'),
             'amp-futures-sep-2026' => stc_competition_progress($pdo, 'amp-futures-sep-2026'),
