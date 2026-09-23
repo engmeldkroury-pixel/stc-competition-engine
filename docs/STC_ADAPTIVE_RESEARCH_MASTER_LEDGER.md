@@ -345,3 +345,21 @@ Status: IN IMPLEMENTATION / PR OPEN.
 - Final 15% is replayed only after development parameters are frozen.
 - Passing the holdout produces only a research promotion candidate; live_authority remains false.
 - PR also adds a parallel 26-symbol frozen-confirmation workflow.
+
+
+## Work-unit register update — 2026-09-24 00:00 EEST
+
+### WU-107 — first frozen holdout implementation
+Status: REJECTED / SUPERSEDED / NOT MERGED.
+- PR #107 CI: 361 passed, 1 failed.
+- Failure exposed a methodology mismatch: helper silently changed the requested 85/15 split when a 500-bar minimum holdout could not be met on the synthetic test history.
+- Controlling decision: never silently resize the frozen holdout. Preserve the percentage exactly or fail closed for insufficient history.
+- PR #107 closed unmerged.
+
+### WU-108 — exact frozen holdout implementation
+Status: IN VERIFICATION.
+- PR #108 created from latest main.
+- Exact first-85% development / final-15% unseen holdout.
+- If the final 15% is smaller than the required confirmation sample floor, the run fails and requires more history instead of changing the split.
+- Final holdout can create only a research promotion candidate; live_authority=false.
+- CI run #374 pending.
