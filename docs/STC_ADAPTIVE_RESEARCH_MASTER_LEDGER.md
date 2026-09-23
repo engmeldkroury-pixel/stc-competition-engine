@@ -420,3 +420,64 @@ Status: IN VERIFICATION.
 - PR #113 supersedes #110 on current main.
 - Target registry: 10 SHADOW component-symbol-timeframe records.
 - MULTITF_CONFIRMED remains zero because none of the original 15m components passed the same component on another timeframe.
+
+
+## Owner continuity checkpoint — 2026-09-24 00:50 EEST
+
+Controlling owner instruction:
+- Continue the STC adaptive-strategy program from the last verified state without waiting for repeated chat prompts.
+- Preserve all new strategy, indicator, weighting, research-layer, General Lab, validation, and promotion decisions in durable project history before advancing work.
+- A future/new chat must be able to continue from repository state alone.
+
+The complete target architecture is therefore fixed as:
+1. Native STC strategy matrix per symbol/timeframe.
+2. Community/composite indicator discovery catalog, expanded continuously with practical/high-use candidates.
+3. Causal/repaint audit before an indicator becomes benchmarkable.
+4. Bounded parameter search on TRAIN only.
+5. OOS TEST + FORWARD validation.
+6. Exact final frozen holdout; insufficient history fails closed.
+7. Symbol/timeframe-specific ensemble weights.
+8. Redundancy/family normalization so correlated indicators cannot create fake consensus.
+9. Shadow registry and multi-timeframe confirmation ladder.
+10. Live outcomes accumulated as evidence, with recalibration only on frozen batches/windows.
+11. General Lab must automatically inherit the entire PROCESS for every newly added symbol; it never inherits weights from another symbol.
+12. Popularity/followers/reviews are discovery priority and qualitative audit evidence only, never direct trading weights.
+13. Human manual execution remains mandatory; research never grants broker execution authority.
+14. No live A+ / risk / competition rule change without a separate explicit promotion decision.
+
+Current executable community pool in main is 14 components:
+- UT Bot Alerts
+- Squeeze Momentum
+- WaveTrend Crosses
+- Hull Suite
+- SuperTrend
+- Chandelier Exit
+- Schaff Trend Cycle
+- Range Filter Buy/Sell
+- AlphaTrend
+- Optimized Trend Tracker
+- QQE MOD
+- SSL Hybrid
+- Waddah Attar Explosion
+- QQE + SSL + WAE composite
+
+Current durable research evidence:
+- 26-symbol 15m native-vs-community run completed.
+- Exact 85/15 final unseen confirmation completed.
+- 10 research-only SHADOW records now exist across 15m/5m/30m/1h.
+- No same-component multi-timeframe confirmation yet for the original 15m survivors.
+- community_indicator_live_authority remains false.
+
+General Lab current runtime boundary:
+- Main already exposes protected research-only endpoints for plan/evaluate/shadow-candidates.
+- Evaluation requires exact-provider OHLCV series; the hosted STC server cannot itself call the ChatGPT TradingView MCP by ticker.
+- Therefore the UI can automate plan/queue/status, but full automatic historical evaluation requires an authorized exact-provider data worker/connector or supplied exact series.
+- This limitation must be shown as a data-source blocker, never bypassed with silent provider substitution.
+
+Next implementation order:
+A. finish General Lab owner-console/runtime bridge;
+B. add durable research-request/queue status so adding a Lab symbol creates a research job request automatically;
+C. keep evaluation fail-closed until exact-provider series arrives;
+D. continue indicator expansion/audit, prioritizing Lorentzian Classification and other practical high-use composites;
+E. extend frozen multi-timeframe scans only where the evidence floor is met;
+F. keep all candidates SHADOW until promotion rules are independently satisfied.
