@@ -29,19 +29,14 @@ The A+ gate is correctly fail-closed because fresh legacy feed cards do not cont
 
 Do NOT weaken the quality gate to compensate.
 
-## URGENT OWNER ACTION 1 — DEPLOY DASHBOARD PATCH
-Upload the current main version of:
-- hostinger_patch/operator.php
-
-to the existing STC public_html directory, replacing only the deployed operator.php.
-
-Expected visible additions:
+## HOSTINGER DEPLOYMENT — COMPLETE
+The current control-bundle deployment is confirmed live. The Owner Console shows:
 - Competition Watchlist — strongest blocked candidates.
-- MTF LIVE CONFIRMATION OFFLINE warning when required evidence is absent.
+- MTF LIVE CONFIRMATION OFFLINE.
 
-Do not replace bridge/database files.
+No additional Hostinger deployment is required before MTF alert activation.
 
-## URGENT OWNER ACTION 2 — CREATE SIX v1.1 TRADINGVIEW ALERTS
+## URGENT OWNER ACTION — CREATE SIX v1.1 TRADINGVIEW ALERTS
 Follow:
 - docs/MTF_PRODUCTION_ACTIVATION.md
 

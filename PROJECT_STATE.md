@@ -1691,3 +1691,17 @@ Owner intervention required now: YES — only for historical-data access, not fo
 - Live Hostinger operator.php does not auto-deploy from GitHub and still shows the pre-PR #97 shell. Latest operator.php must be uploaded manually.
 - TradingView Official MCP cannot create indicator/Pine alerts. Six fresh v1.1 alerts must be created manually from the current Pine scripts before live A+ confirmation can function.
 - Browser automation fallback was attempted but could not start because the connected TinyFish wallet is out of funds; no TradingView change occurred.
+
+
+## Hostinger control-bundle deployment confirmed — 2026-09-23
+- Owner updated the current STC control bundle in public_html.
+- Visual owner-console evidence shows the new Competition Watchlist and MTF LIVE CONFIRMATION OFFLINE panel.
+- Independent live fetch confirms https://stc.feama.site/operator.php exposes the new watchlist section.
+- Live bridge status remains healthy and continues ingesting production events.
+- TradingView legacy production alerts remain active:
+  - 5662088915 Capital 10-symbol 15m.
+  - 5664752419 AMP Feed A 8-symbol 15m.
+  - 5664684004 AMP Feed B 8-symbol 15m.
+- No additional Hostinger file deployment is required before v1.1 MTF alert activation.
+- Safe Mode and Kill Switch remain ON.
+- Next owner-only activation step is creation of the six v1.1 Pine indicator alerts documented in docs/MTF_PRODUCTION_ACTIVATION.md.
