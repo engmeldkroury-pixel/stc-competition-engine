@@ -1891,3 +1891,25 @@ Owner intervention required now: YES — only for historical-data access, not fo
 - PR #110 was superseded by PR #113 after main advanced; the final #110 CI was green but no merge was performed.
 - PR #113 carries the 10-record SHADOW registry update on current main; CI pending.
 - Live authority remains false and no competition A+ gate/risk/execution rule changed.
+
+
+## Owner continuity + General Lab next-stage checkpoint — 2026-09-24 00:50 EEST
+- Owner explicitly required all adaptive-strategy/indicator/weighting/General-Lab decisions to be durable in repository history before more work, so future chats can continue without reconstruction.
+- Controlling durable ledger: docs/STC_ADAPTIVE_RESEARCH_MASTER_LEDGER.md.
+- Main already contains:
+  - 14 implemented community research adapters;
+  - redundancy-aware family normalization;
+  - exact frozen holdout rules;
+  - 10-record research-only shadow registry;
+  - protected serverless General Lab plan/evaluate/shadow endpoints;
+  - live_authority=false throughout research paths.
+- PR #112 and #113 are closed/unmerged as PR objects, but their intended functional outcomes are already present on current main through later/superseding repository changes:
+  - protected General Lab research endpoints exist in api/index.py;
+  - research/community_shadow_registry.json contains 10 records;
+  - tests assert 10 records and protected serverless research behavior.
+- Remaining General Lab gap is not research logic; it is runtime data orchestration/UI:
+  - operator.php currently stores General Lab symbols locally only;
+  - hosted STC cannot fetch TradingView MCP history directly;
+  - exact-provider historical series must come from an authorized worker/connector;
+  - no alternate provider substitution is allowed.
+- Next work: add General Lab UI status/plan + durable request queue, then continue high-value indicator causal audits and frozen multi-timeframe research.
