@@ -15,7 +15,7 @@ from app.shadow_promotion_registry import (
 def test_default_shadow_registry_is_research_only():
     load_shadow_registry.cache_clear()
     rows = load_shadow_registry()
-    assert len(rows) == 10
+    assert len(rows) == 12
     assert {x.state for x in rows} == {"SHADOW"}
     assert all(x.live_authority is False for x in rows)
     assert all(next_research_state(x) == "SHADOW" for x in rows)
@@ -65,3 +65,15 @@ def test_public_shadow_record_never_grants_execution():
         "MULTITF_CONFIRMED",
         "ELIGIBLE_FOR_OWNER_PROMOTION",
     )
+
+
+def test_wave2_trendilo_records_remain_shadow_only():
+    load_shadow_registry.cache_clear()
+    rows = [
+        row for row in load_shadow_registry()
+        if row.component_id == "trendilo" and row.timeframe == "15"
+    ]
+    assert {row.symbol for row in rows} == {"CAPITALCOM:BTCUSD", "CME_MINI:MJY1!"}
+    assert all(row.state == "SHADOW" for row in rows)
+    assert all(row.live_authority is False for row in rows)
+    assert all(next_research_state(row) == "SHADOW" for row in rows)

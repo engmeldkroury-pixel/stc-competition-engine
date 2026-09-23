@@ -1,9 +1,9 @@
 {
   "schema_version": "stc-community-shadow-registry-v1",
-  "generated_at_utc": "2026-09-23T21:17:15Z",
-  "source_run_id": 35919916518,
+  "generated_at_utc": "2026-09-23T22:14:00Z",
+  "source_run_id": 35926880568,
   "live_authority": false,
-  "rule": "All frozen-pass candidates enter SHADOW with live_authority=false. MULTITF_CONFIRMED requires the same component to independently pass a supporting timeframe or a separately approved equivalence rule; no current record meets that condition.",
+  "rule": "All frozen-pass candidates enter SHADOW with live_authority=false. MULTITF_CONFIRMED requires the same component to independently pass a supporting timeframe or a separately approved equivalence rule; no current record meets that condition. Wave-two Trendilo survivors were added from exact frozen run 35926880568.",
   "promotion_ladder": [
     "FROZEN_PASS",
     "SHADOW",
@@ -325,10 +325,81 @@
         "Independent 1h frozen pass from WU-110 multi-timeframe scan.",
         "Not same-component confirmation of the MCL 15m SSL Hybrid candidate."
       ]
+    },
+    {
+      "symbol": "CAPITALCOM:BTCUSD",
+      "timeframe": "15",
+      "component_id": "trendilo",
+      "family": "adaptive_momentum",
+      "state": "SHADOW",
+      "selected_parameters": {
+        "alma_offset": 0.85,
+        "alma_sigma": 6,
+        "band_multiplier": 1.25,
+        "lookback": 50,
+        "smoothing": 1
+      },
+      "development_test_trades": 21,
+      "development_test_expectancy_r": 0.08433846576120035,
+      "development_test_profit_factor": 1.1419156875789407,
+      "development_forward_trades": 27,
+      "development_forward_expectancy_r": 0.09550955323142342,
+      "development_forward_profit_factor": 1.1879719462392104,
+      "frozen_trades": 22,
+      "frozen_expectancy_r": 0.19528442761425752,
+      "frozen_profit_factor": 1.3866232310590296,
+      "frozen_max_drawdown_r": 7.2849079509026495,
+      "source_run_id": 35926880568,
+      "source_date": "2026-09-24",
+      "live_authority": false,
+      "shadow_observations": 0,
+      "shadow_expectancy_r": null,
+      "supporting_timeframes": [],
+      "notes": [
+        "Wave-two Trendilo final 15% unseen holdout passed.",
+        "Research-only SHADOW entry; no live authority.",
+        "Requires shadow observation and independent supporting-timeframe evidence before owner promotion eligibility."
+      ]
+    },
+    {
+      "symbol": "CME_MINI:MJY1!",
+      "timeframe": "15",
+      "component_id": "trendilo",
+      "family": "adaptive_momentum",
+      "state": "SHADOW",
+      "selected_parameters": {
+        "alma_offset": 0.85,
+        "alma_sigma": 6,
+        "band_multiplier": 1.25,
+        "lookback": 50,
+        "smoothing": 1
+      },
+      "development_test_trades": 26,
+      "development_test_expectancy_r": 0.12086736389402869,
+      "development_test_profit_factor": 1.2009304003353374,
+      "development_forward_trades": 19,
+      "development_forward_expectancy_r": 0.06209964528060579,
+      "development_forward_profit_factor": 1.1031375227562523,
+      "frozen_trades": 22,
+      "frozen_expectancy_r": 0.1508503781936634,
+      "frozen_profit_factor": 1.2713051298003084,
+      "frozen_max_drawdown_r": 5.199999999999797,
+      "source_run_id": 35926880568,
+      "source_date": "2026-09-24",
+      "live_authority": false,
+      "shadow_observations": 0,
+      "shadow_expectancy_r": null,
+      "supporting_timeframes": [],
+      "notes": [
+        "Wave-two Trendilo final 15% unseen holdout passed.",
+        "Independent adaptive-momentum family; existing MJY AlphaTrend/WAE/Squeeze candidates remain separate.",
+        "Research-only SHADOW entry; no live authority."
+      ]
     }
   ],
   "source_run_ids": [
     35919916518,
-    35921398218
+    35921398218,
+    35926880568
   ]
 }
