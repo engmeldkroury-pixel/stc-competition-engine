@@ -1618,3 +1618,16 @@ Owner intervention required now: YES — only for historical-data access, not fo
   - historical_context_locked=true and frozen_context_bars=1000 for both.
   - optimization_locked=true; live_calibration_authority=false.
 - No 15m competition trade is authorized.
+
+
+## Automatic exact-provider accumulation watch — 2026-09-23
+- A ChatGPT recurring condition-watch is enabled at hourly frequency for the normal TradingView exact-provider accumulation path.
+- Each iteration must read current main before acting.
+- It checks CME_MINI:MNQ1! and CAPITALCOM:BTCUSD 15m through TradingView Official MCP.
+- If no meaningful newly confirmed evidence exists, it remains silent and makes no unnecessary repository change.
+- If newly confirmed evidence exists, it performs the controlled archive -> PR/CI -> frozen confirmation v2 -> state checkpoint workflow.
+- Mutable final bars remain withheld.
+- Frozen pre-freeze contexts remain immutable.
+- Same-dataset retuning remains prohibited.
+- No trade authorization or execution is permitted by this watch.
+- A user notification is required only for meaningful evidence/status changes or a genuine owner-only blocker.
