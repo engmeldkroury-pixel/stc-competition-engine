@@ -93,12 +93,14 @@ Verified public description:
 - open-source ATR-based trend indicator;
 - similar purpose to SuperTrend but different trend-identification logic.
 
-STC decision:
-- useful because it may provide non-identical ATR trend information;
-- exact swing-state transition semantics must be verified before enabling a benchmark adapter;
-- do not approximate it as SuperTrend under a different name.
+STC implementation:
+- independent causal implementation of the documented HalfTrend swing-extreme + SMA transition state;
+- benchmark emits only confirmed trend flips;
+- ATR channel visuals do not create additional entry signals;
+- bounded amplitude is selected on TRAIN only;
+- prefix-invariance test protects against future-bar dependence.
 
-Status: PENDING_EXACT_TRANSITION_AUDIT.
+Status: CAUSAL_VERIFIED adapter; benchmark evidence pending.
 
 ## VuManChu Cipher B + Divergences
 
