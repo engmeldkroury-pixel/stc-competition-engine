@@ -19,8 +19,11 @@ def test_operator_supports_treasury_exchange_quotes_and_tick_aligned_decimals() 
 
 def test_existing_position_uses_single_inline_form_instead_of_prompt_chain() -> None:
     source = _source()
-    assert 'id="position-modal"' in source
+    assert 'id="record-panel"' in source
     assert "function submitPositionModal()" in source
+    assert "EXECUTION TICKET" in source
+    assert "TradingView size mode: Units / Contracts — NOT % balance" in source
+    assert "Advanced details / why STC selected this setup" in source
     assert "Already filled on platform? Record position" in source
     manual_start = source.index("function recordExistingPosition(")
     manual_end = source.index("function recordFilledPosition(", manual_start)
