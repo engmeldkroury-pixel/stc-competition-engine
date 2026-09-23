@@ -1,68 +1,56 @@
 # NEXT TASK
 
-Updated: 2026-09-24 00:50 EEST
+Updated: 2026-09-24 01:05 EEST
 
 ## CONTROLLING PROJECT
 STC.
 
-## AUTHORITATIVE CONTINUITY
-Read first:
+## READ FIRST
 - docs/STC_ADAPTIVE_RESEARCH_MASTER_LEDGER.md
 - PROJECT_STATE.md
 
-Owner instruction: continue from repository state without requiring the owner to restate the strategy program after a new chat.
-
 ## VERIFIED COMPLETE
-- Native STC strategy matrix exists.
-- 14 implemented community/composite research adapters exist.
-- Train-only tuning + OOS TEST + FORWARD exists.
-- Exact 85/15 final frozen holdout exists and fails closed on insufficient history.
-- Redundancy-aware family normalization exists.
-- 26-symbol 15m native/community benchmark archived.
-- Final unseen 15m confirmation archived.
-- Multi-timeframe frozen scan archived.
-- 10 research-only SHADOW records exist.
-- Protected serverless endpoints exist:
-  - POST /research/general-lab/plan
-  - POST /research/general-lab/evaluate
-  - GET /research/shadow-candidates
+- Adaptive native/community research framework.
+- 14 implemented community/composite research adapters.
+- Train-only tuning, OOS TEST, FORWARD, exact final frozen holdout.
+- Redundancy-aware family normalization.
+- 26-symbol 15m benchmark + frozen confirmation + multi-timeframe scan.
+- 10-record research-only SHADOW registry.
+- General Lab serverless research endpoints.
+- General Lab durable Hostinger queue/runtime bridge merged in PR #117.
 - community_indicator_live_authority=false.
 
-## ACTIVE WORK
-Finish the General Lab runtime bridge.
+## REQUIRED HOSTINGER DEPLOYMENT FOR WU-114
+Run once:
+- hostinger_patch/migrations/004_general_lab_queue.sql
 
-Required behavior when owner adds/saves a General Lab symbol:
-1. persist the symbol in the existing local General Lab list;
-2. automatically build/show the STC research plan for that symbol;
-3. show any existing SHADOW records for the symbol;
-4. create/show a research request status;
-5. if exact-provider OHLCV is not available, show WAITING_FOR_EXACT_HISTORY and fail closed;
-6. once exact-provider series is supplied by an authorized worker/connector, call the existing research evaluation engine;
-7. display a compact result: validated native strategies, validated community components, frozen/shadow status, and no live authority.
+Upload:
+- hostinger_patch/general_lab.php
+- updated hostinger_patch/operator.php
 
-## DATA-SOURCE BLOCKER
-The hosted STC server cannot call ChatGPT TradingView MCP directly by ticker.
-Do not substitute another provider silently.
-Full one-click historical evaluation requires an authorized exact-provider worker/connector or supplied exact series.
+No new secret/config change is required.
 
-## RESEARCH CONTINUATION
-After the General Lab bridge:
-1. causal/repaint-safe audit and implementation priority:
-   - Lorentzian Classification;
-   - HalfTrend;
-   - VuManChu Cipher B;
-   - Trendilo;
-   - Nadaraya-Watson non-repainting mode;
-   - other high-use practical open-source composites found by review;
-2. run exact-provider frozen benchmark before any research weight;
-3. extend 5m/30m/1h/2h/4h/1D only when evidence floor is met;
-4. accumulate shadow/live outcomes, but recalibrate only on frozen batches/windows.
+## NEXT RESEARCH WORK UNIT
+Expand practical community/composite research coverage without weakening validation:
+1. implement/audit Trendilo as a causal conceptual adapter;
+2. implement a separate endpoint Nadaraya-Watson non-repainting adapter rather than using repainting output;
+3. continue exact audit of Lorentzian Classification and Backtest Stream semantics;
+4. keep HalfTrend and VuManChu pending until causal transition/divergence timing is defensible;
+5. add causality/prefix-invariance tests and TRAIN-only parameter grids;
+6. run exact-provider 26-symbol 15m frozen benchmark on newly implemented candidates;
+7. only successful frozen survivors enter SHADOW; no live authority.
+
+## GENERAL LAB CONTINUATION
+- New symbols automatically queue the research PROCESS.
+- If provider-qualified exact history is absent, status stays WAITING_FOR_EXACT_HISTORY.
+- Bare symbols remain WAITING_FOR_SYMBOL_RESOLUTION until an authorized data worker resolves the TradingView ticker.
+- Never inherit another symbol's weights.
 
 ## NON-NEGOTIABLE
 - no lookahead;
-- no repainting evidence unless explicit non-repainting mode is verified;
-- no cross-symbol weight inheritance;
+- no repainting evidence;
+- no silent provider substitution;
 - no popularity/review-based trading weights;
-- no live A+ or risk-rule weakening;
+- no cross-symbol weight inheritance;
 - no automatic broker execution;
-- no provider substitution.
+- no live A+/risk-rule changes from research alone.
