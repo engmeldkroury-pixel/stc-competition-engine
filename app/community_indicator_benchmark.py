@@ -314,6 +314,12 @@ def indicator_parameter_grid(indicator_id: str) -> tuple[dict, ...]:
             {"qqe_rsi_period": 6, "qqe_smoothing": 5, "qqe_fast_factor": 3.0, "qqe_slow_factor": 1.61, "qqe_threshold": 3.0, "ssl_baseline_length": 60, "ssl_length": 15, "wae_fast_length": 20, "wae_slow_length": 40, "wae_sensitivity": 150.0},
             {"qqe_rsi_period": 6, "qqe_smoothing": 5, "qqe_fast_factor": 2.5, "qqe_slow_factor": 1.61, "qqe_threshold": 2.0, "ssl_baseline_length": 50, "ssl_length": 10, "wae_fast_length": 12, "wae_slow_length": 26, "wae_sensitivity": 100.0},
         ),
+        "halftrend_everget": (
+            {"amplitude": 2},
+            {"amplitude": 3},
+            {"amplitude": 5},
+            {"amplitude": 10},
+        ),
         "trendilo": (
             {"smoothing": 1, "lookback": 50, "alma_offset": 0.85, "alma_sigma": 6.0, "band_multiplier": 1.0},
             {"smoothing": 1, "lookback": 34, "alma_offset": 0.85, "alma_sigma": 6.0, "band_multiplier": 1.0},
