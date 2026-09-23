@@ -68,6 +68,8 @@ def test_community_catalog_separates_research_popularity_from_live_weighting():
         "chandelier_exit_everget",
         "schaff_trend_cycle",
         "range_filter_guikroth",
+        "alphatrend",
+        "optimized_trend_tracker",
     ),
 )
 def test_community_indicator_adapters_are_causal(indicator_id: str):
@@ -99,6 +101,8 @@ def test_symbol_benchmark_runs_each_implemented_indicator_independently():
         "chandelier_exit_everget",
         "schaff_trend_cycle",
         "range_filter_guikroth",
+        "alphatrend",
+        "optimized_trend_tracker",
     } <= ids
     assert all(trial.symbol == "CBOT:ZN1!" for trial in trials)
     assert all(trial.timeframe == "15" for trial in trials)
