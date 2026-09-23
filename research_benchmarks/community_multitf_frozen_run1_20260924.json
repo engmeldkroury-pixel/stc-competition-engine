@@ -1,0 +1,153 @@
+{
+  "workflow_run_id": 35921398218,
+  "status": "success",
+  "source": "TradingView Official MCP exact-symbol OHLCV; 2h derived from exact 1h",
+  "symbols_tested": 5,
+  "timeframes_tested": [
+    "5",
+    "30",
+    "60",
+    "120",
+    "240",
+    "1D"
+  ],
+  "live_authority": false,
+  "component_timeframe_pass_counts": {
+    "5:supertrend_kivanc": 1,
+    "5:squeeze_momentum_lazybear": 1,
+    "30:ut_bot_alerts": 1,
+    "60:hull_suite": 1
+  },
+  "same_component_support_for_original_15m_candidates": [],
+  "new_frozen_candidates": [
+    {
+      "symbol": "CAPITALCOM:XAUUSD",
+      "timeframe": "5",
+      "component_id": "supertrend_kivanc",
+      "selected_parameters": {
+        "atr_period": 10,
+        "multiplier": 3
+      },
+      "development_test": {
+        "trades": 24,
+        "expectancy_r": 0.1666477698706807,
+        "profit_factor": 1.3502161335618084
+      },
+      "development_forward": {
+        "trades": 23,
+        "expectancy_r": 0.205371010806483,
+        "profit_factor": 1.4075196683871543
+      },
+      "frozen": {
+        "trades": 16,
+        "expectancy_r": 0.06619195646659021,
+        "profit_factor": 1.1071808045824192,
+        "max_drawdown_r": 4.179762870325044
+      }
+    },
+    {
+      "symbol": "CME_MINI:MJY1!",
+      "timeframe": "5",
+      "component_id": "squeeze_momentum_lazybear",
+      "selected_parameters": {
+        "length": 14,
+        "bb_mult": 2,
+        "kc_mult": 1.5
+      },
+      "development_test": {
+        "trades": 110,
+        "expectancy_r": 0.1062809076701064,
+        "profit_factor": 1.1857027196450554
+      },
+      "development_forward": {
+        "trades": 105,
+        "expectancy_r": 0.3677736089413298,
+        "profit_factor": 1.7665157697011868
+      },
+      "frozen": {
+        "trades": 98,
+        "expectancy_r": 0.2703425714278002,
+        "profit_factor": 1.5213980359348354,
+        "max_drawdown_r": 5.654579122198395
+      }
+    },
+    {
+      "symbol": "NYMEX:MCL1!",
+      "timeframe": "30",
+      "component_id": "ut_bot_alerts",
+      "selected_parameters": {
+        "atr_period": 10,
+        "key_value": 1
+      },
+      "development_test": {
+        "trades": 64,
+        "expectancy_r": 0.09434915715665429,
+        "profit_factor": 1.2279410253928744
+      },
+      "development_forward": {
+        "trades": 68,
+        "expectancy_r": 0.04316165949295137,
+        "profit_factor": 1.0973672727385975
+      },
+      "frozen": {
+        "trades": 63,
+        "expectancy_r": 0.2639484390430606,
+        "profit_factor": 1.6438591008089614,
+        "max_drawdown_r": 6.41184193742945
+      }
+    },
+    {
+      "symbol": "NYMEX:MCL1!",
+      "timeframe": "60",
+      "component_id": "hull_suite",
+      "selected_parameters": {
+        "length": 89
+      },
+      "development_test": {
+        "trades": 102,
+        "expectancy_r": 0.1285829564572322,
+        "profit_factor": 1.260455640054694
+      },
+      "development_forward": {
+        "trades": 105,
+        "expectancy_r": 0.06319080601593217,
+        "profit_factor": 1.1227584405852056
+      },
+      "frozen": {
+        "trades": 93,
+        "expectancy_r": 0.1668720292712643,
+        "profit_factor": 1.3419765515366309,
+        "max_drawdown_r": 6.135760187953549
+      }
+    }
+  ],
+  "symbol_summary": {
+    "CAPITALCOM:USDZAR": {},
+    "CAPITALCOM:XAUUSD": {
+      "5": [
+        "supertrend_kivanc"
+      ]
+    },
+    "CBOT:ZB1!": {},
+    "CME_MINI:MJY1!": {
+      "5": [
+        "squeeze_momentum_lazybear"
+      ]
+    },
+    "NYMEX:MCL1!": {
+      "30": [
+        "ut_bot_alerts"
+      ],
+      "60": [
+        "hull_suite"
+      ]
+    }
+  },
+  "notes": [
+    "No original 15m frozen component independently passed on a second tested timeframe.",
+    "The four new timeframe/component passes are separate frozen shadow candidates, not confirmation of the original 15m component.",
+    "2h was derived from exact 1h data; with the current 5,000-bar connector cap it has too few bars for the exact 85/15 + 500-bar final holdout rule and therefore fails closed.",
+    "Some daily histories were also below the frozen-history minimum and fail closed.",
+    "No live authority or A+ weight changed."
+  ]
+}
