@@ -1827,3 +1827,17 @@ Owner intervention required now: YES — only for historical-data access, not fo
   - test history increased so the invariance test has a valid >=500-bar unseen holdout;
   - live_authority remains false.
 - PR #108 CI run #374 is currently in progress.
+
+
+## Frozen confirmation execution checkpoint — 2026-09-24 00:05 EEST
+- PR #108 merged as 71d338dc34ec3804b042811c66d98aa7f4b1d89f.
+- PR #108 CI run #374 passed.
+- Exact frozen methodology is now in main:
+  - 85% development;
+  - 15% untouched final holdout;
+  - insufficient holdout sample fails closed instead of silently resizing the split;
+  - frozen pass creates research promotion candidate only;
+  - live_authority=false.
+- Research execution branch created: research/community-frozen-15m-20260924.
+- It reuses the 26 exact-provider 5,000-bar 15m datasets from the completed native-community benchmark and includes the merged frozen-confirmation code.
+- GitHub Actions frozen-confirmation run id 35919916518 started for all 26 symbols.
