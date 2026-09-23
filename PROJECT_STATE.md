@@ -1580,3 +1580,26 @@ Owner intervention required now: YES — only for historical-data access, not fo
 - No credential value was exposed and no external trading/data action occurred.
 - Interpretation: the secrets are not available in the repository Actions context under the exact required names. Likely causes include wrong repository, wrong scope, wrong names, environment-only secrets without matching job environment, or values added as variables instead of repository Actions secrets.
 - Owner action required: make the three exact names available under this repository's Settings > Secrets and variables > Actions > Repository secrets. Do not paste values into chat.
+
+
+## Context-locked frozen confirmation checkpoint — 2026-09-23
+- Owner clarified that no Capital.com account exists. Capital.com credentials/backfill are therefore parked as an optional future path; no account creation is required for the STC project.
+- Exact-provider path remains TradingView Official MCP.
+- PR #91 merged to main as 0553d5e0423ee038645183de0598097af539f7f3.
+- CI on PR #91: 335 passed, 2 warnings.
+- TradingView confirmed-only archives were refreshed:
+  - MNQ archive confirmed through t=1790129700; latest mutable tail t=1790130600 withheld.
+  - BTCUSD archive confirmed through t=1790130600; latest mutable tail t=1790131500 withheld.
+- BTCUSD overlap refresh showed 21 same-provider pre-freeze revisions. Close was unchanged on all 21; changes were primarily volume, with one low+volume revision.
+- This exposed a scientific-integrity issue: mutable/revised pre-freeze history could otherwise alter feature warm-up during a supposedly frozen unseen test.
+- Frozen confirmation v2 now locks exactly 1000 pre-freeze development bars copied from the original Strategy Lab v2 research-input branches and ending exactly at each freeze timestamp.
+- Context source branches:
+  - MNQ: research/strategy-v2-xau-mnq-20260922 / research_inputs/mnq/15m.json / run 35781036628.
+  - BTCUSD: research/strategy-v2-btc-mcl-20260922 / research_inputs/btcusd/15m.json / run 35781933861.
+- Frozen confirmation run 35812474596 completed successfully:
+  - MNQ: 25 unseen confirmed bars, 0 completed trades, 1 incomplete open trade, ACCUMULATING.
+  - BTCUSD: 46 unseen confirmed bars, 1 completed trade, -0.32121976097584065R, ACCUMULATING.
+  - Both: historical_context_locked=true; frozen_context_bars=1000; optimization_locked=true; live_calibration_authority=false.
+- The 30-completed-unseen-trade judgment floor remains unchanged.
+- Same-dataset tuning remains CLOSED.
+- No 15m competition trade is authorized.

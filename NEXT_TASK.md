@@ -3,7 +3,7 @@
 Updated: 2026-09-23
 
 ## Active objective
-Increase genuinely unseen 15m evidence depth without reopening same-dataset tuning, weakening any validation/risk gate, or mixing alternate-provider history into exact-provider evidence.
+Accumulate genuinely unseen, confirmed 15m TradingView Official MCP evidence against immutable pre-freeze development context. Do not reopen same-dataset tuning, weaken validation/risk gates, or mix alternate-provider data into exact-provider confirmation.
 
 ## Research state
 - Strategy Lab v2: completed.
@@ -15,26 +15,19 @@ Increase genuinely unseen 15m evidence depth without reopening same-dataset tuni
 - BTCUSD 1D trend_pullback remains VALIDATED research-only.
 - No higher-timeframe result authorizes 15m runtime.
 
-## Exact-provider archive state
-- Archive merger is confirmed-bar only; mutable TradingView tail bars are withheld.
-- CME_MINI:MNQ1!:
-  - freeze timestamp actually used by development research: 1790103600
-  - confirmed archive through: 1790109000
-  - unseen confirmed bars: 6
-- CAPITALCOM:BTCUSD:
-  - freeze timestamp actually used by development research: 1790089200
-  - confirmed archive through: 1790113500
-  - unseen confirmed bars: 27
+## Frozen-confirmation integrity
+Active manifest: research_hypotheses/frozen_15m_v2.json
 
-## Frozen hypotheses
-Manifest: research_hypotheses/frozen_15m_v1.json
+Frozen confirmation v2 uses exactly 1000 immutable pre-freeze development bars from the original Strategy Lab v2 research inputs for feature warm-up. Later TradingView revisions to pre-freeze history cannot alter the frozen confirmation context.
 
 1. MNQ vwap_reversion / 15m
+   - freeze_t: 1790103600
    - threshold 0.72
    - stop 1.2 ATR
    - target 2.5R
    - max hold 16 bars
 2. BTCUSD bollinger_mean_reversion / 15m
+   - freeze_t: 1790089200
    - threshold 0.50
    - stop 1.2 ATR
    - target 2.5R
@@ -42,48 +35,41 @@ Manifest: research_hypotheses/frozen_15m_v1.json
 
 No parameter or regime retuning is allowed during unseen confirmation.
 
-## Current frozen-confirmation result
-Optimized smoke run: 35791585192
-- MNQ: 6 unseen bars, 0 completed trades, ACCUMULATING.
-- BTCUSD: 27 unseen bars, 1 completed trade, -0.32121976097584065R, ACCUMULATING.
+## Latest exact-provider archive state
+- MNQ:
+  - confirmed through: 1790129700
+  - mutable tail 1790130600 withheld
+- BTCUSD:
+  - confirmed through: 1790130600
+  - mutable tail 1790131500 withheld
+
+## Latest frozen-confirmation result
+Run: 35812474596
+- MNQ: 25 unseen bars, 0 completed trades, 1 incomplete open trade, ACCUMULATING.
+- BTCUSD: 46 unseen bars, 1 completed trade, -0.32121976097584065R, ACCUMULATING.
+- Both use historical_context_locked=true and frozen_context_bars=1000.
 - Minimum judgment floor: 30 completed unseen trades.
 - ACCUMULATING is not a failure.
 - Any future UNSEEN_SUPPORT still requires a second confirmation decision.
 - live_calibration_authority remains false.
 
-## Ready automatic paths
-### A. Future exact-provider accumulation
-1. Pull TradingView Official MCP 15m snapshots.
-2. Merge into research_archive with timestamp de-duplication and revised-bar evidence.
-3. Withhold current mutable tail.
-4. Do not retune hypotheses.
-5. Re-run frozen confirmation only when meaningful new evidence exists.
+## Active automatic path
+1. Pull fresh TradingView Official MCP 15m snapshots for CME_MINI:MNQ1! and CAPITALCOM:BTCUSD.
+2. Merge by timestamp into research_archive.
+3. Withhold the current mutable final bar.
+4. Preserve provider revision evidence; frozen v2 context remains immutable.
+5. Do not retune hypotheses.
+6. Re-run context-locked frozen confirmation when meaningful confirmed new evidence exists.
+7. Keep Safe Mode, Kill Switch, manual approval, and manual execution enabled.
 
-### B. Capital.com deeper-history path for CAPITALCOM symbols
-Infrastructure is merged and ready:
-- read-only market discovery;
-- from/to historical backfill;
-- explicit bid/ask/mid price basis;
-- secure GitHub Actions secret handling;
-- overlap reconciliation against TradingView;
-- alternate-provider quarantine.
+## Optional deeper-history paths
+### TradingView / MNQ
+TradingView MCP cannot back-page older than its rolling 5000 bars. Immediate deeper MNQ 15m history requires either:
+- a deeper TradingView CSV export; or
+- authorized CME DataMine access.
 
-After owner adds the required GitHub Actions secrets:
-1. Create a capital-backfill/** discovery branch/request.
-2. Discover and verify the exact Capital.com epic.
-3. Fetch an overlap window first.
-4. Run cross-feed reconciliation.
-5. Review basis-point and return-correlation evidence.
-6. Only if the feed is sufficiently compatible for research, fetch the older historical window.
-7. Keep Capital history separate from research_archive; never silently merge providers.
-8. Use alternate-source results only as additional research evidence, not as frozen exact-provider confirmation.
-
-### C. MNQ immediate older-history path
-TradingView MCP cannot page backward beyond 5000 bars.
-For immediate older MNQ 15m evidence, owner must provide one of:
-- TradingView CSV export with deeper loaded chart history; or
-- authorized CME DataMine historical access/entitlement.
-Otherwise continue future exact-provider accumulation.
+### Capital.com
+Capital.com backfill infrastructure remains implemented but is PARKED because the owner does not have a Capital.com account. Do not request credentials and do not require account creation for STC. If the owner independently chooses to use Capital.com later, the existing discovery/overlap/reconciliation workflow can be reactivated.
 
 ## Production safeguards
 - Safe Mode and Kill Switch remain enabled.
@@ -94,15 +80,6 @@ Otherwise continue future exact-provider accumulation.
 - No current result authorizes a 15m competition trade.
 
 ## Owner dependency — CURRENT
-Capital.com discovery infrastructure is ready, but workflow run 35804984405 proved that all three required secret-backed environment variables are currently empty in this repository Actions context. Immediate deep-history work is blocked only by making the existing credentials visible under the exact repository Actions secret names.
+No owner action is required for the normal future TradingView accumulation path.
 
-For Capital.com workflow, verify these exact names exist under this repository's Settings > Secrets and variables > Actions > Repository secrets:
-- CAPITAL_API_KEY
-- CAPITAL_IDENTIFIER
-- CAPITAL_PASSWORD
-
-Do not use plain Actions variables for these credentials. If they were added as Environment secrets, either move/copy them to Repository secrets or explicitly bind the workflow job to that environment before rerunning.
-
-Do not paste these values into ChatGPT or commit them to the repository.
-
-For MNQ, provide a deeper TradingView CSV export or authorized CME DataMine access if immediate backfill is required.
+Immediate historical expansion beyond the rolling TradingView MCP window is the only owner-controlled dependency. If immediate backfill is required, provide a deeper TradingView CSV export or authorized CME DataMine access. Otherwise continue exact-provider accumulation as new confirmed bars arrive.
