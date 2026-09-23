@@ -1865,3 +1865,29 @@ Owner intervention required now: YES — only for historical-data access, not fo
   - research_benchmarks/community_frozen_15m_run1_summary_20260924.json
   - docs/COMMUNITY_FROZEN_15M_RUN1_20260924.md
 - live_authority remains false. No live A+ gate, risk rule, competition rule, or execution behavior changed.
+
+
+## Shadow registry + multi-timeframe frozen research — 2026-09-24 00:25 EEST
+- PR #109 merged as 6f855e16f52a97f662dff79f837326277d4a5a4f.
+  - CI: 367 passed, 1 warning.
+  - Adds durable research/community_shadow_registry.json.
+  - Adds explicit research ladder FROZEN_PASS -> SHADOW -> MULTITF_CONFIRMED -> ELIGIBLE_FOR_OWNER_PROMOTION.
+  - Adds GET /research/shadow-candidates.
+  - Registry rejects live_authority=true by contract.
+- Multi-timeframe frozen workflow run 35921398218 completed successfully for the 5 symbols that owned the six 15m frozen survivors.
+- Exact-provider timeframes tested: 5m, 30m, 1h, 4h, 1D; 2h derived only from exact 1h and failed closed where provider history was insufficient for the exact holdout requirement.
+- No original 15m component independently passed the same component on a second tested timeframe. Therefore MULTITF_CONFIRMED remains zero.
+- Four new independent timeframe/component frozen candidates were discovered:
+  - CAPITALCOM:XAUUSD 5m — SuperTrend.
+  - CME_MINI:MJY1! 5m — Squeeze Momentum.
+  - NYMEX:MCL1! 30m — UT Bot.
+  - NYMEX:MCL1! 1h — Hull Suite.
+- Durable evidence archived:
+  - research_benchmarks/community_multitf_frozen_run1_20260924.json
+  - docs/COMMUNITY_MULTITF_FROZEN_RUN1_20260924.md
+- PR #111 merged as 68ad095b9a62d926e9bb61b4b464341ba73c23f7:
+  - reusable multi-timeframe frozen runner/workflow;
+  - raw temporary OHLCV files were intentionally not merged to main.
+- PR #110 was superseded by PR #113 after main advanced; the final #110 CI was green but no merge was performed.
+- PR #113 carries the 10-record SHADOW registry update on current main; CI pending.
+- Live authority remains false and no competition A+ gate/risk/execution rule changed.
