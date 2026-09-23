@@ -295,6 +295,21 @@ def indicator_parameter_grid(indicator_id: str) -> tuple[dict, ...]:
             {"length": 3, "percent": 1.4, "cmo_length": 9},
             {"length": 5, "percent": 2.0, "cmo_length": 9},
         ),
+        "trendilo": (
+            {"change_length": 1, "alma_length": 25, "alma_offset": 0.85, "alma_sigma": 6.0, "rms_length": 20, "rms_multiplier": 1.0},
+            {"change_length": 2, "alma_length": 25, "alma_offset": 0.85, "alma_sigma": 6.0, "rms_length": 20, "rms_multiplier": 1.0},
+            {"change_length": 1, "alma_length": 40, "alma_offset": 0.85, "alma_sigma": 6.0, "rms_length": 30, "rms_multiplier": 1.0},
+        ),
+        "nadaraya_watson_envelope_luxalgo": (
+            {"bandwidth": 8.0, "window": 100, "mae_length": 50, "envelope_multiplier": 1.5},
+            {"bandwidth": 8.0, "window": 100, "mae_length": 50, "envelope_multiplier": 2.0},
+            {"bandwidth": 12.0, "window": 150, "mae_length": 75, "envelope_multiplier": 2.0},
+        ),
+        "cm_williams_vix_fix": (
+            {"lookback": 22, "bb_length": 20, "bb_mult": 2.0, "percentile_lookback": 50, "percentile_factor": 0.85},
+            {"lookback": 22, "bb_length": 20, "bb_mult": 2.0, "percentile_lookback": 50, "percentile_factor": 0.90},
+            {"lookback": 30, "bb_length": 20, "bb_mult": 2.0, "percentile_lookback": 75, "percentile_factor": 0.85},
+        ),
         "qqe_mod": (
             {"rsi_period": 6, "smoothing": 5, "fast_factor": 3.0, "slow_factor": 1.61, "threshold": 3.0, "bb_length": 50, "bb_mult": 0.35},
             {"rsi_period": 6, "smoothing": 5, "fast_factor": 2.5, "slow_factor": 1.61, "threshold": 2.0, "bb_length": 50, "bb_mult": 0.35},
