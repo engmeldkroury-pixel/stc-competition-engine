@@ -235,3 +235,28 @@ The Owner Console can import:
 Historical closed imports are ledger/audit operations only. They never send broker orders. If the owner supplies the actual realized P/L from the competition platform, STC stores that value as the authoritative owner-platform record; otherwise STC calculates an estimate from entry/exit/quantity using its verified contract-value model.
 
 Qualification-day progress uses the original recorded open and close dates plus any recorded partial-close dates, so importing older trades does not incorrectly turn today's import date into the historical trading day.
+
+
+## General Lab durable research queue
+
+This additive batch connects the Owner Console General Lab tab to a durable research-request queue. It does not place orders and it cannot grant live trading authority.
+
+Run once:
+- `migrations/004_general_lab_queue.sql`
+
+Upload:
+- `general_lab.php`
+- updated `operator.php`
+
+The endpoint reuses the existing private owner/worker bearer tokens. No new secret is introduced.
+
+Behavior:
+- Saving General Lab symbols creates one durable research request per symbol.
+- Provider-qualified symbols such as `CAPITALCOM:XAUUSD` enter `WAITING_FOR_EXACT_HISTORY`.
+- Bare symbols such as `XAUUSD` enter `WAITING_FOR_SYMBOL_RESOLUTION` until an authorized exact-data worker resolves the TradingView provider symbol.
+- An authorized worker can claim the request and later store a research-only result.
+- Completed results are forced to `live_authority=false` and `promotion_required=true`.
+- The Owner Console shows queue/running/evaluated/failed state and compact research results.
+- No alternate history provider may be substituted silently if exact-provider data is unavailable.
+
+The hosted PHP queue does not itself have access to ChatGPT's TradingView MCP. Automatic historical evaluation therefore requires an authorized exact-provider data worker/connector to claim queued requests, fetch exact TradingView history, run the STC research engine, and submit the result.
