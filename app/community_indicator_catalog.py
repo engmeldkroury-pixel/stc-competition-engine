@@ -183,8 +183,11 @@ INDICATORS: tuple[CommunityIndicatorSpec, ...] = (
         preferred_timeframes=("5", "15", "30", "60", "120", "240", "1D"),
         open_source=True,
         popularity_uses=415_742,
-        implementation_status="pending_exact_port",
-        notes=("High-priority trend candidate; exact swing/ATR transition semantics must be preserved.",),
+        implementation_status="implemented_conceptual",
+        notes=(
+            "Independent causal implementation of the published HalfTrend swing/SMA state-transition methodology.",
+            "Only confirmed trend flips are benchmarked; ATR channel visuals do not create extra entries.",
+        ),
     ),
     CommunityIndicatorSpec(
         indicator_id="ssl_hybrid",
