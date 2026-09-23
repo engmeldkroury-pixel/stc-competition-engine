@@ -1,65 +1,65 @@
 # NEXT TASK
 
-Updated: 2026-09-23
+Updated: 2026-09-23 23:15 EEST
+
+## CONTROLLING PROJECT
+STC — do not rename to CC/SCC in project state.
 
 ## PRIMARY OBJECTIVE
-Execute the new community-indicator research matrix on real exact-provider historical data for the 26 competition symbols, then expand the verified indicator catalog without changing live trading weights on the same evidence used for discovery.
+Finish the reproducible native-vs-community 15m benchmark for all 26 competition symbols on identical exact-provider TradingView history, then merge verified evidence and continue the indicator-expansion + General Lab automation roadmap.
 
-## VERIFIED CURRENT STATE
-- Live Owner Console PR #100 is deployed; Record Trade and simplified EXECUTION TICKET are visible.
-- Six v1.1 MTF production alerts remain the live evidence path.
-- Human approval/manual order entry remains mandatory.
-- Community indicator research framework PR #101 is merged.
-- CI for PR #101: 347 passed.
-- community_indicator_live_authority=false.
+Authoritative research ledger:
+- docs/STC_ADAPTIVE_RESEARCH_MASTER_LEDGER.md
 
-## RESEARCH MATRIX RULE
-For every symbol/timeframe:
-1. benchmark each implemented community indicator independently;
-2. keep train/test/forward separated;
-3. use confirmed-bar / next-bar causal execution;
-4. compare validated community trials with native STC StrategyTrial results;
-5. derive symbol/timeframe-specific research weights from OOS/forward robustness;
-6. allow a community component to outrank a native strategy only when robust evidence is stronger;
-7. do not use popularity/reviews as trading weights;
-8. accumulate new live outcomes continuously, but recalibrate only on frozen batches/windows.
+## VERIFIED COMPLETED
+- PR #101 adaptive community research foundation merged; CI 347 passed.
+- PR #102 expanded indicator catalog + four extra causal adapters + train-only parameter selection merged; CI 351 passed.
+- Community-only 15m benchmark completed for 26/26 competition symbols on 5,000 exact-provider bars each.
+- 208 symbol-indicator community trials completed.
+- 8/26 symbols had at least one community family pass OOS+forward validation.
+- Research remains shadow-only: community_indicator_live_authority=false.
 
-## CURRENT IMPLEMENTED COMMUNITY ADAPTERS
-- UT Bot Alerts family.
-- Squeeze Momentum [LazyBear] family.
-- WaveTrend with Crosses family.
-- Hull Suite family.
+## ACTIVE WORK UNIT
+Branch:
+- research/native-community-15m-20260923
 
-## NEXT IMPLEMENTATION QUEUE
-Exact causal/repaint-safe ports and tests:
-1. Lorentzian Classification + published Backtest Stream semantics.
-2. QQE MOD.
-3. Optimized Trend Tracker confirmed reversals.
-4. expand discovery catalog with additional practical open-source community scripts.
-5. audit LuxAlgo SMC versus STC native structure/liquidity families for information overlap before any added weight.
+Already created:
+- scripts/run_native_community_15m.py
+- .github/workflows/stc-native-community-15m.yml
 
-## DATA EXECUTION
-Run the matrix first on 15m for all 26 competition symbols using the largest exact-provider history available, then extend to 5m/30m/1h/2h/4h/1D where history is sufficient.
-- Prefer >=900 bars for the existing walk-forward strategy comparison.
-- Community adapter benchmark can produce diagnostics from >=300 bars, but promotion still requires robust OOS/forward evidence.
-- Do not promote a same-dataset winner directly to live production.
+Required completion:
+1. stage 15m exact TradingView OHLCV for all 26 symbols;
+2. add research_native_inputs/READY to trigger workflow;
+3. run native STC strategies and implemented community indicators on the same windows;
+4. build per-symbol ensemble profiles;
+5. compare native/community robust scores and weight shares;
+6. retain zero weight for failed OOS/forward components;
+7. merge verified result artifacts to main.
 
-## GENERAL LAB
-Any symbol added to General Lab must be routed through the same matrix:
-asset classification -> indicator/strategy benchmark -> OOS/forward comparison -> symbol-specific weight profile.
-No cross-symbol weight inheritance.
+## CONTINUING RESEARCH ROADMAP
+After WU-104:
+1. add family-correlation/diversity penalty before any live ensemble promotion;
+2. exact/repaint-safe ports in priority order:
+   - Lorentzian Classification;
+   - QQE MOD;
+   - Optimized Trend Tracker;
+   - HalfTrend;
+   - SSL Hybrid;
+   - AlphaTrend;
+   - VuManChu Cipher B;
+   - Trendilo;
+   - Nadaraya-Watson non-repainting mode;
+3. audit LuxAlgo SMC overlap with native STC SMC/structure families;
+4. extend matrix from 15m to 5m/30m/1h/2h/4h/1D wherever history is sufficient;
+5. build General Lab runtime bridge so any new Lab symbol automatically runs the same research matrix and shows a compact result;
+6. accumulate live trade outcomes as new evidence, but recalibrate only on frozen evidence windows.
 
-## REVIEW RESEARCH
-Continue sourcing TradingView open-source pages and community discussions to discover candidates and identify:
-- repaint/lookahead concerns;
-- confirmed vs potential signals;
-- asset/timeframe-specific behavior;
-- parameter sensitivity;
-- known implementation bugs.
-Reviews are qualitative evidence only.
-
-## EXECUTION BOUNDARY
-- No automatic trading.
-- No live community-indicator authority yet.
-- Do not weaken A+ gates.
-- Do not alter risk limits or competition rules from research results without frozen confirmation and explicit promotion.
+## NON-NEGOTIABLE RULES
+- No lookahead.
+- Confirmed bars only.
+- Train-only tuning; test/forward remain untouched.
+- Same-bar ambiguity -> stop first.
+- Reviews/popularity are discovery metadata only.
+- No cross-symbol weight inheritance.
+- No live weight or A+ gate change from same-dataset discovery.
+- No automatic trade execution.
