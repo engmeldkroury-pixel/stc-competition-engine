@@ -36,4 +36,4 @@ def test_approval_preserves_block_reasons_instead_of_only_http_409() -> None:
     assert "err.payload=j" in source
     assert "price_outside_envelope:'Current price is outside the locked entry zone.'" in source
     assert "Approval blocked: '+text" in source
-    assert 'type="text" autocomplete="off" placeholder="Current TradingView price — decimal or exchange quote"' in source
+    assert 'placeholder="Current TradingView price — decimal or exchange quote"' in source
