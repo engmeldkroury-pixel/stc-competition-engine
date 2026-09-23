@@ -289,6 +289,201 @@ def hull_suite_signals(
     return out
 
 
+def supertrend_signals(
+    bars: list[Bar],
+    *,
+    atr_period: int = 10,
+    multiplier: float = 3.0,
+) -> dict[int, float]:
+    atr = _atr_full(bars, atr_period)
+    final_upper: list[float | None] = [None] * len(bars)
+    final_lower: list[float | None] = [None] * len(bars)
+    trend: list[int | None] = [None] * len(bars)
+    out: dict[int, float] = {}
+
+    for i, bar in enumerate(bars):
+        if atr[i] is None:
+            continue
+        mid = (bar.high + bar.low) / 2.0
+        basic_upper = mid + multiplier * float(atr[i])
+        basic_lower = mid - multiplier * float(atr[i])
+        if i == 0 or final_upper[i - 1] is None or final_lower[i - 1] is None:
+            final_upper[i] = basic_upper
+            final_lower[i] = basic_lower
+            trend[i] = 1
+            continue
+
+        prev_close = bars[i - 1].close
+        final_upper[i] = (
+            basic_upper
+            if basic_upper < float(final_upper[i - 1]) or prev_close > float(final_upper[i - 1])
+            else float(final_upper[i - 1])
+        )
+        final_lower[i] = (
+            basic_lower
+            if basic_lower > float(final_lower[i - 1]) or prev_close < float(final_lower[i - 1])
+            else float(final_lower[i - 1])
+        )
+
+        prev_trend = int(trend[i - 1] or 1)
+        if prev_trend < 0 and bar.close > float(final_upper[i]):
+            trend[i] = 1
+        elif prev_trend > 0 and bar.close < float(final_lower[i]):
+            trend[i] = -1
+        else:
+            trend[i] = prev_trend
+        if trend[i] != prev_trend:
+            out[i] = float(trend[i])
+    return out
+
+
+def chandelier_exit_signals(
+    bars: list[Bar],
+    *,
+    period: int = 22,
+    multiplier: float = 3.0,
+) -> dict[int, float]:
+    atr = _atr_full(bars, period)
+    long_stop: list[float | None] = [None] * len(bars)
+    short_stop: list[float | None] = [None] * len(bars)
+    direction: list[int | None] = [None] * len(bars)
+    out: dict[int, float] = {}
+
+    for i in range(len(bars)):
+        if atr[i] is None or i - period + 1 < 0:
+            continue
+        high = max(bar.high for bar in bars[i - period + 1 : i + 1])
+        low = min(bar.low for bar in bars[i - period + 1 : i + 1])
+        raw_long = high - multiplier * float(atr[i])
+        raw_short = low + multiplier * float(atr[i])
+
+        if i == 0 or long_stop[i - 1] is None or short_stop[i - 1] is None:
+            long_stop[i] = raw_long
+            short_stop[i] = raw_short
+            direction[i] = 1
+            continue
+
+        prev_close = bars[i - 1].close
+        prev_long = float(long_stop[i - 1])
+        prev_short = float(short_stop[i - 1])
+        long_stop[i] = max(raw_long, prev_long) if prev_close > prev_long else raw_long
+        short_stop[i] = min(raw_short, prev_short) if prev_close < prev_short else raw_short
+
+        prev_direction = int(direction[i - 1] or 1)
+        if bars[i].close > prev_short:
+            direction[i] = 1
+        elif bars[i].close < prev_long:
+            direction[i] = -1
+        else:
+            direction[i] = prev_direction
+        if direction[i] != prev_direction:
+            out[i] = float(direction[i])
+    return out
+
+
+def schaff_trend_cycle_signals(
+    bars: list[Bar],
+    *,
+    cycle_length: int = 10,
+    fast_length: int = 23,
+    slow_length: int = 50,
+    smoothing: float = 0.5,
+) -> dict[int, float]:
+    closes = [bar.close for bar in bars]
+    fast = _ema_full(closes, fast_length)
+    slow = _ema_full(closes, slow_length)
+    macd_line: list[float | None] = [None] * len(bars)
+    for i in range(len(bars)):
+        if fast[i] is not None and slow[i] is not None:
+            macd_line[i] = float(fast[i]) - float(slow[i])
+
+    d1: list[float | None] = [None] * len(bars)
+    d2: list[float | None] = [None] * len(bars)
+    stc: list[float | None] = [None] * len(bars)
+    alpha = max(0.01, min(0.99, float(smoothing)))
+
+    for i in range(len(bars)):
+        start = i - cycle_length + 1
+        if start < 0 or macd_line[i] is None:
+            continue
+        m_window = [x for x in macd_line[start : i + 1] if x is not None]
+        if len(m_window) < cycle_length:
+            continue
+        low_m = min(m_window)
+        high_m = max(m_window)
+        raw_k1 = 0.0 if high_m == low_m else 100.0 * (float(macd_line[i]) - low_m) / (high_m - low_m)
+        prev_d1 = d1[i - 1] if i > 0 and d1[i - 1] is not None else raw_k1
+        d1[i] = float(prev_d1) + alpha * (raw_k1 - float(prev_d1))
+
+        d1_window = [x for x in d1[start : i + 1] if x is not None]
+        if len(d1_window) < cycle_length:
+            continue
+        low_d1 = min(d1_window)
+        high_d1 = max(d1_window)
+        raw_k2 = 0.0 if high_d1 == low_d1 else 100.0 * (float(d1[i]) - low_d1) / (high_d1 - low_d1)
+        prev_d2 = d2[i - 1] if i > 0 and d2[i - 1] is not None else raw_k2
+        d2[i] = float(prev_d2) + alpha * (raw_k2 - float(prev_d2))
+        stc[i] = d2[i]
+
+    out: dict[int, float] = {}
+    for i in range(2, len(bars)):
+        if stc[i] is None or stc[i - 1] is None or stc[i - 2] is None:
+            continue
+        now = float(stc[i])
+        prev = float(stc[i - 1])
+        older = float(stc[i - 2])
+        if older >= prev < now and prev <= 25.0:
+            out[i] = 1.0
+        elif older <= prev > now and prev >= 75.0:
+            out[i] = -1.0
+        elif prev <= 50.0 < now:
+            out[i] = 0.65
+        elif prev >= 50.0 > now:
+            out[i] = -0.65
+    return out
+
+
+def range_filter_signals(
+    bars: list[Bar],
+    *,
+    sampling_period: int = 100,
+    range_multiplier: float = 3.0,
+) -> dict[int, float]:
+    closes = [bar.close for bar in bars]
+    changes = [0.0] * len(bars)
+    for i in range(1, len(bars)):
+        changes[i] = abs(closes[i] - closes[i - 1])
+    first = _ema_full(changes, sampling_period)
+    first_clean = [0.0 if value is None else float(value) for value in first]
+    second = _ema_full(first_clean, max(1, sampling_period * 2 - 1))
+
+    filt: list[float | None] = [None] * len(bars)
+    direction: list[int] = [0] * len(bars)
+    out: dict[int, float] = {}
+    for i in range(len(bars)):
+        if second[i] is None:
+            continue
+        smooth_range = float(second[i]) * range_multiplier
+        if i == 0 or filt[i - 1] is None:
+            filt[i] = closes[i]
+            continue
+        prev_filter = float(filt[i - 1])
+        if closes[i] > prev_filter:
+            filt[i] = max(prev_filter, closes[i] - smooth_range)
+        elif closes[i] < prev_filter:
+            filt[i] = min(prev_filter, closes[i] + smooth_range)
+        else:
+            filt[i] = prev_filter
+
+        rising = float(filt[i]) > prev_filter
+        falling = float(filt[i]) < prev_filter
+        current = 1 if closes[i] > float(filt[i]) and rising else -1 if closes[i] < float(filt[i]) and falling else direction[i - 1]
+        direction[i] = current
+        if current != 0 and current != direction[i - 1]:
+            out[i] = float(current)
+    return out
+
+
 def indicator_signal_series(
     indicator_id: str,
     bars: list[Bar],
@@ -304,4 +499,12 @@ def indicator_signal_series(
         return wavetrend_signals(bars, **params)
     if indicator_id == "hull_suite":
         return hull_suite_signals(bars, **params)
+    if indicator_id == "supertrend_kivanc":
+        return supertrend_signals(bars, **params)
+    if indicator_id == "chandelier_exit_everget":
+        return chandelier_exit_signals(bars, **params)
+    if indicator_id == "schaff_trend_cycle":
+        return schaff_trend_cycle_signals(bars, **params)
+    if indicator_id == "range_filter_guikroth":
+        return range_filter_signals(bars, **params)
     raise KeyError(f"Community indicator is not implemented for causal benchmarking: {indicator_id}")
