@@ -1,0 +1,76 @@
+name: STC Wave2 Artifact Detail Extract
+
+on:
+  push:
+    branches:
+      - "research/wave2-frozen-15m-*"
+    paths:
+      - "research_wave2/DETAILS"
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  extract:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download prior wave2 artifacts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p downloads
+          gh run download 35926880568 --repo "${{ github.repository }}" --pattern 'stc-wave2-frozen-*' --dir downloads
+
+      - name: Extract detailed survivors
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          target={"trendilo","halftrend_everget","nadaraya_watson_endpoint_nonrepaint"}
+          rows=[]
+          seen=set()
+          for path in sorted(Path("downloads").rglob("*.json")):
+              try:
+                  d=json.loads(path.read_text())
+              except Exception:
+                  continue
+              if not isinstance(d,dict) or "report" not in d or "symbol" not in d:
+                  continue
+              symbol=d["symbol"]
+              key=(symbol,str(path))
+              if key in seen:
+                  continue
+              seen.add(key)
+              for c in d["report"].get("components") or []:
+                  if c.get("indicator_id") not in target:
+                      continue
+                  if not c.get("confirmation_passed"):
+                      continue
+                  dev=c.get("development_trial") or {}
+                  rows.append({
+                      "symbol":symbol,
+                      "indicator_id":c.get("indicator_id"),
+                      "selected_parameters":c.get("selected_parameters"),
+                      "development_test":dev.get("test"),
+                      "development_forward":dev.get("forward"),
+                      "development_robust_score":dev.get("robust_score"),
+                      "confirmation":c.get("confirmation"),
+                      "confirmation_reasons":c.get("confirmation_reasons"),
+                  })
+          summary={
+              "run_id":35926880568,
+              "survivors":rows,
+              "count":len(rows),
+              "live_authority":False,
+          }
+          Path("wave2_survivor_details.json").write_text(json.dumps(summary,indent=2,sort_keys=True)+"\n")
+          print("STC_WAVE2_DETAILS="+json.dumps(summary,sort_keys=True))
+          PY
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: stc-wave2-survivor-details
+          path: wave2_survivor_details.json
+          retention-days: 14
