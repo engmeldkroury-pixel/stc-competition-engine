@@ -1913,3 +1913,19 @@ Owner intervention required now: YES — only for historical-data access, not fo
   - exact-provider historical series must come from an authorized worker/connector;
   - no alternate provider substitution is allowed.
 - Next work: add General Lab UI status/plan + durable request queue, then continue high-value indicator causal audits and frozen multi-timeframe research.
+
+
+## General Lab durable queue merged — 2026-09-24 01:05 EEST
+- PR #117 merged as 9469dccfafa1a3b66eaddd8d9e7ff072c5cdb3fa.
+- CI: 373 passed, 1 warning.
+- General Lab now has a durable research request model and Owner Console queue/status UI.
+- New Hostinger production artifacts:
+  - hostinger_patch/general_lab.php;
+  - hostinger_patch/migrations/004_general_lab_queue.sql;
+  - updated hostinger_patch/operator.php.
+- Exact-provider worker helper:
+  - app/general_lab_request.py;
+  - scripts/run_general_lab_request.py.
+- The hosted queue fails closed while exact TradingView history is unavailable and never substitutes another provider.
+- Full automated ticker-to-history evaluation still needs an authorized exact-provider data worker/connector.
+- Research results remain research-only with live_authority=false.
