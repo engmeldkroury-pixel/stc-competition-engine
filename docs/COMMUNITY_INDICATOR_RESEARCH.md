@@ -141,3 +141,27 @@ This preserves the intended per-symbol specialization without letting the same o
 ## Expanded popularity/discovery snapshot
 
 The current discovery catalog includes several widely used open-source scripts, including SuperTrend, Chandelier Exit, AlphaTrend, VuManChu Cipher B, SSL Hybrid, Range Filter, HalfTrend, and Williams Vix Fix. Popularity can move a script higher in the research queue, but cannot improve its benchmark score or ensemble weight.
+
+
+## Discovery wave 2
+
+The discovery pool was expanded to include:
+- Koncorde Plus — volume composite; only where reliable volume exists.
+- RSI (Kernel Optimized) | Flux Charts — KDE pivot probability; requires explicit confirmation-delay handling because pivots use bars on both sides.
+- VWAP Stdev Bands v2 — session VWAP mean-reversion/continuation context.
+- Order Blocks | Flux Charts — volumized structure/liquidity proxy; double-counting audit required.
+- Market Structure Dashboard | Flux Charts — MTF composite; double-counting/information-gain audit required.
+- Machine Learning Supertrend [Aslan] — adaptive optimizer; must be replayed sequentially, never hindsight-optimized.
+- AI-SuperTrend KNN — pending exact causal port.
+- Machine Learning SuperTrend Strategy [YinYangAlgorithms] — pending exact causal port.
+- Tri-State Supertrend — explicit range state intended to reduce trend whipsaw.
+
+## General Lab automatic research interface
+
+STC now exposes two research-only API routes:
+- POST /research/general-lab/plan
+- POST /research/general-lab/evaluate
+
+The plan route expands any supplied General Lab symbols through the same per-symbol/timeframe strategy + community-indicator research matrix.
+
+The evaluate route accepts exact-provider multi-timeframe OHLCV series and runs the same research runner used by STC. Output is explicitly research-only, live_authority=false, and requires later promotion before any live decision authority.
