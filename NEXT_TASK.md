@@ -3,87 +3,63 @@
 Updated: 2026-09-23
 
 ## PRIMARY OBJECTIVE
-Finish the live Owner Console execution UX update, deploy it to Hostinger, then record and supervise the already-open AMP CBOT:ZN1! position without changing strategy/risk logic.
-
-Primary runtime path:
-TradingView v1.1 MTF alerts -> Hostinger/MySQL -> STC A+ gate -> simplified Execution Ticket -> Telegram -> human approval/manual order -> Record Trade page -> Portfolio Supervisor.
+Execute the new community-indicator research matrix on real exact-provider historical data for the 26 competition symbols, then expand the verified indicator catalog without changing live trading weights on the same evidence used for discovery.
 
 ## VERIFIED CURRENT STATE
-- 26-symbol production universe: 10 Capital.com Africa + 16 AMP Futures.
-- Six v1.1 MTF alerts are active.
-- Three legacy alerts are paused to prevent duplicate event_id collisions.
-- v1.1 transport acceptance passed and Hostinger no longer shows MTF LIVE CONFIRMATION OFFLINE.
-- Telegram configured and test delivery received.
-- Manual approval mode is enabled:
-  - Safe Mode=false.
-  - Kill Switch=false.
-- No automatic trading is available.
+- Live Owner Console PR #100 is deployed; Record Trade and simplified EXECUTION TICKET are visible.
+- Six v1.1 MTF production alerts remain the live evidence path.
+- Human approval/manual order entry remains mandatory.
+- Community indicator research framework PR #101 is merged.
+- CI for PR #101: 347 passed.
+- community_indicator_live_authority=false.
 
-## CURRENT LIVE POSITION / OWNER BLOCKER
-- Owner manually opened an AMP CBOT:ZN1! SHORT position for 3 contracts on the competition platform.
-- The position is not yet recorded in the STC ledger.
-- The old console workflow blocked signal approval with HTTP 409 once the live price moved outside the locked entry envelope.
-- The old existing-position import used multiple browser prompt windows and was too fragile for copy/paste and the 30-second auto-refresh.
+## RESEARCH MATRIX RULE
+For every symbol/timeframe:
+1. benchmark each implemented community indicator independently;
+2. keep train/test/forward separated;
+3. use confirmed-bar / next-bar causal execution;
+4. compare validated community trials with native STC StrategyTrial results;
+5. derive symbol/timeframe-specific research weights from OOS/forward robustness;
+6. allow a community component to outrank a native strategy only when robust evidence is stronger;
+7. do not use popularity/reviews as trading weights;
+8. accumulate new live outcomes continuously, but recalibrate only on frozen batches/windows.
 
-## PR #100 — MERGED / READY FOR HOSTINGER
-Merged commit:
-- ddb017d3c9e5bf8cb46c3c4b41dd358871e4fcba
+## CURRENT IMPLEMENTED COMMUNITY ADAPTERS
+- UT Bot Alerts family.
+- Squeeze Momentum [LazyBear] family.
+- WaveTrend with Crosses family.
+- Hull Suite family.
 
-CI:
-- 339 passed.
+## NEXT IMPLEMENTATION QUEUE
+Exact causal/repaint-safe ports and tests:
+1. Lorentzian Classification + published Backtest Stream semantics.
+2. QQE MOD.
+3. Optimized Trend Tracker confirmed reversals.
+4. expand discovery catalog with additional practical open-source community scripts.
+5. audit LuxAlgo SMC versus STC native structure/liquidity families for information overlap before any added weight.
 
-Changed production file:
-- hostinger_patch/operator.php
+## DATA EXECUTION
+Run the matrix first on 15m for all 26 competition symbols using the largest exact-provider history available, then extend to 5m/30m/1h/2h/4h/1D where history is sufficient.
+- Prefer >=900 bars for the existing walk-forward strategy comparison.
+- Community adapter benchmark can produce diagnostics from >=300 bars, but promotion still requires robust OOS/forward evidence.
+- Do not promote a same-dataset winner directly to live production.
 
-Key UX changes:
-- Large EXECUTION TICKET at the top of each actionable card.
-- Main ticket shows only:
-  - symbol;
-  - BUY/SELL direction;
-  - exact order type;
-  - entry zone;
-  - exact quantity;
-  - platform sizing mode;
-  - stop loss;
-  - one Final TP;
-  - trade risk.
-- AMP Futures explicitly instructs:
-  - use Units / Contracts;
-  - do NOT use % balance.
-- Advanced research/MTF/family evidence is collapsed under Advanced details.
-- ZN/ZB use TradingView Treasury 32nds/half-32nds formatting plus exact tick-aligned decimal parsing.
-- Ambiguous off-tick ZN values such as 105.13 are rejected.
-- Live-price input survives the 30-second console refresh.
-- Existing manual positions use one dedicated Record Trade page/form instead of chained popups.
-- The Record Trade page keeps all fields visible at once and supports copy/paste.
-- An already-filled trade can be recorded even when approval is no longer possible because price left the original envelope.
-- HTTP 409 displays the actual blocking reason instead of a generic status code.
+## GENERAL LAB
+Any symbol added to General Lab must be routed through the same matrix:
+asset classification -> indicator/strategy benchmark -> OOS/forward comparison -> symbol-specific weight profile.
+No cross-symbol weight inheritance.
 
-## NEXT OWNER ACTION
-Upload ONLY the latest:
-- hostinger_patch/operator.php
-
-to the live STC public_html location, replacing the current operator.php.
-
-Do not change:
-- config.php;
-- secrets;
-- database/migrations;
-- webhook files;
-- Pine scripts;
-- strategy thresholds;
-- risk settings.
-
-After upload:
-1. hard refresh operator.php;
-2. confirm the simplified EXECUTION TICKET is visible;
-3. open AMP Futures -> Record Trade;
-4. record the already-open CBOT:ZN1! SHORT 3-contract position using the actual competition-platform fill/stop/final-TP values;
-5. confirm it appears under Open positions / Portfolio Supervisor;
-6. only then continue normal A+ monitoring.
+## REVIEW RESEARCH
+Continue sourcing TradingView open-source pages and community discussions to discover candidates and identify:
+- repaint/lookahead concerns;
+- confirmed vs potential signals;
+- asset/timeframe-specific behavior;
+- parameter sensitivity;
+- known implementation bugs.
+Reviews are qualitative evidence only.
 
 ## EXECUTION BOUNDARY
-- Human approval/manual execution only.
-- Do not weaken the A+ gate to create more trades.
-- Do not use % balance for AMP futures position sizing; use the exact contracts/units shown by STC.
-- One Final TP only; TP1 remains an internal management checkpoint.
+- No automatic trading.
+- No live community-indicator authority yet.
+- Do not weaken A+ gates.
+- Do not alter risk limits or competition rules from research results without frozen confirmation and explicit promotion.
