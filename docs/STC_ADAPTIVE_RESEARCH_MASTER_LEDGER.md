@@ -481,3 +481,34 @@ C. keep evaluation fail-closed until exact-provider series arrives;
 D. continue indicator expansion/audit, prioritizing Lorentzian Classification and other practical high-use composites;
 E. extend frozen multi-timeframe scans only where the evidence floor is met;
 F. keep all candidates SHADOW until promotion rules are independently satisfied.
+
+
+## Work-unit register update — 2026-09-24 01:05 EEST
+
+### WU-114 — General Lab durable runtime bridge
+Status: VERIFIED / MERGED.
+- PR #117 merged as 9469dccfafa1a3b66eaddd8d9e7ff072c5cdb3fa.
+- CI: 373 passed, 1 warning.
+- Added additive migration hostinger_patch/migrations/004_general_lab_queue.sql.
+- Added authenticated hostinger_patch/general_lab.php using existing owner/worker bearer roles.
+- General Lab request states:
+  - WAITING_FOR_SYMBOL_RESOLUTION;
+  - WAITING_FOR_EXACT_HISTORY;
+  - RUNNING;
+  - EVALUATED;
+  - FAILED;
+  - CANCELLED.
+- Owner Console General Lab now queues durable research requests, displays queue/running/evaluated state, and keeps research isolated from both competition accounts.
+- Added app/general_lab_request.py and scripts/run_general_lab_request.py so an authorized exact-data worker can submit exact-provider series to the existing STC research engine and create a completion payload.
+- Completed General Lab results remain:
+  - execution=research_only;
+  - live_authority=false;
+  - promotion_required=true.
+- Existing SHADOW context is included when a symbol is evaluated.
+- No new secret was introduced.
+- No broker execution, A+ threshold, risk rule, competition rule, or live research authority changed.
+- Deployment still required on Hostinger:
+  1. run migration 004 once;
+  2. upload general_lab.php;
+  3. replace operator.php.
+- Data-source boundary remains: Hostinger cannot itself call ChatGPT TradingView MCP; exact-provider history requires an authorized data worker/connector. No provider substitution.
