@@ -23,6 +23,11 @@ Authoritative research ledger:
 Branch:
 - research/native-community-15m-20260923
 
+Controlling workflow:
+- STC Native + Community 15m Benchmark run #5
+- 26 exact-provider 15m datasets staged
+- latest 14 implemented community components + native STC strategies
+
 Already created:
 - scripts/run_native_community_15m.py
 - .github/workflows/stc-native-community-15m.yml
@@ -35,6 +40,11 @@ Required completion:
 5. compare native/community robust scores and weight shares;
 6. retain zero weight for failed OOS/forward components;
 7. merge verified result artifacts to main.
+
+## COMPLETED SINCE LAST CHECKPOINT
+- PR #103: General Lab research plan/evaluate endpoints + discovery wave 2 + AlphaTrend/OTT + family redundancy normalization.
+- PR #104: archived first 26-symbol community benchmark evidence.
+- PR #105: QQE MOD + SSL Hybrid + WAE + QQE/SSL/WAE composite adapters; CI 359 passed.
 
 ## CONTINUING RESEARCH ROADMAP
 After WU-104:
