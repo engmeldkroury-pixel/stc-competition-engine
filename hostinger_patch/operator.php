@@ -22,6 +22,9 @@ input{width:100%}button{cursor:pointer}.primary{background:#1d4ed8}.danger{backg
 .long,.ok{color:#22c55e}.short,.bad{color:#f87171}.wait{color:#facc15}.pill{display:inline-block;border:1px solid #334155;border-radius:999px;padding:3px 7px;margin:2px;font-size:11px}
 .controls{display:grid;grid-template-columns:1fr auto auto auto;gap:8px}.approve{display:grid;grid-template-columns:1fr auto auto;gap:8px;margin-top:10px}
 @media(max-width:700px){.controls,.approve{grid-template-columns:1fr}.row{grid-template-columns:1fr;gap:3px}.grid{grid-template-columns:1fr}}
+.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.formgrid .full{grid-column:1/-1}.fieldnote{font-size:11px;color:#94a3b8;margin-top:4px}.inlineerror{border:1px solid #7f1d1d;background:#450a0a;color:#fecaca;border-radius:9px;padding:9px;margin-top:10px}.inlinesuccess{border:1px solid #166534;background:#052e16;color:#bbf7d0;border-radius:9px;padding:9px;margin-top:10px}.buttonrow{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;margin-top:14px}
+.ticket{border:2px solid #334155;border-radius:14px;padding:14px;margin:10px 0;background:#0b1220}.ticket.actionable{border-color:#166534}.ticket.blockedticket{border-color:#854d0e}.ticket-title{font-size:13px;font-weight:800;letter-spacing:.04em;color:#cbd5e1}.ticket-action{font-size:28px;font-weight:900;line-height:1.15;margin:7px 0}.ticket-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:10px}.ticket-cell{border:1px solid #334155;border-radius:10px;padding:10px;background:#0f172a;min-width:0}.ticket-label{font-size:11px;color:#94a3b8;margin-bottom:4px}.ticket-value{font-size:18px;font-weight:800;overflow-wrap:anywhere}.ticket-note{font-size:12px;color:#cbd5e1;margin-top:8px}.ticket-input{margin-top:12px}.advanced{margin-top:12px;border-top:1px solid #334155;padding-top:10px}.advanced summary{cursor:pointer;font-weight:700;color:#cbd5e1}.advanced-body{margin-top:10px}.record-page{max-width:900px}.record-page h2{margin:0 0 6px}.record-guide{border:1px solid #334155;border-radius:10px;padding:10px;margin:10px 0;background:#0b1220}
+@media(max-width:700px){.formgrid,.ticket-grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body><div class="wrap">
@@ -34,6 +37,7 @@ input{width:100%}button{cursor:pointer}.primary{background:#1d4ed8}.danger{backg
 <button class="tab" data-tab="amp">AMP Futures <span class="tabcount" id="count-amp">0</span></button>
 <button class="tab" data-tab="general">General Lab</button>
 <button class="tab" data-tab="notifications">Notifications</button>
+<button class="tab" data-tab="record">Record Trade</button>
 </div>
 
 <div class="bar">
@@ -95,6 +99,28 @@ input{width:100%}button{cursor:pointer}.primary{background:#1d4ed8}.danger{backg
     <div class="small" style="margin-top:10px">Raw 15-minute feed bars do not generate user notifications. Server notifications are reserved for new locked plans and non-HOLD position-management changes.</div>
   </div>
 </div>
+
+<div id="record-panel" class="hidden">
+  <div class="bar record-page">
+    <h2>Record an already-executed position</h2>
+    <div class="small">Use this only after the trade is ALREADY OPEN in the competition platform. STC will record and monitor it; no order will be sent.</div>
+    <div class="record-guide"><b>One form only.</b> Fill everything here at once. Auto-refresh will not erase these fields while this page is open.</div>
+    <input id="pos-origin" type="hidden"><input id="pos-competition" type="hidden"><input id="pos-card-index" type="hidden">
+    <div class="formgrid" style="margin-top:14px">
+      <div><label class="small">Competition</label><input id="pos-competition-label" type="text" readonly></div>
+      <div><label class="small">Symbol</label><input id="pos-symbol" type="text" autocomplete="off" placeholder="Example: CBOT:ZN1!" oninput="updatePositionPricePreviews()"></div>
+      <div><label class="small">Side</label><select id="pos-side"><option>LONG</option><option>SHORT</option></select></div>
+      <div><label class="small">Quantity actually filled</label><input id="pos-qty" type="number" min="0" step="any"><div id="pos-qty-note" class="fieldnote"></div></div>
+      <div><label class="small">Actual average fill price</label><input id="pos-entry" type="text" autocomplete="off" oninput="updatePositionPricePreviews()"><div id="pos-entry-preview" class="fieldnote"></div></div>
+      <div><label class="small">Current stop price</label><input id="pos-stop" type="text" autocomplete="off" oninput="updatePositionPricePreviews()"><div id="pos-stop-preview" class="fieldnote"></div></div>
+      <div><label class="small">Final take-profit price (one TP only)</label><input id="pos-tp" type="text" autocomplete="off" oninput="updatePositionPricePreviews()"><div id="pos-tp-preview" class="fieldnote"></div></div>
+      <div><label class="small">Original open time if known</label><input id="pos-opened" type="datetime-local"><div class="fieldnote">Leave blank to use the current time.</div></div>
+    </div>
+    <div class="small" style="margin-top:10px">Treasury futures fields accept the exact TradingView quote, for example 105'12'5, or a tick-aligned decimal such as 105.390625. Values such as 105.13 are rejected for ZN because they are not valid ticks.</div>
+    <div id="position-modal-message" class="hidden"></div>
+    <div class="buttonrow"><button onclick="closePositionModal()">Back without saving</button><button class="safe" id="position-submit" onclick="submitPositionModal()">Record open position</button></div>
+  </div>
+</div>
 </div>
 <script>
 const $=id=>document.getElementById(id);
@@ -105,6 +131,8 @@ let autoTimer=null;
 let autoCountdown=null;
 let secondsToRefresh=30;
 let initializedSignals=false;
+let recordReturnTab='overview';
+const livePriceDrafts={};
 function loadSeenSet(key){
  try{
    const value=JSON.parse(localStorage.getItem(key)||'[]');
@@ -123,6 +151,72 @@ function num(x,d=4){
  const n=Number(x);
  return Number.isFinite(n)?n.toFixed(d):'-';
 }
+const PRICE_RULES={
+ 'CBOT:ZN1!':{tick:1/64,style:'treasury32'},
+ 'CBOT:ZB1!':{tick:1/32,style:'treasury32'}
+};
+function priceRule(symbol){return PRICE_RULES[String(symbol||'').toUpperCase()]||null;}
+function tickRound(symbol,price,mode='nearest'){
+ const n=Number(price), rule=priceRule(symbol);
+ if(!Number.isFinite(n)||!rule)return n;
+ const scaled=n/rule.tick;
+ const units=mode==='floor'?Math.floor(scaled+1e-9):mode==='ceil'?Math.ceil(scaled-1e-9):Math.round(scaled);
+ return units*rule.tick;
+}
+function treasury32Quote(price){
+ let n=Number(price);
+ if(!Number.isFinite(n))return '-';
+ let whole=Math.floor(n);
+ let half32=Math.round((n-whole)*64);
+ if(half32>=64){whole+=1;half32-=64;}
+ if(half32<0){whole-=1;half32+=64;}
+ const thirtySeconds=Math.floor(half32/2);
+ const half=(half32%2)?5:0;
+ return whole+"'"+String(thirtySeconds).padStart(2,'0')+"'"+half;
+}
+function formatPlatformPrice(symbol,price,mode='nearest'){
+ const n=Number(price), rule=priceRule(symbol);
+ if(!Number.isFinite(n))return '-';
+ const normalized=tickRound(symbol,n,mode);
+ if(rule&&rule.style==='treasury32')return treasury32Quote(normalized)+' ('+normalized.toFixed(6)+')';
+ return num(n,4);
+}
+function formatPlatformInput(symbol,price,mode='nearest'){
+ const n=Number(price), rule=priceRule(symbol);
+ if(!Number.isFinite(n))return '';
+ const normalized=tickRound(symbol,n,mode);
+ if(rule&&rule.style==='treasury32')return treasury32Quote(normalized);
+ return String(Number(n.toFixed(6)));
+}
+function parsePlatformPrice(symbol,raw){
+ const text=String(raw??'').trim();
+ if(!text)return null;
+ const rule=priceRule(symbol);
+ if(rule&&rule.style==='treasury32'){
+   const m=text.replace(/[’′]/g,"'").match(/^([0-9]+)\s*'\s*([0-9]{1,2})(?:\s*'\s*([05]))?$/);
+   if(m){
+     const whole=Number(m[1]), thirtySeconds=Number(m[2]), half=m[3]==='5'?0.5:0;
+     if(thirtySeconds<0||thirtySeconds>31)return null;
+     return whole+(thirtySeconds+half)/32;
+   }
+ }
+ const n=Number(text);
+ if(!Number.isFinite(n)||n<=0)return null;
+ if(rule){
+   const units=n/rule.tick;
+   if(Math.abs(units-Math.round(units))>1e-7)return null;
+ }
+ return n;
+}
+function planTickMode(direction,kind){
+ if(kind==='stop')return direction==='LONG'?'ceil':'floor';
+ if(kind==='target')return direction==='LONG'?'floor':'ceil';
+ return 'nearest';
+}
+function planPriceText(c,price,kind='generic'){
+ if(!c)return num(price);
+ return formatPlatformPrice(c.symbol,price,planTickMode(c.recommendation||c.locked_trade_plan?.direction,kind));
+}
 function auth(){
  const t=$('token').value.trim();
  return {'Authorization':'Bearer '+t,'Content-Type':'application/json'};
@@ -130,7 +224,14 @@ function auth(){
 async function api(path,opts={}){
  const r=await fetch(path,{cache:'no-store',...opts,headers:{...auth(),...(opts.headers||{})}});
  const j=await r.json().catch(()=>({}));
- if(!r.ok)throw new Error((j&&j.error)||('HTTP '+r.status));
+ if(!r.ok){
+   const reasons=Array.isArray(j&&j.reasons)?j.reasons:[];
+   const message=reasons.length?reasons.join(', '):((j&&j.error)||('HTTP '+r.status));
+   const err=new Error(message);
+   err.status=r.status;
+   err.payload=j;
+   throw err;
+ }
  return j;
 }
 
@@ -189,11 +290,23 @@ function deriveOrderInstruction(c,price){
  if(current<low)return {order_type:'SELL LIMIT',side:'SELL',status:'wait_rebound',trigger_price:null,limit_price:mid,explanation:'Price is below the zone. Wait for a rebound; use a SELL LIMIT inside the zone.'};
  return {order_type:'SELL STOP-LIMIT',side:'SELL',status:'wait_breakdown_into_zone',trigger_price:high,limit_price:low,explanation:'Price is above the zone. Enter only if price falls into it.'};
 }
+function sizeModeText(c){
+ const q=c&&c.position_sizing?Number(c.position_sizing.proposed_quantity):NaN;
+ const qty=Number.isFinite(q)?num(q,6):'-';
+ if(c&&c.competition_id==='amp-futures-sep-2026')return {qty,unit:'contracts',mode:'TradingView size mode: Units / Contracts — NOT % balance'};
+ return {qty,unit:'units',mode:'Use the platform quantity/units field — NOT % balance'};
+}
+function savePriceDraft(i){
+ const c=snapshot&&snapshot.cards?snapshot.cards[i]:null;
+ if(!c)return;
+ const el=$('price-'+i);
+ if(el)livePriceDrafts[c.signal_id]=el.value;
+}
 function orderHtml(c,i){
  const live=(c.order_instruction||deriveOrderInstruction(c,c.current_price));
  if(!live)return '';
- const trigger=live.trigger_price==null?'':' • trigger '+num(live.trigger_price);
- const limit=live.limit_price==null?'':' • limit '+num(live.limit_price);
+ const trigger=live.trigger_price==null?'':' • trigger '+formatPlatformPrice(c.symbol,live.trigger_price);
+ const limit=live.limit_price==null?'':' • limit '+formatPlatformPrice(c.symbol,live.limit_price);
  return '<div class="orderbox"><div class="small">Planned order type • based on latest confirmed 15m close</div>'
   +'<div class="ordername">'+esc((live.side?live.side+' ':'')+(live.order_type||'UNKNOWN'))+'</div>'
   +'<div class="small">'+esc(live.explanation||'')+esc(trigger)+esc(limit)+'</div>'
@@ -201,26 +314,28 @@ function orderHtml(c,i){
 }
 function updateOrderHint(i){
  const c=snapshot&&snapshot.cards?snapshot.cards[i]:null;
- const price=Number($('price-'+i)?.value);
+ const price=parsePlatformPrice(c.symbol,$('price-'+i)?.value);
  const h=$('order-hint-'+i);
  if(!h||!c)return;
  if(!Number.isFinite(price)||price<=0){h.textContent='Enter the current TradingView price to recalculate the order type before approval.';return;}
  const o=deriveOrderInstruction(c,price);
  if(!o){h.textContent='Order type unavailable.';return;}
+ const ticket=$('ticket-order-'+i);
+ if(ticket)ticket.textContent=(o.side?o.side+' ':'')+o.order_type;
  const parts=[(o.side?o.side+' ':'')+o.order_type,o.explanation];
- if(o.trigger_price!=null)parts.push('Trigger '+num(o.trigger_price));
- if(o.limit_price!=null)parts.push('Limit '+num(o.limit_price));
+ if(o.trigger_price!=null)parts.push('Trigger '+formatPlatformPrice(c.symbol,o.trigger_price));
+ if(o.limit_price!=null)parts.push('Limit '+formatPlatformPrice(c.symbol,o.limit_price));
  h.textContent='LIVE PRICE CHECK: '+parts.join(' • ');
 }
-function planHtml(p){
+function planHtml(p,c){
  if(!p)return '<div class="row"><span>Locked plan</span><span class="value">None</span></div>';
  const left=secondsUntil(p.valid_until);
  return '<div class="row"><span>Direction</span><span class="value">'+esc(p.direction||'-')+'</span></div>'
   +'<div class="row"><span>Decision timeframe</span><span class="value">'+esc(p.decision_timeframe||'15')+' min</span></div>'
-  +'<div class="row"><span>Entry zone</span><span class="value">'+num(p.entry_min)+' → '+num(p.entry_max)+'</span></div>'
-  +'<div class="row"><span>Stop loss</span><span class="value">'+num(p.initial_stop)+'</span></div>'
-  +'<div class="row"><span>Management checkpoint</span><span class="value">'+num(p.target1)+' • no partial TP order</span></div>'
-  +'<div class="row"><span>Final take profit</span><span class="value">'+num(p.target2)+'</span></div>'
+  +'<div class="row"><span>Entry zone</span><span class="value">'+formatPlatformPrice(c&&c.symbol,p.entry_min,'floor')+' → '+formatPlatformPrice(c&&c.symbol,p.entry_max,'ceil')+'</span></div>'
+  +'<div class="row"><span>Stop loss</span><span class="value">'+planPriceText(c,p.initial_stop,'stop')+'</span></div>'
+  +'<div class="row"><span>Management checkpoint</span><span class="value">'+planPriceText(c,p.target1,'target')+' • no partial TP order</span></div>'
+  +'<div class="row"><span>Final take profit</span><span class="value">'+planPriceText(c,p.target2,'target')+'</span></div>'
   +'<div class="row"><span>Expires</span><span class="value">'+formatLocalTime(p.valid_until)+' • <span class="countdown" data-valid-until="'+esc(p.valid_until)+'">'+formatCountdown(left)+'</span></span></div>';
 }
 
@@ -235,8 +350,8 @@ function sizingHtml(s,c){
   +'<div class="row"><span>Configured risk budget</span><span class="value">$'+num(s.risk_budget_usd,2)+' • '+num(Number(s.risk_fraction)*100,3)+'%</span></div>'
   +'<div class="row"><span>Official max open position</span><span class="value">'+num(s.max_position,6)+'</span></div>'
   +'<div class="row"><span>Projected open after</span><span class="value">'+num(s.projected_open_quantity,6)+'</span></div>'
-  +(p?'<div class="row"><span>Stop loss</span><span class="value">'+num(p.initial_stop)+'</span></div>':'')
-  +(p?'<div class="row"><span>Final take profit</span><span class="value">'+num(p.target2)+'</span></div>':'')
+  +(p?'<div class="row"><span>Stop loss</span><span class="value">'+planPriceText(c,p.initial_stop,'stop')+'</span></div>':'')
+  +(p?'<div class="row"><span>Final take profit</span><span class="value">'+planPriceText(c,p.target2,'target')+'</span></div>':'')
   +'<div class="small">Single-TP mode: TP1 is an internal management checkpoint only; do not place a separate TP1 order.</div>'
   +(limited?'<div class="small wait">Sizing reduced by: '+esc(limited)+'</div>':'')
   +'</div>';
@@ -351,28 +466,53 @@ function cardHtml(c,i){
  else if(!controlOpen)blockReason='SAFE MODE / KILL SWITCH is ON. Enable manual approval mode before approving.';
  else if(!sizingAllowed)blockReason='New entry blocked by sizing / risk capacity.';
  else if(!macroAllowed)blockReason='New entry blocked by macro-risk gate.';
- return '<div class="card" data-card-index="'+i+'">'
-  +'<div class="statusline">'+statusBadge+'<span class="pill">'+esc(competitionLabel)+'</span><span class="pill">'+esc(c.setup_grade||'MONITOR_ONLY')+'</span></div>'
-  +'<div class="row"><span>Symbol</span><span class="value">'+esc(c.symbol)+'</span></div>'
-  +'<div class="row"><span>Signal</span><span class="value '+cls+'">'+esc(c.recommendation)+' '+num(c.composite_score,2)+'</span></div>'
-  +(c.recommendation==='WAIT'&&c.pre_gate_recommendation&&c.pre_gate_recommendation!=='WAIT'?'<div class="row"><span>Blocked candidate</span><span class="value wait">'+esc(c.pre_gate_recommendation)+' • failed A+ quality gate</span></div>':'')
-  +'<div class="row"><span>Latest confirmed bar</span><span class="value">'+formatLocalTime(c.source_close_time||c.source_time)+' • '+formatAgeSeconds(c.source_age_seconds)+'</span></div>'
-  +convictionHtml(c)
-  +planHtml(c.locked_trade_plan)
-  +orderHtml(c,i)
-  +sizingHtml(c.position_sizing,c)
-  +macroHtml(c.macro_context)
-  +'<div class="row"><span>Approval</span><span class="value">'+esc(a.decision||'not approved yet')+'</span></div>'
-  +'<div class="row"><span>Ready to execute</span><span class="value '+(c.manual_execution_ready?'ok':'wait')+'">'+(c.manual_execution_ready?'YES':'NO')+'</span></div>'
-  +(blockReason?'<div class="small wait" style="margin:8px 0">'+esc(blockReason)+'</div>':'')
-  +'<div class="small" style="margin:8px 0">'+reasons+'</div>'
-  +(active&&(c.recommendation==='LONG'||c.recommendation==='SHORT')
-    ?'<div class="approve"><input id="price-'+i+'" type="number" step="any" placeholder="Current TradingView price" oninput="updateOrderHint('+i+')">'
-      +(canApprove?'<button class="safe" onclick="approveCard('+i+',\'approve\')">Approve</button><button class="danger" onclick="approveCard('+i+',\'reject\')">Reject</button>':'')
-      +'</div>'
-    :'')
-  +(active && c.locked_trade_plan && a.decision==='approved'?'<button style="margin-top:8px" onclick="recordFilledPosition('+i+')">After manual fill: record open position</button>':'')
-  +'</div>';
+
+ const p=c.locked_trade_plan;
+ const live=(c.order_instruction||deriveOrderInstruction(c,c.current_price));
+ const actionText=(live&&live.side?live.side+' ':'')+(live&&live.order_type?live.order_type:(c.recommendation==='LONG'?'BUY':c.recommendation==='SHORT'?'SELL':'WAIT'));
+ const s=sizeModeText(c);
+ const riskPct=c.position_sizing&&Number(c.position_sizing.equity_usd)>0
+   ?Number(c.position_sizing.risk_amount_usd)/Number(c.position_sizing.equity_usd)*100:null;
+ const draft=livePriceDrafts[c.signal_id]||'';
+ const ticketClass=active?'ticket actionable':'ticket blockedticket';
+
+ let ticket='<div class="'+ticketClass+'"><div class="ticket-title">EXECUTION TICKET</div>'
+   +'<div class="ticket-action '+cls+'">'+esc(c.recommendation==='LONG'?'BUY / LONG':c.recommendation==='SHORT'?'SELL / SHORT':'DO NOT ENTER')+' • '+esc(c.symbol)+'</div>';
+ if(p){
+   ticket+='<div class="ticket-grid">'
+     +'<div class="ticket-cell"><div class="ticket-label">ORDER TO PLACE</div><div class="ticket-value" id="ticket-order-'+i+'">'+esc(actionText)+'</div></div>'
+     +'<div class="ticket-cell"><div class="ticket-label">QUANTITY</div><div class="ticket-value">'+esc(s.qty)+' '+esc(s.unit)+'</div><div class="ticket-note">'+esc(s.mode)+'</div></div>'
+     +'<div class="ticket-cell"><div class="ticket-label">ENTRY ZONE</div><div class="ticket-value">'+formatPlatformPrice(c.symbol,p.entry_min,'floor')+' → '+formatPlatformPrice(c.symbol,p.entry_max,'ceil')+'</div></div>'
+     +'<div class="ticket-cell"><div class="ticket-label">STOP LOSS</div><div class="ticket-value">'+planPriceText(c,p.initial_stop,'stop')+'</div></div>'
+     +'<div class="ticket-cell"><div class="ticket-label">FINAL TAKE PROFIT</div><div class="ticket-value">'+planPriceText(c,p.target2,'target')+'</div><div class="ticket-note">One final TP only. Do not place a separate TP1 order.</div></div>'
+     +'<div class="ticket-cell"><div class="ticket-label">RISK</div><div class="ticket-value">'+(c.position_sizing?'$'+num(c.position_sizing.risk_amount_usd,2):'-')+(riskPct!==null?' • '+num(riskPct,3)+'%':'')+'</div></div>'
+     +'</div>'
+     +'<div class="ticket-input"><label class="small"><b>LIVE PRICE BEFORE APPROVAL</b> — copy the current TradingView price here</label>'
+     +'<input id="price-'+i+'" type="text" autocomplete="off" value="'+esc(draft)+'" placeholder="Current TradingView price — decimal or exchange quote" oninput="updateOrderHint('+i+');savePriceDraft('+i+')">'
+     +'<div id="order-hint-'+i+'" class="ticket-note">Enter the live price. STC will tell you MARKET / LIMIT / STOP-LIMIT before approval.</div></div>';
+   if(canApprove){
+     ticket+='<div class="buttonrow"><button class="safe" onclick="approveCard('+i+',\'approve\')">Approve this plan</button><button class="danger" onclick="approveCard('+i+',\'reject\')">Reject</button></div>';
+   }
+   ticket+='<div id="approval-feedback-'+i+'" class="small" style="margin-top:6px"></div>'
+     +'<div class="buttonrow"><button onclick="recordExistingPositionFromCard('+i+')">Already filled on platform? Record position</button>'
+     +(active&&a.decision==='approved'?'<button class="primary" onclick="recordFilledPosition('+i+')">After manual fill: record open position</button>':'')
+     +'</div>';
+ } else {
+   ticket+='<div class="ticket-note">No locked executable plan. Do not place a trade from this card.</div>';
+ }
+ ticket+='</div>';
+
+ const advanced='<details class="advanced"><summary>Advanced details / why STC selected this setup</summary><div class="advanced-body">'
+   +'<div class="statusline">'+statusBadge+'<span class="pill">'+esc(competitionLabel)+'</span><span class="pill">'+esc(c.setup_grade||'MONITOR_ONLY')+'</span></div>'
+   +'<div class="row"><span>Signal score</span><span class="value '+cls+'">'+esc(c.recommendation)+' '+num(c.composite_score,2)+'</span></div>'
+   +'<div class="row"><span>Latest confirmed bar</span><span class="value">'+formatLocalTime(c.source_close_time||c.source_time)+' • '+formatAgeSeconds(c.source_age_seconds)+'</span></div>'
+   +convictionHtml(c)+planHtml(p,c)+sizingHtml(c.position_sizing,c)+macroHtml(c.macro_context)
+   +'<div class="row"><span>Approval</span><span class="value">'+esc(a.decision||'not approved yet')+'</span></div>'
+   +'<div class="row"><span>Ready to execute</span><span class="value '+(c.manual_execution_ready?'ok':'wait')+'">'+(c.manual_execution_ready?'YES':'NO')+'</span></div>'
+   +(blockReason?'<div class="small wait" style="margin:8px 0">'+esc(blockReason)+'</div>':'')
+   +'<div class="small" style="margin:8px 0">'+reasons+'</div></div></details>';
+
+ return '<div class="card" data-card-index="'+i+'">'+ticket+advanced+'</div>';
 }
 
 function persistSeenSet(key,set){
@@ -385,7 +525,7 @@ function maybeNotify(cards){
    const key=String(c.locked_trade_plan.plan_id||c.signal_id);
    if(seenSignalPlans.has(key))continue;
    const oi=c.order_instruction||{};
-   const body=c.symbol+' • A+ '+c.recommendation+' • Quality '+(Number.isFinite(Number(c.setup_quality_score))?Math.round(Number(c.setup_quality_score))+'/100':'-')+' • '+(oi.order_type||'ENTRY')+' • Entry '+num(c.locked_trade_plan.entry_min)+' - '+num(c.locked_trade_plan.entry_max)+' • SL '+num(c.locked_trade_plan.initial_stop)+' • Final TP '+num(c.locked_trade_plan.target2)+' • Expires '+formatLocalTime(c.locked_trade_plan.valid_until);
+   const body=c.symbol+' • A+ '+c.recommendation+' • Quality '+(Number.isFinite(Number(c.setup_quality_score))?Math.round(Number(c.setup_quality_score))+'/100':'-')+' • '+(oi.order_type||'ENTRY')+' • Entry '+formatPlatformPrice(c.symbol,c.locked_trade_plan.entry_min,'floor')+' - '+formatPlatformPrice(c.symbol,c.locked_trade_plan.entry_max,'ceil')+' • SL '+planPriceText(c,c.locked_trade_plan.initial_stop,'stop')+' • Final TP '+planPriceText(c,c.locked_trade_plan.target2,'target')+' • Expires '+formatLocalTime(c.locked_trade_plan.valid_until);
    document.title='A+ '+c.recommendation+' • '+c.symbol+' • STC';
    if('Notification' in window && Notification.permission==='granted'){
      new Notification('STC A+ HIGH-CONVICTION PLAN',{body,tag:key,requireInteraction:true});
@@ -402,6 +542,10 @@ function renderCards(target,cards){
  const all=snapshot&&snapshot.cards?snapshot.cards:[];
  const visible=(cards||[]).filter(c=>c.recommendation==='WAIT'||isOpportunityActive(c));
  $(target).innerHTML=visible.map(c=>cardHtml(c,all.indexOf(c))).join('')||'<div class="card">No current signals or active opportunities.</div>';
+ for(const card of visible){
+   const i=all.indexOf(card);
+   if(livePriceDrafts[card.signal_id])updateOrderHint(i);
+ }
 }
 
 function riskSummaryFor(competitionId){
@@ -476,10 +620,10 @@ function positionHtml(p){
   +'<div class="row"><span>Symbol</span><span class="value">'+esc(p.symbol)+'</span></div>'
   +'<div class="row"><span>Position</span><span class="value '+(p.side==='LONG'?'long':'short')+'">'+esc(p.side)+' × '+num(p.quantity,6)+'</span></div>'
   +'<div class="row"><span>Opened</span><span class="value">'+formatLocalTime(p.opened_at_utc)+'</span></div>'
-  +'<div class="row"><span>Entry</span><span class="value">'+num(p.entry_price)+'</span></div>'
-  +'<div class="row"><span>Active stop</span><span class="value">'+num(p.current_stop)+'</span></div>'
-  +'<div class="row"><span>Management checkpoint</span><span class="value">'+num(p.target1)+' • no partial close</span></div>'
-  +'<div class="row"><span>Final take profit</span><span class="value">'+num(p.target2)+'</span></div>'
+  +'<div class="row"><span>Entry</span><span class="value">'+formatPlatformPrice(p.symbol,p.entry_price)+'</span></div>'
+  +'<div class="row"><span>Active stop</span><span class="value">'+formatPlatformPrice(p.symbol,p.current_stop)+'</span></div>'
+  +'<div class="row"><span>Management checkpoint</span><span class="value">'+formatPlatformPrice(p.symbol,p.target1)+' • no partial close</span></div>'
+  +'<div class="row"><span>Final take profit</span><span class="value">'+formatPlatformPrice(p.symbol,p.target2)+'</span></div>'
   +(latest?'<div class="row"><span>Latest market check</span><span class="value">'+formatLocalTime(latest.time)+' • '+esc(latest.recommendation)+' '+num(latest.composite_score,2)+' @ '+num(latest.close)+'</span></div>':'')
   +'<div class="row"><span>What to do now</span><span class="value '+managementClass(m.action)+'">'+esc(m.action||'HOLD')+'</span></div>'
   +'<div class="row"><span>R multiple</span><span class="value">'+num(m.r_multiple,2)+'</span></div>'
@@ -682,43 +826,134 @@ async function recordClosedTradeHistory(competitionId){
  }catch(e){alert('Historical trade import failed: '+e.message);}
 }
 
-async function recordExistingPosition(competitionId){
- const symbol=String(prompt('Symbol exactly as shown in STC / TradingView','')||'').trim();
- if(!symbol)return;
- const side=String(prompt('Side: LONG or SHORT','LONG')||'').trim().toUpperCase();
- if(!(side==='LONG'||side==='SHORT')){alert('Side must be LONG or SHORT.');return;}
- const qty=Number(prompt('Quantity currently open',''));
- const entry=Number(prompt('Actual average entry price',''));
- const stop=Number(prompt('Current stop price',''));
- const finalTp=Number(prompt('Final take-profit price (one TP only)',''));
- if(![qty,entry,stop,finalTp].every(x=>Number.isFinite(x)&&x>0)){alert('Enter valid positive numbers.');return;}
- const geometryOk=side==='LONG'?(stop<entry&&finalTp>entry):(stop>entry&&finalTp<entry);
- if(!geometryOk){alert('Stop / take-profit geometry does not match the selected side.');return;}
- const checkpoint=(entry+finalTp)/2;
- const openedLocal=String(prompt('Original open time if known (ISO/date-time). Leave blank to use now.','')||'').trim();
- const openedAt=openedLocal?new Date(openedLocal):new Date();
- if(Number.isNaN(openedAt.getTime())){alert('Open time is invalid.');return;}
- if(!confirm('Confirm this trade is ALREADY OPEN in the competition platform. STC will only import and monitor it; no order will be sent.'))return;
- const body={action:'OPEN',origin:'manual_external',competition_id:competitionId,symbol,side,quantity:qty,entry_price:entry,initial_stop:stop,current_stop:stop,target1:checkpoint,target2:finalTp,opened_at_utc:openedAt.toISOString(),note:'Backfilled existing manual position; single final TP'};
- try{await api('position.php',{method:'POST',body:JSON.stringify(body)});await refresh();}
- catch(e){alert('Existing-position record failed: '+e.message);}
+function setPositionModalMessage(message,kind='error'){
+ const el=$('position-modal-message');
+ if(!el)return;
+ if(!message){el.className='hidden';el.textContent='';return;}
+ el.className=kind==='success'?'inlinesuccess':'inlineerror';
+ el.textContent=message;
 }
-
-async function recordFilledPosition(i){
- const c=snapshot.cards[i];
- if(!c||!c.locked_trade_plan||!c.approval||c.approval.decision!=='approved'){alert('An approved locked plan is required.');return;}
- if(!isOpportunityActive(c)){alert('This locked plan has expired. Do not enter it; wait for a new active plan.');await refresh();return;}
- if(c.position_sizing && (c.position_sizing.allowed_by_position_limit===false || c.position_sizing.allowed_by_risk_policy===false)){alert('STC position limit or portfolio risk capacity currently blocks a new entry.');return;}
- const suggested=c.position_sizing?c.position_sizing.proposed_quantity:'';
- const qty=Number(prompt('Quantity actually filled manually in the competition platform',suggested));
- if(!Number.isFinite(qty)||qty<=0)return;
- const entry=Number(prompt('Actual average fill price',c.current_price||c.locked_trade_plan.entry_mid));
- if(!Number.isFinite(entry)||entry<=0)return;
- if(!confirm('Confirm the order was already entered manually in the competition platform. STC will only record it.'))return;
+function closePositionModal(){
+ setPositionModalMessage('');
+ showTab(recordReturnTab||'overview');
+}
+function updatePositionPricePreviews(){
+ const symbol=$('pos-symbol').value.trim();
+ for(const key of ['entry','stop','tp']){
+   const raw=$('pos-'+key).value;
+   const parsed=parsePlatformPrice(symbol,raw);
+   const preview=$('pos-'+key+'-preview');
+   if(!preview)continue;
+   if(!raw.trim()){preview.textContent='';continue;}
+   if(parsed===null){
+     preview.textContent=priceRule(symbol)?"Invalid tick. Use TradingView form such as 105'12'5 or an exact tick-aligned decimal.":'Enter a valid positive price.';
+     preview.className='fieldnote bad';
+   }else{
+     preview.textContent='Parsed: '+formatPlatformPrice(symbol,parsed);
+     preview.className='fieldnote ok';
+   }
+ }
+}
+function recordExistingPosition(competitionId){
+ // Compatibility/safety contract: ALREADY OPEN in the competition platform; no order will be sent.
+ return openExistingPositionForm(competitionId,null);
+}
+function recordExistingPositionFromCard(cardIndex){
+ const c=snapshot&&snapshot.cards?snapshot.cards[cardIndex]:null;
+ if(!c)return;
+ return openExistingPositionForm(c.competition_id,cardIndex);
+}
+function openExistingPositionForm(competitionId,cardIndex=null){
+ recordReturnTab=activeTab;
+ const c=cardIndex!==null&&snapshot&&snapshot.cards?snapshot.cards[cardIndex]:null;
+ const p=c&&c.locked_trade_plan?c.locked_trade_plan:null;
+ $('pos-origin').value='manual_external';
+ $('pos-competition').value=competitionId;
+ $('pos-competition-label').value=competitionId==='amp-futures-sep-2026'?'AMP Futures':'Capital.com Africa';
+ $('pos-card-index').value=cardIndex===null?'':String(cardIndex);
+ $('pos-symbol').value=c?c.symbol:'';
+ $('pos-side').value=p&&p.direction?p.direction:'LONG';
+ $('pos-qty').value=c&&c.position_sizing&&c.position_sizing.proposed_quantity?c.position_sizing.proposed_quantity:'';
+ $('pos-entry').value=c&&Number.isFinite(Number(c.current_price))?formatPlatformInput(c.symbol,c.current_price):'';
+ $('pos-stop').value=p?formatPlatformInput(c.symbol,p.initial_stop,planTickMode(p.direction,'stop')):'';
+ $('pos-tp').value=p?formatPlatformInput(c.symbol,p.target2,planTickMode(p.direction,'target')):'';
+ $('pos-opened').value='';
+ $('position-submit').textContent='Record open position';
+ $('pos-qty-note').textContent=competitionId==='amp-futures-sep-2026'?'Enter contracts / units. Do NOT use % balance.':'Enter platform units. Do NOT use % balance.';
+ setPositionModalMessage('');
+ showTab('record');
+ updatePositionPricePreviews();
+}
+function recordFilledPosition(i){
+ const c=snapshot&&snapshot.cards?snapshot.cards[i]:null;
+ if(!c||!c.locked_trade_plan||!c.approval||c.approval.decision!=='approved'){
+   const feedback=$('approval-feedback-'+i); if(feedback)feedback.textContent='An approved locked plan is required before using the STC-plan fill workflow.';
+   return;
+ }
+ if(!isOpportunityActive(c)){
+   const feedback=$('approval-feedback-'+i); if(feedback)feedback.textContent='This locked plan expired. If the order is already open on the platform, use “Already filled on platform? Record position”.';
+   return;
+ }
  const p=c.locked_trade_plan;
- const body={action:'OPEN',origin:'stc_plan',competition_id:c.competition_id,symbol:c.symbol,side:p.direction,quantity:qty,entry_price:entry,initial_stop:p.initial_stop,current_stop:p.initial_stop,target1:p.target1,target2:p.target2,source_plan_id:p.plan_id,opened_at_utc:new Date().toISOString(),note:'Owner-confirmed manual fill'};
- try{await api('position.php',{method:'POST',body:JSON.stringify(body)});await refresh();}
- catch(e){alert('Position record failed: '+e.message);}
+ recordReturnTab=activeTab;
+ $('pos-origin').value='stc_plan';
+ $('pos-competition').value=c.competition_id;
+ $('pos-competition-label').value=c.competition_id==='amp-futures-sep-2026'?'AMP Futures':'Capital.com Africa';
+ $('pos-card-index').value=String(i);
+ $('pos-symbol').value=c.symbol;
+ $('pos-side').value=p.direction;
+ $('pos-qty').value=c.position_sizing&&c.position_sizing.proposed_quantity?c.position_sizing.proposed_quantity:'';
+ $('pos-entry').value=Number.isFinite(Number(c.current_price))?formatPlatformInput(c.symbol,c.current_price):formatPlatformInput(c.symbol,p.entry_mid);
+ $('pos-stop').value=formatPlatformInput(c.symbol,p.initial_stop,planTickMode(p.direction,'stop'));
+ $('pos-tp').value=formatPlatformInput(c.symbol,p.target2,planTickMode(p.direction,'target'));
+ $('pos-opened').value='';
+ $('position-submit').textContent='Record approved plan fill';
+ $('pos-qty-note').textContent=c.competition_id==='amp-futures-sep-2026'?'Enter contracts / units. Do NOT use % balance.':'Enter platform units. Do NOT use % balance.';
+ setPositionModalMessage('');
+ showTab('record');
+ updatePositionPricePreviews();
+}
+async function submitPositionModal(){
+ const competitionId=$('pos-competition').value;
+ const origin=$('pos-origin').value||'manual_external';
+ const cardIndex=$('pos-card-index').value===''?null:Number($('pos-card-index').value);
+ const symbol=$('pos-symbol').value.trim();
+ const side=$('pos-side').value.trim().toUpperCase();
+ const qty=Number($('pos-qty').value);
+ const entry=parsePlatformPrice(symbol,$('pos-entry').value);
+ const stop=parsePlatformPrice(symbol,$('pos-stop').value);
+ const finalTp=parsePlatformPrice(symbol,$('pos-tp').value);
+ if(!symbol){setPositionModalMessage('Symbol is required.');return;}
+ if(!(side==='LONG'||side==='SHORT')){setPositionModalMessage('Side must be LONG or SHORT.');return;}
+ if(!Number.isFinite(qty)||qty<=0){setPositionModalMessage('Enter the quantity actually filled.');return;}
+ if(entry===null||stop===null||finalTp===null){setPositionModalMessage('One or more prices are invalid for this contract tick size. Use the TradingView quote format shown in the green preview.');return;}
+ const geometryOk=side==='LONG'?(stop<entry&&finalTp>entry):(stop>entry&&finalTp<entry);
+ if(!geometryOk){setPositionModalMessage('Stop / take-profit geometry does not match '+side+'.');return;}
+ const openedText=$('pos-opened').value.trim();
+ const openedAt=openedText?new Date(openedText):new Date();
+ if(Number.isNaN(openedAt.getTime())){setPositionModalMessage('Open time is invalid.');return;}
+ let body;
+ if(origin==='stc_plan'){
+   const c=cardIndex!==null&&snapshot&&snapshot.cards?snapshot.cards[cardIndex]:null;
+   const p=c&&c.locked_trade_plan?c.locked_trade_plan:null;
+   if(!c||!p||!c.approval||c.approval.decision!=='approved'){setPositionModalMessage('The approved STC plan is no longer available. Use the existing-manual-position workflow instead.');return;}
+   body={action:'OPEN',origin:'stc_plan',competition_id:competitionId,symbol,side,quantity:qty,entry_price:entry,initial_stop:stop,current_stop:stop,target1:p.target1,target2:finalTp,source_plan_id:p.plan_id,opened_at_utc:openedAt.toISOString(),note:'Owner-confirmed manual fill via inline form'};
+ }else{
+   const checkpoint=(entry+finalTp)/2;
+   body={action:'OPEN',origin:'manual_external',competition_id:competitionId,symbol,side,quantity:qty,entry_price:entry,initial_stop:stop,current_stop:stop,target1:checkpoint,target2:finalTp,opened_at_utc:openedAt.toISOString(),note:'Backfilled existing manual position via inline form; single final TP'};
+ }
+ $('position-submit').disabled=true;
+ setPositionModalMessage('Saving position…','success');
+ try{
+   await api('position.php',{method:'POST',body:JSON.stringify(body)});
+   setPositionModalMessage('Position recorded in STC. Portfolio Supervisor will track it now.','success');
+   await refresh();
+   setTimeout(()=>closePositionModal(),900);
+ }catch(e){
+   setPositionModalMessage('Position record failed: '+e.message);
+ }finally{
+   $('position-submit').disabled=false;
+ }
 }
 async function recordStopUpdate(positionId,suggested){
  const stop=Number(prompt('Stop price already changed manually in the platform',suggested));
@@ -748,29 +983,50 @@ async function setControls(safe,kill){
  try{await api('runtime_control.php',{method:'POST',body:JSON.stringify({safe_mode:safe,kill_switch:kill,reason:$('reason').value.trim()||null})});await refresh();}
  catch(e){alert('Control change failed: '+e.message);}
 }
+function approvalReasonText(reason){
+ const labels={
+   price_outside_envelope:'Current price is outside the locked entry zone.',
+   newer_signal_exists:'A newer confirmed signal already exists; refresh and use the newest plan.',
+   signal_expired:'The locked plan has expired.',
+   evidence_stale:'The price confirmation became stale; enter the current price again.',
+   safe_mode_active:'Safe Mode is active.',
+   kill_switch_active:'Kill Switch is active.',
+   high_conviction_gate_not_passed:'The A+ quality gate is no longer passed.',
+   macro_high_impact_blackout:'A high-impact macro blackout is active.',
+   macro_calendar_unavailable_fail_closed:'Macro calendar is unavailable, so approval fails closed.',
+   invalid_quote_price:'The entered price is invalid.',
+   market_not_open:'The market is not open.'
+ };
+ return labels[reason]||String(reason).replaceAll('_',' ');
+}
 async function approveCard(i,decision){
  const c=snapshot.cards[i];
  if(!c)return;
- if(decision==='approve'&&!isOpportunityActive(c)){alert('This opportunity has expired and was removed from the active set. Wait for a new locked plan.');await refresh();return;}
- if(decision==='approve' && c.position_sizing && (c.position_sizing.allowed_by_position_limit===false || c.position_sizing.allowed_by_risk_policy===false)){alert('Approval blocked by competition position limit or STC portfolio/cluster risk capacity.');return;}
- if(decision==='approve'&&!confirm('Approve this signal for MANUAL order entry only? No order will be sent.'))return;
- const price=Number($('price-'+i)?.value);
+ const feedback=$('approval-feedback-'+i);
+ if(decision==='approve'&&!isOpportunityActive(c)){if(feedback)feedback.textContent='This opportunity expired. Refresh and wait for a new locked plan.';return;}
+ if(decision==='approve' && c.position_sizing && (c.position_sizing.allowed_by_position_limit===false || c.position_sizing.allowed_by_risk_policy===false)){if(feedback)feedback.textContent='Approval blocked by position limit or STC portfolio risk capacity.';return;}
+ const price=parsePlatformPrice(c.symbol,$('price-'+i)?.value);
  const body={signal_id:c.signal_id,decision,note:'STC owner console'};
  if(decision==='approve'){
-   if(!Number.isFinite(price)||price<=0){alert('Enter the current TradingView price first.');return;}
+   if(price===null){if(feedback)feedback.textContent=priceRule(c.symbol)?"Invalid contract price. Use TradingView format such as 105'12'5 or an exact tick-aligned decimal.":'Enter a valid current TradingView price first.';return;}
    body.confirmation={observed_at_utc:new Date().toISOString(),quote_price:price,market_status:'open'};
  }
+ if(feedback)feedback.textContent='Submitting '+decision+'…';
  try{
    const r=await api('approval.php',{method:'POST',body:JSON.stringify(body)});
-   alert('Decision: '+r.decision);
+   if(feedback)feedback.textContent='Decision: '+r.decision;
    await refresh();
- }catch(e){alert('Approval failed/blocked: '+e.message);await refresh();}
+ }catch(e){
+   const reasons=e.payload&&Array.isArray(e.payload.reasons)?e.payload.reasons:[];
+   const text=reasons.length?reasons.map(approvalReasonText).join(' '):e.message;
+   if(feedback)feedback.textContent='Approval blocked: '+text;
+ }
 }
 
 function showTab(name){
  activeTab=name;
  for(const el of document.querySelectorAll('.tab'))el.classList.toggle('active',el.dataset.tab===name);
- for(const id of ['overview','capital','amp','general','notifications'])$(id+'-panel').classList.toggle('hidden',id!==name);
+ for(const id of ['overview','capital','amp','general','notifications','record'])$(id+'-panel').classList.toggle('hidden',id!==name);
  localStorage.setItem('stc_active_tab',name);
 }
 for(const el of document.querySelectorAll('.tab'))el.addEventListener('click',()=>showTab(el.dataset.tab));
