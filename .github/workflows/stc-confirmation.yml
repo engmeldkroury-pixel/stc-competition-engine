@@ -35,13 +35,13 @@ jobs:
         run: |
           set -euo pipefail
           python scripts/run_frozen_confirmation.py \
-            --manifest research_hypotheses/frozen_15m_v1.json \
-            --output confirmation_outputs/frozen_15m_v1.json
+            --manifest research_hypotheses/frozen_15m_v2.json \
+            --output confirmation_outputs/frozen_15m_v2.json
 
       - name: Upload confirmation output
         uses: actions/upload-artifact@v4
         with:
           name: stc-frozen-confirmation-${{ github.run_id }}
-          path: confirmation_outputs/frozen_15m_v1.json
+          path: confirmation_outputs/frozen_15m_v2.json
           if-no-files-found: error
           retention-days: 14
