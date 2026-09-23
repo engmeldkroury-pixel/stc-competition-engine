@@ -50,6 +50,36 @@ jobs:
 
           cards = s.get("cards") or []
           positions = ((s.get("portfolio") or {}).get("positions") or [])
+          ranked_cards = sorted(
+              cards,
+              key=lambda c: (
+                  bool(c.get("quality_gate_passed")),
+                  int(c.get("setup_quality_score") or 0),
+                  abs(float(c.get("composite_score") or 0.0)),
+              ),
+              reverse=True,
+          )
+          top_candidates = [
+              {
+                  "competition_id": c.get("competition_id"),
+                  "symbol": c.get("symbol"),
+                  "recommendation": c.get("recommendation"),
+                  "pre_gate_recommendation": c.get("pre_gate_recommendation"),
+                  "setup_grade": c.get("setup_grade"),
+                  "quality_gate_passed": c.get("quality_gate_passed"),
+                  "quality_score": c.get("setup_quality_score"),
+                  "score": c.get("composite_score"),
+                  "confidence": c.get("confidence"),
+                  "quality_gate_failures": c.get("quality_gate_failures"),
+                  "reasons": c.get("reasons"),
+                  "current_price": c.get("current_price"),
+                  "source_age_seconds": c.get("source_age_seconds"),
+                  "has_locked_plan": bool(c.get("locked_trade_plan")),
+                  "opportunity_active": c.get("opportunity_active"),
+                  "expires_in_seconds": c.get("expires_in_seconds"),
+              }
+              for c in ranked_cards[:12]
+          ]
           summary = {
               "ok": bool(s.get("ok")) and bool(n.get("ok")),
               "scope": s.get("scope"),
@@ -60,6 +90,7 @@ jobs:
               "competition_progress": s.get("competition_progress"),
               "cards_total": len(cards),
               "cards_by_competition": dict(Counter(c.get("competition_id") for c in cards)),
+              "top_candidates": top_candidates,
               "active_opportunities": [
                   {
                       "competition_id": c.get("competition_id"),
