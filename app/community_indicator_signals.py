@@ -80,6 +80,48 @@ def atr_by_index(bars: list[Bar], period: int = 14) -> dict[int, float]:
     return {i: float(value) for i, value in enumerate(_atr_full(bars, period)) if value is not None}
 
 
+def _rsi_full(values: list[float], period: int = 14) -> list[float | None]:
+    out: list[float | None] = [None] * len(values)
+    if period <= 0 or len(values) <= period:
+        return out
+    gains = [0.0] * len(values)
+    losses = [0.0] * len(values)
+    for i in range(1, len(values)):
+        change = values[i] - values[i - 1]
+        gains[i] = max(0.0, change)
+        losses[i] = max(0.0, -change)
+    avg_gain = fmean(gains[1 : period + 1])
+    avg_loss = fmean(losses[1 : period + 1])
+    out[period] = 100.0 if avg_loss <= 1e-12 else 100.0 - 100.0 / (1.0 + avg_gain / avg_loss)
+    for i in range(period + 1, len(values)):
+        avg_gain = ((period - 1) * avg_gain + gains[i]) / period
+        avg_loss = ((period - 1) * avg_loss + losses[i]) / period
+        out[i] = 100.0 if avg_loss <= 1e-12 else 100.0 - 100.0 / (1.0 + avg_gain / avg_loss)
+    return out
+
+
+def _mfi_full(bars: list[Bar], period: int = 14) -> list[float | None]:
+    out: list[float | None] = [None] * len(bars)
+    if period <= 0 or len(bars) <= period:
+        return out
+    typical = [(bar.high + bar.low + bar.close) / 3.0 for bar in bars]
+    positive = [0.0] * len(bars)
+    negative = [0.0] * len(bars)
+    for i in range(1, len(bars)):
+        flow = typical[i] * max(0.0, bars[i].volume)
+        if typical[i] > typical[i - 1]:
+            positive[i] = flow
+        elif typical[i] < typical[i - 1]:
+            negative[i] = flow
+    for i in range(period, len(bars)):
+        pos = sum(positive[i - period + 1 : i + 1])
+        neg = sum(negative[i - period + 1 : i + 1])
+        if pos <= 1e-12 and neg <= 1e-12:
+            continue
+        out[i] = 100.0 if neg <= 1e-12 else 100.0 - 100.0 / (1.0 + pos / neg)
+    return out
+
+
 def _stddev_at(values: list[float], i: int, period: int) -> float | None:
     start = i - period + 1
     if start < 0:
@@ -484,6 +526,118 @@ def range_filter_signals(
     return out
 
 
+def alphatrend_signals(
+    bars: list[Bar],
+    *,
+    period: int = 14,
+    coefficient: float = 1.0,
+    force_rsi: bool = False,
+) -> dict[int, float]:
+    """Confirmed AlphaTrend-style line/2-bar-offset crosses.
+
+    Uses MFI only when volume is sufficiently present; otherwise RSI is used,
+    matching the published fallback intent for symbols without usable volume.
+    """
+    closes = [bar.close for bar in bars]
+    atr = _atr_full(bars, period)
+    zero_volume_fraction = (
+        sum(bar.volume <= 0 for bar in bars) / len(bars) if bars else 1.0
+    )
+    use_rsi = force_rsi or zero_volume_fraction > 0.50
+    momentum = _rsi_full(closes, period) if use_rsi else _mfi_full(bars, period)
+    line: list[float | None] = [None] * len(bars)
+    out: dict[int, float] = {}
+
+    for i, bar in enumerate(bars):
+        if atr[i] is None or momentum[i] is None:
+            continue
+        up = bar.low - float(atr[i]) * coefficient
+        down = bar.high + float(atr[i]) * coefficient
+        prev = line[i - 1] if i > 0 else None
+        if float(momentum[i]) >= 50.0:
+            line[i] = up if prev is None else max(up, float(prev))
+        else:
+            line[i] = down if prev is None else min(down, float(prev))
+
+        if i < 3 or line[i - 1] is None or line[i - 2] is None or line[i - 3] is None:
+            continue
+        now_diff = float(line[i]) - float(line[i - 2])
+        prev_diff = float(line[i - 1]) - float(line[i - 3])
+        if prev_diff <= 0 < now_diff:
+            out[i] = 1.0
+        elif prev_diff >= 0 > now_diff:
+            out[i] = -1.0
+    return out
+
+
+def optimized_trend_tracker_signals(
+    bars: list[Bar],
+    *,
+    length: int = 2,
+    percent: float = 1.4,
+    cmo_length: int = 9,
+) -> dict[int, float]:
+    """Confirmed default-VAR Optimized Trend Tracker support-line crosses."""
+    closes = [bar.close for bar in bars]
+    var: list[float | None] = [None] * len(bars)
+    long_stop: list[float | None] = [None] * len(bars)
+    short_stop: list[float | None] = [None] * len(bars)
+    direction: list[int] = [1] * len(bars)
+    ott: list[float | None] = [None] * len(bars)
+    alpha = 2.0 / (length + 1.0)
+    pct = max(0.0001, percent) / 100.0
+    out: dict[int, float] = {}
+
+    up_moves = [0.0] * len(bars)
+    down_moves = [0.0] * len(bars)
+    for i in range(1, len(bars)):
+        change = closes[i] - closes[i - 1]
+        up_moves[i] = max(0.0, change)
+        down_moves[i] = max(0.0, -change)
+
+    for i in range(len(bars)):
+        start = max(1, i - cmo_length + 1)
+        up_sum = sum(up_moves[start : i + 1])
+        down_sum = sum(down_moves[start : i + 1])
+        den = up_sum + down_sum
+        abs_cmo = abs((up_sum - down_sum) / den) if den > 1e-12 else 0.0
+        prev_var = var[i - 1] if i > 0 and var[i - 1] is not None else closes[i]
+        var[i] = alpha * abs_cmo * closes[i] + (1.0 - alpha * abs_cmo) * float(prev_var)
+
+        raw_long = float(var[i]) * (1.0 - pct)
+        raw_short = float(var[i]) * (1.0 + pct)
+        if i == 0 or long_stop[i - 1] is None or short_stop[i - 1] is None:
+            long_stop[i] = raw_long
+            short_stop[i] = raw_short
+            direction[i] = 1
+        else:
+            prev_long = float(long_stop[i - 1])
+            prev_short = float(short_stop[i - 1])
+            prev_var_value = float(var[i - 1]) if var[i - 1] is not None else float(var[i])
+            long_stop[i] = max(raw_long, prev_long) if float(var[i]) > prev_long else raw_long
+            short_stop[i] = min(raw_short, prev_short) if float(var[i]) < prev_short else raw_short
+            prev_direction = direction[i - 1]
+            if prev_direction < 0 and float(var[i]) > prev_short:
+                direction[i] = 1
+            elif prev_direction > 0 and float(var[i]) < prev_long:
+                direction[i] = -1
+            else:
+                direction[i] = prev_direction
+
+        mt = float(long_stop[i]) if direction[i] > 0 else float(short_stop[i])
+        ott[i] = mt * ((200.0 + percent) / 200.0) if float(var[i]) > mt else mt * ((200.0 - percent) / 200.0)
+
+        if i == 0 or ott[i - 1] is None or var[i - 1] is None:
+            continue
+        prev_diff = float(var[i - 1]) - float(ott[i - 1])
+        diff = float(var[i]) - float(ott[i])
+        if prev_diff <= 0 < diff:
+            out[i] = 1.0
+        elif prev_diff >= 0 > diff:
+            out[i] = -1.0
+    return out
+
+
 def indicator_signal_series(
     indicator_id: str,
     bars: list[Bar],
@@ -507,4 +661,8 @@ def indicator_signal_series(
         return schaff_trend_cycle_signals(bars, **params)
     if indicator_id == "range_filter_guikroth":
         return range_filter_signals(bars, **params)
+    if indicator_id == "alphatrend":
+        return alphatrend_signals(bars, **params)
+    if indicator_id == "optimized_trend_tracker":
+        return optimized_trend_tracker_signals(bars, **params)
     raise KeyError(f"Community indicator is not implemented for causal benchmarking: {indicator_id}")
