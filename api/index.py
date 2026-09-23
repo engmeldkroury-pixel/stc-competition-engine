@@ -10,6 +10,9 @@ from fastapi.responses import HTMLResponse, JSONResponse
 from app.bridge_client import BridgeClient, BridgeClientError
 from app.cloud_approval import CloudSnapshotError, cloud_readiness, read_cloud_snapshot, read_operator_snapshot
 from app.competition_profiles import PROFILES
+from app.community_research_plan import community_research_plan_summary
+from app.research_runner import run_symbol_research
+from app.shadow_promotion_registry import public_shadow_record, shadow_candidates
 from app.serverless_worker import run_serverless_once
 
 app = FastAPI(title="STC Serverless Processor", version="0.9.0")
@@ -52,6 +55,68 @@ def process_pending(authorization: str | None = Header(default=None)):
     client = BridgeClient(bridge_url, worker_token, timeout_seconds=8.0)
     result = run_serverless_once(client, worker_id=worker_id, limit=limit)
     return {"ok": True, **result.to_dict(), "execution": "manual_only"}
+
+
+@app.post("/research/general-lab/plan")
+def serverless_general_lab_plan(
+    payload: dict,
+    authorization: str | None = Header(default=None),
+):
+    _require_trigger(authorization)
+    raw_symbols = payload.get("symbols") or []
+    if not isinstance(raw_symbols, list):
+        raise HTTPException(status_code=400, detail="symbols must be a list")
+    symbols = tuple(dict.fromkeys(str(x).strip() for x in raw_symbols if str(x).strip()))
+    if not symbols:
+        raise HTTPException(status_code=400, detail="At least one General Lab symbol is required")
+    if len(symbols) > 50:
+        raise HTTPException(status_code=400, detail="General Lab plan supports at most 50 symbols per request")
+    result = community_research_plan_summary(lab_symbols=symbols)
+    result["symbols_requested"] = list(symbols)
+    result["execution"] = "research_only"
+    result["live_authority"] = False
+    return result
+
+
+@app.post("/research/general-lab/evaluate")
+def serverless_general_lab_evaluate(
+    payload: dict,
+    authorization: str | None = Header(default=None),
+):
+    _require_trigger(authorization)
+    symbol = str(payload.get("symbol") or "").strip()
+    if not symbol:
+        raise HTTPException(status_code=400, detail="General Lab payload requires symbol")
+    if not isinstance(payload.get("series"), dict):
+        raise HTTPException(status_code=400, detail="General Lab payload requires exact-provider series")
+    try:
+        result = run_symbol_research(payload)
+    except (KeyError, TypeError, ValueError) as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    result["general_lab"] = True
+    result["execution"] = "research_only"
+    result["live_authority"] = False
+    result["promotion_required"] = True
+    return result
+
+
+@app.get("/research/shadow-candidates")
+def serverless_shadow_candidates(
+    symbol: str | None = None,
+    state: str | None = None,
+    authorization: str | None = Header(default=None),
+):
+    _require_trigger(authorization)
+    try:
+        rows = shadow_candidates(symbol=symbol, state=state)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return {
+        "records": [public_shadow_record(row) for row in rows],
+        "count": len(rows),
+        "execution": "research_only",
+        "live_authority": False,
+    }
 
 
 @app.get("/cloud/readiness")
