@@ -1814,3 +1814,16 @@ Owner intervention required now: YES — only for historical-data access, not fo
 - Controlling native-vs-community benchmark is GitHub Actions run #5 on branch research/native-community-15m-20260923; older benchmark runs are superseded/cancelled.
 - General Lab rule is now both documented and exposed through API: new Lab symbols use the same research process and never inherit weights from another symbol.
 - Live competition authority remains unchanged: human approval/manual execution only; community_indicator_live_authority=false.
+
+
+## Frozen holdout repair checkpoint — 2026-09-24 00:00 EEST
+- PR #107 failed CI because its test expected an exact 85/15 split on only 2,000 bars while the implementation silently expanded the holdout to a 500-bar minimum, producing 1,500/500 instead of 1,700/300.
+- Method decision: the requested frozen percentage must remain exact. STC must never silently change an 85/15 research split to satisfy a sample floor.
+- PR #107 was closed unmerged and explicitly superseded.
+- PR #108 created from latest main:
+  - branch feature/frozen-confirmation-v2-20260923;
+  - exact 85/15 split is preserved;
+  - if the 15% frozen segment is below the minimum sample floor, research fails closed and asks for more history;
+  - test history increased so the invariance test has a valid >=500-bar unseen holdout;
+  - live_authority remains false.
+- PR #108 CI run #374 is currently in progress.
