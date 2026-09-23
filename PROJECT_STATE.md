@@ -1736,3 +1736,50 @@ Owner intervention required now: YES — only for historical-data access, not fo
   - HTTP 409 approval failures now display the actual blocking reason inline.
   - No strategy threshold, risk gate, database schema, secret, or broker execution behavior changed.
 - PR #100 is merged in GitHub but operator.php must still be uploaded to Hostinger because the live site does not auto-deploy from GitHub.
+
+
+## Community indicator adaptive research matrix — 2026-09-23
+- Owner requested a scalable CC/STC research layer that studies practical free/community indicators per symbol/timeframe, compares them with native STC strategies by backtest, and derives symbol-specific weights that can evolve only from validated new evidence.
+- Owner Console PR #100 deployment is visually confirmed live:
+  - Record Trade tab visible.
+  - simplified EXECUTION TICKET visible.
+  - research details collapsed under Advanced details.
+- Design decision:
+  - community indicators are benchmarked independently on every compatible competition symbol and timeframe;
+  - General Lab symbols use the same engine and do not inherit weights from unrelated symbols;
+  - a validated community component may receive more research weight than a native STC strategy when its out-of-sample/forward robust score is higher on the exact same symbol/timeframe;
+  - popularity/reviews are discovery and audit metadata only, never direct trading weights;
+  - each live outcome may be accumulated, but weights are not changed after every single trade; recalibration requires a frozen evaluation window with enough new evidence to prevent recency chasing/online overfit.
+- PR #101 merged as 8779c8ac8f66d1007ce962a5cfde46db65dfe1d2.
+- CI: 347 passed, 1 warning.
+- New research components:
+  - app/community_indicator_catalog.py
+  - app/community_indicator_signals.py
+  - app/community_indicator_benchmark.py
+  - app/community_research_plan.py
+  - docs/COMMUNITY_INDICATOR_RESEARCH.md
+  - tests/test_community_indicator_lab.py
+  - app/research_runner.py now exports community_indicator_trials and community_ensemble_profiles.
+- Initial catalog includes:
+  - Machine Learning: Lorentzian Classification;
+  - UT Bot Alerts;
+  - Squeeze Momentum [LazyBear];
+  - WaveTrend with Crosses;
+  - Hull Suite;
+  - QQE MOD;
+  - Optimized Trend Tracker;
+  - Smart Money Concepts [LuxAlgo];
+  - %R Trend Exhaustion discovery family;
+  - CM Williams Vix Fix discovery family.
+- Causal research adapters are currently implemented for:
+  - UT Bot family;
+  - Squeeze Momentum family;
+  - WaveTrend family;
+  - Hull Suite family.
+- Pending exact/repaint-safe ports:
+  - Lorentzian Classification;
+  - QQE MOD;
+  - Optimized Trend Tracker.
+- LuxAlgo SMC is treated first as a native-proxy/double-counting audit because STC already contains BOS/CHoCH/order-block/FVG/liquidity families.
+- community_indicator_live_authority remains false.
+- No live A+ threshold, risk rule, competition rule, broker execution, or manual-approval boundary was changed.
