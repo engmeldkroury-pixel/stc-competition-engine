@@ -219,3 +219,68 @@ No stage may be skipped solely because an indicator is popular.
 6. Implement the next exact community adapters in priority order: Lorentzian, QQE MOD, OTT, then HalfTrend/SSL Hybrid/AlphaTrend/VuManChu subject to repaint/source audit.
 7. Extend validated matrix to additional timeframes.
 8. Build the General Lab runtime bridge so newly added symbols automatically run the same matrix and show a compact report.
+
+
+## Work-unit register update — 2026-09-23 23:35 EEST
+
+### WU-103A — General Lab routing + discovery wave 2
+Status: VERIFIED / MERGED.
+- PR #103 merged as 22150b34cffbc47a1481d5b7a196fb76b1fa341b.
+- Added POST /research/general-lab/plan and POST /research/general-lab/evaluate.
+- Any General Lab symbol can be routed through the same symbol/timeframe native + community research matrix when exact-provider OHLCV series are supplied.
+- Added second-wave candidates: Koncorde Plus, RSI Kernel Optimized, VWAP Stdev Bands v2, Flux Order Blocks, Flux Market Structure Dashboard, Machine Learning Supertrend variants, AI-SuperTrend KNN, Tri-State Supertrend.
+- AlphaTrend and Optimized Trend Tracker were promoted to implemented causal research adapters.
+- Ensemble normalization became redundancy-aware by evidence family so several similar trend indicators cannot manufacture fake consensus.
+- General Lab remains research_only/live_authority=false.
+
+### WU-103B — archive first 26-symbol community benchmark
+Status: VERIFIED / MERGED.
+- PR #104 merged as eea0c49a65091a76acadae974b0a9b1d18975c4d.
+- Archived the 26-symbol / 208-trial 15m benchmark evidence and human-readable leaderboard in main.
+- Evidence is historical/research only and did not modify live weights.
+
+### WU-105 — composite strategy research wave
+Status: VERIFIED / MERGED.
+- PR #105 merged as d120d460db9d0b8614a5e81fd7e6a60d875ddba8.
+- CI: 359 passed, 1 warning.
+- Added causal/conceptual research adapters for:
+  - QQE MOD dual-QQE/Bollinger agreement;
+  - SSL Hybrid baseline/SSL1 entry state;
+  - Waddah Attar Explosion MACD/Bollinger/ATR-dead-zone state;
+  - QQE MOD + SSL Hybrid + Waddah Attar Explosion composite strategy.
+- Added TRAIN-only bounded parameter grids for all four.
+- Public composite rule recorded: QQE direction change + SSL alignment + WAE explosion alignment on the same confirmed bar.
+- No live A+ gate/risk/execution behavior changed.
+
+### WU-104 status refinement — latest native-vs-community benchmark
+Status: IN PROGRESS.
+- Exact 15m datasets for all 26 competition symbols are staged on research/native-community-15m-20260923.
+- Runner was converted to parallel per-symbol GitHub Actions jobs after the sequential version proved too slow.
+- Older runs 1-4 were cancelled/superseded by newer code/data snapshots.
+- Run 5 is the controlling benchmark request.
+- Run 5 uses latest research branch state containing 14 implemented community research components plus the native STC strategy matrix.
+- Acceptance evidence required:
+  1. all 26 symbol jobs complete successfully;
+  2. combined summary artifact produced;
+  3. native and community components compared on identical 5,000-bar 15m windows;
+  4. per-symbol ensemble weights generated with redundancy-aware family normalization;
+  5. results archived to main before any promotion discussion.
+
+## Current implemented community research set
+The executable research pool now includes at least:
+1. UT Bot Alerts
+2. Squeeze Momentum
+3. WaveTrend Crosses
+4. Hull Suite
+5. SuperTrend
+6. Chandelier Exit
+7. Schaff Trend Cycle
+8. Range Filter
+9. AlphaTrend
+10. Optimized Trend Tracker
+11. QQE MOD
+12. SSL Hybrid baseline/SSL1 adapter
+13. Waddah Attar Explosion
+14. QQE + SSL + WAE composite
+
+The catalog remains larger than the executable pool. Pending candidates remain pending until causal/repaint-safe semantics are verified.
