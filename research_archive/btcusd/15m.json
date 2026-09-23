@@ -2,7 +2,7 @@
   "success": true,
   "symbol": "CAPITALCOM:BTCUSD",
   "interval": "15m",
-  "count": 5019,
+  "count": 5020,
   "bars": [
     {
       "t": 1785556800,
@@ -40155,25 +40155,33 @@
       "l": 86432.5,
       "c": 86447.1,
       "v": 4927
+    },
+    {
+      "t": 1790131500,
+      "o": 86447,
+      "h": 86518,
+      "l": 86418.75,
+      "c": 86510.65,
+      "v": 5416
     }
   ],
   "archive": {
     "schema_version": "stc-ohlcv-archive-v1",
     "provider": "TradingView Official MCP",
-    "snapshots_merged": 3,
+    "snapshots_merged": 4,
     "coverage_first_t": 1785556800,
-    "coverage_last_t": 1790130600,
-    "latest_input_t": 1790131500,
-    "confirmed_through_t": 1790130600,
-    "withheld_unconfirmed_t": 1790131500,
+    "coverage_last_t": 1790131500,
+    "latest_input_t": 1790132400,
+    "confirmed_through_t": 1790131500,
+    "withheld_unconfirmed_t": 1790132400,
     "last_merge": {
       "incoming_bars": 5000,
       "confirmed_incoming_bars": 4999,
       "withheld_unconfirmed_bars": 1,
       "removed_existing_unconfirmed_bars": 0,
-      "added_bars": 19,
-      "replaced_bars": 21,
-      "unchanged_overlap_bars": 4959
+      "added_bars": 1,
+      "replaced_bars": 0,
+      "unchanged_overlap_bars": 4998
     }
   },
   "notice": "Market data notice: bars are delayed 15+ minutes depending on the exchange — the last bar is not a live price and may still change; no pre/post-market bars; prices are split-adjusted only; some exchanges are served from an alternative or end-of-day feed. For the most recent quote use get_symbol_data (or get_symbol_data_batch) with the \"close\", \"change\" and \"update_mode\" columns."
