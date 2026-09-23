@@ -284,3 +284,64 @@ The executable research pool now includes at least:
 14. QQE + SSL + WAE composite
 
 The catalog remains larger than the executable pool. Pending candidates remain pending until causal/repaint-safe semantics are verified.
+
+
+## Work-unit register update — 2026-09-23 23:40 EEST
+
+### WU-104 — native vs community 15m benchmark
+Status: VERIFIED / COMPLETED / ARCHIVED.
+- Controlling workflow run: GitHub Actions run #5, run id 35916027610.
+- 26/26 symbol jobs succeeded; combine job succeeded.
+- Dataset: 5,000 exact-symbol TradingView 15m bars per competition symbol.
+- Research pool: native STC strategy matrix + 14 implemented community research components.
+- PR #106 merged as 52f43e5f057489d11d09211baabf118c2bc0b331.
+- Durable evidence:
+  - research_benchmarks/native_community_15m_run5_summary_20260923.json
+  - docs/NATIVE_COMMUNITY_15M_RUN5_20260923.md
+- Result:
+  - native strategies passing every strict 15m robustness gate: 0;
+  - symbols with at least one validated community component: 10/26;
+  - symbols with no validated component: 16/26;
+  - no live weight/A+ gate/risk/execution setting changed.
+
+Cross-symbol community validation counts in run #5:
+- SSL Hybrid: 4/26
+- Range Filter: 4/26
+- QQE MOD: 4/26
+- Schaff Trend Cycle: 4/26
+- Waddah Attar Explosion: 3/26
+- UT Bot: 3/26
+- Chandelier Exit: 2/26
+- AlphaTrend: 2/26
+- WaveTrend: 1/26
+- SuperTrend: 1/26
+- Squeeze Momentum: 1/26
+- Hull Suite: 0/26
+- QQE+SSL+WAE composite: 0/26
+- Optimized Trend Tracker: 0/26
+
+Validated 15m research profiles:
+- CAPITALCOM:DOGEUSD: Range Filter 60.1%, Schaff Trend Cycle 39.9%.
+- CAPITALCOM:ETHUSD: SSL Hybrid 100%.
+- CAPITALCOM:USDZAR: AlphaTrend 37.4%, SuperTrend 37.1%, UT Bot 25.5%.
+- CBOT:ZB1!: Range Filter 25.7%, Chandelier Exit 25.7%, WAE 20.3%, QQE MOD 14.4%, SSL Hybrid 13.8%.
+- CBOT:ZN1!: Schaff Trend Cycle 37.0%, AlphaTrend 35.6%, QQE MOD 27.3%.
+- CME:MET1!: WAE 60.8%, UT Bot 39.2%.
+- CME_MINI:MJY1!: WaveTrend 36.3%, Schaff Trend Cycle 31.9%, WAE 31.8%.
+- COMEX_MINI:MGC1!: QQE MOD 57.0%, SSL Hybrid 43.0%.
+- NYMEX:MCL1!: SSL Hybrid 21.1%, QQE MOD 18.7%, Chandelier Exit 16.8%, Range Filter 12.7%, UT Bot 11.2%, Schaff Trend Cycle 11.0%, Squeeze Momentum 8.5%.
+- NYMEX:MNG1!: Range Filter 100%.
+
+Interpretation:
+- These are research weights, not live trading weights.
+- The fact that native 15m strategies produced zero full passes is not permission to weaken gates.
+- The 10/26 community successes are strongly symbol-specific and reinforce the no-cross-symbol-inheritance rule.
+- The final unseen holdout is still required before any promotion candidate can advance.
+
+### WU-107 — final unseen community holdout
+Status: IN IMPLEMENTATION / PR OPEN.
+- PR #107 adds a final 15% frozen holdout that is excluded from parameter tuning and development validation.
+- First 85% is the complete development set; within it each indicator still uses TRAIN-only tuning and internal TEST/FORWARD validation.
+- Final 15% is replayed only after development parameters are frozen.
+- Passing the holdout produces only a research promotion candidate; live_authority remains false.
+- PR also adds a parallel 26-symbol frozen-confirmation workflow.
