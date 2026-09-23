@@ -1,0 +1,77 @@
+{
+  "workflow_run_id": 35919916518,
+  "workflow_run_number": 1,
+  "status": "success",
+  "source": "TradingView Official MCP exact-symbol 15m datasets",
+  "bars_per_symbol": 5000,
+  "development_bars": 4250,
+  "confirmation_bars": 750,
+  "development_fraction": 0.85,
+  "confirmation_fraction": 0.15,
+  "symbol_count": 26,
+  "symbols_with_frozen_pass": 5,
+  "component_pass_counts": {
+    "alphatrend": 1,
+    "range_filter_guikroth": 2,
+    "ssl_hybrid": 1,
+    "supertrend_kivanc": 1,
+    "waddah_attar_explosion": 1
+  },
+  "live_authority": false,
+  "promotion_candidates": [
+    {
+      "symbol": "CAPITALCOM:USDZAR",
+      "components": [
+        "supertrend_kivanc"
+      ]
+    },
+    {
+      "symbol": "CAPITALCOM:XAUUSD",
+      "components": [
+        "range_filter_guikroth"
+      ]
+    },
+    {
+      "symbol": "CBOT:ZB1!",
+      "components": [
+        "range_filter_guikroth"
+      ]
+    },
+    {
+      "symbol": "CME_MINI:MJY1!",
+      "components": [
+        "alphatrend",
+        "waddah_attar_explosion"
+      ]
+    },
+    {
+      "symbol": "NYMEX:MCL1!",
+      "components": [
+        "ssl_hybrid"
+      ]
+    }
+  ],
+  "no_frozen_pass_symbols": [
+    "CAPITALCOM:AUDUSD",
+    "CAPITALCOM:BTCUSD",
+    "CAPITALCOM:DOGEUSD",
+    "CAPITALCOM:ETHUSD",
+    "CAPITALCOM:EURUSD",
+    "CAPITALCOM:NAS100",
+    "CAPITALCOM:SPX500",
+    "CAPITALCOM:XAGUSD",
+    "CBOT_MINI:MYM1!",
+    "CBOT:ZN1!",
+    "CME:MBT1!",
+    "CME:MET1!",
+    "CME_MINI:M2K1!",
+    "CME_MINI:M6A1!",
+    "CME_MINI:M6B1!",
+    "CME_MINI:M6E1!",
+    "CME_MINI:MES1!",
+    "CME_MINI:MNQ1!",
+    "COMEX_MINI:MGC1!",
+    "COMEX_MINI:SIL1!",
+    "NYMEX:MNG1!"
+  ]
+}
