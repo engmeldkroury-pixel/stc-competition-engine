@@ -1705,3 +1705,34 @@ Owner intervention required now: YES — only for historical-data access, not fo
 - No additional Hostinger file deployment is required before v1.1 MTF alert activation.
 - Safe Mode and Kill Switch remain ON.
 - Next owner-only activation step is creation of the six v1.1 Pine indicator alerts documented in docs/MTF_PRODUCTION_ACTIVATION.md.
+
+
+## Live competition UX simplification + first AMP execution issue — 2026-09-23
+- Six TradingView v1.1 MTF production alerts are active and accepted at the transport layer; the three legacy alerts were paused to eliminate same-event_id collisions.
+- Owner Console no longer reports MTF LIVE CONFIRMATION OFFLINE after the v1.1-only cycle.
+- Telegram is configured and a server notification test was received successfully by the owner.
+- Manual approval mode is enabled in the live Owner Console:
+  - Safe Mode=false.
+  - Kill Switch=false.
+  - execution remains human-approved and manually entered only.
+- First actionable AMP opportunity observed on CBOT:ZN1!:
+  - direction SHORT;
+  - A_PLUS setup quality shown by the live console;
+  - owner manually opened 3 contracts on the competition platform;
+  - the trade is not yet recorded in the STC position ledger because the approval attempt was blocked with HTTP 409 after the live price moved outside the locked entry envelope, and the old manual-import UX used fragile chained browser prompts.
+- A futures-price usability defect was confirmed:
+  - STC displayed Treasury futures plan prices as generic decimals;
+  - TradingView uses 32nds / half-32nds style quotations for ZN/ZB;
+  - owner needs exact platform-ready price notation plus explicit quantity mode.
+- PR #100 merged as ddb017d3c9e5bf8cb46c3c4b41dd358871e4fcba after CI success:
+  - 339 automated tests passed.
+  - Adds a large simplified EXECUTION TICKET with only symbol, BUY/SELL, order type, entry zone, exact quantity, size mode, stop, final TP, and risk.
+  - AMP futures explicitly says Units / Contracts — NOT % balance.
+  - Research/MTF/family evidence is collapsed under Advanced details.
+  - ZN/ZB prices are displayed/accepted in TradingView-style Treasury notation as well as exact tick-aligned decimals; off-tick ambiguous values such as 105.13 are rejected for ZN.
+  - Typed live-price drafts survive the 30-second console refresh.
+  - Replaces chained prompt dialogs for existing open positions with one dedicated Record Trade page/form containing all fields at once.
+  - Allows an already-filled platform trade to be recorded directly from the signal card even if approval later became blocked.
+  - HTTP 409 approval failures now display the actual blocking reason inline.
+  - No strategy threshold, risk gate, database schema, secret, or broker execution behavior changed.
+- PR #100 is merged in GitHub but operator.php must still be uploaded to Hostinger because the live site does not auto-deploy from GitHub.
