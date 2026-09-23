@@ -1,0 +1,652 @@
+{
+  "schema": "stc-community-15m-combined-summary-v1",
+  "created_utc": "2026-09-23T19:59:16.218Z",
+  "symbols_tested": 26,
+  "bars_per_symbol": 5000,
+  "total_symbol_indicator_tests": 208,
+  "method": "60% train parameter selection / 20% test / 20% forward; next-bar open; 1.5 ATR stop; 2R target; 16-bar max hold; 0.04R round-trip cost; same-bar stop first",
+  "indicators": [
+    {
+      "indicator_id": "range_filter_guikroth",
+      "symbols_tested": 26,
+      "validated_symbols": 4,
+      "validation_rate": 0.15384615384615385,
+      "avg_robust_score_validated": 30.542425,
+      "avg_test_expectancy_r_validated": 0.21202528332752432,
+      "avg_forward_expectancy_r_validated": 0.22270975393844894,
+      "validated_examples": [
+        {
+          "symbol": "CBOT:ZB1!",
+          "score": 51.0827,
+          "test_expectancy_r": 0.37955177979511057,
+          "forward_expectancy_r": 0.4735970650609585,
+          "test_pf": 1.9371101008189613,
+          "forward_pf": 2.2236133324063814,
+          "parameters": {
+            "period": 100,
+            "mult": 3
+          }
+        },
+        {
+          "symbol": "NYMEX:MCL1!",
+          "score": 24.9265,
+          "test_expectancy_r": 0.16044052900497557,
+          "forward_expectancy_r": 0.1349660876071012,
+          "test_pf": 1.3347224357035665,
+          "forward_pf": 1.26556184530911,
+          "parameters": {
+            "period": 50,
+            "mult": 2
+          }
+        },
+        {
+          "symbol": "NYMEX:MNG1!",
+          "score": 24.2998,
+          "test_expectancy_r": 0.10749528057158132,
+          "forward_expectancy_r": 0.1541111912664528,
+          "test_pf": 1.211402260104844,
+          "forward_pf": 1.3156708871612548,
+          "parameters": {
+            "period": 100,
+            "mult": 2
+          }
+        },
+        {
+          "symbol": "CAPITALCOM:DOGEUSD",
+          "score": 21.8607,
+          "test_expectancy_r": 0.20061354393842987,
+          "forward_expectancy_r": 0.12816467181928323,
+          "test_pf": 1.435129956382183,
+          "forward_pf": 1.2158988722505073,
+          "parameters": {
+            "period": 100,
+            "mult": 3
+          }
+        }
+      ]
+    },
+    {
+      "indicator_id": "ut_bot_alerts",
+      "symbols_tested": 26,
+      "validated_symbols": 3,
+      "validation_rate": 0.11538461538461539,
+      "avg_robust_score_validated": 24.1694,
+      "avg_test_expectancy_r_validated": 0.08892066201642174,
+      "avg_forward_expectancy_r_validated": 0.1697889306767324,
+      "validated_examples": [
+        {
+          "symbol": "NYMEX:MCL1!",
+          "score": 28.3159,
+          "test_expectancy_r": 0.11906711999899583,
+          "forward_expectancy_r": 0.19232775354818102,
+          "test_pf": 1.249217508355804,
+          "forward_pf": 1.416408767848218,
+          "parameters": {
+            "atrPeriod": 10,
+            "key": 1.5
+          }
+        },
+        {
+          "symbol": "CME:MET1!",
+          "score": 25.1746,
+          "test_expectancy_r": 0.08346196198538326,
+          "forward_expectancy_r": 0.20980583910467132,
+          "test_pf": 1.1586150318046644,
+          "forward_pf": 1.3927021892149065,
+          "parameters": {
+            "atrPeriod": 14,
+            "key": 2
+          }
+        },
+        {
+          "symbol": "CAPITALCOM:USDZAR",
+          "score": 19.0177,
+          "test_expectancy_r": 0.06423290406488612,
+          "forward_expectancy_r": 0.10723319937734488,
+          "test_pf": 1.1270491336931832,
+          "forward_pf": 1.2144909174924305,
+          "parameters": {
+            "atrPeriod": 14,
+            "key": 1.5
+          }
+        }
+      ]
+    },
+    {
+      "indicator_id": "schaff_trend_cycle",
+      "symbols_tested": 26,
+      "validated_symbols": 3,
+      "validation_rate": 0.11538461538461539,
+      "avg_robust_score_validated": 22.956400000000002,
+      "avg_test_expectancy_r_validated": 0.09708847985281056,
+      "avg_forward_expectancy_r_validated": 0.17252290143310023,
+      "validated_examples": [
+        {
+          "symbol": "CME_MINI:MJY1!",
+          "score": 25.5276,
+          "test_expectancy_r": 0.10656805527532513,
+          "forward_expectancy_r": 0.27392129592303843,
+          "test_pf": 1.2044884158607232,
+          "forward_pf": 1.5640710564432718,
+          "parameters": {
+            "cycle": 12,
+            "fast": 26,
+            "slow": 50,
+            "smooth": 0.5
+          }
+        },
+        {
+          "symbol": "CBOT:ZN1!",
+          "score": 22.9355,
+          "test_expectancy_r": 0.051522912577596794,
+          "forward_expectancy_r": 0.12933094354259056,
+          "test_pf": 1.1332807434512053,
+          "forward_pf": 1.3014497394386433,
+          "parameters": {
+            "cycle": 12,
+            "fast": 26,
+            "slow": 50,
+            "smooth": 0.5
+          }
+        },
+        {
+          "symbol": "NYMEX:MCL1!",
+          "score": 20.4061,
+          "test_expectancy_r": 0.13317447170550978,
+          "forward_expectancy_r": 0.11431646483367176,
+          "test_pf": 1.298319031496117,
+          "forward_pf": 1.239032880945368,
+          "parameters": {
+            "cycle": 12,
+            "fast": 26,
+            "slow": 50,
+            "smooth": 0.5
+          }
+        }
+      ]
+    },
+    {
+      "indicator_id": "chandelier_exit_everget",
+      "symbols_tested": 26,
+      "validated_symbols": 2,
+      "validation_rate": 0.07692307692307693,
+      "avg_robust_score_validated": 46.9911,
+      "avg_test_expectancy_r_validated": 0.36717467356673317,
+      "avg_forward_expectancy_r_validated": 0.33912469972407977,
+      "validated_examples": [
+        {
+          "symbol": "CBOT:ZB1!",
+          "score": 51.0501,
+          "test_expectancy_r": 0.3233434920903993,
+          "forward_expectancy_r": 0.4988879081824107,
+          "test_pf": 1.7684047539807526,
+          "forward_pf": 2.149609761584405,
+          "parameters": {
+            "period": 14,
+            "mult": 3
+          }
+        },
+        {
+          "symbol": "NYMEX:MCL1!",
+          "score": 42.9321,
+          "test_expectancy_r": 0.4110058550430671,
+          "forward_expectancy_r": 0.1793614912657489,
+          "test_pf": 2.1444589276498975,
+          "forward_pf": 1.453216607111794,
+          "parameters": {
+            "period": 14,
+            "mult": 2
+          }
+        }
+      ]
+    },
+    {
+      "indicator_id": "wavetrend_crosses",
+      "symbols_tested": 26,
+      "validated_symbols": 2,
+      "validation_rate": 0.07692307692307693,
+      "avg_robust_score_validated": 23.00435,
+      "avg_test_expectancy_r_validated": 0.10567565953582933,
+      "avg_forward_expectancy_r_validated": 0.13379160085964661,
+      "validated_examples": [
+        {
+          "symbol": "CME_MINI:MJY1!",
+          "score": 30.2613,
+          "test_expectancy_r": 0.15350758732176098,
+          "forward_expectancy_r": 0.24711839574025657,
+          "test_pf": 1.3270450175479038,
+          "forward_pf": 1.6130930088663389,
+          "parameters": {
+            "ch": 14,
+            "avg": 21,
+            "sig": 4
+          }
+        },
+        {
+          "symbol": "CAPITALCOM:USDZAR",
+          "score": 15.7474,
+          "test_expectancy_r": 0.057843731749897695,
+          "forward_expectancy_r": 0.020464805979036684,
+          "test_pf": 1.1430525908924263,
+          "forward_pf": 1.0460812710771745,
+          "parameters": {
+            "ch": 14,
+            "avg": 21,
+            "sig": 4
+          }
+        }
+      ]
+    },
+    {
+      "indicator_id": "supertrend_kivanc",
+      "symbols_tested": 26,
+      "validated_symbols": 1,
+      "validation_rate": 0.038461538461538464,
+      "avg_robust_score_validated": 27.6163,
+      "avg_test_expectancy_r_validated": 0.17260479494321732,
+      "avg_forward_expectancy_r_validated": 0.1497692935199204,
+      "validated_examples": [
+        {
+          "symbol": "CAPITALCOM:USDZAR",
+          "score": 27.6163,
+          "test_expectancy_r": 0.17260479494321732,
+          "forward_expectancy_r": 0.1497692935199204,
+          "test_pf": 1.4327996292409928,
+          "forward_pf": 1.3429988580985226,
+          "parameters": {
+            "atrPeriod": 14,
+            "mult": 3
+          }
+        }
+      ]
+    },
+    {
+      "indicator_id": "squeeze_momentum_lazybear",
+      "symbols_tested": 26,
+      "validated_symbols": 1,
+      "validation_rate": 0.038461538461538464,
+      "avg_robust_score_validated": 14.4743,
+      "avg_test_expectancy_r_validated": 0.11851951159070637,
+      "avg_forward_expectancy_r_validated": 0.05273426269070948,
+      "validated_examples": [
+        {
+          "symbol": "NYMEX:MCL1!",
+          "score": 14.4743,
+          "test_expectancy_r": 0.11851951159070637,
+          "forward_expectancy_r": 0.05273426269070948,
+          "test_pf": 1.2286099605714302,
+          "forward_pf": 1.097403711567347,
+          "parameters": {
+            "len": 20,
+            "bb": 2,
+            "kc": 1.5
+          }
+        }
+      ]
+    },
+    {
+      "indicator_id": "hull_suite",
+      "symbols_tested": 26,
+      "validated_symbols": 0,
+      "validation_rate": 0,
+      "avg_robust_score_validated": 0,
+      "avg_test_expectancy_r_validated": 0,
+      "avg_forward_expectancy_r_validated": 0,
+      "validated_examples": []
+    }
+  ],
+  "symbols": [
+    {
+      "symbol": "CAPITALCOM:BTCUSD",
+      "bars": 5000,
+      "validated_count": 0,
+      "top_validated": []
+    },
+    {
+      "symbol": "CAPITALCOM:ETHUSD",
+      "bars": 5000,
+      "validated_count": 0,
+      "top_validated": []
+    },
+    {
+      "symbol": "CAPITALCOM:DOGEUSD",
+      "bars": 5000,
+      "validated_count": 1,
+      "top_validated": [
+        {
+          "indicator_id": "range_filter_guikroth",
+          "score": 21.8607,
+          "test_expectancy_r": 0.20061354393842987,
+          "forward_expectancy_r": 0.12816467181928323,
+          "test_pf": 1.435129956382183,
+          "forward_pf": 1.2158988722505073,
+          "parameters": {
+            "period": 100,
+            "mult": 3
+          }
+        }
+      ]
+    },
+    {
+      "symbol": "CAPITALCOM:EURUSD",
+      "bars": 5000,
+      "validated_count": 0,
+      "top_validated": []
+    },
+    {
+      "symbol": "CAPITALCOM:AUDUSD",
+      "bars": 5000,
+      "validated_count": 0,
+      "top_validated": []
+    },
+    {
+      "symbol": "CAPITALCOM:USDZAR",
+      "bars": 5000,
+      "validated_count": 3,
+      "top_validated": [
+        {
+          "indicator_id": "supertrend_kivanc",
+          "score": 27.6163,
+          "test_expectancy_r": 0.17260479494321732,
+          "forward_expectancy_r": 0.1497692935199204,
+          "test_pf": 1.4327996292409928,
+          "forward_pf": 1.3429988580985226,
+          "parameters": {
+            "atrPeriod": 14,
+            "mult": 3
+          }
+        },
+        {
+          "indicator_id": "ut_bot_alerts",
+          "score": 19.0177,
+          "test_expectancy_r": 0.06423290406488612,
+          "forward_expectancy_r": 0.10723319937734488,
+          "test_pf": 1.1270491336931832,
+          "forward_pf": 1.2144909174924305,
+          "parameters": {
+            "atrPeriod": 14,
+            "key": 1.5
+          }
+        },
+        {
+          "indicator_id": "wavetrend_crosses",
+          "score": 15.7474,
+          "test_expectancy_r": 0.057843731749897695,
+          "forward_expectancy_r": 0.020464805979036684,
+          "test_pf": 1.1430525908924263,
+          "forward_pf": 1.0460812710771745,
+          "parameters": {
+            "ch": 14,
+            "avg": 21,
+            "sig": 4
+          }
+        }
+      ]
+    },
+    {
+      "symbol": "CAPITALCOM:XAUUSD",
+      "bars": 5000,
+      "validated_count": 0,
+      "top_validated": []
+    },
+    {
+      "symbol": "CAPITALCOM:XAGUSD",
+      "bars": 5000,
+      "validated_count": 0,
+      "top_validated": []
+    },
+    {
+      "symbol": "CAPITALCOM:SPX500",
+      "bars": 5000,
+      "validated_count": 0,
+      "top_validated": []
+    },
+    {
+      "symbol": "CAPITALCOM:NAS100",
+      "bars": 5000,
+      "validated_count": 0,
+      "top_validated": []
+    },
+    {
+      "symbol": "CME_MINI:MES1!",
+      "bars": 5000,
+      "validated_count": 0,
+      "top_validated": []
+    },
+    {
+      "symbol": "CME_MINI:MNQ1!",
+      "bars": 5000,
+      "validated_count": 0,
+      "top_validated": []
+    },
+    {
+      "symbol": "CBOT_MINI:MYM1!",
+      "bars": 5000,
+      "validated_count": 0,
+      "top_validated": []
+    },
+    {
+      "symbol": "CME_MINI:M2K1!",
+      "bars": 5000,
+      "validated_count": 0,
+      "top_validated": []
+    },
+    {
+      "symbol": "NYMEX:MCL1!",
+      "bars": 5000,
+      "validated_count": 5,
+      "top_validated": [
+        {
+          "indicator_id": "chandelier_exit_everget",
+          "score": 42.9321,
+          "test_expectancy_r": 0.4110058550430671,
+          "forward_expectancy_r": 0.1793614912657489,
+          "test_pf": 2.1444589276498975,
+          "forward_pf": 1.453216607111794,
+          "parameters": {
+            "period": 14,
+            "mult": 2
+          }
+        },
+        {
+          "indicator_id": "ut_bot_alerts",
+          "score": 28.3159,
+          "test_expectancy_r": 0.11906711999899583,
+          "forward_expectancy_r": 0.19232775354818102,
+          "test_pf": 1.249217508355804,
+          "forward_pf": 1.416408767848218,
+          "parameters": {
+            "atrPeriod": 10,
+            "key": 1.5
+          }
+        },
+        {
+          "indicator_id": "range_filter_guikroth",
+          "score": 24.9265,
+          "test_expectancy_r": 0.16044052900497557,
+          "forward_expectancy_r": 0.1349660876071012,
+          "test_pf": 1.3347224357035665,
+          "forward_pf": 1.26556184530911,
+          "parameters": {
+            "period": 50,
+            "mult": 2
+          }
+        },
+        {
+          "indicator_id": "schaff_trend_cycle",
+          "score": 20.4061,
+          "test_expectancy_r": 0.13317447170550978,
+          "forward_expectancy_r": 0.11431646483367176,
+          "test_pf": 1.298319031496117,
+          "forward_pf": 1.239032880945368,
+          "parameters": {
+            "cycle": 12,
+            "fast": 26,
+            "slow": 50,
+            "smooth": 0.5
+          }
+        }
+      ]
+    },
+    {
+      "symbol": "NYMEX:MNG1!",
+      "bars": 5000,
+      "validated_count": 1,
+      "top_validated": [
+        {
+          "indicator_id": "range_filter_guikroth",
+          "score": 24.2998,
+          "test_expectancy_r": 0.10749528057158132,
+          "forward_expectancy_r": 0.1541111912664528,
+          "test_pf": 1.211402260104844,
+          "forward_pf": 1.3156708871612548,
+          "parameters": {
+            "period": 100,
+            "mult": 2
+          }
+        }
+      ]
+    },
+    {
+      "symbol": "COMEX_MINI:MGC1!",
+      "bars": 5000,
+      "validated_count": 0,
+      "top_validated": []
+    },
+    {
+      "symbol": "COMEX_MINI:SIL1!",
+      "bars": 5000,
+      "validated_count": 0,
+      "top_validated": []
+    },
+    {
+      "symbol": "CME_MINI:M6E1!",
+      "bars": 5000,
+      "validated_count": 0,
+      "top_validated": []
+    },
+    {
+      "symbol": "CME_MINI:M6B1!",
+      "bars": 5000,
+      "validated_count": 0,
+      "top_validated": []
+    },
+    {
+      "symbol": "CME_MINI:MJY1!",
+      "bars": 5000,
+      "validated_count": 2,
+      "top_validated": [
+        {
+          "indicator_id": "wavetrend_crosses",
+          "score": 30.2613,
+          "test_expectancy_r": 0.15350758732176098,
+          "forward_expectancy_r": 0.24711839574025657,
+          "test_pf": 1.3270450175479038,
+          "forward_pf": 1.6130930088663389,
+          "parameters": {
+            "ch": 14,
+            "avg": 21,
+            "sig": 4
+          }
+        },
+        {
+          "indicator_id": "schaff_trend_cycle",
+          "score": 25.5276,
+          "test_expectancy_r": 0.10656805527532513,
+          "forward_expectancy_r": 0.27392129592303843,
+          "test_pf": 1.2044884158607232,
+          "forward_pf": 1.5640710564432718,
+          "parameters": {
+            "cycle": 12,
+            "fast": 26,
+            "slow": 50,
+            "smooth": 0.5
+          }
+        }
+      ]
+    },
+    {
+      "symbol": "CME_MINI:M6A1!",
+      "bars": 5000,
+      "validated_count": 0,
+      "top_validated": []
+    },
+    {
+      "symbol": "CME:MBT1!",
+      "bars": 5000,
+      "validated_count": 0,
+      "top_validated": []
+    },
+    {
+      "symbol": "CME:MET1!",
+      "bars": 5000,
+      "validated_count": 1,
+      "top_validated": [
+        {
+          "indicator_id": "ut_bot_alerts",
+          "score": 25.1746,
+          "test_expectancy_r": 0.08346196198538326,
+          "forward_expectancy_r": 0.20980583910467132,
+          "test_pf": 1.1586150318046644,
+          "forward_pf": 1.3927021892149065,
+          "parameters": {
+            "atrPeriod": 14,
+            "key": 2
+          }
+        }
+      ]
+    },
+    {
+      "symbol": "CBOT:ZN1!",
+      "bars": 5000,
+      "validated_count": 1,
+      "top_validated": [
+        {
+          "indicator_id": "schaff_trend_cycle",
+          "score": 22.9355,
+          "test_expectancy_r": 0.051522912577596794,
+          "forward_expectancy_r": 0.12933094354259056,
+          "test_pf": 1.1332807434512053,
+          "forward_pf": 1.3014497394386433,
+          "parameters": {
+            "cycle": 12,
+            "fast": 26,
+            "slow": 50,
+            "smooth": 0.5
+          }
+        }
+      ]
+    },
+    {
+      "symbol": "CBOT:ZB1!",
+      "bars": 5000,
+      "validated_count": 2,
+      "top_validated": [
+        {
+          "indicator_id": "range_filter_guikroth",
+          "score": 51.0827,
+          "test_expectancy_r": 0.37955177979511057,
+          "forward_expectancy_r": 0.4735970650609585,
+          "test_pf": 1.9371101008189613,
+          "forward_pf": 2.2236133324063814,
+          "parameters": {
+            "period": 100,
+            "mult": 3
+          }
+        },
+        {
+          "indicator_id": "chandelier_exit_everget",
+          "score": 51.0501,
+          "test_expectancy_r": 0.3233434920903993,
+          "forward_expectancy_r": 0.4988879081824107,
+          "test_pf": 1.7684047539807526,
+          "forward_pf": 2.149609761584405,
+          "parameters": {
+            "period": 14,
+            "mult": 3
+          }
+        }
+      ]
+    }
+  ]
+}

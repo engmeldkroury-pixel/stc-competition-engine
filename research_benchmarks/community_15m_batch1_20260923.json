@@ -1,0 +1,4478 @@
+{
+  "schema": "stc-community-15m-pilot-v1",
+  "generated_utc": "2026-09-23T19:50:46.338Z",
+  "source": "TradingView Official MCP exact symbol OHLCV",
+  "interval": "15m",
+  "bars_requested": 5000,
+  "method": "60% train parameter selection / 20% test / 20% forward; next-bar open; 1.5 ATR stop; 2R target; 16-bar max hold; 0.04R round-trip cost; same-bar stop first",
+  "symbols": [
+    {
+      "symbol": "CAPITALCOM:BTCUSD",
+      "status": "OK",
+      "bars": 5000,
+      "first_t": 1785643200,
+      "last_t": 1790192700,
+      "validated_count": 0,
+      "indicators": [
+        {
+          "indicator_id": "supertrend_kivanc",
+          "selected_parameters": {
+            "atrPeriod": 14,
+            "mult": 4
+          },
+          "train": {
+            "trades": 50,
+            "wins": 18,
+            "losses": 32,
+            "win_rate": 0.36,
+            "expectancy_r": -0.09911464694234688,
+            "profit_factor": 0.8510897732236374,
+            "max_drawdown_r": 9.562527555569615
+          },
+          "test": {
+            "trades": 15,
+            "wins": 5,
+            "losses": 10,
+            "win_rate": 0.3333333333333333,
+            "expectancy_r": 0.07946315069994465,
+            "profit_factor": 1.1384688612593572,
+            "max_drawdown_r": 5.383979517681965
+          },
+          "forward": {
+            "trades": 16,
+            "wins": 10,
+            "losses": 6,
+            "win_rate": 0.625,
+            "expectancy_r": 0.40084871419088897,
+            "profit_factor": 2.1503097917963694,
+            "max_drawdown_r": 4.53322722210948
+          },
+          "validated": false,
+          "reasons": [
+            "insufficient_out_of_sample_trades"
+          ],
+          "robust_score": 0
+        },
+        {
+          "indicator_id": "squeeze_momentum_lazybear",
+          "selected_parameters": {
+            "len": 20,
+            "bb": 2,
+            "kc": 2
+          },
+          "train": {
+            "trades": 190,
+            "wins": 76,
+            "losses": 114,
+            "win_rate": 0.4,
+            "expectancy_r": 0.0326281722934294,
+            "profit_factor": 1.0555322461230177,
+            "max_drawdown_r": 12.857204737657753
+          },
+          "test": {
+            "trades": 54,
+            "wins": 12,
+            "losses": 42,
+            "win_rate": 0.2222222222222222,
+            "expectancy_r": -0.30602180623414627,
+            "profit_factor": 0.5608550615194394,
+            "max_drawdown_r": 22.369390895932323
+          },
+          "forward": {
+            "trades": 51,
+            "wins": 28,
+            "losses": 23,
+            "win_rate": 0.5490196078431373,
+            "expectancy_r": 0.3174892520668868,
+            "profit_factor": 1.7032600665861715,
+            "max_drawdown_r": 7.3413063451436305
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "weak_out_of_sample_profit_factor",
+            "drawdown_too_large"
+          ],
+          "robust_score": 0
+        },
+        {
+          "indicator_id": "ut_bot_alerts",
+          "selected_parameters": {
+            "atrPeriod": 14,
+            "key": 2
+          },
+          "train": {
+            "trades": 139,
+            "wins": 57,
+            "losses": 82,
+            "win_rate": 0.41007194244604317,
+            "expectancy_r": 0.09625703740680937,
+            "profit_factor": 1.17354114009368,
+            "max_drawdown_r": 13.307476833965682
+          },
+          "test": {
+            "trades": 50,
+            "wins": 18,
+            "losses": 32,
+            "win_rate": 0.36,
+            "expectancy_r": -0.05931385343364348,
+            "profit_factor": 0.8931600164313711,
+            "max_drawdown_r": 8.347542360678826
+          },
+          "forward": {
+            "trades": 37,
+            "wins": 16,
+            "losses": 21,
+            "win_rate": 0.43243243243243246,
+            "expectancy_r": 0.15533245234915846,
+            "profit_factor": 1.2807328206323991,
+            "max_drawdown_r": 9.032493112747147
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "weak_out_of_sample_profit_factor"
+          ],
+          "robust_score": 0
+        },
+        {
+          "indicator_id": "chandelier_exit_everget",
+          "selected_parameters": {
+            "period": 22,
+            "mult": 3
+          },
+          "train": {
+            "trades": 141,
+            "wins": 51,
+            "losses": 90,
+            "win_rate": 0.3617021276595745,
+            "expectancy_r": -0.01914330830145175,
+            "profit_factor": 0.9656211801478619,
+            "max_drawdown_r": 8.55077949146157
+          },
+          "test": {
+            "trades": 45,
+            "wins": 15,
+            "losses": 30,
+            "win_rate": 0.3333333333333333,
+            "expectancy_r": -0.1423892944495169,
+            "profit_factor": 0.7271075316868487,
+            "max_drawdown_r": 8.157230745766523
+          },
+          "forward": {
+            "trades": 44,
+            "wins": 17,
+            "losses": 27,
+            "win_rate": 0.38636363636363635,
+            "expectancy_r": 0.1362447818123151,
+            "profit_factor": 1.2818691667914297,
+            "max_drawdown_r": 8.514250641692644
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "weak_out_of_sample_profit_factor"
+          ],
+          "robust_score": 0
+        },
+        {
+          "indicator_id": "hull_suite",
+          "selected_parameters": {
+            "length": 34
+          },
+          "train": {
+            "trades": 376,
+            "wins": 147,
+            "losses": 229,
+            "win_rate": 0.39095744680851063,
+            "expectancy_r": 0.020807150799210524,
+            "profit_factor": 1.0410298271216865,
+            "max_drawdown_r": 14.185340111369932
+          },
+          "test": {
+            "trades": 134,
+            "wins": 37,
+            "losses": 97,
+            "win_rate": 0.27611940298507465,
+            "expectancy_r": -0.21349636506694145,
+            "profit_factor": 0.6177296612180336,
+            "max_drawdown_r": 32.72597462952335
+          },
+          "forward": {
+            "trades": 129,
+            "wins": 59,
+            "losses": 70,
+            "win_rate": 0.4573643410852713,
+            "expectancy_r": 0.10607806647191328,
+            "profit_factor": 1.2365468730373022,
+            "max_drawdown_r": 14.546236117307567
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "weak_out_of_sample_profit_factor",
+            "drawdown_too_large"
+          ],
+          "robust_score": 0
+        },
+        {
+          "indicator_id": "range_filter_guikroth",
+          "selected_parameters": {
+            "period": 50,
+            "mult": 2
+          },
+          "train": {
+            "trades": 138,
+            "wins": 61,
+            "losses": 77,
+            "win_rate": 0.4420289855072464,
+            "expectancy_r": 0.11714481570444979,
+            "profit_factor": 1.2228003554761995,
+            "max_drawdown_r": 7.850091630276443
+          },
+          "test": {
+            "trades": 42,
+            "wins": 14,
+            "losses": 28,
+            "win_rate": 0.3333333333333333,
+            "expectancy_r": -0.19079556905382453,
+            "profit_factor": 0.6634483918685952,
+            "max_drawdown_r": 9.60659468655398
+          },
+          "forward": {
+            "trades": 41,
+            "wins": 14,
+            "losses": 27,
+            "win_rate": 0.34146341463414637,
+            "expectancy_r": 0.0026225739968236675,
+            "profit_factor": 1.0045298612301394,
+            "max_drawdown_r": 11.099208849092658
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "weak_out_of_sample_profit_factor",
+            "weak_forward_profit_factor"
+          ],
+          "robust_score": 0
+        },
+        {
+          "indicator_id": "wavetrend_crosses",
+          "selected_parameters": {
+            "ch": 14,
+            "avg": 21,
+            "sig": 4
+          },
+          "train": {
+            "trades": 227,
+            "wins": 89,
+            "losses": 138,
+            "win_rate": 0.3920704845814978,
+            "expectancy_r": 0.07246724608951138,
+            "profit_factor": 1.1838494546711997,
+            "max_drawdown_r": 11.801538028385423
+          },
+          "test": {
+            "trades": 92,
+            "wins": 30,
+            "losses": 62,
+            "win_rate": 0.32608695652173914,
+            "expectancy_r": -0.16540895410975373,
+            "profit_factor": 0.6591464827754735,
+            "max_drawdown_r": 19.158042262703486
+          },
+          "forward": {
+            "trades": 104,
+            "wins": 32,
+            "losses": 72,
+            "win_rate": 0.3076923076923077,
+            "expectancy_r": -0.0376345984496762,
+            "profit_factor": 0.9172474184858487,
+            "max_drawdown_r": 11.381408285046144
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "negative_forward_expectancy",
+            "weak_out_of_sample_profit_factor",
+            "weak_forward_profit_factor",
+            "drawdown_too_large"
+          ],
+          "robust_score": 0
+        },
+        {
+          "indicator_id": "schaff_trend_cycle",
+          "selected_parameters": {
+            "cycle": 10,
+            "fast": 9,
+            "slow": 30,
+            "smooth": 0.5
+          },
+          "train": {
+            "trades": 266,
+            "wins": 101,
+            "losses": 165,
+            "win_rate": 0.37969924812030076,
+            "expectancy_r": 0.022451134496027765,
+            "profit_factor": 1.0502435130794054,
+            "max_drawdown_r": 12.585218206545832
+          },
+          "test": {
+            "trades": 96,
+            "wins": 33,
+            "losses": 63,
+            "win_rate": 0.34375,
+            "expectancy_r": -0.033690106029272866,
+            "profit_factor": 0.9202519230579852,
+            "max_drawdown_r": 6.197495538796699
+          },
+          "forward": {
+            "trades": 107,
+            "wins": 34,
+            "losses": 73,
+            "win_rate": 0.3177570093457944,
+            "expectancy_r": -0.106059827703453,
+            "profit_factor": 0.7936959536173401,
+            "max_drawdown_r": 14.753430159477308
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "negative_forward_expectancy",
+            "weak_out_of_sample_profit_factor",
+            "weak_forward_profit_factor",
+            "drawdown_too_large"
+          ],
+          "robust_score": 0
+        }
+      ]
+    },
+    {
+      "symbol": "CAPITALCOM:ETHUSD",
+      "status": "OK",
+      "bars": 5000,
+      "first_t": 1785643200,
+      "last_t": 1790192700,
+      "validated_count": 0,
+      "indicators": [
+        {
+          "indicator_id": "ut_bot_alerts",
+          "selected_parameters": {
+            "atrPeriod": 14,
+            "key": 2
+          },
+          "train": {
+            "trades": 132,
+            "wins": 52,
+            "losses": 80,
+            "win_rate": 0.3939393939393939,
+            "expectancy_r": -0.01303820304273626,
+            "profit_factor": 0.9774121367326211,
+            "max_drawdown_r": 16.447224784686945
+          },
+          "test": {
+            "trades": 47,
+            "wins": 13,
+            "losses": 34,
+            "win_rate": 0.2765957446808511,
+            "expectancy_r": -0.2540641134102396,
+            "profit_factor": 0.6074863309972979,
+            "max_drawdown_r": 12.841194672718151
+          },
+          "forward": {
+            "trades": 33,
+            "wins": 19,
+            "losses": 14,
+            "win_rate": 0.5757575757575758,
+            "expectancy_r": 0.5953986773814886,
+            "profit_factor": 2.5379450670162473,
+            "max_drawdown_r": 3.5021624392967468
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "weak_out_of_sample_profit_factor",
+            "drawdown_too_large"
+          ],
+          "robust_score": 0
+        },
+        {
+          "indicator_id": "supertrend_kivanc",
+          "selected_parameters": {
+            "atrPeriod": 10,
+            "mult": 2
+          },
+          "train": {
+            "trades": 126,
+            "wins": 48,
+            "losses": 78,
+            "win_rate": 0.38095238095238093,
+            "expectancy_r": -0.007010730937207738,
+            "profit_factor": 0.9879470915798352,
+            "max_drawdown_r": 17.081880018251297
+          },
+          "test": {
+            "trades": 49,
+            "wins": 15,
+            "losses": 34,
+            "win_rate": 0.30612244897959184,
+            "expectancy_r": -0.16260303637515391,
+            "profit_factor": 0.7462354587951076,
+            "max_drawdown_r": 11.747730124819446
+          },
+          "forward": {
+            "trades": 33,
+            "wins": 18,
+            "losses": 15,
+            "win_rate": 0.5454545454545454,
+            "expectancy_r": 0.465231180300083,
+            "profit_factor": 1.9841428814040212,
+            "max_drawdown_r": 5.200000000000006
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "weak_out_of_sample_profit_factor"
+          ],
+          "robust_score": 0
+        },
+        {
+          "indicator_id": "squeeze_momentum_lazybear",
+          "selected_parameters": {
+            "len": 20,
+            "bb": 2,
+            "kc": 2
+          },
+          "train": {
+            "trades": 138,
+            "wins": 57,
+            "losses": 81,
+            "win_rate": 0.41304347826086957,
+            "expectancy_r": 0.08358872661757877,
+            "profit_factor": 1.1528342942340444,
+            "max_drawdown_r": 11.453504819788872
+          },
+          "test": {
+            "trades": 54,
+            "wins": 19,
+            "losses": 35,
+            "win_rate": 0.35185185185185186,
+            "expectancy_r": -0.054816594552643004,
+            "profit_factor": 0.9077370376089864,
+            "max_drawdown_r": 14.735157614445834
+          },
+          "forward": {
+            "trades": 51,
+            "wins": 27,
+            "losses": 24,
+            "win_rate": 0.5294117647058824,
+            "expectancy_r": 0.4051141153174138,
+            "profit_factor": 1.9787302851198143,
+            "max_drawdown_r": 6.319274320699417
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "weak_out_of_sample_profit_factor",
+            "drawdown_too_large"
+          ],
+          "robust_score": 0
+        },
+        {
+          "indicator_id": "hull_suite",
+          "selected_parameters": {
+            "length": 34
+          },
+          "train": {
+            "trades": 374,
+            "wins": 148,
+            "losses": 226,
+            "win_rate": 0.39572192513368987,
+            "expectancy_r": 0.02586998779535447,
+            "profit_factor": 1.0546246241660497,
+            "max_drawdown_r": 14.592378606105749
+          },
+          "test": {
+            "trades": 139,
+            "wins": 47,
+            "losses": 92,
+            "win_rate": 0.3381294964028777,
+            "expectancy_r": -0.09947642666426412,
+            "profit_factor": 0.8163492150764132,
+            "max_drawdown_r": 21.091705465056453
+          },
+          "forward": {
+            "trades": 120,
+            "wins": 56,
+            "losses": 64,
+            "win_rate": 0.4666666666666667,
+            "expectancy_r": 0.17041275710298445,
+            "profit_factor": 1.3990943365546624,
+            "max_drawdown_r": 11.254252666201392
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "weak_out_of_sample_profit_factor",
+            "drawdown_too_large"
+          ],
+          "robust_score": 0
+        },
+        {
+          "indicator_id": "range_filter_guikroth",
+          "selected_parameters": {
+            "period": 50,
+            "mult": 2
+          },
+          "train": {
+            "trades": 126,
+            "wins": 49,
+            "losses": 77,
+            "win_rate": 0.3888888888888889,
+            "expectancy_r": 0.012798664639362202,
+            "profit_factor": 1.023463497363192,
+            "max_drawdown_r": 18.58341614305438
+          },
+          "test": {
+            "trades": 47,
+            "wins": 18,
+            "losses": 29,
+            "win_rate": 0.3829787234042553,
+            "expectancy_r": 0.02225137540731789,
+            "profit_factor": 1.0394952582883261,
+            "max_drawdown_r": 8.926203015180247
+          },
+          "forward": {
+            "trades": 54,
+            "wins": 21,
+            "losses": 33,
+            "win_rate": 0.3888888888888889,
+            "expectancy_r": 0.06702313360385281,
+            "profit_factor": 1.1125803907089657,
+            "max_drawdown_r": 5.200000000000015
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "weak_out_of_sample_profit_factor"
+          ],
+          "robust_score": 0
+        },
+        {
+          "indicator_id": "wavetrend_crosses",
+          "selected_parameters": {
+            "ch": 14,
+            "avg": 21,
+            "sig": 4
+          },
+          "train": {
+            "trades": 242,
+            "wins": 83,
+            "losses": 159,
+            "win_rate": 0.34297520661157027,
+            "expectancy_r": -0.021721841268413797,
+            "profit_factor": 0.9481588942574621,
+            "max_drawdown_r": 15.920580671015262
+          },
+          "test": {
+            "trades": 83,
+            "wins": 24,
+            "losses": 59,
+            "win_rate": 0.2891566265060241,
+            "expectancy_r": -0.11608037163314411,
+            "profit_factor": 0.7596714118911571,
+            "max_drawdown_r": 18.474284211747868
+          },
+          "forward": {
+            "trades": 91,
+            "wins": 26,
+            "losses": 65,
+            "win_rate": 0.2857142857142857,
+            "expectancy_r": -0.05064391229969424,
+            "profit_factor": 0.892887954902593,
+            "max_drawdown_r": 12.218546245420319
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "negative_forward_expectancy",
+            "weak_out_of_sample_profit_factor",
+            "weak_forward_profit_factor",
+            "drawdown_too_large"
+          ],
+          "robust_score": 0
+        },
+        {
+          "indicator_id": "chandelier_exit_everget",
+          "selected_parameters": {
+            "period": 22,
+            "mult": 2
+          },
+          "train": {
+            "trades": 190,
+            "wins": 54,
+            "losses": 136,
+            "win_rate": 0.28421052631578947,
+            "expectancy_r": -0.0038295634054352767,
+            "profit_factor": 0.99123551866209,
+            "max_drawdown_r": 11.513718285296283
+          },
+          "test": {
+            "trades": 59,
+            "wins": 19,
+            "losses": 40,
+            "win_rate": 0.3220338983050847,
+            "expectancy_r": -0.016435894686256877,
+            "profit_factor": 0.9610138781277567,
+            "max_drawdown_r": 8.529085031659779
+          },
+          "forward": {
+            "trades": 73,
+            "wins": 17,
+            "losses": 56,
+            "win_rate": 0.2328767123287671,
+            "expectancy_r": -0.07818451155025369,
+            "profit_factor": 0.8394951609523255,
+            "max_drawdown_r": 14.411455357266037
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "negative_forward_expectancy",
+            "weak_out_of_sample_profit_factor",
+            "weak_forward_profit_factor",
+            "drawdown_too_large"
+          ],
+          "robust_score": 0
+        },
+        {
+          "indicator_id": "schaff_trend_cycle",
+          "selected_parameters": {
+            "cycle": 10,
+            "fast": 9,
+            "slow": 30,
+            "smooth": 0.5
+          },
+          "train": {
+            "trades": 271,
+            "wins": 102,
+            "losses": 169,
+            "win_rate": 0.3763837638376384,
+            "expectancy_r": -0.036361212287811265,
+            "profit_factor": 0.919330909419259,
+            "max_drawdown_r": 19.484393772856766
+          },
+          "test": {
+            "trades": 91,
+            "wins": 35,
+            "losses": 56,
+            "win_rate": 0.38461538461538464,
+            "expectancy_r": -0.002493413763021301,
+            "profit_factor": 0.99445991726778,
+            "max_drawdown_r": 8.754588408478229
+          },
+          "forward": {
+            "trades": 99,
+            "wins": 28,
+            "losses": 71,
+            "win_rate": 0.2828282828282828,
+            "expectancy_r": -0.14686800095045108,
+            "profit_factor": 0.705682182315063,
+            "max_drawdown_r": 15.247934268732358
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "negative_forward_expectancy",
+            "weak_out_of_sample_profit_factor",
+            "weak_forward_profit_factor",
+            "drawdown_too_large"
+          ],
+          "robust_score": 0
+        }
+      ]
+    },
+    {
+      "symbol": "CAPITALCOM:DOGEUSD",
+      "status": "OK",
+      "bars": 5000,
+      "first_t": 1785643200,
+      "last_t": 1790192700,
+      "validated_count": 1,
+      "indicators": [
+        {
+          "indicator_id": "range_filter_guikroth",
+          "selected_parameters": {
+            "period": 100,
+            "mult": 3
+          },
+          "train": {
+            "trades": 81,
+            "wins": 24,
+            "losses": 57,
+            "win_rate": 0.2962962962962963,
+            "expectancy_r": -0.18245251119307443,
+            "profit_factor": 0.7173091594159157,
+            "max_drawdown_r": 16.103025014674667
+          },
+          "test": {
+            "trades": 24,
+            "wins": 13,
+            "losses": 11,
+            "win_rate": 0.5416666666666666,
+            "expectancy_r": 0.20061354393842987,
+            "profit_factor": 1.435129956382183,
+            "max_drawdown_r": 6.742415202944622
+          },
+          "forward": {
+            "trades": 35,
+            "wins": 15,
+            "losses": 20,
+            "win_rate": 0.42857142857142855,
+            "expectancy_r": 0.12816467181928323,
+            "profit_factor": 1.2158988722505073,
+            "max_drawdown_r": 8.297151204708873
+          },
+          "validated": true,
+          "reasons": [],
+          "robust_score": 21.8607
+        },
+        {
+          "indicator_id": "supertrend_kivanc",
+          "selected_parameters": {
+            "atrPeriod": 14,
+            "mult": 4
+          },
+          "train": {
+            "trades": 45,
+            "wins": 17,
+            "losses": 28,
+            "win_rate": 0.37777777777777777,
+            "expectancy_r": 0.019972904421858614,
+            "profit_factor": 1.0346555761085323,
+            "max_drawdown_r": 12.799871655500636
+          },
+          "test": {
+            "trades": 15,
+            "wins": 4,
+            "losses": 11,
+            "win_rate": 0.26666666666666666,
+            "expectancy_r": -0.4115056938310653,
+            "profit_factor": 0.43214255182505223,
+            "max_drawdown_r": 8.141275662211495
+          },
+          "forward": {
+            "trades": 12,
+            "wins": 8,
+            "losses": 4,
+            "win_rate": 0.6666666666666666,
+            "expectancy_r": 0.5976010685719045,
+            "profit_factor": 3.261796559093485,
+            "max_drawdown_r": 1.4529256489397575
+          },
+          "validated": false,
+          "reasons": [
+            "insufficient_out_of_sample_trades",
+            "weak_out_of_sample_expectancy",
+            "weak_out_of_sample_profit_factor"
+          ],
+          "robust_score": 0
+        },
+        {
+          "indicator_id": "squeeze_momentum_lazybear",
+          "selected_parameters": {
+            "len": 14,
+            "bb": 2,
+            "kc": 1.5
+          },
+          "train": {
+            "trades": 211,
+            "wins": 83,
+            "losses": 128,
+            "win_rate": 0.3933649289099526,
+            "expectancy_r": 0.02938040085645473,
+            "profit_factor": 1.0506796924404327,
+            "max_drawdown_r": 19.543425581655672
+          },
+          "test": {
+            "trades": 73,
+            "wins": 32,
+            "losses": 41,
+            "win_rate": 0.4383561643835616,
+            "expectancy_r": 0.03694585489430525,
+            "profit_factor": 1.0715767964902416,
+            "max_drawdown_r": 13.636877204499529
+          },
+          "forward": {
+            "trades": 77,
+            "wins": 36,
+            "losses": 41,
+            "win_rate": 0.4675324675324675,
+            "expectancy_r": 0.1786151123766266,
+            "profit_factor": 1.353535828311318,
+            "max_drawdown_r": 7.125708355631417
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "weak_out_of_sample_profit_factor",
+            "drawdown_too_large"
+          ],
+          "robust_score": 0
+        },
+        {
+          "indicator_id": "schaff_trend_cycle",
+          "selected_parameters": {
+            "cycle": 12,
+            "fast": 26,
+            "slow": 50,
+            "smooth": 0.5
+          },
+          "train": {
+            "trades": 207,
+            "wins": 62,
+            "losses": 145,
+            "win_rate": 0.2995169082125604,
+            "expectancy_r": -0.0798308111976333,
+            "profit_factor": 0.85361012471137,
+            "max_drawdown_r": 25.069095263251846
+          },
+          "test": {
+            "trades": 67,
+            "wins": 27,
+            "losses": 40,
+            "win_rate": 0.40298507462686567,
+            "expectancy_r": 0.038808700319046076,
+            "profit_factor": 1.089395414455797,
+            "max_drawdown_r": 7.2453315950907236
+          },
+          "forward": {
+            "trades": 72,
+            "wins": 27,
+            "losses": 45,
+            "win_rate": 0.375,
+            "expectancy_r": 0.13330508647658576,
+            "profit_factor": 1.271941391587078,
+            "max_drawdown_r": 11.295628320571307
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "weak_out_of_sample_profit_factor"
+          ],
+          "robust_score": 0
+        },
+        {
+          "indicator_id": "chandelier_exit_everget",
+          "selected_parameters": {
+            "period": 14,
+            "mult": 2
+          },
+          "train": {
+            "trades": 193,
+            "wins": 58,
+            "losses": 135,
+            "win_rate": 0.3005181347150259,
+            "expectancy_r": -0.023597496695975242,
+            "profit_factor": 0.9503006369585293,
+            "max_drawdown_r": 13.19914763965839
+          },
+          "test": {
+            "trades": 66,
+            "wins": 18,
+            "losses": 48,
+            "win_rate": 0.2727272727272727,
+            "expectancy_r": -0.2121373237100786,
+            "profit_factor": 0.6069134299393905,
+            "max_drawdown_r": 14.008103299544373
+          },
+          "forward": {
+            "trades": 73,
+            "wins": 21,
+            "losses": 52,
+            "win_rate": 0.2876712328767123,
+            "expectancy_r": 0.052186513686554074,
+            "profit_factor": 1.1070178451062307,
+            "max_drawdown_r": 9.041987538858898
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "weak_out_of_sample_profit_factor",
+            "drawdown_too_large"
+          ],
+          "robust_score": 0
+        },
+        {
+          "indicator_id": "hull_suite",
+          "selected_parameters": {
+            "length": 89
+          },
+          "train": {
+            "trades": 339,
+            "wins": 132,
+            "losses": 207,
+            "win_rate": 0.3893805309734513,
+            "expectancy_r": 0.02204860306554035,
+            "profit_factor": 1.0414694702735081,
+            "max_drawdown_r": 19.84944025832175
+          },
+          "test": {
+            "trades": 129,
+            "wins": 46,
+            "losses": 83,
+            "win_rate": 0.35658914728682173,
+            "expectancy_r": -0.12074004127497959,
+            "profit_factor": 0.7742776258005705,
+            "max_drawdown_r": 29.37512815599797
+          },
+          "forward": {
+            "trades": 126,
+            "wins": 53,
+            "losses": 73,
+            "win_rate": 0.42063492063492064,
+            "expectancy_r": 0.016923524501523676,
+            "profit_factor": 1.0303985106381692,
+            "max_drawdown_r": 25.25283264070559
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "weak_out_of_sample_profit_factor",
+            "drawdown_too_large"
+          ],
+          "robust_score": 0
+        },
+        {
+          "indicator_id": "ut_bot_alerts",
+          "selected_parameters": {
+            "atrPeriod": 10,
+            "key": 1.5
+          },
+          "train": {
+            "trades": 177,
+            "wins": 56,
+            "losses": 121,
+            "win_rate": 0.3163841807909605,
+            "expectancy_r": -0.09481895727146224,
+            "profit_factor": 0.8340792755573119,
+            "max_drawdown_r": 19.735750787248406
+          },
+          "test": {
+            "trades": 50,
+            "wins": 19,
+            "losses": 31,
+            "win_rate": 0.38,
+            "expectancy_r": -0.05802259443779065,
+            "profit_factor": 0.879941908173483,
+            "max_drawdown_r": 6.845520952799383
+          },
+          "forward": {
+            "trades": 63,
+            "wins": 23,
+            "losses": 40,
+            "win_rate": 0.36507936507936506,
+            "expectancy_r": 0.016080057718447265,
+            "profit_factor": 1.0269837334577552,
+            "max_drawdown_r": 10.230719949025477
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "weak_out_of_sample_profit_factor"
+          ],
+          "robust_score": 0
+        },
+        {
+          "indicator_id": "wavetrend_crosses",
+          "selected_parameters": {
+            "ch": 14,
+            "avg": 21,
+            "sig": 4
+          },
+          "train": {
+            "trades": 258,
+            "wins": 92,
+            "losses": 166,
+            "win_rate": 0.35658914728682173,
+            "expectancy_r": 0.018383729280952707,
+            "profit_factor": 1.0417818353333597,
+            "max_drawdown_r": 14.66758973186564
+          },
+          "test": {
+            "trades": 78,
+            "wins": 32,
+            "losses": 46,
+            "win_rate": 0.41025641025641024,
+            "expectancy_r": 0.09410938687602623,
+            "profit_factor": 1.2566974698850817,
+            "max_drawdown_r": 4.964736303661702
+          },
+          "forward": {
+            "trades": 96,
+            "wins": 27,
+            "losses": 69,
+            "win_rate": 0.28125,
+            "expectancy_r": -0.14241186594253066,
+            "profit_factor": 0.724927480658802,
+            "max_drawdown_r": 19.949917697800515
+          },
+          "validated": false,
+          "reasons": [
+            "negative_forward_expectancy",
+            "weak_forward_profit_factor",
+            "drawdown_too_large",
+            "forward_degradation"
+          ],
+          "robust_score": 0
+        }
+      ]
+    },
+    {
+      "symbol": "CAPITALCOM:EURUSD",
+      "status": "OK",
+      "bars": 5000,
+      "first_t": 1783964700,
+      "last_t": 1790192700,
+      "validated_count": 0,
+      "indicators": [
+        {
+          "indicator_id": "range_filter_guikroth",
+          "selected_parameters": {
+            "period": 50,
+            "mult": 3
+          },
+          "train": {
+            "trades": 65,
+            "wins": 28,
+            "losses": 37,
+            "win_rate": 0.4307692307692308,
+            "expectancy_r": 0.0726012061034677,
+            "profit_factor": 1.1391550326210576,
+            "max_drawdown_r": 5.4042614601221795
+          },
+          "test": {
+            "trades": 32,
+            "wins": 10,
+            "losses": 22,
+            "win_rate": 0.3125,
+            "expectancy_r": -0.3061738734304488,
+            "profit_factor": 0.5497365389147313,
+            "max_drawdown_r": 11.732831768970929
+          },
+          "forward": {
+            "trades": 33,
+            "wins": 14,
+            "losses": 19,
+            "win_rate": 0.42424242424242425,
+            "expectancy_r": 0.13988761254586082,
+            "profit_factor": 1.2761319171306706,
+            "max_drawdown_r": 5.912829330078876
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "weak_out_of_sample_profit_factor"
+          ],
+          "robust_score": 0
+        },
+        {
+          "indicator_id": "ut_bot_alerts",
+          "selected_parameters": {
+            "atrPeriod": 10,
+            "key": 1
+          },
+          "train": {
+            "trades": 234,
+            "wins": 82,
+            "losses": 152,
+            "win_rate": 0.3504273504273504,
+            "expectancy_r": -0.07570839220576334,
+            "profit_factor": 0.843852481328138,
+            "max_drawdown_r": 29.010172430403983
+          },
+          "test": {
+            "trades": 84,
+            "wins": 28,
+            "losses": 56,
+            "win_rate": 0.3333333333333333,
+            "expectancy_r": -0.07561916845070919,
+            "profit_factor": 0.8401144495732292,
+            "max_drawdown_r": 13.976141761537484
+          },
+          "forward": {
+            "trades": 82,
+            "wins": 35,
+            "losses": 47,
+            "win_rate": 0.4268292682926829,
+            "expectancy_r": 0.12891409167579315,
+            "profit_factor": 1.3000051368349845,
+            "max_drawdown_r": 6.928527209677696
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "weak_out_of_sample_profit_factor",
+            "drawdown_too_large"
+          ],
+          "robust_score": 0
+        },
+        {
+          "indicator_id": "supertrend_kivanc",
+          "selected_parameters": {
+            "atrPeriod": 10,
+            "mult": 3
+          },
+          "train": {
+            "trades": 60,
+            "wins": 28,
+            "losses": 32,
+            "win_rate": 0.4666666666666667,
+            "expectancy_r": 0.14134905296003833,
+            "profit_factor": 1.2688049627869913,
+            "max_drawdown_r": 8.319999999999931
+          },
+          "test": {
+            "trades": 19,
+            "wins": 7,
+            "losses": 12,
+            "win_rate": 0.3684210526315789,
+            "expectancy_r": -0.20370132495279863,
+            "profit_factor": 0.6686413045944801,
+            "max_drawdown_r": 7.147773005438544
+          },
+          "forward": {
+            "trades": 30,
+            "wins": 10,
+            "losses": 20,
+            "win_rate": 0.3333333333333333,
+            "expectancy_r": -0.001792670745431346,
+            "profit_factor": 0.9969376874825947,
+            "max_drawdown_r": 5.0788463768713035
+          },
+          "validated": false,
+          "reasons": [
+            "insufficient_out_of_sample_trades",
+            "weak_out_of_sample_expectancy",
+            "negative_forward_expectancy",
+            "weak_out_of_sample_profit_factor",
+            "weak_forward_profit_factor"
+          ],
+          "robust_score": 0
+        },
+        {
+          "indicator_id": "hull_suite",
+          "selected_parameters": {
+            "length": 55
+          },
+          "train": {
+            "trades": 329,
+            "wins": 134,
+            "losses": 195,
+            "win_rate": 0.4072948328267477,
+            "expectancy_r": 0.02690079297564466,
+            "profit_factor": 1.0563651592411103,
+            "max_drawdown_r": 14.068180838835739
+          },
+          "test": {
+            "trades": 122,
+            "wins": 43,
+            "losses": 79,
+            "win_rate": 0.3524590163934426,
+            "expectancy_r": -0.15123769169536078,
+            "profit_factor": 0.71594973971512,
+            "max_drawdown_r": 24.63423094191551
+          },
+          "forward": {
+            "trades": 129,
+            "wins": 53,
+            "losses": 76,
+            "win_rate": 0.4108527131782946,
+            "expectancy_r": -0.015247027469262124,
+            "profit_factor": 0.9709623246522667,
+            "max_drawdown_r": 12.271320133347785
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "negative_forward_expectancy",
+            "weak_out_of_sample_profit_factor",
+            "weak_forward_profit_factor",
+            "drawdown_too_large"
+          ],
+          "robust_score": 0
+        },
+        {
+          "indicator_id": "schaff_trend_cycle",
+          "selected_parameters": {
+            "cycle": 12,
+            "fast": 26,
+            "slow": 50,
+            "smooth": 0.5
+          },
+          "train": {
+            "trades": 193,
+            "wins": 60,
+            "losses": 133,
+            "win_rate": 0.31088082901554404,
+            "expectancy_r": -0.09506665251971264,
+            "profit_factor": 0.8250456038550903,
+            "max_drawdown_r": 26.86515928451188
+          },
+          "test": {
+            "trades": 76,
+            "wins": 24,
+            "losses": 52,
+            "win_rate": 0.3157894736842105,
+            "expectancy_r": -0.176472641644517,
+            "profit_factor": 0.6804872662383283,
+            "max_drawdown_r": 20.661765177007535
+          },
+          "forward": {
+            "trades": 70,
+            "wins": 26,
+            "losses": 44,
+            "win_rate": 0.37142857142857144,
+            "expectancy_r": -0.023398690435703234,
+            "profit_factor": 0.9474612299771066,
+            "max_drawdown_r": 6.810744625228117
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "negative_forward_expectancy",
+            "weak_out_of_sample_profit_factor",
+            "weak_forward_profit_factor",
+            "drawdown_too_large"
+          ],
+          "robust_score": 0
+        },
+        {
+          "indicator_id": "chandelier_exit_everget",
+          "selected_parameters": {
+            "period": 14,
+            "mult": 3
+          },
+          "train": {
+            "trades": 104,
+            "wins": 39,
+            "losses": 65,
+            "win_rate": 0.375,
+            "expectancy_r": -0.04545746298202719,
+            "profit_factor": 0.9254508886946696,
+            "max_drawdown_r": 7.9974338752594605
+          },
+          "test": {
+            "trades": 41,
+            "wins": 13,
+            "losses": 28,
+            "win_rate": 0.3170731707317073,
+            "expectancy_r": -0.08651709829059878,
+            "profit_factor": 0.8396448873451028,
+            "max_drawdown_r": 9.808186099900091
+          },
+          "forward": {
+            "trades": 43,
+            "wins": 17,
+            "losses": 26,
+            "win_rate": 0.3953488372093023,
+            "expectancy_r": -0.05354131453679576,
+            "profit_factor": 0.9043019334039112,
+            "max_drawdown_r": 7.341872469939623
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "negative_forward_expectancy",
+            "weak_out_of_sample_profit_factor",
+            "weak_forward_profit_factor"
+          ],
+          "robust_score": 0
+        },
+        {
+          "indicator_id": "wavetrend_crosses",
+          "selected_parameters": {
+            "ch": 14,
+            "avg": 21,
+            "sig": 4
+          },
+          "train": {
+            "trades": 248,
+            "wins": 77,
+            "losses": 171,
+            "win_rate": 0.31048387096774194,
+            "expectancy_r": -0.10133174076219963,
+            "profit_factor": 0.7854280417446795,
+            "max_drawdown_r": 31.6434190714209
+          },
+          "test": {
+            "trades": 83,
+            "wins": 28,
+            "losses": 55,
+            "win_rate": 0.3373493975903614,
+            "expectancy_r": -0.04594670215909291,
+            "profit_factor": 0.893405764178986,
+            "max_drawdown_r": 14.10452174874906
+          },
+          "forward": {
+            "trades": 82,
+            "wins": 25,
+            "losses": 57,
+            "win_rate": 0.3048780487804878,
+            "expectancy_r": -0.11353083848803887,
+            "profit_factor": 0.7387017083209053,
+            "max_drawdown_r": 13.229528756019057
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "negative_forward_expectancy",
+            "weak_out_of_sample_profit_factor",
+            "weak_forward_profit_factor",
+            "drawdown_too_large"
+          ],
+          "robust_score": 0
+        },
+        {
+          "indicator_id": "squeeze_momentum_lazybear",
+          "selected_parameters": {
+            "len": 20,
+            "bb": 2,
+            "kc": 2
+          },
+          "train": {
+            "trades": 126,
+            "wins": 52,
+            "losses": 74,
+            "win_rate": 0.4126984126984127,
+            "expectancy_r": 0.05483210469199449,
+            "profit_factor": 1.0986450450413883,
+            "max_drawdown_r": 15.924261435971488
+          },
+          "test": {
+            "trades": 46,
+            "wins": 8,
+            "losses": 38,
+            "win_rate": 0.17391304347826086,
+            "expectancy_r": -0.5924505468733117,
+            "profit_factor": 0.21576703660454155,
+            "max_drawdown_r": 28.178852210754737
+          },
+          "forward": {
+            "trades": 59,
+            "wins": 19,
+            "losses": 40,
+            "win_rate": 0.3220338983050847,
+            "expectancy_r": -0.22381136183110462,
+            "profit_factor": 0.6532118368804803,
+            "max_drawdown_r": 14.465500999069558
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "negative_forward_expectancy",
+            "weak_out_of_sample_profit_factor",
+            "weak_forward_profit_factor",
+            "drawdown_too_large"
+          ],
+          "robust_score": 0
+        }
+      ]
+    },
+    {
+      "symbol": "CAPITALCOM:AUDUSD",
+      "status": "OK",
+      "bars": 5000,
+      "first_t": 1783962900,
+      "last_t": 1790192700,
+      "validated_count": 0,
+      "indicators": [
+        {
+          "indicator_id": "chandelier_exit_everget",
+          "selected_parameters": {
+            "period": 22,
+            "mult": 2
+          },
+          "train": {
+            "trades": 187,
+            "wins": 57,
+            "losses": 130,
+            "win_rate": 0.3048128342245989,
+            "expectancy_r": -0.0023263949274477287,
+            "profit_factor": 0.9949311663841948,
+            "max_drawdown_r": 16.29562766981245
+          },
+          "test": {
+            "trades": 68,
+            "wins": 18,
+            "losses": 50,
+            "win_rate": 0.2647058823529412,
+            "expectancy_r": -0.12440421819006542,
+            "profit_factor": 0.7567997479445951,
+            "max_drawdown_r": 13.343073580428603
+          },
+          "forward": {
+            "trades": 71,
+            "wins": 21,
+            "losses": 50,
+            "win_rate": 0.29577464788732394,
+            "expectancy_r": 0.04456025802521485,
+            "profit_factor": 1.103867436245008,
+            "max_drawdown_r": 11.682872591373219
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "weak_out_of_sample_profit_factor",
+            "drawdown_too_large"
+          ],
+          "robust_score": 0
+        },
+        {
+          "indicator_id": "hull_suite",
+          "selected_parameters": {
+            "length": 55
+          },
+          "train": {
+            "trades": 330,
+            "wins": 128,
+            "losses": 202,
+            "win_rate": 0.3878787878787879,
+            "expectancy_r": -0.019964912230694458,
+            "profit_factor": 0.9615585438696425,
+            "max_drawdown_r": 27.536331411181685
+          },
+          "test": {
+            "trades": 129,
+            "wins": 39,
+            "losses": 90,
+            "win_rate": 0.3023255813953488,
+            "expectancy_r": -0.24588731070385367,
+            "profit_factor": 0.5743552059372834,
+            "max_drawdown_r": 33.260152740258995
+          },
+          "forward": {
+            "trades": 135,
+            "wins": 51,
+            "losses": 84,
+            "win_rate": 0.37777777777777777,
+            "expectancy_r": -0.01108593094340097,
+            "profit_factor": 0.9781423191548465,
+            "max_drawdown_r": 18.04857159074591
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "negative_forward_expectancy",
+            "weak_out_of_sample_profit_factor",
+            "weak_forward_profit_factor",
+            "drawdown_too_large"
+          ],
+          "robust_score": 0
+        },
+        {
+          "indicator_id": "ut_bot_alerts",
+          "selected_parameters": {
+            "atrPeriod": 14,
+            "key": 2
+          },
+          "train": {
+            "trades": 130,
+            "wins": 43,
+            "losses": 87,
+            "win_rate": 0.33076923076923076,
+            "expectancy_r": -0.08552639921461641,
+            "profit_factor": 0.8483145665665351,
+            "max_drawdown_r": 16.450211142158533
+          },
+          "test": {
+            "trades": 62,
+            "wins": 17,
+            "losses": 45,
+            "win_rate": 0.27419354838709675,
+            "expectancy_r": -0.18353789999918138,
+            "profit_factor": 0.7101561092256744,
+            "max_drawdown_r": 15.43861782609314
+          },
+          "forward": {
+            "trades": 43,
+            "wins": 12,
+            "losses": 31,
+            "win_rate": 0.27906976744186046,
+            "expectancy_r": -0.03147494102693878,
+            "profit_factor": 0.9454177084594972,
+            "max_drawdown_r": 9.557825423229632
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "negative_forward_expectancy",
+            "weak_out_of_sample_profit_factor",
+            "weak_forward_profit_factor",
+            "drawdown_too_large"
+          ],
+          "robust_score": 0
+        },
+        {
+          "indicator_id": "wavetrend_crosses",
+          "selected_parameters": {
+            "ch": 9,
+            "avg": 12,
+            "sig": 3
+          },
+          "train": {
+            "trades": 319,
+            "wins": 112,
+            "losses": 207,
+            "win_rate": 0.3510971786833856,
+            "expectancy_r": -0.0883648139190146,
+            "profit_factor": 0.7740411532708503,
+            "max_drawdown_r": 29.981144828085213
+          },
+          "test": {
+            "trades": 116,
+            "wins": 40,
+            "losses": 76,
+            "win_rate": 0.3448275862068966,
+            "expectancy_r": -0.09647975176008229,
+            "profit_factor": 0.7748262930228317,
+            "max_drawdown_r": 15.866676473981393
+          },
+          "forward": {
+            "trades": 121,
+            "wins": 39,
+            "losses": 82,
+            "win_rate": 0.32231404958677684,
+            "expectancy_r": -0.05069444085047667,
+            "profit_factor": 0.8720775451769996,
+            "max_drawdown_r": 15.031814552060654
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "negative_forward_expectancy",
+            "weak_out_of_sample_profit_factor",
+            "weak_forward_profit_factor",
+            "drawdown_too_large"
+          ],
+          "robust_score": 0
+        },
+        {
+          "indicator_id": "squeeze_momentum_lazybear",
+          "selected_parameters": {
+            "len": 14,
+            "bb": 2,
+            "kc": 1.5
+          },
+          "train": {
+            "trades": 192,
+            "wins": 67,
+            "losses": 125,
+            "win_rate": 0.3489583333333333,
+            "expectancy_r": -0.06918074680589494,
+            "profit_factor": 0.8809661162198439,
+            "max_drawdown_r": 28.154821557297083
+          },
+          "test": {
+            "trades": 68,
+            "wins": 20,
+            "losses": 48,
+            "win_rate": 0.29411764705882354,
+            "expectancy_r": -0.2693724704374632,
+            "profit_factor": 0.601834939845482,
+            "max_drawdown_r": 23.938013551752814
+          },
+          "forward": {
+            "trades": 76,
+            "wins": 27,
+            "losses": 49,
+            "win_rate": 0.35526315789473684,
+            "expectancy_r": -0.07392130795865591,
+            "profit_factor": 0.8788328334723621,
+            "max_drawdown_r": 15.413692558355821
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "negative_forward_expectancy",
+            "weak_out_of_sample_profit_factor",
+            "weak_forward_profit_factor",
+            "drawdown_too_large"
+          ],
+          "robust_score": 0
+        },
+        {
+          "indicator_id": "supertrend_kivanc",
+          "selected_parameters": {
+            "atrPeriod": 10,
+            "mult": 2
+          },
+          "train": {
+            "trades": 116,
+            "wins": 42,
+            "losses": 74,
+            "win_rate": 0.3620689655172414,
+            "expectancy_r": -0.03659511568993729,
+            "profit_factor": 0.9363563154766831,
+            "max_drawdown_r": 12.349840839604528
+          },
+          "test": {
+            "trades": 52,
+            "wins": 19,
+            "losses": 33,
+            "win_rate": 0.36538461538461536,
+            "expectancy_r": -0.07583528795001473,
+            "profit_factor": 0.8716050246693071,
+            "max_drawdown_r": 13.529621179155605
+          },
+          "forward": {
+            "trades": 47,
+            "wins": 15,
+            "losses": 32,
+            "win_rate": 0.3191489361702128,
+            "expectancy_r": -0.07594061177535695,
+            "profit_factor": 0.8806433429985432,
+            "max_drawdown_r": 13.07103469661688
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "negative_forward_expectancy",
+            "weak_out_of_sample_profit_factor",
+            "weak_forward_profit_factor",
+            "drawdown_too_large"
+          ],
+          "robust_score": 0
+        },
+        {
+          "indicator_id": "range_filter_guikroth",
+          "selected_parameters": {
+            "period": 50,
+            "mult": 2
+          },
+          "train": {
+            "trades": 135,
+            "wins": 48,
+            "losses": 87,
+            "win_rate": 0.35555555555555557,
+            "expectancy_r": -0.07949242640619375,
+            "profit_factor": 0.8630772592955475,
+            "max_drawdown_r": 18.57147756483593
+          },
+          "test": {
+            "trades": 56,
+            "wins": 19,
+            "losses": 37,
+            "win_rate": 0.3392857142857143,
+            "expectancy_r": -0.07250920041589015,
+            "profit_factor": 0.8698882156198469,
+            "max_drawdown_r": 11.375901772722923
+          },
+          "forward": {
+            "trades": 53,
+            "wins": 18,
+            "losses": 35,
+            "win_rate": 0.33962264150943394,
+            "expectancy_r": -0.15830418636523325,
+            "profit_factor": 0.7499341818089238,
+            "max_drawdown_r": 14.223909598914165
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "negative_forward_expectancy",
+            "weak_out_of_sample_profit_factor",
+            "weak_forward_profit_factor",
+            "drawdown_too_large"
+          ],
+          "robust_score": 0
+        },
+        {
+          "indicator_id": "schaff_trend_cycle",
+          "selected_parameters": {
+            "cycle": 10,
+            "fast": 23,
+            "slow": 50,
+            "smooth": 0.5
+          },
+          "train": {
+            "trades": 214,
+            "wins": 69,
+            "losses": 145,
+            "win_rate": 0.32242990654205606,
+            "expectancy_r": -0.05816458899752141,
+            "profit_factor": 0.8863269153878536,
+            "max_drawdown_r": 20.324549283381707
+          },
+          "test": {
+            "trades": 84,
+            "wins": 25,
+            "losses": 59,
+            "win_rate": 0.2976190476190476,
+            "expectancy_r": -0.18665019791857704,
+            "profit_factor": 0.6537459241510174,
+            "max_drawdown_r": 22.009508623851282
+          },
+          "forward": {
+            "trades": 78,
+            "wins": 19,
+            "losses": 59,
+            "win_rate": 0.24358974358974358,
+            "expectancy_r": -0.16642644331246867,
+            "profit_factor": 0.6739491494044237,
+            "max_drawdown_r": 18.789806945379983
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "negative_forward_expectancy",
+            "weak_out_of_sample_profit_factor",
+            "weak_forward_profit_factor",
+            "drawdown_too_large"
+          ],
+          "robust_score": 0
+        }
+      ]
+    },
+    {
+      "symbol": "CAPITALCOM:USDZAR",
+      "status": "OK",
+      "bars": 5000,
+      "first_t": 1783955700,
+      "last_t": 1790192700,
+      "validated_count": 3,
+      "indicators": [
+        {
+          "indicator_id": "supertrend_kivanc",
+          "selected_parameters": {
+            "atrPeriod": 14,
+            "mult": 3
+          },
+          "train": {
+            "trades": 81,
+            "wins": 30,
+            "losses": 51,
+            "win_rate": 0.37037037037037035,
+            "expectancy_r": -0.07924657458562395,
+            "profit_factor": 0.8612706864892676,
+            "max_drawdown_r": 10.705078474531302
+          },
+          "test": {
+            "trades": 27,
+            "wins": 15,
+            "losses": 12,
+            "win_rate": 0.5555555555555556,
+            "expectancy_r": 0.17260479494321732,
+            "profit_factor": 1.4327996292409928,
+            "max_drawdown_r": 3.3147356830222874
+          },
+          "forward": {
+            "trades": 28,
+            "wins": 14,
+            "losses": 14,
+            "win_rate": 0.5,
+            "expectancy_r": 0.1497692935199204,
+            "profit_factor": 1.3429988580985226,
+            "max_drawdown_r": 4.863526819855612
+          },
+          "validated": true,
+          "reasons": [],
+          "robust_score": 27.6163
+        },
+        {
+          "indicator_id": "ut_bot_alerts",
+          "selected_parameters": {
+            "atrPeriod": 14,
+            "key": 1.5
+          },
+          "train": {
+            "trades": 168,
+            "wins": 68,
+            "losses": 100,
+            "win_rate": 0.40476190476190477,
+            "expectancy_r": 0.043963958751742596,
+            "profit_factor": 1.0896373702015478,
+            "max_drawdown_r": 12.173223596630578
+          },
+          "test": {
+            "trades": 65,
+            "wins": 26,
+            "losses": 39,
+            "win_rate": 0.4,
+            "expectancy_r": 0.06423290406488612,
+            "profit_factor": 1.1270491336931832,
+            "max_drawdown_r": 7.629696772367006
+          },
+          "forward": {
+            "trades": 67,
+            "wins": 29,
+            "losses": 38,
+            "win_rate": 0.43283582089552236,
+            "expectancy_r": 0.10723319937734488,
+            "profit_factor": 1.2144909174924305,
+            "max_drawdown_r": 5.200000000000129
+          },
+          "validated": true,
+          "reasons": [],
+          "robust_score": 19.0177
+        },
+        {
+          "indicator_id": "wavetrend_crosses",
+          "selected_parameters": {
+            "ch": 14,
+            "avg": 21,
+            "sig": 4
+          },
+          "train": {
+            "trades": 233,
+            "wins": 82,
+            "losses": 151,
+            "win_rate": 0.351931330472103,
+            "expectancy_r": 0.025338495945036572,
+            "profit_factor": 1.0584968620345157,
+            "max_drawdown_r": 16.031052168831117
+          },
+          "test": {
+            "trades": 80,
+            "wins": 33,
+            "losses": 47,
+            "win_rate": 0.4125,
+            "expectancy_r": 0.057843731749897695,
+            "profit_factor": 1.1430525908924263,
+            "max_drawdown_r": 7.210931025389027
+          },
+          "forward": {
+            "trades": 80,
+            "wins": 34,
+            "losses": 46,
+            "win_rate": 0.425,
+            "expectancy_r": 0.020464805979036684,
+            "profit_factor": 1.0460812710771745,
+            "max_drawdown_r": 5.8209928444316725
+          },
+          "validated": true,
+          "reasons": [],
+          "robust_score": 15.7474
+        },
+        {
+          "indicator_id": "squeeze_momentum_lazybear",
+          "selected_parameters": {
+            "len": 14,
+            "bb": 2,
+            "kc": 1.5
+          },
+          "train": {
+            "trades": 215,
+            "wins": 73,
+            "losses": 142,
+            "win_rate": 0.3395348837209302,
+            "expectancy_r": -0.14857131413909286,
+            "profit_factor": 0.7629923575615335,
+            "max_drawdown_r": 37.448199067310576
+          },
+          "test": {
+            "trades": 82,
+            "wins": 30,
+            "losses": 52,
+            "win_rate": 0.36585365853658536,
+            "expectancy_r": -0.09795001703170407,
+            "profit_factor": 0.8319301783883013,
+            "max_drawdown_r": 16.302827841007023
+          },
+          "forward": {
+            "trades": 83,
+            "wins": 34,
+            "losses": 49,
+            "win_rate": 0.40963855421686746,
+            "expectancy_r": 0.08567976525127394,
+            "profit_factor": 1.1695412216351617,
+            "max_drawdown_r": 6.718153931553448
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "weak_out_of_sample_profit_factor",
+            "drawdown_too_large"
+          ],
+          "robust_score": 0
+        },
+        {
+          "indicator_id": "hull_suite",
+          "selected_parameters": {
+            "length": 34
+          },
+          "train": {
+            "trades": 376,
+            "wins": 126,
+            "losses": 250,
+            "win_rate": 0.3351063829787234,
+            "expectancy_r": -0.06931334936397535,
+            "profit_factor": 0.8729970328959558,
+            "max_drawdown_r": 38.50621489766433
+          },
+          "test": {
+            "trades": 134,
+            "wins": 46,
+            "losses": 88,
+            "win_rate": 0.34328358208955223,
+            "expectancy_r": -0.09290846135612302,
+            "profit_factor": 0.8123014689697446,
+            "max_drawdown_r": 17.48786813731201
+          },
+          "forward": {
+            "trades": 137,
+            "wins": 53,
+            "losses": 84,
+            "win_rate": 0.38686131386861317,
+            "expectancy_r": 0.010331559336541184,
+            "profit_factor": 1.0202633700208394,
+            "max_drawdown_r": 11.67849182698641
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "weak_out_of_sample_profit_factor",
+            "drawdown_too_large"
+          ],
+          "robust_score": 0
+        },
+        {
+          "indicator_id": "chandelier_exit_everget",
+          "selected_parameters": {
+            "period": 22,
+            "mult": 2
+          },
+          "train": {
+            "trades": 167,
+            "wins": 63,
+            "losses": 104,
+            "win_rate": 0.3772455089820359,
+            "expectancy_r": 0.1065037299859711,
+            "profit_factor": 1.2461081608060611,
+            "max_drawdown_r": 11.615730807509635
+          },
+          "test": {
+            "trades": 55,
+            "wins": 19,
+            "losses": 36,
+            "win_rate": 0.34545454545454546,
+            "expectancy_r": -0.07730021374394405,
+            "profit_factor": 0.8629472578265414,
+            "max_drawdown_r": 11.4310277086554
+          },
+          "forward": {
+            "trades": 55,
+            "wins": 18,
+            "losses": 37,
+            "win_rate": 0.32727272727272727,
+            "expectancy_r": -0.015594581266433647,
+            "profit_factor": 0.9670314405022271,
+            "max_drawdown_r": 7.987504671218946
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "negative_forward_expectancy",
+            "weak_out_of_sample_profit_factor",
+            "weak_forward_profit_factor"
+          ],
+          "robust_score": 0
+        },
+        {
+          "indicator_id": "range_filter_guikroth",
+          "selected_parameters": {
+            "period": 100,
+            "mult": 2
+          },
+          "train": {
+            "trades": 126,
+            "wins": 50,
+            "losses": 76,
+            "win_rate": 0.3968253968253968,
+            "expectancy_r": 0.07545891805983614,
+            "profit_factor": 1.1529330412173444,
+            "max_drawdown_r": 13.8190287977786
+          },
+          "test": {
+            "trades": 46,
+            "wins": 21,
+            "losses": 25,
+            "win_rate": 0.45652173913043476,
+            "expectancy_r": 0.28698375688098354,
+            "profit_factor": 1.6456730432152256,
+            "max_drawdown_r": 3.5883319531857785
+          },
+          "forward": {
+            "trades": 55,
+            "wins": 21,
+            "losses": 34,
+            "win_rate": 0.38181818181818183,
+            "expectancy_r": -0.03564721585205387,
+            "profit_factor": 0.933684330380619,
+            "max_drawdown_r": 5.20000000000017
+          },
+          "validated": false,
+          "reasons": [
+            "negative_forward_expectancy",
+            "weak_forward_profit_factor",
+            "forward_degradation"
+          ],
+          "robust_score": 0
+        },
+        {
+          "indicator_id": "schaff_trend_cycle",
+          "selected_parameters": {
+            "cycle": 12,
+            "fast": 26,
+            "slow": 50,
+            "smooth": 0.5
+          },
+          "train": {
+            "trades": 192,
+            "wins": 66,
+            "losses": 126,
+            "win_rate": 0.34375,
+            "expectancy_r": -0.02866807948413246,
+            "profit_factor": 0.9423594043670395,
+            "max_drawdown_r": 24.40144974500251
+          },
+          "test": {
+            "trades": 74,
+            "wins": 29,
+            "losses": 45,
+            "win_rate": 0.3918918918918919,
+            "expectancy_r": 0.12699405569990768,
+            "profit_factor": 1.3124121043832042,
+            "max_drawdown_r": 8.720855625338302
+          },
+          "forward": {
+            "trades": 76,
+            "wins": 26,
+            "losses": 50,
+            "win_rate": 0.34210526315789475,
+            "expectancy_r": -0.07511499862431283,
+            "profit_factor": 0.8499382081704132,
+            "max_drawdown_r": 9.323403825298152
+          },
+          "validated": false,
+          "reasons": [
+            "negative_forward_expectancy",
+            "weak_forward_profit_factor",
+            "forward_degradation"
+          ],
+          "robust_score": 0
+        }
+      ]
+    },
+    {
+      "symbol": "CAPITALCOM:XAUUSD",
+      "status": "OK",
+      "bars": 5000,
+      "first_t": 1783589400,
+      "last_t": 1790192700,
+      "validated_count": 0,
+      "indicators": [
+        {
+          "indicator_id": "schaff_trend_cycle",
+          "selected_parameters": {
+            "cycle": 12,
+            "fast": 26,
+            "slow": 50,
+            "smooth": 0.5
+          },
+          "train": {
+            "trades": 194,
+            "wins": 73,
+            "losses": 121,
+            "win_rate": 0.37628865979381443,
+            "expectancy_r": -0.0023677725140985027,
+            "profit_factor": 0.9953149136344508,
+            "max_drawdown_r": 11.731434175306914
+          },
+          "test": {
+            "trades": 69,
+            "wins": 28,
+            "losses": 41,
+            "win_rate": 0.4057971014492754,
+            "expectancy_r": 0.047232289696440784,
+            "profit_factor": 1.0937891905233839,
+            "max_drawdown_r": 4.412246109033447
+          },
+          "forward": {
+            "trades": 67,
+            "wins": 27,
+            "losses": 40,
+            "win_rate": 0.40298507462686567,
+            "expectancy_r": 0.2034106092399153,
+            "profit_factor": 1.423347063625009,
+            "max_drawdown_r": 4.473713891759584
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "weak_out_of_sample_profit_factor"
+          ],
+          "robust_score": 0
+        },
+        {
+          "indicator_id": "supertrend_kivanc",
+          "selected_parameters": {
+            "atrPeriod": 14,
+            "mult": 3
+          },
+          "train": {
+            "trades": 66,
+            "wins": 27,
+            "losses": 39,
+            "win_rate": 0.4090909090909091,
+            "expectancy_r": 0.08741624125760156,
+            "profit_factor": 1.1684573153304287,
+            "max_drawdown_r": 5.8070143752199685
+          },
+          "test": {
+            "trades": 27,
+            "wins": 5,
+            "losses": 22,
+            "win_rate": 0.18518518518518517,
+            "expectancy_r": -0.4639187401110623,
+            "profit_factor": 0.3633154134492969,
+            "max_drawdown_r": 15.428693015242374
+          },
+          "forward": {
+            "trades": 26,
+            "wins": 12,
+            "losses": 14,
+            "win_rate": 0.46153846153846156,
+            "expectancy_r": 0.15368351928657636,
+            "profit_factor": 1.2902211507240016,
+            "max_drawdown_r": 5.56802307992689
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "weak_out_of_sample_profit_factor",
+            "drawdown_too_large"
+          ],
+          "robust_score": 0
+        },
+        {
+          "indicator_id": "ut_bot_alerts",
+          "selected_parameters": {
+            "atrPeriod": 14,
+            "key": 2
+          },
+          "train": {
+            "trades": 122,
+            "wins": 57,
+            "losses": 65,
+            "win_rate": 0.4672131147540984,
+            "expectancy_r": 0.18038938580814315,
+            "profit_factor": 1.3734476210990427,
+            "max_drawdown_r": 10.562403338353924
+          },
+          "test": {
+            "trades": 47,
+            "wins": 18,
+            "losses": 29,
+            "win_rate": 0.3829787234042553,
+            "expectancy_r": -0.03363161813046747,
+            "profit_factor": 0.9403418953495543,
+            "max_drawdown_r": 7.273136691405699
+          },
+          "forward": {
+            "trades": 48,
+            "wins": 20,
+            "losses": 28,
+            "win_rate": 0.4166666666666667,
+            "expectancy_r": 0.05255969054297325,
+            "profit_factor": 1.103241960267698,
+            "max_drawdown_r": 7.17681851122547
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "weak_out_of_sample_profit_factor"
+          ],
+          "robust_score": 0
+        },
+        {
+          "indicator_id": "chandelier_exit_everget",
+          "selected_parameters": {
+            "period": 22,
+            "mult": 3
+          },
+          "train": {
+            "trades": 116,
+            "wins": 47,
+            "losses": 69,
+            "win_rate": 0.4051724137931034,
+            "expectancy_r": 0.08464222646642156,
+            "profit_factor": 1.1690367302959237,
+            "max_drawdown_r": 7.9898988341602255
+          },
+          "test": {
+            "trades": 35,
+            "wins": 15,
+            "losses": 20,
+            "win_rate": 0.42857142857142855,
+            "expectancy_r": 0.05646739186846378,
+            "profit_factor": 1.1164598919310642,
+            "max_drawdown_r": 8.657756155920701
+          },
+          "forward": {
+            "trades": 49,
+            "wins": 17,
+            "losses": 32,
+            "win_rate": 0.3469387755102041,
+            "expectancy_r": 0.01896601384306465,
+            "profit_factor": 1.0391200557956264,
+            "max_drawdown_r": 4.82789760859863
+          },
+          "validated": false,
+          "reasons": [
+            "forward_degradation"
+          ],
+          "robust_score": 0
+        },
+        {
+          "indicator_id": "squeeze_momentum_lazybear",
+          "selected_parameters": {
+            "len": 14,
+            "bb": 2,
+            "kc": 1.5
+          },
+          "train": {
+            "trades": 203,
+            "wins": 90,
+            "losses": 113,
+            "win_rate": 0.4433497536945813,
+            "expectancy_r": 0.07312432392931009,
+            "profit_factor": 1.142587516500595,
+            "max_drawdown_r": 9.957662789711703
+          },
+          "test": {
+            "trades": 82,
+            "wins": 29,
+            "losses": 53,
+            "win_rate": 0.35365853658536583,
+            "expectancy_r": -0.10812370505497292,
+            "profit_factor": 0.8258741877598031,
+            "max_drawdown_r": 13.064052617663599
+          },
+          "forward": {
+            "trades": 76,
+            "wins": 29,
+            "losses": 47,
+            "win_rate": 0.3815789473684211,
+            "expectancy_r": 0.01688168830060122,
+            "profit_factor": 1.0302013413077837,
+            "max_drawdown_r": 7.38119567557113
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "weak_out_of_sample_profit_factor",
+            "drawdown_too_large"
+          ],
+          "robust_score": 0
+        },
+        {
+          "indicator_id": "range_filter_guikroth",
+          "selected_parameters": {
+            "period": 100,
+            "mult": 3
+          },
+          "train": {
+            "trades": 81,
+            "wins": 34,
+            "losses": 47,
+            "win_rate": 0.41975308641975306,
+            "expectancy_r": 0.02978728273084022,
+            "profit_factor": 1.0571814521607916,
+            "max_drawdown_r": 5.944780836934355
+          },
+          "test": {
+            "trades": 24,
+            "wins": 9,
+            "losses": 15,
+            "win_rate": 0.375,
+            "expectancy_r": -0.19651054989225902,
+            "profit_factor": 0.6558035746326234,
+            "max_drawdown_r": 8.06041046621375
+          },
+          "forward": {
+            "trades": 33,
+            "wins": 12,
+            "losses": 21,
+            "win_rate": 0.36363636363636365,
+            "expectancy_r": -0.005232526594023428,
+            "profit_factor": 0.9911169479915536,
+            "max_drawdown_r": 8.207486188974885
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "negative_forward_expectancy",
+            "weak_out_of_sample_profit_factor",
+            "weak_forward_profit_factor"
+          ],
+          "robust_score": 0
+        },
+        {
+          "indicator_id": "wavetrend_crosses",
+          "selected_parameters": {
+            "ch": 14,
+            "avg": 21,
+            "sig": 4
+          },
+          "train": {
+            "trades": 224,
+            "wins": 79,
+            "losses": 145,
+            "win_rate": 0.35267857142857145,
+            "expectancy_r": 0.02996860732753765,
+            "profit_factor": 1.0695175928637088,
+            "max_drawdown_r": 10.717987871884588
+          },
+          "test": {
+            "trades": 90,
+            "wins": 28,
+            "losses": 62,
+            "win_rate": 0.3111111111111111,
+            "expectancy_r": -0.11858761292088131,
+            "profit_factor": 0.7361457007868779,
+            "max_drawdown_r": 15.667654505558025
+          },
+          "forward": {
+            "trades": 90,
+            "wins": 28,
+            "losses": 62,
+            "win_rate": 0.3111111111111111,
+            "expectancy_r": -0.007488140263031929,
+            "profit_factor": 0.9842414363182138,
+            "max_drawdown_r": 8.714231272689767
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "negative_forward_expectancy",
+            "weak_out_of_sample_profit_factor",
+            "weak_forward_profit_factor",
+            "drawdown_too_large"
+          ],
+          "robust_score": 0
+        },
+        {
+          "indicator_id": "hull_suite",
+          "selected_parameters": {
+            "length": 34
+          },
+          "train": {
+            "trades": 348,
+            "wins": 138,
+            "losses": 210,
+            "win_rate": 0.39655172413793105,
+            "expectancy_r": 0.01804849418790856,
+            "profit_factor": 1.0364320322503453,
+            "max_drawdown_r": 14.36983900207307
+          },
+          "test": {
+            "trades": 137,
+            "wins": 43,
+            "losses": 94,
+            "win_rate": 0.31386861313868614,
+            "expectancy_r": -0.1593148277374868,
+            "profit_factor": 0.724754558882908,
+            "max_drawdown_r": 26.332080434324144
+          },
+          "forward": {
+            "trades": 129,
+            "wins": 46,
+            "losses": 83,
+            "win_rate": 0.35658914728682173,
+            "expectancy_r": -0.06933648230785203,
+            "profit_factor": 0.8684060412710586,
+            "max_drawdown_r": 19.13764434734572
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "negative_forward_expectancy",
+            "weak_out_of_sample_profit_factor",
+            "weak_forward_profit_factor",
+            "drawdown_too_large"
+          ],
+          "robust_score": 0
+        }
+      ]
+    },
+    {
+      "symbol": "CAPITALCOM:XAGUSD",
+      "status": "OK",
+      "bars": 5000,
+      "first_t": 1783589400,
+      "last_t": 1790192700,
+      "validated_count": 0,
+      "indicators": [
+        {
+          "indicator_id": "chandelier_exit_everget",
+          "selected_parameters": {
+            "period": 22,
+            "mult": 3
+          },
+          "train": {
+            "trades": 121,
+            "wins": 45,
+            "losses": 76,
+            "win_rate": 0.371900826446281,
+            "expectancy_r": 0.014610460130640882,
+            "profit_factor": 1.025725051609251,
+            "max_drawdown_r": 11.197013772002114
+          },
+          "test": {
+            "trades": 47,
+            "wins": 15,
+            "losses": 32,
+            "win_rate": 0.3191489361702128,
+            "expectancy_r": -0.16368440875259524,
+            "profit_factor": 0.744487363659912,
+            "max_drawdown_r": 13.680177178651709
+          },
+          "forward": {
+            "trades": 38,
+            "wins": 16,
+            "losses": 22,
+            "win_rate": 0.42105263157894735,
+            "expectancy_r": 0.06946189501612812,
+            "profit_factor": 1.1369948598330895,
+            "max_drawdown_r": 8.277199355439883
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "weak_out_of_sample_profit_factor",
+            "drawdown_too_large"
+          ],
+          "robust_score": 0
+        },
+        {
+          "indicator_id": "squeeze_momentum_lazybear",
+          "selected_parameters": {
+            "len": 20,
+            "bb": 2,
+            "kc": 2
+          },
+          "train": {
+            "trades": 133,
+            "wins": 55,
+            "losses": 78,
+            "win_rate": 0.41353383458646614,
+            "expectancy_r": 0.04935505086447442,
+            "profit_factor": 1.0910731161871614,
+            "max_drawdown_r": 12.400618809103262
+          },
+          "test": {
+            "trades": 43,
+            "wins": 18,
+            "losses": 25,
+            "win_rate": 0.4186046511627907,
+            "expectancy_r": -0.069203303843409,
+            "profit_factor": 0.8607956999493356,
+            "max_drawdown_r": 7.467175252501525
+          },
+          "forward": {
+            "trades": 55,
+            "wins": 23,
+            "losses": 32,
+            "win_rate": 0.41818181818181815,
+            "expectancy_r": 0.06589663722832058,
+            "profit_factor": 1.1213972811116644,
+            "max_drawdown_r": 10.112193991874683
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "weak_out_of_sample_profit_factor"
+          ],
+          "robust_score": 0
+        },
+        {
+          "indicator_id": "hull_suite",
+          "selected_parameters": {
+            "length": 89
+          },
+          "train": {
+            "trades": 357,
+            "wins": 136,
+            "losses": 221,
+            "win_rate": 0.38095238095238093,
+            "expectancy_r": -0.01659563719411138,
+            "profit_factor": 0.9689773255828376,
+            "max_drawdown_r": 21.320054339354066
+          },
+          "test": {
+            "trades": 123,
+            "wins": 48,
+            "losses": 75,
+            "win_rate": 0.3902439024390244,
+            "expectancy_r": -0.09061450960961248,
+            "profit_factor": 0.8364837245074864,
+            "max_drawdown_r": 14.45707075091823
+          },
+          "forward": {
+            "trades": 127,
+            "wins": 49,
+            "losses": 78,
+            "win_rate": 0.3858267716535433,
+            "expectancy_r": 0.014013764197965867,
+            "profit_factor": 1.0257997906669551,
+            "max_drawdown_r": 15.144674950815077
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "weak_out_of_sample_profit_factor",
+            "drawdown_too_large"
+          ],
+          "robust_score": 0
+        },
+        {
+          "indicator_id": "schaff_trend_cycle",
+          "selected_parameters": {
+            "cycle": 10,
+            "fast": 9,
+            "slow": 30,
+            "smooth": 0.5
+          },
+          "train": {
+            "trades": 273,
+            "wins": 93,
+            "losses": 180,
+            "win_rate": 0.34065934065934067,
+            "expectancy_r": -0.04461426553259603,
+            "profit_factor": 0.899835797384995,
+            "max_drawdown_r": 21.016699020929025
+          },
+          "test": {
+            "trades": 98,
+            "wins": 28,
+            "losses": 70,
+            "win_rate": 0.2857142857142857,
+            "expectancy_r": -0.18438343966685217,
+            "profit_factor": 0.6570717633856157,
+            "max_drawdown_r": 20.48908141165001
+          },
+          "forward": {
+            "trades": 83,
+            "wins": 33,
+            "losses": 50,
+            "win_rate": 0.39759036144578314,
+            "expectancy_r": 0.0033754890514305297,
+            "profit_factor": 1.0071087915494947,
+            "max_drawdown_r": 6.182093784266788
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "weak_out_of_sample_profit_factor",
+            "weak_forward_profit_factor",
+            "drawdown_too_large"
+          ],
+          "robust_score": 0
+        },
+        {
+          "indicator_id": "range_filter_guikroth",
+          "selected_parameters": {
+            "period": 100,
+            "mult": 3
+          },
+          "train": {
+            "trades": 83,
+            "wins": 39,
+            "losses": 44,
+            "win_rate": 0.46987951807228917,
+            "expectancy_r": 0.07003658439463463,
+            "profit_factor": 1.1350478966081843,
+            "max_drawdown_r": 8.851951885075707
+          },
+          "test": {
+            "trades": 24,
+            "wins": 12,
+            "losses": 12,
+            "win_rate": 0.5,
+            "expectancy_r": 0.13855677731533125,
+            "profit_factor": 1.334065368701813,
+            "max_drawdown_r": 4.5038678919007165
+          },
+          "forward": {
+            "trades": 29,
+            "wins": 13,
+            "losses": 16,
+            "win_rate": 0.4482758620689655,
+            "expectancy_r": -0.011800190405098197,
+            "profit_factor": 0.9777234997914471,
+            "max_drawdown_r": 5.136773555286476
+          },
+          "validated": false,
+          "reasons": [
+            "negative_forward_expectancy",
+            "weak_forward_profit_factor",
+            "forward_degradation"
+          ],
+          "robust_score": 0
+        },
+        {
+          "indicator_id": "supertrend_kivanc",
+          "selected_parameters": {
+            "atrPeriod": 10,
+            "mult": 3
+          },
+          "train": {
+            "trades": 71,
+            "wins": 33,
+            "losses": 38,
+            "win_rate": 0.4647887323943662,
+            "expectancy_r": 0.11757875577228143,
+            "profit_factor": 1.2218382071460165,
+            "max_drawdown_r": 5.825704047800749
+          },
+          "test": {
+            "trades": 25,
+            "wins": 10,
+            "losses": 15,
+            "win_rate": 0.4,
+            "expectancy_r": 0.018462325086233466,
+            "profit_factor": 1.0351488428457774,
+            "max_drawdown_r": 5.320000000000036
+          },
+          "forward": {
+            "trades": 24,
+            "wins": 8,
+            "losses": 16,
+            "win_rate": 0.3333333333333333,
+            "expectancy_r": -0.11050660236007885,
+            "profit_factor": 0.8296216682215705,
+            "max_drawdown_r": 11.526289615342161
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "negative_forward_expectancy",
+            "weak_out_of_sample_profit_factor",
+            "weak_forward_profit_factor",
+            "forward_degradation"
+          ],
+          "robust_score": 0
+        },
+        {
+          "indicator_id": "wavetrend_crosses",
+          "selected_parameters": {
+            "ch": 14,
+            "avg": 21,
+            "sig": 4
+          },
+          "train": {
+            "trades": 229,
+            "wins": 74,
+            "losses": 155,
+            "win_rate": 0.3231441048034934,
+            "expectancy_r": -0.024152191407649348,
+            "profit_factor": 0.9484837510518658,
+            "max_drawdown_r": 22.980616024272646
+          },
+          "test": {
+            "trades": 89,
+            "wins": 25,
+            "losses": 64,
+            "win_rate": 0.2808988764044944,
+            "expectancy_r": -0.25195850220233734,
+            "profit_factor": 0.5005142904041735,
+            "max_drawdown_r": 26.82193723636475
+          },
+          "forward": {
+            "trades": 77,
+            "wins": 22,
+            "losses": 55,
+            "win_rate": 0.2857142857142857,
+            "expectancy_r": -0.11084150041988432,
+            "profit_factor": 0.7808916477623397,
+            "max_drawdown_r": 8.742809222436055
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "negative_forward_expectancy",
+            "weak_out_of_sample_profit_factor",
+            "weak_forward_profit_factor",
+            "drawdown_too_large"
+          ],
+          "robust_score": 0
+        },
+        {
+          "indicator_id": "ut_bot_alerts",
+          "selected_parameters": {
+            "atrPeriod": 14,
+            "key": 2
+          },
+          "train": {
+            "trades": 124,
+            "wins": 47,
+            "losses": 77,
+            "win_rate": 0.3790322580645161,
+            "expectancy_r": -0.048117269912881816,
+            "profit_factor": 0.916490395472443,
+            "max_drawdown_r": 16.361800862206795
+          },
+          "test": {
+            "trades": 53,
+            "wins": 16,
+            "losses": 37,
+            "win_rate": 0.3018867924528302,
+            "expectancy_r": -0.1452737612833191,
+            "profit_factor": 0.7828544266580224,
+            "max_drawdown_r": 13.328237235801081
+          },
+          "forward": {
+            "trades": 46,
+            "wins": 13,
+            "losses": 33,
+            "win_rate": 0.2826086956521739,
+            "expectancy_r": -0.1395098761812952,
+            "profit_factor": 0.7795109076678771,
+            "max_drawdown_r": 14.884929157849925
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "negative_forward_expectancy",
+            "weak_out_of_sample_profit_factor",
+            "weak_forward_profit_factor",
+            "drawdown_too_large"
+          ],
+          "robust_score": 0
+        }
+      ]
+    },
+    {
+      "symbol": "CAPITALCOM:SPX500",
+      "status": "OK",
+      "bars": 5000,
+      "first_t": 1783918800,
+      "last_t": 1790192700,
+      "validated_count": 0,
+      "indicators": [
+        {
+          "indicator_id": "supertrend_kivanc",
+          "selected_parameters": {
+            "atrPeriod": 10,
+            "mult": 3
+          },
+          "train": {
+            "trades": 67,
+            "wins": 32,
+            "losses": 35,
+            "win_rate": 0.47761194029850745,
+            "expectancy_r": 0.14561596661841272,
+            "profit_factor": 1.2982824276383094,
+            "max_drawdown_r": 7.364930751049236
+          },
+          "test": {
+            "trades": 31,
+            "wins": 7,
+            "losses": 24,
+            "win_rate": 0.22580645161290322,
+            "expectancy_r": -0.4455474822291699,
+            "profit_factor": 0.38861211369770926,
+            "max_drawdown_r": 14.3699750028964
+          },
+          "forward": {
+            "trades": 19,
+            "wins": 13,
+            "losses": 6,
+            "win_rate": 0.6842105263157895,
+            "expectancy_r": 0.7514545972582876,
+            "profit_factor": 3.288082908318508,
+            "max_drawdown_r": 3.120000000000036
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "weak_out_of_sample_profit_factor",
+            "drawdown_too_large"
+          ],
+          "robust_score": 0
+        },
+        {
+          "indicator_id": "squeeze_momentum_lazybear",
+          "selected_parameters": {
+            "len": 14,
+            "bb": 2,
+            "kc": 1.5
+          },
+          "train": {
+            "trades": 200,
+            "wins": 71,
+            "losses": 129,
+            "win_rate": 0.355,
+            "expectancy_r": -0.05188783499902452,
+            "profit_factor": 0.9134570002550509,
+            "max_drawdown_r": 19.457326844723415
+          },
+          "test": {
+            "trades": 84,
+            "wins": 25,
+            "losses": 59,
+            "win_rate": 0.2976190476190476,
+            "expectancy_r": -0.2520231248700022,
+            "profit_factor": 0.6117234040828646,
+            "max_drawdown_r": 21.93324734653069
+          },
+          "forward": {
+            "trades": 75,
+            "wins": 36,
+            "losses": 39,
+            "win_rate": 0.48,
+            "expectancy_r": 0.2597375793036129,
+            "profit_factor": 1.590377161186863,
+            "max_drawdown_r": 6.360293571955511
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "weak_out_of_sample_profit_factor",
+            "drawdown_too_large"
+          ],
+          "robust_score": 0
+        },
+        {
+          "indicator_id": "hull_suite",
+          "selected_parameters": {
+            "length": 89
+          },
+          "train": {
+            "trades": 353,
+            "wins": 143,
+            "losses": 210,
+            "win_rate": 0.40509915014164305,
+            "expectancy_r": 0.019860193178134006,
+            "profit_factor": 1.0388353806009338,
+            "max_drawdown_r": 17.067994420547496
+          },
+          "test": {
+            "trades": 137,
+            "wins": 41,
+            "losses": 96,
+            "win_rate": 0.29927007299270075,
+            "expectancy_r": -0.26996630921540676,
+            "profit_factor": 0.5617097339889909,
+            "max_drawdown_r": 37.75464684458036
+          },
+          "forward": {
+            "trades": 127,
+            "wins": 55,
+            "losses": 72,
+            "win_rate": 0.4330708661417323,
+            "expectancy_r": 0.19929422505480204,
+            "profit_factor": 1.418297605567527,
+            "max_drawdown_r": 8.929409168890317
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "weak_out_of_sample_profit_factor",
+            "drawdown_too_large"
+          ],
+          "robust_score": 0
+        },
+        {
+          "indicator_id": "ut_bot_alerts",
+          "selected_parameters": {
+            "atrPeriod": 14,
+            "key": 1.5
+          },
+          "train": {
+            "trades": 167,
+            "wins": 60,
+            "losses": 107,
+            "win_rate": 0.3592814371257485,
+            "expectancy_r": -0.02276945953901002,
+            "profit_factor": 0.9562534089087539,
+            "max_drawdown_r": 16.698349850074116
+          },
+          "test": {
+            "trades": 76,
+            "wins": 17,
+            "losses": 59,
+            "win_rate": 0.2236842105263158,
+            "expectancy_r": -0.4280238138117264,
+            "profit_factor": 0.3898462680930255,
+            "max_drawdown_r": 33.570632346493746
+          },
+          "forward": {
+            "trades": 56,
+            "wins": 21,
+            "losses": 35,
+            "win_rate": 0.375,
+            "expectancy_r": 0.013000777140374597,
+            "profit_factor": 1.0247049222230662,
+            "max_drawdown_r": 7.580742137980798
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "weak_out_of_sample_profit_factor",
+            "drawdown_too_large"
+          ],
+          "robust_score": 0
+        },
+        {
+          "indicator_id": "chandelier_exit_everget",
+          "selected_parameters": {
+            "period": 22,
+            "mult": 3
+          },
+          "train": {
+            "trades": 115,
+            "wins": 36,
+            "losses": 79,
+            "win_rate": 0.3130434782608696,
+            "expectancy_r": -0.10729244702973696,
+            "profit_factor": 0.8152160534720354,
+            "max_drawdown_r": 18.808526284513757
+          },
+          "test": {
+            "trades": 45,
+            "wins": 13,
+            "losses": 32,
+            "win_rate": 0.28888888888888886,
+            "expectancy_r": -0.18174996353601655,
+            "profit_factor": 0.7213114917706658,
+            "max_drawdown_r": 9.261367062146386
+          },
+          "forward": {
+            "trades": 38,
+            "wins": 12,
+            "losses": 26,
+            "win_rate": 0.3157894736842105,
+            "expectancy_r": -0.03732335454580367,
+            "profit_factor": 0.9315205787988065,
+            "max_drawdown_r": 13.047497076846614
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "negative_forward_expectancy",
+            "weak_out_of_sample_profit_factor",
+            "weak_forward_profit_factor",
+            "drawdown_too_large"
+          ],
+          "robust_score": 0
+        },
+        {
+          "indicator_id": "range_filter_guikroth",
+          "selected_parameters": {
+            "period": 100,
+            "mult": 3
+          },
+          "train": {
+            "trades": 80,
+            "wins": 31,
+            "losses": 49,
+            "win_rate": 0.3875,
+            "expectancy_r": -0.0064170614288131785,
+            "profit_factor": 0.9884290669021712,
+            "max_drawdown_r": 12.203838874111073
+          },
+          "test": {
+            "trades": 29,
+            "wins": 7,
+            "losses": 22,
+            "win_rate": 0.2413793103448276,
+            "expectancy_r": -0.37674001733528906,
+            "profit_factor": 0.43640843416722797,
+            "max_drawdown_r": 10.925460502723382
+          },
+          "forward": {
+            "trades": 29,
+            "wins": 9,
+            "losses": 20,
+            "win_rate": 0.3103448275862069,
+            "expectancy_r": -0.04378437952572225,
+            "profit_factor": 0.9260469933845848,
+            "max_drawdown_r": 4.636523534207446
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "negative_forward_expectancy",
+            "weak_out_of_sample_profit_factor",
+            "weak_forward_profit_factor"
+          ],
+          "robust_score": 0
+        },
+        {
+          "indicator_id": "wavetrend_crosses",
+          "selected_parameters": {
+            "ch": 9,
+            "avg": 12,
+            "sig": 3
+          },
+          "train": {
+            "trades": 328,
+            "wins": 119,
+            "losses": 209,
+            "win_rate": 0.3628048780487805,
+            "expectancy_r": -0.035931202455845794,
+            "profit_factor": 0.9019544679535125,
+            "max_drawdown_r": 22.766597615816856
+          },
+          "test": {
+            "trades": 126,
+            "wins": 40,
+            "losses": 86,
+            "win_rate": 0.31746031746031744,
+            "expectancy_r": -0.0991185367716007,
+            "profit_factor": 0.7610730932853276,
+            "max_drawdown_r": 15.597410477604546
+          },
+          "forward": {
+            "trades": 119,
+            "wins": 40,
+            "losses": 79,
+            "win_rate": 0.33613445378151263,
+            "expectancy_r": -0.05751640115274046,
+            "profit_factor": 0.8435942601602908,
+            "max_drawdown_r": 9.906061489303749
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "negative_forward_expectancy",
+            "weak_out_of_sample_profit_factor",
+            "weak_forward_profit_factor",
+            "drawdown_too_large"
+          ],
+          "robust_score": 0
+        },
+        {
+          "indicator_id": "schaff_trend_cycle",
+          "selected_parameters": {
+            "cycle": 10,
+            "fast": 9,
+            "slow": 30,
+            "smooth": 0.5
+          },
+          "train": {
+            "trades": 260,
+            "wins": 98,
+            "losses": 162,
+            "win_rate": 0.3769230769230769,
+            "expectancy_r": -0.03284844122258617,
+            "profit_factor": 0.9269861579957996,
+            "max_drawdown_r": 24.210378942240645
+          },
+          "test": {
+            "trades": 105,
+            "wins": 35,
+            "losses": 70,
+            "win_rate": 0.3333333333333333,
+            "expectancy_r": -0.13584368070227482,
+            "profit_factor": 0.7482237534946753,
+            "max_drawdown_r": 15.576419568015059
+          },
+          "forward": {
+            "trades": 94,
+            "wins": 31,
+            "losses": 63,
+            "win_rate": 0.32978723404255317,
+            "expectancy_r": -0.14133571637894002,
+            "profit_factor": 0.7072516884312837,
+            "max_drawdown_r": 14.411690156537109
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "negative_forward_expectancy",
+            "weak_out_of_sample_profit_factor",
+            "weak_forward_profit_factor",
+            "drawdown_too_large"
+          ],
+          "robust_score": 0
+        }
+      ]
+    },
+    {
+      "symbol": "CAPITALCOM:NAS100",
+      "status": "OK",
+      "bars": 5000,
+      "first_t": 1783921500,
+      "last_t": 1790192700,
+      "validated_count": 0,
+      "indicators": [
+        {
+          "indicator_id": "chandelier_exit_everget",
+          "selected_parameters": {
+            "period": 14,
+            "mult": 2
+          },
+          "train": {
+            "trades": 160,
+            "wins": 59,
+            "losses": 101,
+            "win_rate": 0.36875,
+            "expectancy_r": 0.04796048014658369,
+            "profit_factor": 1.1117618124883097,
+            "max_drawdown_r": 9.038879249503747
+          },
+          "test": {
+            "trades": 71,
+            "wins": 23,
+            "losses": 48,
+            "win_rate": 0.323943661971831,
+            "expectancy_r": -0.12062091823934351,
+            "profit_factor": 0.7683239929195695,
+            "max_drawdown_r": 9.241991196827769
+          },
+          "forward": {
+            "trades": 53,
+            "wins": 25,
+            "losses": 28,
+            "win_rate": 0.4716981132075472,
+            "expectancy_r": 0.43798053094710526,
+            "profit_factor": 2.1693768091331864,
+            "max_drawdown_r": 3.753969602073615
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "weak_out_of_sample_profit_factor"
+          ],
+          "robust_score": 0
+        },
+        {
+          "indicator_id": "range_filter_guikroth",
+          "selected_parameters": {
+            "period": 100,
+            "mult": 2
+          },
+          "train": {
+            "trades": 121,
+            "wins": 47,
+            "losses": 74,
+            "win_rate": 0.3884297520661157,
+            "expectancy_r": 0.050784343066929076,
+            "profit_factor": 1.1093355311018587,
+            "max_drawdown_r": 8.33026167288623
+          },
+          "test": {
+            "trades": 52,
+            "wins": 19,
+            "losses": 33,
+            "win_rate": 0.36538461538461536,
+            "expectancy_r": -0.098932490388539,
+            "profit_factor": 0.8268979641531639,
+            "max_drawdown_r": 10.469861809905872
+          },
+          "forward": {
+            "trades": 42,
+            "wins": 20,
+            "losses": 22,
+            "win_rate": 0.47619047619047616,
+            "expectancy_r": 0.37555792901041246,
+            "profit_factor": 1.8689197865660574,
+            "max_drawdown_r": 4.600844445044051
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "weak_out_of_sample_profit_factor"
+          ],
+          "robust_score": 0
+        },
+        {
+          "indicator_id": "ut_bot_alerts",
+          "selected_parameters": {
+            "atrPeriod": 14,
+            "key": 2
+          },
+          "train": {
+            "trades": 131,
+            "wins": 50,
+            "losses": 81,
+            "win_rate": 0.3816793893129771,
+            "expectancy_r": 0.05476322969989205,
+            "profit_factor": 1.1056267929631436,
+            "max_drawdown_r": 7.847030469873266
+          },
+          "test": {
+            "trades": 55,
+            "wins": 17,
+            "losses": 38,
+            "win_rate": 0.3090909090909091,
+            "expectancy_r": -0.16060609027955475,
+            "profit_factor": 0.7354848191549939,
+            "max_drawdown_r": 10.42923208392062
+          },
+          "forward": {
+            "trades": 40,
+            "wins": 18,
+            "losses": 22,
+            "win_rate": 0.45,
+            "expectancy_r": 0.3606222194623771,
+            "profit_factor": 1.8098913160918761,
+            "max_drawdown_r": 4.929194931208373
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "weak_out_of_sample_profit_factor"
+          ],
+          "robust_score": 0
+        },
+        {
+          "indicator_id": "hull_suite",
+          "selected_parameters": {
+            "length": 55
+          },
+          "train": {
+            "trades": 371,
+            "wins": 142,
+            "losses": 229,
+            "win_rate": 0.38274932614555257,
+            "expectancy_r": -0.01668152538410575,
+            "profit_factor": 0.968153243440206,
+            "max_drawdown_r": 27.675195017742247
+          },
+          "test": {
+            "trades": 151,
+            "wins": 44,
+            "losses": 107,
+            "win_rate": 0.2913907284768212,
+            "expectancy_r": -0.2669814988011061,
+            "profit_factor": 0.5531652610628189,
+            "max_drawdown_r": 40.40778050737427
+          },
+          "forward": {
+            "trades": 128,
+            "wins": 58,
+            "losses": 70,
+            "win_rate": 0.453125,
+            "expectancy_r": 0.2087657333533493,
+            "profit_factor": 1.4396905746181508,
+            "max_drawdown_r": 6.810291436425494
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "weak_out_of_sample_profit_factor",
+            "drawdown_too_large"
+          ],
+          "robust_score": 0
+        },
+        {
+          "indicator_id": "squeeze_momentum_lazybear",
+          "selected_parameters": {
+            "len": 20,
+            "bb": 2,
+            "kc": 1.5
+          },
+          "train": {
+            "trades": 216,
+            "wins": 79,
+            "losses": 137,
+            "win_rate": 0.36574074074074076,
+            "expectancy_r": -0.051568819380431,
+            "profit_factor": 0.9117209076015999,
+            "max_drawdown_r": 15.600194853320563
+          },
+          "test": {
+            "trades": 77,
+            "wins": 18,
+            "losses": 59,
+            "win_rate": 0.23376623376623376,
+            "expectancy_r": -0.4136529142211304,
+            "profit_factor": 0.4224681462218928,
+            "max_drawdown_r": 31.85127439502704
+          },
+          "forward": {
+            "trades": 80,
+            "wins": 34,
+            "losses": 46,
+            "win_rate": 0.425,
+            "expectancy_r": 0.19863824699921656,
+            "profit_factor": 1.3770312514061194,
+            "max_drawdown_r": 8.290842062507952
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "weak_out_of_sample_profit_factor",
+            "drawdown_too_large"
+          ],
+          "robust_score": 0
+        },
+        {
+          "indicator_id": "wavetrend_crosses",
+          "selected_parameters": {
+            "ch": 9,
+            "avg": 12,
+            "sig": 3
+          },
+          "train": {
+            "trades": 327,
+            "wins": 110,
+            "losses": 217,
+            "win_rate": 0.3363914373088685,
+            "expectancy_r": -0.05228675518376015,
+            "profit_factor": 0.8622680053009114,
+            "max_drawdown_r": 28.11978111831776
+          },
+          "test": {
+            "trades": 116,
+            "wins": 35,
+            "losses": 81,
+            "win_rate": 0.3017241379310345,
+            "expectancy_r": -0.1109922858004684,
+            "profit_factor": 0.7396632142708103,
+            "max_drawdown_r": 22.032455911065608
+          },
+          "forward": {
+            "trades": 113,
+            "wins": 40,
+            "losses": 73,
+            "win_rate": 0.35398230088495575,
+            "expectancy_r": 0.05222140499628491,
+            "profit_factor": 1.1441971453571178,
+            "max_drawdown_r": 8.34601532228948
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "weak_out_of_sample_profit_factor",
+            "drawdown_too_large"
+          ],
+          "robust_score": 0
+        },
+        {
+          "indicator_id": "supertrend_kivanc",
+          "selected_parameters": {
+            "atrPeriod": 14,
+            "mult": 4
+          },
+          "train": {
+            "trades": 46,
+            "wins": 18,
+            "losses": 28,
+            "win_rate": 0.391304347826087,
+            "expectancy_r": 0.007674030847974988,
+            "profit_factor": 1.0133103054750658,
+            "max_drawdown_r": 5.571391350170814
+          },
+          "test": {
+            "trades": 23,
+            "wins": 3,
+            "losses": 20,
+            "win_rate": 0.13043478260869565,
+            "expectancy_r": -0.5758729380149551,
+            "profit_factor": 0.30744973332228137,
+            "max_drawdown_r": 16.125077574343983
+          },
+          "forward": {
+            "trades": 17,
+            "wins": 7,
+            "losses": 10,
+            "win_rate": 0.4117647058823529,
+            "expectancy_r": -0.014118701353211504,
+            "profit_factor": 0.9756306677271821,
+            "max_drawdown_r": 3.5508386218419465
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "negative_forward_expectancy",
+            "weak_out_of_sample_profit_factor",
+            "weak_forward_profit_factor",
+            "drawdown_too_large"
+          ],
+          "robust_score": 0
+        },
+        {
+          "indicator_id": "schaff_trend_cycle",
+          "selected_parameters": {
+            "cycle": 10,
+            "fast": 9,
+            "slow": 30,
+            "smooth": 0.5
+          },
+          "train": {
+            "trades": 275,
+            "wins": 91,
+            "losses": 184,
+            "win_rate": 0.33090909090909093,
+            "expectancy_r": -0.10786302313066977,
+            "profit_factor": 0.7755059253165223,
+            "max_drawdown_r": 33.51748101237871
+          },
+          "test": {
+            "trades": 106,
+            "wins": 32,
+            "losses": 74,
+            "win_rate": 0.3018867924528302,
+            "expectancy_r": -0.07290809694064736,
+            "profit_factor": 0.8488055185608376,
+            "max_drawdown_r": 13.168059369990294
+          },
+          "forward": {
+            "trades": 93,
+            "wins": 32,
+            "losses": 61,
+            "win_rate": 0.34408602150537637,
+            "expectancy_r": -0.027886829296359238,
+            "profit_factor": 0.9423325712380711,
+            "max_drawdown_r": 10.039379322910001
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "negative_forward_expectancy",
+            "weak_out_of_sample_profit_factor",
+            "weak_forward_profit_factor",
+            "drawdown_too_large"
+          ],
+          "robust_score": 0
+        }
+      ]
+    },
+    {
+      "symbol": "CME_MINI:MES1!",
+      "status": "OK",
+      "bars": 5000,
+      "first_t": 1783583100,
+      "last_t": 1790191800,
+      "validated_count": 0,
+      "indicators": [
+        {
+          "indicator_id": "supertrend_kivanc",
+          "selected_parameters": {
+            "atrPeriod": 14,
+            "mult": 3
+          },
+          "train": {
+            "trades": 70,
+            "wins": 28,
+            "losses": 42,
+            "win_rate": 0.4,
+            "expectancy_r": 0.029196121580214823,
+            "profit_factor": 1.0533081615592947,
+            "max_drawdown_r": 8.99340558458431
+          },
+          "test": {
+            "trades": 31,
+            "wins": 9,
+            "losses": 22,
+            "win_rate": 0.2903225806451613,
+            "expectancy_r": -0.17917668852458007,
+            "profit_factor": 0.739106935681157,
+            "max_drawdown_r": 12.357114562959001
+          },
+          "forward": {
+            "trades": 18,
+            "wins": 12,
+            "losses": 6,
+            "win_rate": 0.6666666666666666,
+            "expectancy_r": 0.7693168348211371,
+            "profit_factor": 3.219183177368602,
+            "max_drawdown_r": 2.080000000000089
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "weak_out_of_sample_profit_factor",
+            "drawdown_too_large"
+          ],
+          "robust_score": 0
+        },
+        {
+          "indicator_id": "squeeze_momentum_lazybear",
+          "selected_parameters": {
+            "len": 14,
+            "bb": 2,
+            "kc": 1.5
+          },
+          "train": {
+            "trades": 201,
+            "wins": 72,
+            "losses": 129,
+            "win_rate": 0.3582089552238806,
+            "expectancy_r": -0.05867525904061277,
+            "profit_factor": 0.9022182045422095,
+            "max_drawdown_r": 18.34460907913695
+          },
+          "test": {
+            "trades": 81,
+            "wins": 22,
+            "losses": 59,
+            "win_rate": 0.2716049382716049,
+            "expectancy_r": -0.3429083219276686,
+            "profit_factor": 0.5030858759156203,
+            "max_drawdown_r": 32.10640713809445
+          },
+          "forward": {
+            "trades": 71,
+            "wins": 31,
+            "losses": 40,
+            "win_rate": 0.43661971830985913,
+            "expectancy_r": 0.1935474948252723,
+            "profit_factor": 1.391542437956754,
+            "max_drawdown_r": 9.041559899519898
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "weak_out_of_sample_profit_factor",
+            "drawdown_too_large"
+          ],
+          "robust_score": 0
+        },
+        {
+          "indicator_id": "chandelier_exit_everget",
+          "selected_parameters": {
+            "period": 22,
+            "mult": 2
+          },
+          "train": {
+            "trades": 167,
+            "wins": 43,
+            "losses": 124,
+            "win_rate": 0.25748502994011974,
+            "expectancy_r": -0.10510868269499926,
+            "profit_factor": 0.786219643916541,
+            "max_drawdown_r": 17.987127563896095
+          },
+          "test": {
+            "trades": 79,
+            "wins": 21,
+            "losses": 58,
+            "win_rate": 0.26582278481012656,
+            "expectancy_r": -0.1224378914872182,
+            "profit_factor": 0.7710450293951027,
+            "max_drawdown_r": 17.925351578650787
+          },
+          "forward": {
+            "trades": 52,
+            "wins": 17,
+            "losses": 35,
+            "win_rate": 0.3269230769230769,
+            "expectancy_r": 0.12908366723249984,
+            "profit_factor": 1.3545625488155106,
+            "max_drawdown_r": 5.335680795992029
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "weak_out_of_sample_profit_factor",
+            "drawdown_too_large"
+          ],
+          "robust_score": 0
+        },
+        {
+          "indicator_id": "range_filter_guikroth",
+          "selected_parameters": {
+            "period": 100,
+            "mult": 3
+          },
+          "train": {
+            "trades": 76,
+            "wins": 28,
+            "losses": 48,
+            "win_rate": 0.3684210526315789,
+            "expectancy_r": -0.057925940710788756,
+            "profit_factor": 0.8943757595699259,
+            "max_drawdown_r": 13.893484504507267
+          },
+          "test": {
+            "trades": 29,
+            "wins": 9,
+            "losses": 20,
+            "win_rate": 0.3103448275862069,
+            "expectancy_r": -0.25039515076037133,
+            "profit_factor": 0.6017740214958386,
+            "max_drawdown_r": 9.921059557206467
+          },
+          "forward": {
+            "trades": 27,
+            "wins": 11,
+            "losses": 16,
+            "win_rate": 0.4074074074074074,
+            "expectancy_r": 0.11588987026687075,
+            "profit_factor": 1.2101035795878818,
+            "max_drawdown_r": 3.557779799251455
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "weak_out_of_sample_profit_factor"
+          ],
+          "robust_score": 0
+        },
+        {
+          "indicator_id": "hull_suite",
+          "selected_parameters": {
+            "length": 89
+          },
+          "train": {
+            "trades": 347,
+            "wins": 144,
+            "losses": 203,
+            "win_rate": 0.414985590778098,
+            "expectancy_r": 0.017918691653380874,
+            "profit_factor": 1.0352035387638,
+            "max_drawdown_r": 14.979540502557589
+          },
+          "test": {
+            "trades": 132,
+            "wins": 42,
+            "losses": 90,
+            "win_rate": 0.3181818181818182,
+            "expectancy_r": -0.22075539993053483,
+            "profit_factor": 0.6412356399876163,
+            "max_drawdown_r": 33.03531562759893
+          },
+          "forward": {
+            "trades": 124,
+            "wins": 51,
+            "losses": 73,
+            "win_rate": 0.4112903225806452,
+            "expectancy_r": 0.10669941491807125,
+            "profit_factor": 1.2161179362675352,
+            "max_drawdown_r": 12.950478143871464
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "weak_out_of_sample_profit_factor",
+            "drawdown_too_large"
+          ],
+          "robust_score": 0
+        },
+        {
+          "indicator_id": "ut_bot_alerts",
+          "selected_parameters": {
+            "atrPeriod": 10,
+            "key": 1.5
+          },
+          "train": {
+            "trades": 168,
+            "wins": 59,
+            "losses": 109,
+            "win_rate": 0.35119047619047616,
+            "expectancy_r": -0.03339974408223142,
+            "profit_factor": 0.9381224522231513,
+            "max_drawdown_r": 21.211071715304918
+          },
+          "test": {
+            "trades": 72,
+            "wins": 17,
+            "losses": 55,
+            "win_rate": 0.2361111111111111,
+            "expectancy_r": -0.41618264555954854,
+            "profit_factor": 0.4081941376172374,
+            "max_drawdown_r": 31.803749315949783
+          },
+          "forward": {
+            "trades": 57,
+            "wins": 23,
+            "losses": 34,
+            "win_rate": 0.40350877192982454,
+            "expectancy_r": 0.0630399618732277,
+            "profit_factor": 1.1287218202709441,
+            "max_drawdown_r": 9.279943929473259
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "weak_out_of_sample_profit_factor",
+            "drawdown_too_large"
+          ],
+          "robust_score": 0
+        },
+        {
+          "indicator_id": "wavetrend_crosses",
+          "selected_parameters": {
+            "ch": 10,
+            "avg": 21,
+            "sig": 4
+          },
+          "train": {
+            "trades": 255,
+            "wins": 82,
+            "losses": 173,
+            "win_rate": 0.3215686274509804,
+            "expectancy_r": -0.06260374769115834,
+            "profit_factor": 0.8423219885515801,
+            "max_drawdown_r": 17.456340763305707
+          },
+          "test": {
+            "trades": 97,
+            "wins": 33,
+            "losses": 64,
+            "win_rate": 0.3402061855670103,
+            "expectancy_r": -0.0009391346936515455,
+            "profit_factor": 0.9976026423837645,
+            "max_drawdown_r": 8.169726189011385
+          },
+          "forward": {
+            "trades": 87,
+            "wins": 24,
+            "losses": 63,
+            "win_rate": 0.27586206896551724,
+            "expectancy_r": -0.06650109558147459,
+            "profit_factor": 0.8342538791940938,
+            "max_drawdown_r": 8.616798402255665
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "negative_forward_expectancy",
+            "weak_out_of_sample_profit_factor",
+            "weak_forward_profit_factor"
+          ],
+          "robust_score": 0
+        },
+        {
+          "indicator_id": "schaff_trend_cycle",
+          "selected_parameters": {
+            "cycle": 10,
+            "fast": 9,
+            "slow": 30,
+            "smooth": 0.5
+          },
+          "train": {
+            "trades": 267,
+            "wins": 92,
+            "losses": 175,
+            "win_rate": 0.3445692883895131,
+            "expectancy_r": -0.048344347587381944,
+            "profit_factor": 0.8898253129494369,
+            "max_drawdown_r": 23.533462003597908
+          },
+          "test": {
+            "trades": 103,
+            "wins": 34,
+            "losses": 69,
+            "win_rate": 0.3300970873786408,
+            "expectancy_r": -0.07322394287082046,
+            "profit_factor": 0.8500096434976364,
+            "max_drawdown_r": 15.184676257049885
+          },
+          "forward": {
+            "trades": 89,
+            "wins": 26,
+            "losses": 63,
+            "win_rate": 0.29213483146067415,
+            "expectancy_r": -0.19856733257825418,
+            "profit_factor": 0.6168702789537238,
+            "max_drawdown_r": 18.92706089071889
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "negative_forward_expectancy",
+            "weak_out_of_sample_profit_factor",
+            "weak_forward_profit_factor",
+            "drawdown_too_large"
+          ],
+          "robust_score": 0
+        }
+      ]
+    },
+    {
+      "symbol": "CME_MINI:MNQ1!",
+      "status": "OK",
+      "bars": 5000,
+      "first_t": 1783583100,
+      "last_t": 1790191800,
+      "validated_count": 0,
+      "indicators": [
+        {
+          "indicator_id": "chandelier_exit_everget",
+          "selected_parameters": {
+            "period": 14,
+            "mult": 2
+          },
+          "train": {
+            "trades": 171,
+            "wins": 61,
+            "losses": 110,
+            "win_rate": 0.3567251461988304,
+            "expectancy_r": 0.004462365143461366,
+            "profit_factor": 1.0098032414560139,
+            "max_drawdown_r": 9.657971362655898
+          },
+          "test": {
+            "trades": 68,
+            "wins": 23,
+            "losses": 45,
+            "win_rate": 0.3382352941176471,
+            "expectancy_r": -0.12174198969803397,
+            "profit_factor": 0.766696856959475,
+            "max_drawdown_r": 11.18462891732019
+          },
+          "forward": {
+            "trades": 48,
+            "wins": 23,
+            "losses": 25,
+            "win_rate": 0.4791666666666667,
+            "expectancy_r": 0.4657836993023743,
+            "profit_factor": 2.3337159189562917,
+            "max_drawdown_r": 2.8390222798713687
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "weak_out_of_sample_profit_factor"
+          ],
+          "robust_score": 0
+        },
+        {
+          "indicator_id": "range_filter_guikroth",
+          "selected_parameters": {
+            "period": 100,
+            "mult": 2
+          },
+          "train": {
+            "trades": 124,
+            "wins": 54,
+            "losses": 70,
+            "win_rate": 0.43548387096774194,
+            "expectancy_r": 0.1075190258411234,
+            "profit_factor": 1.2470330864203543,
+            "max_drawdown_r": 8.14416239582737
+          },
+          "test": {
+            "trades": 48,
+            "wins": 19,
+            "losses": 29,
+            "win_rate": 0.3958333333333333,
+            "expectancy_r": -0.07690267027866848,
+            "profit_factor": 0.867359652049813,
+            "max_drawdown_r": 6.548959735584672
+          },
+          "forward": {
+            "trades": 45,
+            "wins": 22,
+            "losses": 23,
+            "win_rate": 0.4888888888888889,
+            "expectancy_r": 0.35891324682089165,
+            "profit_factor": 1.853973155786147,
+            "max_drawdown_r": 4.577127192040482
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "weak_out_of_sample_profit_factor"
+          ],
+          "robust_score": 0
+        },
+        {
+          "indicator_id": "ut_bot_alerts",
+          "selected_parameters": {
+            "atrPeriod": 10,
+            "key": 1.5
+          },
+          "train": {
+            "trades": 172,
+            "wins": 70,
+            "losses": 102,
+            "win_rate": 0.4069767441860465,
+            "expectancy_r": 0.04475355372294141,
+            "profit_factor": 1.089449617942392,
+            "max_drawdown_r": 8.886623906824763
+          },
+          "test": {
+            "trades": 60,
+            "wins": 19,
+            "losses": 41,
+            "win_rate": 0.31666666666666665,
+            "expectancy_r": -0.20376561415740818,
+            "profit_factor": 0.6502478101489454,
+            "max_drawdown_r": 14.685823836101203
+          },
+          "forward": {
+            "trades": 48,
+            "wins": 21,
+            "losses": 27,
+            "win_rate": 0.4375,
+            "expectancy_r": 0.2793332161707143,
+            "profit_factor": 1.7156405071401497,
+            "max_drawdown_r": 4.086507873767112
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "weak_out_of_sample_profit_factor",
+            "drawdown_too_large"
+          ],
+          "robust_score": 0
+        },
+        {
+          "indicator_id": "squeeze_momentum_lazybear",
+          "selected_parameters": {
+            "len": 20,
+            "bb": 2,
+            "kc": 1.5
+          },
+          "train": {
+            "trades": 219,
+            "wins": 81,
+            "losses": 138,
+            "win_rate": 0.3698630136986301,
+            "expectancy_r": -0.07457142443390376,
+            "profit_factor": 0.8746144167633277,
+            "max_drawdown_r": 25.72586834440503
+          },
+          "test": {
+            "trades": 73,
+            "wins": 20,
+            "losses": 53,
+            "win_rate": 0.273972602739726,
+            "expectancy_r": -0.34719870609271003,
+            "profit_factor": 0.4853431411474917,
+            "max_drawdown_r": 27.120520389832212
+          },
+          "forward": {
+            "trades": 80,
+            "wins": 33,
+            "losses": 47,
+            "win_rate": 0.4125,
+            "expectancy_r": 0.13303418161377514,
+            "profit_factor": 1.2514868959267984,
+            "max_drawdown_r": 10.427189662415497
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "weak_out_of_sample_profit_factor",
+            "drawdown_too_large"
+          ],
+          "robust_score": 0
+        },
+        {
+          "indicator_id": "wavetrend_crosses",
+          "selected_parameters": {
+            "ch": 9,
+            "avg": 12,
+            "sig": 3
+          },
+          "train": {
+            "trades": 334,
+            "wins": 106,
+            "losses": 228,
+            "win_rate": 0.31736526946107785,
+            "expectancy_r": -0.06007947013070087,
+            "profit_factor": 0.8407492521703454,
+            "max_drawdown_r": 32.290011561822546
+          },
+          "test": {
+            "trades": 116,
+            "wins": 33,
+            "losses": 83,
+            "win_rate": 0.28448275862068967,
+            "expectancy_r": -0.13845443820839556,
+            "profit_factor": 0.6797724592260886,
+            "max_drawdown_r": 20.972316419805836
+          },
+          "forward": {
+            "trades": 110,
+            "wins": 39,
+            "losses": 71,
+            "win_rate": 0.35454545454545455,
+            "expectancy_r": 0.042201573649844885,
+            "profit_factor": 1.1153268822567015,
+            "max_drawdown_r": 6.619382051211509
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "weak_out_of_sample_profit_factor",
+            "drawdown_too_large"
+          ],
+          "robust_score": 0
+        },
+        {
+          "indicator_id": "hull_suite",
+          "selected_parameters": {
+            "length": 89
+          },
+          "train": {
+            "trades": 336,
+            "wins": 130,
+            "losses": 206,
+            "win_rate": 0.3869047619047619,
+            "expectancy_r": -0.025057923378086707,
+            "profit_factor": 0.9526998868282022,
+            "max_drawdown_r": 25.612150318872235
+          },
+          "test": {
+            "trades": 132,
+            "wins": 38,
+            "losses": 94,
+            "win_rate": 0.2878787878787879,
+            "expectancy_r": -0.2740254898663107,
+            "profit_factor": 0.5488019379526741,
+            "max_drawdown_r": 41.15808709036551
+          },
+          "forward": {
+            "trades": 128,
+            "wins": 45,
+            "losses": 83,
+            "win_rate": 0.3515625,
+            "expectancy_r": 0.0016044784036138707,
+            "profit_factor": 1.0028810245845539,
+            "max_drawdown_r": 15.493319032543564
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "weak_out_of_sample_profit_factor",
+            "weak_forward_profit_factor",
+            "drawdown_too_large"
+          ],
+          "robust_score": 0
+        },
+        {
+          "indicator_id": "schaff_trend_cycle",
+          "selected_parameters": {
+            "cycle": 10,
+            "fast": 9,
+            "slow": 30,
+            "smooth": 0.5
+          },
+          "train": {
+            "trades": 283,
+            "wins": 100,
+            "losses": 183,
+            "win_rate": 0.35335689045936397,
+            "expectancy_r": -0.05064523301863163,
+            "profit_factor": 0.8915390186485627,
+            "max_drawdown_r": 26.82484886535076
+          },
+          "test": {
+            "trades": 109,
+            "wins": 31,
+            "losses": 78,
+            "win_rate": 0.28440366972477066,
+            "expectancy_r": -0.12230178688965782,
+            "profit_factor": 0.7616522892126828,
+            "max_drawdown_r": 14.665403668283355
+          },
+          "forward": {
+            "trades": 94,
+            "wins": 29,
+            "losses": 65,
+            "win_rate": 0.30851063829787234,
+            "expectancy_r": -0.042662368615954266,
+            "profit_factor": 0.9114347442460958,
+            "max_drawdown_r": 10.558076971036524
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "negative_forward_expectancy",
+            "weak_out_of_sample_profit_factor",
+            "weak_forward_profit_factor",
+            "drawdown_too_large"
+          ],
+          "robust_score": 0
+        },
+        {
+          "indicator_id": "supertrend_kivanc",
+          "selected_parameters": {
+            "atrPeriod": 14,
+            "mult": 4
+          },
+          "train": {
+            "trades": 44,
+            "wins": 17,
+            "losses": 27,
+            "win_rate": 0.38636363636363635,
+            "expectancy_r": 0.009229486984215067,
+            "profit_factor": 1.0158107160535295,
+            "max_drawdown_r": 5.2000000000000295
+          },
+          "test": {
+            "trades": 20,
+            "wins": 4,
+            "losses": 16,
+            "win_rate": 0.2,
+            "expectancy_r": -0.36164681039244656,
+            "profit_factor": 0.5201375426718434,
+            "max_drawdown_r": 13.11293620784893
+          },
+          "forward": {
+            "trades": 18,
+            "wins": 7,
+            "losses": 11,
+            "win_rate": 0.3888888888888889,
+            "expectancy_r": -0.12387709665627439,
+            "profit_factor": 0.7954315388447177,
+            "max_drawdown_r": 4.489829226069338
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "negative_forward_expectancy",
+            "weak_out_of_sample_profit_factor",
+            "weak_forward_profit_factor",
+            "drawdown_too_large"
+          ],
+          "robust_score": 0
+        }
+      ]
+    },
+    {
+      "symbol": "CBOT_MINI:MYM1!",
+      "status": "OK",
+      "bars": 5000,
+      "first_t": 1783583100,
+      "last_t": 1790191800,
+      "validated_count": 0,
+      "indicators": [
+        {
+          "indicator_id": "schaff_trend_cycle",
+          "selected_parameters": {
+            "cycle": 10,
+            "fast": 23,
+            "slow": 50,
+            "smooth": 0.5
+          },
+          "train": {
+            "trades": 205,
+            "wins": 65,
+            "losses": 140,
+            "win_rate": 0.3170731707317073,
+            "expectancy_r": -0.08408730042790952,
+            "profit_factor": 0.8200282758731643,
+            "max_drawdown_r": 22.051308237177523
+          },
+          "test": {
+            "trades": 79,
+            "wins": 24,
+            "losses": 55,
+            "win_rate": 0.3037974683544304,
+            "expectancy_r": -0.20771778031139873,
+            "profit_factor": 0.6216865428272272,
+            "max_drawdown_r": 19.049748624564774
+          },
+          "forward": {
+            "trades": 64,
+            "wins": 31,
+            "losses": 33,
+            "win_rate": 0.484375,
+            "expectancy_r": 0.29161545284020235,
+            "profit_factor": 1.703981999913731,
+            "max_drawdown_r": 5.911426034447972
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "weak_out_of_sample_profit_factor",
+            "drawdown_too_large"
+          ],
+          "robust_score": 0
+        },
+        {
+          "indicator_id": "chandelier_exit_everget",
+          "selected_parameters": {
+            "period": 14,
+            "mult": 3
+          },
+          "train": {
+            "trades": 115,
+            "wins": 43,
+            "losses": 72,
+            "win_rate": 0.3739130434782609,
+            "expectancy_r": -0.023471883105682528,
+            "profit_factor": 0.9594754512107277,
+            "max_drawdown_r": 10.569253476800416
+          },
+          "test": {
+            "trades": 46,
+            "wins": 12,
+            "losses": 34,
+            "win_rate": 0.2608695652173913,
+            "expectancy_r": -0.3551032026938036,
+            "profit_factor": 0.48751137889934754,
+            "max_drawdown_r": 16.944193213139894
+          },
+          "forward": {
+            "trades": 45,
+            "wins": 20,
+            "losses": 25,
+            "win_rate": 0.4444444444444444,
+            "expectancy_r": 0.21267625209984875,
+            "profit_factor": 1.418869975987189,
+            "max_drawdown_r": 6.921752819655005
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "weak_out_of_sample_profit_factor",
+            "drawdown_too_large"
+          ],
+          "robust_score": 0
+        },
+        {
+          "indicator_id": "range_filter_guikroth",
+          "selected_parameters": {
+            "period": 100,
+            "mult": 3
+          },
+          "train": {
+            "trades": 84,
+            "wins": 36,
+            "losses": 48,
+            "win_rate": 0.42857142857142855,
+            "expectancy_r": 0.04037854636154869,
+            "profit_factor": 1.0746282670688512,
+            "max_drawdown_r": 9.33650679314717
+          },
+          "test": {
+            "trades": 27,
+            "wins": 9,
+            "losses": 18,
+            "win_rate": 0.3333333333333333,
+            "expectancy_r": -0.13684784723733845,
+            "profit_factor": 0.7514098055171603,
+            "max_drawdown_r": 6.337651942667434
+          },
+          "forward": {
+            "trades": 32,
+            "wins": 13,
+            "losses": 19,
+            "win_rate": 0.40625,
+            "expectancy_r": 0.14625695811876607,
+            "profit_factor": 1.2862093072307785,
+            "max_drawdown_r": 7.3528178301625875
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "weak_out_of_sample_profit_factor"
+          ],
+          "robust_score": 0
+        },
+        {
+          "indicator_id": "ut_bot_alerts",
+          "selected_parameters": {
+            "atrPeriod": 14,
+            "key": 2
+          },
+          "train": {
+            "trades": 133,
+            "wins": 53,
+            "losses": 80,
+            "win_rate": 0.39849624060150374,
+            "expectancy_r": 0.028169583949726035,
+            "profit_factor": 1.049216674077323,
+            "max_drawdown_r": 10.706715709533587
+          },
+          "test": {
+            "trades": 61,
+            "wins": 15,
+            "losses": 46,
+            "win_rate": 0.2459016393442623,
+            "expectancy_r": -0.35598980085583676,
+            "profit_factor": 0.4904783605405935,
+            "max_drawdown_r": 23.77584970631565
+          },
+          "forward": {
+            "trades": 53,
+            "wins": 20,
+            "losses": 33,
+            "win_rate": 0.37735849056603776,
+            "expectancy_r": 0.10030525299280879,
+            "profit_factor": 1.1720795907743606,
+            "max_drawdown_r": 11.056600429897165
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "weak_out_of_sample_profit_factor",
+            "drawdown_too_large"
+          ],
+          "robust_score": 0
+        },
+        {
+          "indicator_id": "wavetrend_crosses",
+          "selected_parameters": {
+            "ch": 9,
+            "avg": 12,
+            "sig": 3
+          },
+          "train": {
+            "trades": 323,
+            "wins": 117,
+            "losses": 206,
+            "win_rate": 0.3622291021671827,
+            "expectancy_r": -0.009500494721258494,
+            "profit_factor": 0.9773521618646639,
+            "max_drawdown_r": 23.933078776672453
+          },
+          "test": {
+            "trades": 121,
+            "wins": 39,
+            "losses": 82,
+            "win_rate": 0.32231404958677684,
+            "expectancy_r": -0.03237114133125215,
+            "profit_factor": 0.9153811480656152,
+            "max_drawdown_r": 17.45740838370945
+          },
+          "forward": {
+            "trades": 109,
+            "wins": 43,
+            "losses": 66,
+            "win_rate": 0.3944954128440367,
+            "expectancy_r": 0.07536570859731742,
+            "profit_factor": 1.1897658784057363,
+            "max_drawdown_r": 10.07458256298384
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "weak_out_of_sample_profit_factor",
+            "drawdown_too_large"
+          ],
+          "robust_score": 0
+        },
+        {
+          "indicator_id": "supertrend_kivanc",
+          "selected_parameters": {
+            "atrPeriod": 14,
+            "mult": 4
+          },
+          "train": {
+            "trades": 53,
+            "wins": 19,
+            "losses": 34,
+            "win_rate": 0.3584905660377358,
+            "expectancy_r": -0.048811488934241344,
+            "profit_factor": 0.9209248724376704,
+            "max_drawdown_r": 8.388724790487718
+          },
+          "test": {
+            "trades": 13,
+            "wins": 4,
+            "losses": 9,
+            "win_rate": 0.3076923076923077,
+            "expectancy_r": -0.09802889731639865,
+            "profit_factor": 0.822518078269629,
+            "max_drawdown_r": 5.194375665113233
+          },
+          "forward": {
+            "trades": 20,
+            "wins": 8,
+            "losses": 12,
+            "win_rate": 0.4,
+            "expectancy_r": 0.04201793832511873,
+            "profit_factor": 1.0724446009467548,
+            "max_drawdown_r": 3.891026184547727
+          },
+          "validated": false,
+          "reasons": [
+            "insufficient_out_of_sample_trades",
+            "weak_out_of_sample_expectancy",
+            "weak_out_of_sample_profit_factor"
+          ],
+          "robust_score": 0
+        },
+        {
+          "indicator_id": "hull_suite",
+          "selected_parameters": {
+            "length": 89
+          },
+          "train": {
+            "trades": 367,
+            "wins": 142,
+            "losses": 225,
+            "win_rate": 0.3869209809264305,
+            "expectancy_r": -0.04416305388140261,
+            "profit_factor": 0.9216636640295832,
+            "max_drawdown_r": 36.31318700836629
+          },
+          "test": {
+            "trades": 143,
+            "wins": 46,
+            "losses": 97,
+            "win_rate": 0.32167832167832167,
+            "expectancy_r": -0.16699195958244847,
+            "profit_factor": 0.7242292697701201,
+            "max_drawdown_r": 28.291431467164085
+          },
+          "forward": {
+            "trades": 144,
+            "wins": 56,
+            "losses": 88,
+            "win_rate": 0.3888888888888889,
+            "expectancy_r": -0.018183169796342498,
+            "profit_factor": 0.9681440425103832,
+            "max_drawdown_r": 20.83139958431596
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "negative_forward_expectancy",
+            "weak_out_of_sample_profit_factor",
+            "weak_forward_profit_factor",
+            "drawdown_too_large"
+          ],
+          "robust_score": 0
+        },
+        {
+          "indicator_id": "squeeze_momentum_lazybear",
+          "selected_parameters": {
+            "len": 20,
+            "bb": 2,
+            "kc": 2
+          },
+          "train": {
+            "trades": 149,
+            "wins": 55,
+            "losses": 94,
+            "win_rate": 0.3691275167785235,
+            "expectancy_r": -0.06434925544077688,
+            "profit_factor": 0.8952235811741608,
+            "max_drawdown_r": 23.5575969206823
+          },
+          "test": {
+            "trades": 58,
+            "wins": 16,
+            "losses": 42,
+            "win_rate": 0.27586206896551724,
+            "expectancy_r": -0.27484734025357516,
+            "profit_factor": 0.5976191041507319,
+            "max_drawdown_r": 16.0398029932047
+          },
+          "forward": {
+            "trades": 65,
+            "wins": 25,
+            "losses": 40,
+            "win_rate": 0.38461538461538464,
+            "expectancy_r": -0.0703790678426093,
+            "profit_factor": 0.8856411949971814,
+            "max_drawdown_r": 16.2532779191246
+          },
+          "validated": false,
+          "reasons": [
+            "weak_out_of_sample_expectancy",
+            "negative_forward_expectancy",
+            "weak_out_of_sample_profit_factor",
+            "weak_forward_profit_factor",
+            "drawdown_too_large"
+          ],
+          "robust_score": 0
+        }
+      ]
+    }
+  ]
+}
