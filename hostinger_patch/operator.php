@@ -52,6 +52,7 @@ input{width:100%}button{cursor:pointer}.primary{background:#1d4ed8}.danger{backg
 <div id="overview-panel">
   <div id="overview-summary" class="summary"></div>
   <div class="bar" style="margin-top:14px"><div class="sectiontitle">Latest opportunities across both competitions</div><div id="overview-cards" class="grid"></div></div>
+  <div class="bar" style="margin-top:14px"><div class="sectiontitle">Competition Watchlist — strongest blocked candidates</div><div class="small">These are NOT trade approvals. They show the strongest current directional evidence that is still blocked by the A+ gate, so the operator can see whether the market is close to becoming actionable and exactly which confirmations are missing.</div><div id="watchlist-cards" class="grid" style="margin-top:10px"></div></div>
 </div>
 
 <div id="capital-panel" class="hidden">
@@ -492,6 +493,25 @@ function renderPositions(target,positions){
  $(target).innerHTML=(positions||[]).map(positionHtml).join('')||'<div class="card">No open positions recorded in STC for this competition.</div>';
 }
 
+function watchlistHtml(c){
+ const direction=Number(c.composite_score||0)>0?'LONG BIAS':Number(c.composite_score||0)<0?'SHORT BIAS':'NEUTRAL';
+ const failures=(c.quality_gate_failures||[]).length
+   ?(c.quality_gate_failures||[]).slice(0,8)
+   :(c.reasons||[]).filter(x=>String(x).startsWith('gate_block=')).slice(0,8);
+ const missing=(c.reasons||[]).filter(x=>/unavailable|gate_block=.*present|gate_block=.*alignment|family_/i.test(String(x))).slice(0,10);
+ return '<div class="card">'
+  +'<div class="statusline"><span class="badge blocked">WATCH ONLY</span><span class="pill">'+esc(c.competition_id==='amp-futures-sep-2026'?'AMP Futures':'Capital.com Africa')+'</span></div>'
+  +'<div class="row"><span>Symbol</span><span class="value">'+esc(c.symbol)+'</span></div>'
+  +'<div class="row"><span>Current bias</span><span class="value '+(direction==='LONG BIAS'?'long':direction==='SHORT BIAS'?'short':'wait')+'">'+esc(direction)+' • '+num(c.composite_score,2)+'</span></div>'
+  +'<div class="row"><span>Confidence</span><span class="value">'+num(Number(c.confidence||0)*100,1)+'%</span></div>'
+  +(Number.isFinite(Number(c.setup_quality_score))?'<div class="row"><span>Setup quality</span><span class="value">'+Math.round(Number(c.setup_quality_score))+'/100</span></div>':'')
+  +'<div class="row"><span>Latest confirmed price</span><span class="value">'+num(c.current_price,6)+'</span></div>'
+  +'<div class="small wait" style="margin-top:8px">NOT ACTIONABLE — no locked plan. Do not enter from this card.</div>'
+  +(failures.length?'<div class="small" style="margin-top:8px"><b>Gate blockers:</b> '+failures.map(x=>esc(String(x).replace('gate_block=',''))).join(' • ')+'</div>':'')
+  +(missing.length?'<div class="small" style="margin-top:6px"><b>Missing/unaligned evidence:</b> '+missing.map(x=>esc(String(x))).join(' • ')+'</div>':'')
+  +'</div>';
+}
+
 function renderOverview(cards){
  const capital=cards.filter(c=>competitionOf(c)==='capital');
  const amp=cards.filter(c=>competitionOf(c)==='amp');
@@ -506,11 +526,22 @@ function renderOverview(cards){
   +'<div class="card"><div class="small">ACTIVE opportunities now</div><div class="big">'+actionable.length+'</div></div>'
   +'<div class="card"><div class="small">Manual-ready now</div><div class="big">'+ready.length+'</div></div>'
   +'<div class="card"><div class="small">Open positions tracked</div><div class="big">'+positions.length+'</div></div>';
+ const missingMtf=cards.filter(c=>(c.reasons||[]).some(x=>/confirmation_1h=unavailable|trend_2h=unavailable|trend_4h=unavailable|family_evidence=unavailable/i.test(String(x)))).length;
+ if(missingMtf){
+   $('overview-summary').innerHTML+='<div class="card"><div class="small bad">MTF LIVE CONFIRMATION</div><div class="big bad">OFFLINE</div><div class="small">'+missingMtf+'/'+cards.length+' cards are missing higher-timeframe/family evidence. A+ opportunities can remain blocked until the v1.1 MTF production feeds are activated.</div></div>';
+ }
  const ranked=[...actionable].sort((a,b)=>Math.abs(Number(b.composite_score||0))-Math.abs(Number(a.composite_score||0)));
  const all=snapshot&&snapshot.cards?snapshot.cards:[];
  $('overview-cards').innerHTML=ranked.length
    ?ranked.slice(0,8).map(c=>cardHtml(c,all.indexOf(c))).join('')
    :'<div class="card">No ACTIVE opportunity right now. Expired plans are removed automatically; WAIT signals remain visible inside each competition tab.</div>';
+ const watch=[...cards]
+   .filter(c=>!isOpportunityActive(c)&&c.recommendation==='WAIT'&&Math.abs(Number(c.composite_score||0))>0)
+   .sort((a,b)=>Math.abs(Number(b.composite_score||0))-Math.abs(Number(a.composite_score||0)))
+   .slice(0,8);
+ $('watchlist-cards').innerHTML=watch.length
+   ?watch.map(watchlistHtml).join('')
+   :'<div class="card">No directional watchlist candidates at the moment.</div>';
 }
 
 function render(){
