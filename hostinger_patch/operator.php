@@ -76,14 +76,23 @@ input{width:100%}button{cursor:pointer}.primary{background:#1d4ed8}.danger{backg
 <div id="general-panel" class="hidden">
   <div class="bar">
     <div class="sectiontitle">General Lab</div>
-    <div class="small">Separate research/sandbox area. It does not affect either competition account.</div>
+    <div class="small">Separate research/sandbox area. Adding a symbol creates a research-only STC request and never affects either competition account.</div>
     <div class="generalbox" style="margin-top:12px">
       <div><label class="small">Research capital</label><input id="general-capital" type="number" min="0" step="any" placeholder="Example: 10000"></div>
       <div><label class="small">Preferred base currency</label><select id="general-currency"><option>USD</option><option>EUR</option><option>GBP</option><option>EGP</option></select></div>
-      <div style="grid-column:1/-1"><label class="small">Watch symbols / ideas</label><textarea id="general-symbols" placeholder="Examples: EURUSD, XAUUSD, BTCUSD ..."></textarea></div>
+      <div style="grid-column:1/-1"><label class="small">Symbols to research — one per line or comma-separated</label><textarea id="general-symbols" placeholder="Examples: CAPITALCOM:EURUSD, CAPITALCOM:XAUUSD, CBOT:ZN1!&#10;Bare symbols such as EURUSD are accepted but must be resolved to the exact TradingView provider symbol before history can be evaluated."></textarea></div>
     </div>
-    <button class="primary" id="save-general" style="margin-top:10px">Save General Lab settings on this device</button>
-    <div id="general-status" class="small" style="margin-top:8px">The General Lab engine is intentionally separate from competition execution.</div>
+    <div class="buttonrow" style="justify-content:flex-start">
+      <button class="primary" id="save-general">Save + queue research</button>
+      <button id="refresh-general">Refresh research status</button>
+    </div>
+    <div id="general-status" class="small" style="margin-top:8px">Research is isolated from competition execution. Exact-provider history is mandatory; no substitute data provider is used silently.</div>
+  </div>
+  <div class="bar">
+    <div class="sectiontitle">General Lab research queue</div>
+    <div class="small">Every queued symbol follows the same STC process: asset classification → native strategies → community/composite indicators → train-only tuning → OOS/forward → frozen holdout → research/shadow status. Weights are symbol/timeframe-specific.</div>
+    <div id="general-research-summary" class="summary" style="margin-top:10px"></div>
+    <div id="general-research-cards" class="grid" style="margin-top:10px"></div>
   </div>
 </div>
 
@@ -1029,8 +1038,139 @@ function showTab(name){
  for(const id of ['overview','capital','amp','general','notifications','record'])$(id+'-panel').classList.toggle('hidden',id!==name);
  localStorage.setItem('stc_active_tab',name);
 }
-for(const el of document.querySelectorAll('.tab'))el.addEventListener('click',()=>showTab(el.dataset.tab));
+for(const el of document.querySelectorAll('.tab'))el.addEventListener('click',()=>{
+ showTab(el.dataset.tab);
+ if(el.dataset.tab==='general')refreshGeneralLabResearch();
+});
 
+function generalLabSymbols(){
+ const raw=$('general-symbols').value||'';
+ return [...new Set(raw.split(/[\n,;]+/).map(x=>x.trim().toUpperCase()).filter(Boolean))].slice(0,50);
+}
+function generalStatusLabel(status){
+ const labels={
+   WAITING_FOR_SYMBOL_RESOLUTION:'Waiting for exact TradingView symbol',
+   WAITING_FOR_EXACT_HISTORY:'Waiting for exact TradingView history',
+   RUNNING:'Research running',
+   EVALUATED:'Research evaluated',
+   FAILED:'Research failed',
+   CANCELLED:'Cancelled'
+ };
+ return labels[status]||status||'Unknown';
+}
+function generalStatusClass(status){
+ if(status==='EVALUATED')return 'ok';
+ if(status==='FAILED'||status==='CANCELLED')return 'bad';
+ return 'wait';
+}
+function generalResultSummary(r){
+ if(!r||typeof r!=='object')return null;
+ const report=r.research_report||{};
+ const entry=r.live_entry_research_report||{};
+ const community=r.community_ensemble_profiles||{};
+ const candidates=[];
+ for(const [tf,p] of Object.entries(community)){
+   if(!p||!Array.isArray(p.components)||!p.components.length)continue;
+   const top=p.components[0]||{};
+   candidates.push({tf,component:top.component_id||'-',weight:Number(top.normalized_weight||0),status:p.status||'-'});
+ }
+ candidates.sort((a,b)=>b.weight-a.weight);
+ return {
+   nativeStatus:report.status||entry.status||'-',
+   nativeStrategy:report.selected_strategy||entry.selected_strategy||'-',
+   nativeTf:report.selected_timeframe||r.live_entry_timeframe||'-',
+   community:candidates[0]||null,
+   liveAuthority:r.live_authority===true
+ };
+}
+function generalRequestCard(req){
+ const status=String(req.status||'');
+ const resolved=req.resolved_symbol||req.requested_symbol||'-';
+ const result=generalResultSummary(req.result);
+ let detail='';
+ if(status==='WAITING_FOR_SYMBOL_RESOLUTION'){
+   detail='An authorized exact-data worker must resolve the provider-qualified TradingView ticker first.';
+ }else if(status==='WAITING_FOR_EXACT_HISTORY'){
+   detail='The full STC research matrix is queued but exact-provider historical bars have not arrived yet.';
+ }else if(status==='RUNNING'){
+   detail='Exact history has been claimed and the native + community research matrix is being evaluated.';
+ }else if(status==='EVALUATED'){
+   detail='Research completed. Result remains research-only and cannot affect competition execution without a separate promotion decision.';
+ }else{
+   detail=req.note||'Research request is not active.';
+ }
+ let resultHtml='';
+ if(result){
+   resultHtml='<div class="row"><span>Native research</span><span class="value">'+esc(result.nativeStatus)+' • '+esc(result.nativeStrategy)+' • '+esc(result.nativeTf)+'</span></div>'
+    +(result.community?'<div class="row"><span>Top community research</span><span class="value">'+esc(result.community.component)+' • '+esc(result.community.tf)+' • '+num(result.community.weight*100,1)+'%</span></div>':'')
+    +'<div class="row"><span>Live authority</span><span class="value '+(result.liveAuthority?'bad':'ok')+'">'+(result.liveAuthority?'UNEXPECTED TRUE':'FALSE • research only')+'</span></div>';
+ }
+ return '<div class="card">'
+   +'<div class="statusline"><span class="badge '+(status==='EVALUATED'?'active':status==='FAILED'||status==='CANCELLED'?'expired':'blocked')+'">'+esc(generalStatusLabel(status))+'</span><span class="pill">RESEARCH ONLY</span></div>'
+   +'<div class="row"><span>Requested symbol</span><span class="value">'+esc(req.requested_symbol||'-')+'</span></div>'
+   +'<div class="row"><span>Resolved symbol</span><span class="value">'+esc(resolved)+'</span></div>'
+   +'<div class="row"><span>Request</span><span class="value">'+esc(req.request_id||'-')+'</span></div>'
+   +'<div class="row"><span>Updated</span><span class="value">'+formatLocalTime(req.updated_at_utc)+'</span></div>'
+   +'<div class="small '+generalStatusClass(status)+'">'+esc(detail)+'</div>'
+   +resultHtml
+   +'</div>';
+}
+function renderGeneralResearch(requests){
+ const rows=Array.isArray(requests)?requests:[];
+ const counts={waiting:0,running:0,evaluated:0,failed:0};
+ for(const r of rows){
+   if(r.status==='RUNNING')counts.running++;
+   else if(r.status==='EVALUATED')counts.evaluated++;
+   else if(r.status==='FAILED'||r.status==='CANCELLED')counts.failed++;
+   else counts.waiting++;
+ }
+ $('general-research-summary').innerHTML=
+   '<div class="card"><div class="small">Queued / waiting</div><div class="big">'+counts.waiting+'</div></div>'
+  +'<div class="card"><div class="small">Running</div><div class="big">'+counts.running+'</div></div>'
+  +'<div class="card"><div class="small">Evaluated</div><div class="big">'+counts.evaluated+'</div></div>'
+  +'<div class="card"><div class="small">Failed / cancelled</div><div class="big">'+counts.failed+'</div></div>';
+ $('general-research-cards').innerHTML=rows.map(generalRequestCard).join('')||'<div class="card">No General Lab research requests yet.</div>';
+}
+async function refreshGeneralLabResearch(){
+ if(!$('token').value.trim()){
+   $('general-status').textContent='Enter the owner token first to load the durable General Lab research queue.';
+   return;
+ }
+ try{
+   const r=await api('general_lab.php?limit=100');
+   renderGeneralResearch(r.requests||[]);
+   $('general-status').textContent='General Lab queue loaded. Exact-provider history is mandatory; research has no live authority.';
+ }catch(e){
+   $('general-status').textContent='General Lab queue unavailable: '+e.message;
+ }
+}
+async function queueGeneralLabResearch(){
+ const symbols=generalLabSymbols();
+ const g={capital:$('general-capital').value,currency:$('general-currency').value,symbols:$('general-symbols').value};
+ localStorage.setItem('stc_general_lab',JSON.stringify(g));
+ if(!symbols.length){
+   $('general-status').textContent='Saved locally. Add at least one symbol to queue STC research.';
+   renderGeneralResearch([]);
+   return;
+ }
+ if(!$('token').value.trim()){
+   $('general-status').textContent='Saved locally. Enter the owner token, then press Save + queue research again.';
+   return;
+ }
+ $('general-status').textContent='Queuing '+symbols.length+' symbol(s) for STC research…';
+ let ok=0,failed=[];
+ for(const symbol of symbols){
+   try{
+     await api('general_lab.php',{method:'POST',body:JSON.stringify({action:'REQUEST',symbol})});
+     ok++;
+   }catch(e){
+     failed.push(symbol+': '+e.message);
+   }
+ }
+ await refreshGeneralLabResearch();
+ $('general-status').textContent='Queued/confirmed '+ok+'/'+symbols.length+' symbol(s).'
+   +(failed.length?' Failed: '+failed.join(' | '):' Exact-provider history will be required before evaluation.');
+}
 function loadGeneralSettings(){
  try{
    const g=JSON.parse(localStorage.getItem('stc_general_lab')||'{}');
@@ -1039,17 +1179,14 @@ function loadGeneralSettings(){
    $('general-symbols').value=g.symbols||'';
  }catch(e){}
 }
-$('save-general').onclick=()=>{
- const g={capital:$('general-capital').value,currency:$('general-currency').value,symbols:$('general-symbols').value};
- localStorage.setItem('stc_general_lab',JSON.stringify(g));
- $('general-status').textContent='Saved on this device. General Lab analysis remains isolated from both competition accounts.';
-};
+$('save-general').onclick=queueGeneralLabResearch;
+$('refresh-general').onclick=refreshGeneralLabResearch;
 
 loadGeneralSettings();
 showTab(localStorage.getItem('stc_active_tab')||'overview');
 if('Notification' in window && $('browser-notify-status'))$('browser-notify-status').textContent=Notification.permission==='granted'?'Enabled':'Not enabled';
 
-$('refresh').onclick=refresh;
+$('refresh').onclick=async()=>{await refresh();if(activeTab==='general')await refreshGeneralLabResearch();};
 $('notify').onclick=enableNotifications;
 $('test-server-notify').onclick=async()=>{
  if(!confirm('Send one harmless STC notification test through configured server channels?'))return;
