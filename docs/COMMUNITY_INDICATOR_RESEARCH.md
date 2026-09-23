@@ -64,6 +64,10 @@ historical backtest -> out-of-sample -> forward -> frozen confirmation -> resear
 - Squeeze Momentum [LazyBear] family
 - WaveTrend with Crosses family
 - Hull Suite family
+- SuperTrend family
+- Chandelier Exit family
+- Schaff Trend Cycle family
+- Range Filter Buy/Sell family
 
 These are independent conceptual implementations based on public algorithm descriptions. Third-party source code is not copied into STC.
 
@@ -71,6 +75,12 @@ These are independent conceptual implementations based on public algorithm descr
 - Machine Learning: Lorentzian Classification
 - QQE MOD
 - Optimized Trend Tracker
+- HalfTrend
+- SSL Hybrid
+- AlphaTrend
+- VuManChu Cipher B + Divergences
+- Trendilo
+- Nadaraya-Watson Envelope non-repainting mode
 
 These require exact causal semantics and repaint/lookahead review before benchmarking.
 
@@ -120,3 +130,14 @@ The research output is exposed by app.research_runner under:
 - community_indicator_trials
 - community_ensemble_profiles
 - community_indicator_live_authority = false
+
+
+## Train-only parameter selection
+
+Community indicators are not compared with one arbitrary default setting. Each implemented adapter now has a bounded parameter grid. STC selects the parameter set on the training segment only, then freezes it for test and forward segments. The test/forward segments cannot choose or tune parameters.
+
+This preserves the intended per-symbol specialization without letting the same out-of-sample data both choose and judge the configuration.
+
+## Expanded popularity/discovery snapshot
+
+The current discovery catalog includes several widely used open-source scripts, including SuperTrend, Chandelier Exit, AlphaTrend, VuManChu Cipher B, SSL Hybrid, Range Filter, HalfTrend, and Williams Vix Fix. Popularity can move a script higher in the research queue, but cannot improve its benchmark score or ensemble weight.
