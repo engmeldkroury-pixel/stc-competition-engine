@@ -2,87 +2,104 @@
 
 Updated: 2026-09-23
 
-## Active objective
-Accumulate genuinely unseen, confirmed 15m TradingView Official MCP evidence against immutable pre-freeze development context. Do not reopen same-dataset tuning, weaken validation/risk gates, or mix alternate-provider data into exact-provider confirmation.
+## PRIMARY PRODUCT OBJECTIVE
+Operate and complete STC as a Hostinger-based competition control system, not as a research-only candle project.
 
-## Research state
-- Strategy Lab v2: completed.
-- No-lookahead MTF comparison: completed; no 15m rescue.
-- Single-regime comparison: completed; no 15m validation.
-- Bounded regime-pool comparison: completed; no 15m validation.
-- Same-dataset combinatorial tuning: CLOSED.
-- XAUUSD 4h adx_ema_trend remains VALIDATED research-only.
-- BTCUSD 1D trend_pullback remains VALIDATED research-only.
-- No higher-timeframe result authorizes 15m runtime.
+Primary flow:
+TradingView production feeds -> Hostinger/MySQL source of truth -> STC analysis/ranking -> Owner Console -> Telegram/mobile alert -> human approval -> manual competition order entry -> persistent open-position tracking -> HOLD/PROTECT/EXIT management -> competition progress/rule compliance.
 
-## Frozen-confirmation integrity
-Active manifest: research_hypotheses/frozen_15m_v2.json
+Historical research, feature calibration, and frozen unseen-data confirmation remain supporting subsystems only. They must improve evidence quality without displacing the product workflow.
 
-Frozen confirmation v2 uses exactly 1000 immutable pre-freeze development bars from the original Strategy Lab v2 research inputs for feature warm-up. Later TradingView revisions to pre-freeze history cannot alter the frozen confirmation context.
+## VERIFIED LIVE PRODUCT
+Live console:
+- https://stc.feama.site/operator.php
+- Capital.com Africa lane: 10 monitored symbols.
+- AMP Futures lane: 16 monitored symbols.
+- Portfolio Supervisor: deployed.
+- Competition Progress: deployed.
+- Macro calendar gate: connected.
+- Browser/server notification center: deployed.
+- Auto refresh: deployed.
+- Safe Mode=true.
+- Kill Switch=true.
+- No automatic broker/order execution exists.
 
-1. MNQ vwap_reversion / 15m
-   - freeze_t: 1790103600
-   - threshold 0.72
-   - stop 1.2 ATR
-   - target 2.5R
-   - max hold 16 bars
-2. BTCUSD bollinger_mean_reversion / 15m
-   - freeze_t: 1790089200
-   - threshold 0.50
-   - stop 1.2 ATR
-   - target 2.5R
-   - max hold 16 bars
+Latest authenticated readback: run 35813971595.
+- 26 current cards total.
+- 0 active opportunities at the readback instant.
+- 0 manual-ready opportunities.
+- 0 recorded open positions.
+- Capital.com Africa progress: 0/3 qualifying days.
+- AMP Futures progress: 0/5 qualifying days.
+- Durable notification events: 35.
+- Telegram configured=false.
+- Email configured=false.
+- Notification deliveries: 0.
 
-No parameter or regime retuning is allowed during unseen confirmation.
+## ACTIVE COMPETITIONS
+1. The Leap by AMP Futures — September 2026
+   - competition_id: amp-futures-sep-2026
+   - initial balance: USD 250,000
+   - first prize: USD 10,000
+   - minimum trading days: 5
+   - scoring: realized P/L on closed positions
+   - futures leverage: 20:1
+   - current STC production feed: 16 core symbols
+2. The Leap by Capital.com Africa — September 2026
+   - competition_id: capital-africa-sep-2026
+   - initial balance: USD 100,000
+   - first prize: USD 3,000
+   - minimum trading days: 3
+   - scoring: realized P/L on closed positions
+   - leverage: forex 25:1, crypto 1:1, other 10:1
+   - commission: 0.01%
+   - current STC production feed: 10 symbols
 
-## Latest exact-provider archive state
-- MNQ:
-  - confirmed through: 1790130600
-  - mutable tail 1790131500 withheld
-- BTCUSD:
-  - confirmed through: 1790131500
-  - mutable tail 1790132400 withheld
+The current authoritative project contains exactly these two active competition profiles. Do not invent a third profile.
 
-## Latest frozen-confirmation result
-Run: 35813263594
-- MNQ: 26 unseen bars, 0 completed trades, 1 incomplete open trade, ACCUMULATING.
-- BTCUSD: 47 unseen bars, 1 completed trade, -0.32121976097584065R, ACCUMULATING.
-- Both use historical_context_locked=true and frozen_context_bars=1000.
-- Minimum judgment floor: 30 completed unseen trades.
-- ACCUMULATING is not a failure.
-- Any future UNSEEN_SUPPORT still requires a second confirmation decision.
-- live_calibration_authority remains false.
+## OWNER CONSOLE REQUIREMENTS
+The live page must continue to provide:
+- ranked active opportunities across both competitions;
+- separate Capital.com Africa and AMP Futures tabs;
+- explicit order type, quantity, risk, entry zone, Stop, and one Final TP;
+- persistent executed/open positions that cannot be replaced by later signals;
+- management state: HOLD / PROTECT / EXIT_NOW;
+- no operational TP1/TP2 split; target1 remains internal management checkpoint only and target2 is the owner-facing Final TP;
+- competition progress: qualifying days, days remaining, entries, open/closed trades, actions, realized P/L;
+- official competition-rule summary and official-rule link;
+- browser + Telegram/email notification status and delivery audit;
+- manual approval/manual execution only.
 
-## Active automatic path
-1. Pull fresh TradingView Official MCP 15m snapshots for CME_MINI:MNQ1! and CAPITALCOM:BTCUSD.
-2. Merge by timestamp into research_archive.
-3. Withhold the current mutable final bar.
-4. Preserve provider revision evidence; frozen v2 context remains immutable.
-5. Do not retune hypotheses.
-6. Re-run context-locked frozen confirmation when meaningful confirmed new evidence exists.
-7. Keep Safe Mode, Kill Switch, manual approval, and manual execution enabled.
+## IMMEDIATE PRODUCT WORK
+1. Merge the competition-rules dashboard patch only after CI passes.
+2. Keep the live Owner Console as the primary operational surface.
+3. Preserve signal ranking/filtering and only surface active A+ locked opportunities as actionable.
+4. Preserve the 26-symbol dual-feed health: 10 Capital + 16 AMP.
+5. Keep Portfolio Supervisor persistent for executed trades.
+6. Continue background research only as support; do not change the product priority or enable 15m authority from research-only results.
 
-## Optional deeper-history paths
-### TradingView / MNQ
-TradingView MCP cannot back-page older than its rolling 5000 bars. Immediate deeper MNQ 15m history requires either:
-- a deeper TradingView CSV export; or
-- authorized CME DataMine access.
+## CURRENT OWNER-ONLY BLOCKERS
+### Telegram
+Telegram code and audit tables are deployed, but live Hostinger config currently has no Telegram credentials.
+Required private Hostinger config values:
+- telegram_bot_token
+- telegram_chat_id
+Never paste these into chat or commit them to GitHub.
 
-### Capital.com
-Capital.com backfill infrastructure remains implemented but is PARKED because the owner does not have a Capital.com account. Do not request credentials and do not require account creation for STC. If the owner independently chooses to use Capital.com later, the existing discovery/overlap/reconciliation workflow can be reactivated.
+### Historical/open trade ledger
+The live ledger currently contains zero positions and zero past trades. STC can import them, but exact platform records are required. Do not invent prior trades. Use actual competition screenshots/records to backfill:
+- competition
+- symbol
+- side
+- quantity
+- entry
+- original open time
+- final TP / stop if applicable
+- close time and realized P/L for closed trades
 
-## Production safeguards
-- Safe Mode and Kill Switch remain enabled.
+## SAFETY
+- Safe Mode and Kill Switch stay ON until owner explicitly changes them after product validation.
 - Manual approval and manual execution remain mandatory.
-- Validation gates remain unchanged.
-- Research outputs always have live_calibration_authority=false.
-- Verified legacy TradingView production alerts remain the rollback baseline.
-- No current result authorizes a 15m competition trade.
-
-## Automatic continuation
-An hourly ChatGPT condition-watch is active for the normal TradingView exact-provider accumulation path. It remains silent when there is no meaningful new confirmed evidence and runs the controlled archive/CI/frozen-confirmation/state-update sequence when new evidence exists.
-
-## Owner dependency — CURRENT
-No owner action is required for the normal future TradingView accumulation path.
-
-Immediate historical expansion beyond the rolling TradingView MCP window is the only owner-controlled dependency. If immediate backfill is required, provide a deeper TradingView CSV export or authorized CME DataMine access. Otherwise continue exact-provider accumulation as new confirmed bars arrive.
+- No auto-trading.
+- New signals never replace an executed position.
+- Competition rule validation must match the real active competition.
