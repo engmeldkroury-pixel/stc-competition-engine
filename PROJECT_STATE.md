@@ -1929,3 +1929,15 @@ Owner intervention required now: YES — only for historical-data access, not fo
 - The hosted queue fails closed while exact TradingView history is unavailable and never substitutes another provider.
 - Full automated ticker-to-history evaluation still needs an authorized exact-provider data worker/connector.
 - Research results remain research-only with live_authority=false.
+
+
+## Wave-two community adapters merged — 2026-09-24
+- PR #118 merged as 485f6d03479846e9060d82fe6906d6a3de6501b0.
+- CI: 378 passed, 1 warning.
+- New causal research components:
+  - Trendilo;
+  - HalfTrend;
+  - Endpoint Nadaraya-Watson non-repainting.
+- Total implemented community/composite research pool is now 17.
+- No live weight, A+ gate, risk rule, competition rule, or broker execution path changed.
+- Next evidence step is exact-provider 26-symbol 15m frozen confirmation for the expanded pool.
