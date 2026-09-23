@@ -15,8 +15,8 @@ from app.shadow_promotion_registry import (
 def test_default_shadow_registry_is_research_only():
     load_shadow_registry.cache_clear()
     rows = load_shadow_registry()
-    assert len(rows) == 6
-    assert {x.state for x in rows} == {"FROZEN_PASS"}
+    assert len(rows) == 10
+    assert {x.state for x in rows} == {"SHADOW"}
     assert all(x.live_authority is False for x in rows)
     assert all(next_research_state(x) == "SHADOW" for x in rows)
 
