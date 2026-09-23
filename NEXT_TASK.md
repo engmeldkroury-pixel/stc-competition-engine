@@ -37,16 +37,16 @@ No parameter or regime retuning is allowed during unseen confirmation.
 
 ## Latest exact-provider archive state
 - MNQ:
-  - confirmed through: 1790129700
-  - mutable tail 1790130600 withheld
-- BTCUSD:
   - confirmed through: 1790130600
   - mutable tail 1790131500 withheld
+- BTCUSD:
+  - confirmed through: 1790131500
+  - mutable tail 1790132400 withheld
 
 ## Latest frozen-confirmation result
-Run: 35812474596
-- MNQ: 25 unseen bars, 0 completed trades, 1 incomplete open trade, ACCUMULATING.
-- BTCUSD: 46 unseen bars, 1 completed trade, -0.32121976097584065R, ACCUMULATING.
+Run: 35813263594
+- MNQ: 26 unseen bars, 0 completed trades, 1 incomplete open trade, ACCUMULATING.
+- BTCUSD: 47 unseen bars, 1 completed trade, -0.32121976097584065R, ACCUMULATING.
 - Both use historical_context_locked=true and frozen_context_bars=1000.
 - Minimum judgment floor: 30 completed unseen trades.
 - ACCUMULATING is not a failure.
