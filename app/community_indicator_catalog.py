@@ -212,10 +212,10 @@ INDICATORS: tuple[CommunityIndicatorSpec, ...] = (
         preferred_timeframes=("15", "30", "60", "120", "240", "1D"),
         open_source=True,
         popularity_uses=710_443,
-        implementation_status="pending_exact_port",
+        implementation_status="implemented_conceptual",
         notes=(
-            "Combines momentum, trend, volatility, volume and trailing-stop concepts.",
-            "Public strategy version is explicitly intended for backtesting/optimization.",
+            "ATR trailing support/resistance controlled by MFI when reliable volume exists and RSI fallback otherwise.",
+            "Benchmark only confirmed line-vs-two-bar-offset cross signals, matching the author's confirmed-signal description.",
         ),
     ),
     CommunityIndicatorSpec(
@@ -302,8 +302,11 @@ INDICATORS: tuple[CommunityIndicatorSpec, ...] = (
         open_source=True,
         editor_pick=True,
         popularity_uses=575_019,
-        implementation_status="pending_exact_port",
-        notes=("Confirmed reversals are suitable for causal benchmarking; potential reversals must not be used.",),
+        implementation_status="implemented_conceptual",
+        notes=(
+            "Default VAR/VIDYA-style support line with OTT trailing envelope and confirmed cross signals.",
+            "Only confirmed-bar transitions are benchmarked; alternative MA types remain future research variants.",
+        ),
         review_urls=("https://www.reddit.com/r/TradingView/comments/1lqg6ra/best_tradingview_indicators_3_years_experience/",),
     ),
     CommunityIndicatorSpec(
