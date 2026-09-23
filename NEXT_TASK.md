@@ -79,6 +79,9 @@ Capital.com backfill infrastructure remains implemented but is PARKED because th
 - Verified legacy TradingView production alerts remain the rollback baseline.
 - No current result authorizes a 15m competition trade.
 
+## Automatic continuation
+An hourly ChatGPT condition-watch is active for the normal TradingView exact-provider accumulation path. It remains silent when there is no meaningful new confirmed evidence and runs the controlled archive/CI/frozen-confirmation/state-update sequence when new evidence exists.
+
 ## Owner dependency — CURRENT
 No owner action is required for the normal future TradingView accumulation path.
 
