@@ -244,8 +244,11 @@ INDICATORS: tuple[CommunityIndicatorSpec, ...] = (
         preferred_timeframes=("5", "15", "30", "60", "120", "240", "1D"),
         open_source=True,
         popularity_uses=55_235,
-        implementation_status="pending_exact_port",
-        notes=("ALMA-smoothed percentage-change trend state with RMS band; exact defaults still require source verification.",),
+        implementation_status="implemented_conceptual",
+        notes=(
+            "Independent confirmed-bar implementation of the public ALMA-smoothed percentage-change/RMS-band design.",
+            "Parameters are selected on TRAIN only before OOS/forward evaluation.",
+        ),
     ),
     CommunityIndicatorSpec(
         indicator_id="nadaraya_watson_envelope_luxalgo",
@@ -256,10 +259,10 @@ INDICATORS: tuple[CommunityIndicatorSpec, ...] = (
         suitable_asset_classes=("forex", "crypto", "indices", "metals", "energy", "rates"),
         preferred_timeframes=("5", "15", "30", "60", "120", "240", "1D"),
         open_source=True,
-        implementation_status="pending_non_repaint_port",
+        implementation_status="implemented_conceptual",
         notes=(
-            "The script supports both repainting and non-repainting modes.",
-            "STC may benchmark only the explicitly non-repainting mode.",
+            "The public script supports both repainting and non-repainting modes.",
+            "STC implements endpoint-only past/current-bar kernel regression and never benchmarks centered repainting smoothing.",
         ),
     ),
     CommunityIndicatorSpec(
@@ -272,10 +275,10 @@ INDICATORS: tuple[CommunityIndicatorSpec, ...] = (
         preferred_timeframes=("15", "30", "60", "120", "240", "1D"),
         open_source=True,
         popularity_uses=1_353_052,
-        implementation_status="context_only_pending",
+        implementation_status="implemented_conceptual",
         notes=(
-            "Synthetic volatility-spike detector; use as context/reversal evidence rather than a standalone direction engine.",
-            "Asset/timeframe thresholds must be calibrated separately.",
+            "Original Williams Vix Fix is a bottom detector; STC adds an independently calculated mirrored top context for symmetric research.",
+            "Signals wait for a confirmed spike release. Asset/timeframe parameters tune on TRAIN only.",
         ),
     ),
     CommunityIndicatorSpec(
