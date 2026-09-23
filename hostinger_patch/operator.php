@@ -488,7 +488,7 @@ function cardHtml(c,i){
      +'<div class="ticket-cell"><div class="ticket-label">RISK</div><div class="ticket-value">'+(c.position_sizing?'$'+num(c.position_sizing.risk_amount_usd,2):'-')+(riskPct!==null?' • '+num(riskPct,3)+'%':'')+'</div></div>'
      +'</div>'
      +'<div class="ticket-input"><label class="small"><b>LIVE PRICE BEFORE APPROVAL</b> — copy the current TradingView price here</label>'
-     +'<input id="price-'+i+'" type="text" autocomplete="off" value="'+esc(draft)+'" placeholder="Current TradingView price — decimal or exchange quote" oninput="savePriceDraft('+i+');updateOrderHint('+i+')">'
+     +'<input id="price-'+i+'" type="text" autocomplete="off" value="'+esc(draft)+'" placeholder="Current TradingView price — decimal or exchange quote" oninput="updateOrderHint('+i+');savePriceDraft('+i+')">'
      +'<div id="order-hint-'+i+'" class="ticket-note">Enter the live price. STC will tell you MARKET / LIMIT / STOP-LIMIT before approval.</div></div>';
    if(canApprove){
      ticket+='<div class="buttonrow"><button class="safe" onclick="approveCard('+i+',\'approve\')">Approve this plan</button><button class="danger" onclick="approveCard('+i+',\'reject\')">Reject</button></div>';
