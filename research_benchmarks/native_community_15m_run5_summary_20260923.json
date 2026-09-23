@@ -1,0 +1,442 @@
+{
+  "schema": "stc-native-community-15m-run5-summary-v1",
+  "generated_utc": "2026-09-23T20:36:08Z",
+  "github_actions": {
+    "run_id": 35916027610,
+    "run_number": 5,
+    "branch": "research/native-community-15m-20260923",
+    "head_sha": "c371f89e3f722515261cc9a462bf8175ec304057",
+    "status": "success"
+  },
+  "data": {
+    "symbols": 26,
+    "bars_per_symbol": 5000,
+    "provider": "TradingView Official MCP exact symbol OHLCV",
+    "timeframe": "15m"
+  },
+  "method": {
+    "parameter_selection": "TRAIN only",
+    "split": "community: 60% train / 20% test / 20% forward; native uses existing STC walk-forward split",
+    "entry": "confirmed signal, no earlier than next bar/conservative STC entry",
+    "community_stop": "1.5 ATR",
+    "community_target": "2R",
+    "community_max_hold_bars": 16,
+    "community_round_trip_cost_r": 0.04,
+    "ambiguous_same_bar": "STOP first",
+    "ensemble": "OOS/forward robust score with redundancy-aware family normalization"
+  },
+  "outcome": {
+    "native_validated_strategies_across_26_symbols": 0,
+    "symbols_with_validated_community_profile": 10,
+    "symbols_without_any_validated_component": 16,
+    "community_component_tests": 364,
+    "live_authority_changed": false
+  },
+  "community_leaderboard": [
+    {
+      "indicator_id": "ssl_hybrid",
+      "validated": 4,
+      "tested": 26,
+      "validation_rate": 0.15384615384615385,
+      "avg_validated_score": 32.804125
+    },
+    {
+      "indicator_id": "range_filter_guikroth",
+      "validated": 4,
+      "tested": 26,
+      "validation_rate": 0.15384615384615385,
+      "avg_validated_score": 30.9089
+    },
+    {
+      "indicator_id": "qqe_mod",
+      "validated": 4,
+      "tested": 26,
+      "validation_rate": 0.15384615384615385,
+      "avg_validated_score": 27.665675
+    },
+    {
+      "indicator_id": "schaff_trend_cycle",
+      "validated": 4,
+      "tested": 26,
+      "validation_rate": 0.15384615384615385,
+      "avg_validated_score": 20.606225
+    },
+    {
+      "indicator_id": "waddah_attar_explosion",
+      "validated": 3,
+      "tested": 26,
+      "validation_rate": 0.11538461538461539,
+      "avg_validated_score": 35.9051333333
+    },
+    {
+      "indicator_id": "ut_bot_alerts",
+      "validated": 3,
+      "tested": 26,
+      "validation_rate": 0.11538461538461539,
+      "avg_validated_score": 24.2076666667
+    },
+    {
+      "indicator_id": "chandelier_exit_everget",
+      "validated": 2,
+      "tested": 26,
+      "validation_rate": 0.07692307692307693,
+      "avg_validated_score": 46.9911
+    },
+    {
+      "indicator_id": "alphatrend",
+      "validated": 2,
+      "tested": 26,
+      "validation_rate": 0.07692307692307693,
+      "avg_validated_score": 22.621
+    },
+    {
+      "indicator_id": "wavetrend_crosses",
+      "validated": 1,
+      "tested": 26,
+      "validation_rate": 0.038461538461538464,
+      "avg_validated_score": 30.2613
+    },
+    {
+      "indicator_id": "supertrend_kivanc",
+      "validated": 1,
+      "tested": 26,
+      "validation_rate": 0.038461538461538464,
+      "avg_validated_score": 27.6163
+    },
+    {
+      "indicator_id": "squeeze_momentum_lazybear",
+      "validated": 1,
+      "tested": 26,
+      "validation_rate": 0.038461538461538464,
+      "avg_validated_score": 14.5333
+    },
+    {
+      "indicator_id": "hull_suite",
+      "validated": 0,
+      "tested": 26,
+      "validation_rate": 0,
+      "avg_validated_score": 0
+    },
+    {
+      "indicator_id": "qqe_ssl_wae_composite",
+      "validated": 0,
+      "tested": 26,
+      "validation_rate": 0,
+      "avg_validated_score": 0
+    },
+    {
+      "indicator_id": "optimized_trend_tracker",
+      "validated": 0,
+      "tested": 26,
+      "validation_rate": 0,
+      "avg_validated_score": 0
+    }
+  ],
+  "symbol_profiles": {
+    "CAPITALCOM:DOGEUSD": [
+      {
+        "component_id": "range_filter_guikroth",
+        "source_type": "community_indicator",
+        "family": "adaptive_range_trend",
+        "raw_score": 23.2279,
+        "normalized_weight": 0.6006253304,
+        "test_trades": 24,
+        "forward_trades": 35
+      },
+      {
+        "component_id": "schaff_trend_cycle",
+        "source_type": "community_indicator",
+        "family": "momentum_cycle",
+        "raw_score": 13.4807,
+        "normalized_weight": 0.3993746696,
+        "test_trades": 66,
+        "forward_trades": 72
+      }
+    ],
+    "CAPITALCOM:ETHUSD": [
+      {
+        "component_id": "ssl_hybrid",
+        "source_type": "community_indicator",
+        "family": "composite_trend",
+        "raw_score": 39.1016,
+        "normalized_weight": 1,
+        "test_trades": 42,
+        "forward_trades": 27
+      }
+    ],
+    "CAPITALCOM:USDZAR": [
+      {
+        "component_id": "alphatrend",
+        "source_type": "community_indicator",
+        "family": "composite_trend",
+        "raw_score": 23.4804,
+        "normalized_weight": 0.3741609084,
+        "test_trades": 46,
+        "forward_trades": 45
+      },
+      {
+        "component_id": "supertrend_kivanc",
+        "source_type": "community_indicator",
+        "family": "atr_trend",
+        "raw_score": 27.6163,
+        "normalized_weight": 0.3707236738,
+        "test_trades": 27,
+        "forward_trades": 28
+      },
+      {
+        "component_id": "ut_bot_alerts",
+        "source_type": "community_indicator",
+        "family": "atr_trend",
+        "raw_score": 19.0043,
+        "normalized_weight": 0.2551154178,
+        "test_trades": 65,
+        "forward_trades": 67
+      }
+    ],
+    "CBOT:ZB1!": [
+      {
+        "component_id": "range_filter_guikroth",
+        "source_type": "community_indicator",
+        "family": "adaptive_range_trend",
+        "raw_score": 51.0827,
+        "normalized_weight": 0.2572147456,
+        "test_trades": 32,
+        "forward_trades": 24
+      },
+      {
+        "component_id": "chandelier_exit_everget",
+        "source_type": "community_indicator",
+        "family": "atr_trend",
+        "raw_score": 51.0501,
+        "normalized_weight": 0.2570916236,
+        "test_trades": 42,
+        "forward_trades": 34
+      },
+      {
+        "component_id": "waddah_attar_explosion",
+        "source_type": "community_indicator",
+        "family": "volatility_momentum",
+        "raw_score": 37.3101,
+        "normalized_weight": 0.2032171185,
+        "test_trades": 23,
+        "forward_trades": 20
+      },
+      {
+        "component_id": "qqe_mod",
+        "source_type": "community_indicator",
+        "family": "momentum",
+        "raw_score": 23.6325,
+        "normalized_weight": 0.1442855134,
+        "test_trades": 52,
+        "forward_trades": 49
+      },
+      {
+        "component_id": "ssl_hybrid",
+        "source_type": "community_indicator",
+        "family": "composite_trend",
+        "raw_score": 22.311,
+        "normalized_weight": 0.138190999,
+        "test_trades": 39,
+        "forward_trades": 36
+      }
+    ],
+    "CBOT:ZN1!": [
+      {
+        "component_id": "schaff_trend_cycle",
+        "source_type": "community_indicator",
+        "family": "momentum_cycle",
+        "raw_score": 22.9355,
+        "normalized_weight": 0.37,
+        "test_trades": 0,
+        "forward_trades": 0
+      },
+      {
+        "component_id": "alphatrend",
+        "source_type": "community_indicator",
+        "family": "composite_trend",
+        "raw_score": 21.76,
+        "normalized_weight": 0.356,
+        "test_trades": 0,
+        "forward_trades": 0
+      },
+      {
+        "component_id": "qqe_mod",
+        "source_type": "community_indicator",
+        "family": "momentum",
+        "raw_score": 15.3,
+        "normalized_weight": 0.273,
+        "test_trades": 0,
+        "forward_trades": 0
+      }
+    ],
+    "CME:MET1!": [
+      {
+        "component_id": "waddah_attar_explosion",
+        "source_type": "community_indicator",
+        "family": "volatility_momentum",
+        "raw_score": 45.01,
+        "normalized_weight": 0.608,
+        "test_trades": 0,
+        "forward_trades": 0
+      },
+      {
+        "component_id": "ut_bot_alerts",
+        "source_type": "community_indicator",
+        "family": "atr_trend",
+        "raw_score": 25.06,
+        "normalized_weight": 0.392,
+        "test_trades": 0,
+        "forward_trades": 0
+      }
+    ],
+    "CME_MINI:MJY1!": [
+      {
+        "component_id": "wavetrend_crosses",
+        "source_type": "community_indicator",
+        "family": "momentum",
+        "raw_score": 30.2613,
+        "normalized_weight": 0.363,
+        "test_trades": 0,
+        "forward_trades": 0
+      },
+      {
+        "component_id": "schaff_trend_cycle",
+        "source_type": "community_indicator",
+        "family": "momentum_cycle",
+        "raw_score": 25.53,
+        "normalized_weight": 0.319,
+        "test_trades": 0,
+        "forward_trades": 0
+      },
+      {
+        "component_id": "waddah_attar_explosion",
+        "source_type": "community_indicator",
+        "family": "volatility_momentum",
+        "raw_score": 25.39,
+        "normalized_weight": 0.318,
+        "test_trades": 0,
+        "forward_trades": 0
+      }
+    ],
+    "COMEX_MINI:MGC1!": [
+      {
+        "component_id": "qqe_mod",
+        "source_type": "community_indicator",
+        "family": "momentum",
+        "raw_score": 30.1199,
+        "normalized_weight": 0.57,
+        "test_trades": 39,
+        "forward_trades": 38
+      },
+      {
+        "component_id": "ssl_hybrid",
+        "source_type": "community_indicator",
+        "family": "composite_trend",
+        "raw_score": 20.7,
+        "normalized_weight": 0.43,
+        "test_trades": 0,
+        "forward_trades": 0
+      }
+    ],
+    "NYMEX:MCL1!": [
+      {
+        "component_id": "ssl_hybrid",
+        "source_type": "community_indicator",
+        "family": "composite_trend",
+        "raw_score": 49.1042,
+        "normalized_weight": 0.211321771,
+        "test_trades": 23,
+        "forward_trades": 17
+      },
+      {
+        "component_id": "qqe_mod",
+        "source_type": "community_indicator",
+        "family": "momentum",
+        "raw_score": 41.6144,
+        "normalized_weight": 0.1866542959,
+        "test_trades": 45,
+        "forward_trades": 42
+      },
+      {
+        "component_id": "chandelier_exit_everget",
+        "source_type": "community_indicator",
+        "family": "atr_trend",
+        "raw_score": 42.9321,
+        "normalized_weight": 0.1681999715,
+        "test_trades": 50,
+        "forward_trades": 68
+      },
+      {
+        "component_id": "range_filter_guikroth",
+        "source_type": "community_indicator",
+        "family": "adaptive_range_trend",
+        "raw_score": 25.0252,
+        "normalized_weight": 0.1274642601,
+        "test_trades": 47,
+        "forward_trades": 50
+      },
+      {
+        "component_id": "ut_bot_alerts",
+        "source_type": "community_indicator",
+        "family": "atr_trend",
+        "raw_score": 28.558,
+        "normalized_weight": 0.1118849249,
+        "test_trades": 53,
+        "forward_trades": 63
+      },
+      {
+        "component_id": "schaff_trend_cycle",
+        "source_type": "community_indicator",
+        "family": "momentum_cycle",
+        "raw_score": 20.4811,
+        "normalized_weight": 0.1096781762,
+        "test_trades": 70,
+        "forward_trades": 64
+      },
+      {
+        "component_id": "squeeze_momentum_lazybear",
+        "source_type": "community_indicator",
+        "family": "volatility_momentum",
+        "raw_score": 14.5333,
+        "normalized_weight": 0.0847966003,
+        "test_trades": 73,
+        "forward_trades": 84
+      }
+    ],
+    "NYMEX:MNG1!": [
+      {
+        "component_id": "range_filter_guikroth",
+        "source_type": "community_indicator",
+        "family": "adaptive_range_trend",
+        "raw_score": 24.2998,
+        "normalized_weight": 1,
+        "test_trades": 44,
+        "forward_trades": 49
+      }
+    ]
+  },
+  "no_validated_component_symbols": [
+    "CAPITALCOM:AUDUSD",
+    "CAPITALCOM:BTCUSD",
+    "CAPITALCOM:EURUSD",
+    "CAPITALCOM:NAS100",
+    "CAPITALCOM:SPX500",
+    "CAPITALCOM:XAGUSD",
+    "CAPITALCOM:XAUUSD",
+    "CBOT_MINI:MYM1!",
+    "CME:MBT1!",
+    "CME_MINI:M2K1!",
+    "CME_MINI:M6A1!",
+    "CME_MINI:M6B1!",
+    "CME_MINI:M6E1!",
+    "CME_MINI:MES1!",
+    "CME_MINI:MNQ1!",
+    "COMEX_MINI:SIL1!"
+  ],
+  "interpretation": [
+    "No native 15m strategy passed all strict STC robustness gates in this 5000-bar run.",
+    "Community components passed only on selected symbols; no indicator is globally valid.",
+    "Research weights are symbol/timeframe-specific and are not live trading weights.",
+    "Zero-pass symbols retain zero deployable research weight rather than receiving forced signals."
+  ]
+}
