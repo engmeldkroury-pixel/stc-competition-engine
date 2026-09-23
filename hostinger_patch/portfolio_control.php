@@ -380,6 +380,51 @@ function stc_max_open_position(string $competitionId, string $symbol): ?float {
     return null;
 }
 
+function stc_competition_rule_summary(string $competitionId): array {
+    if ($competitionId === 'capital-africa-sep-2026') {
+        return [
+            'competition_id' => $competitionId,
+            'name' => 'The Leap by Capital.com Africa — September 2026',
+            'start_utc' => '2026-09-16T08:00:00+00:00',
+            'end_utc' => '2026-10-02T08:00:00+00:00',
+            'registration_close_utc' => '2026-09-23T08:00:00+00:00',
+            'initial_balance_usd' => 100000.0,
+            'min_trading_days' => 3,
+            'first_prize_usd' => 3000.0,
+            'scoring_basis' => 'realized_pnl_closed_positions',
+            'commission_rate' => 0.0001,
+            'leverage' => [
+                'forex' => 25.0,
+                'crypto' => 1.0,
+                'other' => 10.0,
+            ],
+            'production_feed_symbols' => 10,
+            'official_rules_url' => 'https://www.tradingview.com/the-leap/capitalcom-africa-september-2026/rules/?source=individual_landing_page',
+        ];
+    }
+    if ($competitionId === 'amp-futures-sep-2026') {
+        return [
+            'competition_id' => $competitionId,
+            'name' => 'The Leap by AMP Futures — September 2026',
+            'start_utc' => '2026-09-01T08:00:00+00:00',
+            'end_utc' => '2026-09-30T12:00:00+00:00',
+            'registration_close_utc' => '2026-09-23T08:00:00+00:00',
+            'initial_balance_usd' => 250000.0,
+            'min_trading_days' => 5,
+            'first_prize_usd' => 10000.0,
+            'scoring_basis' => 'realized_pnl_closed_positions',
+            'commission_rate' => 0.0,
+            'leverage' => [
+                'futures' => 20.0,
+            ],
+            'production_feed_symbols' => 16,
+            'official_rules_url' => 'https://www.tradingview.com/the-leap/amp-futures-september-2026/rules/',
+        ];
+    }
+    throw new RuntimeException('unknown_competition');
+}
+
+
 function stc_competition_min_trading_days(string $competitionId): int {
     if ($competitionId === 'capital-africa-sep-2026') {
         return 3;
