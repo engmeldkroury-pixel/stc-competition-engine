@@ -1783,3 +1783,23 @@ Owner intervention required now: YES — only for historical-data access, not fo
 - LuxAlgo SMC is treated first as a native-proxy/double-counting audit because STC already contains BOS/CHoCH/order-block/FVG/liquidity families.
 - community_indicator_live_authority remains false.
 - No live A+ threshold, risk rule, competition rule, broker execution, or manual-approval boundary was changed.
+
+
+## Adaptive research master checkpoint — 2026-09-23 23:15 EEST
+- Controlling owner correction: project name is STC.
+- A durable authoritative research ledger has been added at docs/STC_ADAPTIVE_RESEARCH_MASTER_LEDGER.md so a new chat/agent can continue without reconstructing the strategy plan from conversation history.
+- PR #102 merged as f47bb7e3a630915de264dcabcde31988fa8eb7de.
+  - CI: 351 passed, 1 warning.
+  - Community catalog expanded substantially.
+  - New causal adapters: SuperTrend, Chandelier Exit, Schaff Trend Cycle, Range Filter.
+  - Train-only bounded parameter tuning is frozen before test/forward.
+- Exact-provider community 15m benchmark completed on all 26 competition symbols on research/community-15m-pilot-20260923:
+  - 5,000 TradingView bars per symbol.
+  - 8 implemented community families per symbol.
+  - 208 symbol-indicator trials.
+  - 8/26 symbols produced at least one fully validated community trial.
+  - Cross-symbol pass counts: Range Filter 4, UT Bot 3, Schaff Trend Cycle 3, Chandelier Exit 2, WaveTrend 2, SuperTrend 1, Squeeze Momentum 1, Hull Suite 0.
+  - This is research evidence only; no live A+ weight was changed.
+- Native-vs-community exact-data benchmark is now the active work unit on branch research/native-community-15m-20260923.
+- General Lab controlling requirement is explicit: every newly added Lab symbol must automatically run the same asset classification -> native matrix -> community matrix -> OOS/forward comparison -> symbol/timeframe weight profile process. It inherits process, never weights.
+- Weight-learning rule is explicit: every live outcome may be stored, but recalibration is batch/window based and frozen; never change weight after one isolated trade.
