@@ -4,6 +4,11 @@ from math import sqrt
 from statistics import fmean
 
 from .models import Bar
+from .community_indicator_wave3 import (
+    nadaraya_watson_nonrepaint_signals,
+    trendilo_signals,
+    williams_vix_fix_dual_signals,
+)
 
 
 def _ema_full(values: list[float], period: int) -> list[float | None]:
@@ -987,4 +992,10 @@ def indicator_signal_series(
         return waddah_attar_explosion_signals(bars, **params)
     if indicator_id == "qqe_ssl_wae_composite":
         return qqe_ssl_wae_composite_signals(bars, **params)
+    if indicator_id == "trendilo":
+        return trendilo_signals(bars, **params)
+    if indicator_id == "nadaraya_watson_envelope_luxalgo":
+        return nadaraya_watson_nonrepaint_signals(bars, **params)
+    if indicator_id == "cm_williams_vix_fix":
+        return williams_vix_fix_dual_signals(bars, **params)
     raise KeyError(f"Community indicator is not implemented for causal benchmarking: {indicator_id}")
