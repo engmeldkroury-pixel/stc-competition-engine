@@ -384,3 +384,39 @@ Status: IN PROGRESS.
 - Final unseen holdout: last 750 bars.
 - Only components that pass development OOS/forward are eligible for final replay.
 - Acceptance: 26 symbol jobs + combined artifact + archived pass/fail reasons; no live promotion in this work unit.
+
+
+## Work-unit register update — 2026-09-24 00:25 EEST
+
+### WU-110 — shadow registry foundation
+Status: VERIFIED / MERGED.
+- PR #109 merged as 6f855e16f52a97f662dff79f837326277d4a5a4f.
+- CI: 367 passed, 1 warning.
+- Six WU-109 frozen survivors were persisted in a research-only registry.
+- Registry/API contract rejects live authority.
+- Promotion ladder is explicit and cannot skip directly to live use.
+
+### WU-111 — multi-timeframe frozen scan of 15m survivor symbols
+Status: VERIFIED / COMPLETED / ARCHIVED.
+- Workflow run: 35921398218 — SUCCESS.
+- Symbols: USDZAR, XAUUSD, ZB1!, MJY1!, MCL1!.
+- Timeframes: 5m, 30m, 1h, derived 2h, 4h, 1D where exact history satisfies the frozen split.
+- Same-component support for the original 15m candidates: 0.
+- New independent frozen candidates:
+  - XAUUSD 5m / SuperTrend;
+  - MJY1! 5m / Squeeze Momentum;
+  - MCL1! 30m / UT Bot;
+  - MCL1! 1h / Hull Suite.
+- No candidate receives live authority.
+- 2h and some 1D histories fail closed when the exact final 15% cannot meet the minimum evidence floor.
+
+### WU-112 — reusable multi-timeframe research tooling
+Status: VERIFIED / MERGED.
+- PR #111 merged as 68ad095b9a62d926e9bb61b4b464341ba73c23f7.
+- Keeps reusable workflow/runner in main without storing temporary bulk OHLCV input data.
+
+### WU-113 — expanded shadow registry
+Status: IN VERIFICATION.
+- PR #113 supersedes #110 on current main.
+- Target registry: 10 SHADOW component-symbol-timeframe records.
+- MULTITF_CONFIRMED remains zero because none of the original 15m components passed the same component on another timeframe.
