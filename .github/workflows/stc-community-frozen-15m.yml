@@ -1,0 +1,110 @@
+name: STC Community Frozen 15m Confirmation
+
+on:
+  push:
+    branches:
+      - "research/community-frozen-15m-*"
+    paths:
+      - "research_native_inputs/READY_FROZEN"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: stc-community-frozen-15m-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  discover:
+    runs-on: ubuntu-latest
+    outputs:
+      dirs: ${{ steps.matrix.outputs.dirs }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: matrix
+        shell: bash
+        run: |
+          set -euo pipefail
+          dirs="$(find research_native_inputs -mindepth 1 -maxdepth 1 -type d -printf '%f\n' | sort | jq -R -s -c 'split("\n")[:-1]')"
+          echo "dirs=$dirs" >> "$GITHUB_OUTPUT"
+
+  confirm:
+    needs: discover
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      max-parallel: 8
+      matrix:
+        dir: ${{ fromJson(needs.discover.outputs.dirs) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Run frozen confirmation
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p research_frozen_outputs
+          python scripts/run_community_frozen_confirmation.py "research_native_inputs/${{ matrix.dir }}" --output "research_frozen_outputs/${{ matrix.dir }}.json"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: stc-frozen-${{ matrix.dir }}
+          path: research_frozen_outputs/*.json
+          if-no-files-found: error
+          retention-days: 14
+
+  combine:
+    needs: confirm
+    if: always() && needs.confirm.result == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: stc-frozen-*
+          merge-multiple: true
+          path: research_frozen_outputs
+      - name: Build frozen confirmation summary
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from collections import Counter
+          from pathlib import Path
+
+          symbols=[]
+          passes=Counter()
+          for path in sorted(Path("research_frozen_outputs").glob("*.json")):
+              d=json.loads(path.read_text())
+              r=d["report"]
+              candidates=list(r.get("promotion_candidates") or [])
+              for item in candidates:
+                  passes[item]+=1
+              symbols.append({
+                  "symbol":d["symbol"],
+                  "status":r["status"],
+                  "development_bars":r["development_bars"],
+                  "confirmation_bars":r["confirmation_bars"],
+                  "promotion_candidates":candidates,
+              })
+          summary={
+              "symbol_count":len(symbols),
+              "symbols_with_frozen_pass":sum(bool(x["promotion_candidates"]) for x in symbols),
+              "component_pass_counts":dict(passes),
+              "symbols":symbols,
+              "live_authority":False,
+          }
+          Path("research_frozen_outputs/combined_frozen_summary.json").write_text(
+              json.dumps(summary,indent=2,sort_keys=True)+"\n"
+          )
+          print("STC_FROZEN_CONFIRMATION_SUMMARY="+json.dumps(summary,sort_keys=True))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: stc-community-frozen-15m-combined-${{ github.run_id }}
+          path: research_frozen_outputs/*.json
+          if-no-files-found: error
+          retention-days: 14
