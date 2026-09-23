@@ -4,6 +4,7 @@ from dataclasses import asdict
 from typing import Any
 
 from .asset_classification import strategy_asset_class
+from .community_indicator_benchmark import benchmark_symbol_indicators, build_symbol_ensemble_profile
 from .feature_validation import FeatureValidation, atr_series_by_index, validate_feature_weight
 from .indicator_catalog import FEATURE_FAMILIES
 from .research_dataset import (
@@ -207,6 +208,26 @@ def run_symbol_research(
         snapshot_cache=snapshot_cache,
     )
     timeframe_selections = matrix_selections_by_timeframe(symbol, validations)
+
+    community_indicator_trials = []
+    community_ensemble_profiles = {}
+    for timeframe, bars in bundle.items():
+        if len(bars) < 300:
+            continue
+        trials = benchmark_symbol_indicators(
+            symbol=symbol,
+            asset_class=asset_class,
+            timeframe=timeframe,
+            bars=bars,
+        )
+        community_indicator_trials.extend(trials)
+        profile = build_symbol_ensemble_profile(
+            symbol=symbol,
+            timeframe=timeframe,
+            core_trials=[row.trial for row in validations if row.trial.timeframe == timeframe],
+            community_trials=trials,
+        )
+        community_ensemble_profiles[timeframe] = profile
     live_entry_selection = timeframe_selections.get(
         "15",
         MatrixSelection(
@@ -441,6 +462,17 @@ def run_symbol_research(
         "mtf_validation": mtf_validation,
         "regime_validation": regime_validation,
         "regime_pool_validation": regime_pool_validation,
+        "community_indicator_trials": [
+            asdict(item) for item in community_indicator_trials
+        ],
+        "community_ensemble_profiles": {
+            key: asdict(value) for key, value in community_ensemble_profiles.items()
+        },
+        "community_indicator_live_authority": False,
+        "community_indicator_weighting_rule": (
+            "OOS/forward robustness only. Reviews/popularity prioritize research discovery and "
+            "never become live trading weights. Weight changes require frozen-window recalibration."
+        ),
         "strategy_trials": [
             {
                 "trial": asdict(row.trial),

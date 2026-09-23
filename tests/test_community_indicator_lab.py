@@ -1,0 +1,145 @@
+from __future__ import annotations
+
+from datetime import UTC, datetime, timedelta
+
+import pytest
+
+from app.community_indicator_benchmark import (
+    CommunityIndicatorTrial,
+    IndicatorStats,
+    benchmark_symbol_indicators,
+    build_symbol_ensemble_profile,
+)
+from app.community_indicator_catalog import catalog_summary, eligible_indicators
+from app.community_indicator_signals import indicator_signal_series
+from app.community_research_plan import community_research_plan_summary
+from app.models import Bar
+from app.strategy_lab import StrategyTrial
+
+
+def _bars(count: int = 700) -> list[Bar]:
+    start = datetime(2026, 1, 1, tzinfo=UTC)
+    rows: list[Bar] = []
+    price = 100.0
+    for i in range(count):
+        # Deterministic trend/cycle mix creates realistic enough variation for
+        # causal adapter and benchmark contract tests.
+        drift = 0.035 if (i // 90) % 2 == 0 else -0.030
+        cycle = ((i % 17) - 8) * 0.006
+        open_ = price
+        close = max(1.0, open_ + drift + cycle)
+        high = max(open_, close) + 0.18 + (i % 5) * 0.01
+        low = min(open_, close) - 0.18 - (i % 3) * 0.01
+        rows.append(
+            Bar(
+                timestamp=start + timedelta(minutes=15 * i),
+                open=open_,
+                high=high,
+                low=low,
+                close=close,
+                volume=1000 + (i % 31) * 17,
+            )
+        )
+        price = close
+    return rows
+
+
+def test_community_catalog_separates_research_popularity_from_live_weighting():
+    summary = catalog_summary()
+    assert summary["total"] >= 10
+    assert summary["implemented_or_proxy"] >= 5
+    assert "never become trading weights" in summary["rule"]
+
+    ids = {x.indicator_id for x in eligible_indicators("rates", "15", implemented_only=True)}
+    assert "ut_bot_alerts" in ids
+    assert "squeeze_momentum_lazybear" in ids
+    assert "wavetrend_crosses" in ids
+    assert "hull_suite" in ids
+
+
+@pytest.mark.parametrize(
+    "indicator_id",
+    ("ut_bot_alerts", "squeeze_momentum_lazybear", "wavetrend_crosses", "hull_suite"),
+)
+def test_community_indicator_adapters_are_causal(indicator_id: str):
+    bars = _bars()
+    full = indicator_signal_series(indicator_id, bars)
+    prefix = indicator_signal_series(indicator_id, bars[:501])
+    assert {
+        i: value for i, value in full.items() if i < 500
+    } == {
+        i: value for i, value in prefix.items() if i < 500
+    }
+    assert all(-1.0 <= value <= 1.0 for value in full.values())
+
+
+def test_symbol_benchmark_runs_each_implemented_indicator_independently():
+    trials = benchmark_symbol_indicators(
+        symbol="CBOT:ZN1!",
+        asset_class="rates",
+        timeframe="15",
+        bars=_bars(),
+    )
+    ids = {trial.indicator_id for trial in trials}
+    assert {"ut_bot_alerts", "squeeze_momentum_lazybear", "wavetrend_crosses", "hull_suite"} <= ids
+    assert all(trial.symbol == "CBOT:ZN1!" for trial in trials)
+    assert all(trial.timeframe == "15" for trial in trials)
+    assert all(trial.train.trades >= 0 and trial.test.trades >= 0 and trial.forward.trades >= 0 for trial in trials)
+
+
+def test_better_validated_community_component_can_outweigh_core_for_same_symbol():
+    core = StrategyTrial(
+        strategy_id="trend_pullback",
+        symbol="CBOT:ZN1!",
+        timeframe="15",
+        train_trades=90,
+        test_trades=45,
+        forward_trades=25,
+        train_expectancy_r=0.30,
+        test_expectancy_r=0.18,
+        forward_expectancy_r=0.14,
+        test_profit_factor=1.30,
+        forward_profit_factor=1.20,
+        test_win_rate=0.53,
+        max_drawdown_r=4.0,
+        parameter_stability=0.80,
+        regime_stability=0.75,
+    )
+    stats = IndicatorStats(
+        trades=45,
+        wins=27,
+        losses=18,
+        win_rate=0.60,
+        expectancy_r=0.28,
+        profit_factor=1.55,
+        max_drawdown_r=3.0,
+    )
+    community = CommunityIndicatorTrial(
+        indicator_id="ut_bot_alerts",
+        symbol="CBOT:ZN1!",
+        timeframe="15",
+        family="atr_trend",
+        train=stats,
+        test=stats,
+        forward=stats,
+        robust_score=120.0,
+        validated=True,
+        reasons=(),
+    )
+    profile = build_symbol_ensemble_profile(
+        symbol="CBOT:ZN1!",
+        timeframe="15",
+        core_trials=[core],
+        community_trials=[community],
+    )
+    weights = {item.component_id: item.normalized_weight for item in profile.components}
+    assert profile.status == "RESEARCH_PROFILE_READY"
+    assert weights["ut_bot_alerts"] > weights["trend_pullback"]
+    assert profile.community_weight_share > profile.core_weight_share
+
+
+def test_general_lab_gets_same_matrix_engine_for_arbitrary_symbols():
+    summary = community_research_plan_summary(lab_symbols=("CAPITALCOM:BTCUSD", "CBOT:ZN1!"))
+    assert summary["symbols"] >= 28
+    assert summary["by_scope"]["general-lab"] > 0
+    assert "does not inherit weights from a different asset" in summary["general_lab_rule"]
