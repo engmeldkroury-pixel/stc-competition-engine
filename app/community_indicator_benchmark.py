@@ -283,6 +283,18 @@ def indicator_parameter_grid(indicator_id: str) -> tuple[dict, ...]:
             {"sampling_period": 100, "range_multiplier": 2.0},
             {"sampling_period": 100, "range_multiplier": 3.0},
         ),
+        "alphatrend": (
+            {"period": 10, "coefficient": 0.75},
+            {"period": 14, "coefficient": 1.0},
+            {"period": 20, "coefficient": 1.0},
+            {"period": 14, "coefficient": 1.5},
+        ),
+        "optimized_trend_tracker": (
+            {"length": 2, "percent": 1.0, "cmo_length": 9},
+            {"length": 2, "percent": 1.4, "cmo_length": 9},
+            {"length": 3, "percent": 1.4, "cmo_length": 9},
+            {"length": 5, "percent": 2.0, "cmo_length": 9},
+        ),
     }
     return grids.get(indicator_id, ({},))
 
