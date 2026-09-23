@@ -295,6 +295,25 @@ def indicator_parameter_grid(indicator_id: str) -> tuple[dict, ...]:
             {"length": 3, "percent": 1.4, "cmo_length": 9},
             {"length": 5, "percent": 2.0, "cmo_length": 9},
         ),
+        "qqe_mod": (
+            {"rsi_period": 6, "smoothing": 5, "fast_factor": 3.0, "slow_factor": 1.61, "threshold": 3.0, "bb_length": 50, "bb_mult": 0.35},
+            {"rsi_period": 6, "smoothing": 5, "fast_factor": 2.5, "slow_factor": 1.61, "threshold": 2.0, "bb_length": 50, "bb_mult": 0.35},
+            {"rsi_period": 8, "smoothing": 5, "fast_factor": 3.0, "slow_factor": 1.8, "threshold": 3.0, "bb_length": 40, "bb_mult": 0.35},
+        ),
+        "ssl_hybrid": (
+            {"baseline_length": 60, "ssl_length": 15},
+            {"baseline_length": 50, "ssl_length": 10},
+            {"baseline_length": 100, "ssl_length": 20},
+        ),
+        "waddah_attar_explosion": (
+            {"fast_length": 20, "slow_length": 40, "bb_length": 20, "bb_mult": 2.0, "sensitivity": 150.0, "dead_zone_atr_period": 100, "dead_zone_mult": 3.7},
+            {"fast_length": 12, "slow_length": 26, "bb_length": 20, "bb_mult": 2.0, "sensitivity": 100.0, "dead_zone_atr_period": 100, "dead_zone_mult": 3.0},
+            {"fast_length": 20, "slow_length": 40, "bb_length": 20, "bb_mult": 2.0, "sensitivity": 100.0, "dead_zone_atr_period": 50, "dead_zone_mult": 2.5},
+        ),
+        "qqe_ssl_wae_composite": (
+            {"qqe_rsi_period": 6, "qqe_smoothing": 5, "qqe_fast_factor": 3.0, "qqe_slow_factor": 1.61, "qqe_threshold": 3.0, "ssl_baseline_length": 60, "ssl_length": 15, "wae_fast_length": 20, "wae_slow_length": 40, "wae_sensitivity": 150.0},
+            {"qqe_rsi_period": 6, "qqe_smoothing": 5, "qqe_fast_factor": 2.5, "qqe_slow_factor": 1.61, "qqe_threshold": 2.0, "ssl_baseline_length": 50, "ssl_length": 10, "wae_fast_length": 12, "wae_slow_length": 26, "wae_sensitivity": 100.0},
+        ),
     }
     return grids.get(indicator_id, ({},))
 

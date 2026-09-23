@@ -47,7 +47,7 @@ def _bars(count: int = 700) -> list[Bar]:
 def test_community_catalog_separates_research_popularity_from_live_weighting():
     summary = catalog_summary()
     assert summary["total"] >= 20
-    assert summary["implemented_or_proxy"] >= 9
+    assert summary["implemented_or_proxy"] >= 13
     assert "never become trading weights" in summary["rule"]
 
     ids = {x.indicator_id for x in eligible_indicators("rates", "15", implemented_only=True)}
@@ -70,6 +70,10 @@ def test_community_catalog_separates_research_popularity_from_live_weighting():
         "range_filter_guikroth",
         "alphatrend",
         "optimized_trend_tracker",
+        "qqe_mod",
+        "ssl_hybrid",
+        "waddah_attar_explosion",
+        "qqe_ssl_wae_composite",
     ),
 )
 def test_community_indicator_adapters_are_causal(indicator_id: str):
@@ -103,6 +107,10 @@ def test_symbol_benchmark_runs_each_implemented_indicator_independently():
         "range_filter_guikroth",
         "alphatrend",
         "optimized_trend_tracker",
+        "qqe_mod",
+        "ssl_hybrid",
+        "waddah_attar_explosion",
+        "qqe_ssl_wae_composite",
     } <= ids
     assert all(trial.symbol == "CBOT:ZN1!" for trial in trials)
     assert all(trial.timeframe == "15" for trial in trials)
