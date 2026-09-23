@@ -1,41 +1,68 @@
 # NEXT TASK
 
-Updated: 2026-09-24 00:25 EEST
+Updated: 2026-09-24 00:50 EEST
 
 ## CONTROLLING PROJECT
 STC.
 
-## VERIFIED COMPLETED
-- 26-symbol 15m native-vs-community benchmark archived.
-- Exact final 85/15 frozen confirmation archived.
-- Shadow registry foundation merged.
-- Multi-timeframe frozen scan of the five 15m survivor symbols completed.
-- Reusable multi-timeframe frozen research runner merged.
+## AUTHORITATIVE CONTINUITY
+Read first:
+- docs/STC_ADAPTIVE_RESEARCH_MASTER_LEDGER.md
+- PROJECT_STATE.md
+
+Owner instruction: continue from repository state without requiring the owner to restate the strategy program after a new chat.
+
+## VERIFIED COMPLETE
+- Native STC strategy matrix exists.
+- 14 implemented community/composite research adapters exist.
+- Train-only tuning + OOS TEST + FORWARD exists.
+- Exact 85/15 final frozen holdout exists and fails closed on insufficient history.
+- Redundancy-aware family normalization exists.
+- 26-symbol 15m native/community benchmark archived.
+- Final unseen 15m confirmation archived.
+- Multi-timeframe frozen scan archived.
+- 10 research-only SHADOW records exist.
+- Protected serverless endpoints exist:
+  - POST /research/general-lab/plan
+  - POST /research/general-lab/evaluate
+  - GET /research/shadow-candidates
 - community_indicator_live_authority=false.
 
-## IMPORTANT RESULT
-No original 15m component has same-component multi-timeframe confirmation yet.
-New independent frozen candidates exist on:
-- XAUUSD 5m SuperTrend.
-- MJY 5m Squeeze Momentum.
-- MCL 30m UT Bot.
-- MCL 1h Hull Suite.
+## ACTIVE WORK
+Finish the General Lab runtime bridge.
 
-## ACTIVE
-- PR #113: expand durable SHADOW registry to 10 records.
-- PR #112: expose protected General Lab research/shadow endpoints through the Vercel-compatible serverless API.
+Required behavior when owner adds/saves a General Lab symbol:
+1. persist the symbol in the existing local General Lab list;
+2. automatically build/show the STC research plan for that symbol;
+3. show any existing SHADOW records for the symbol;
+4. create/show a research request status;
+5. if exact-provider OHLCV is not available, show WAITING_FOR_EXACT_HISTORY and fail closed;
+6. once exact-provider series is supplied by an authorized worker/connector, call the existing research evaluation engine;
+7. display a compact result: validated native strategies, validated community components, frozen/shadow status, and no live authority.
 
-## NEXT WORK
-1. merge #113 and #112 after CI;
-2. finish General Lab owner-console/runtime bridge without exposing trigger secrets;
-3. record the exact current blocker: hosted STC cannot fetch TradingView MCP history by ticker alone; exact-provider series must be supplied by an authorized data worker/connector;
-4. continue catalog expansion and causal/repaint audits, prioritizing Lorentzian Classification and other high-use composite indicators;
-5. run broader multi-timeframe research only where exact-provider history meets the frozen evidence floor;
-6. keep all new candidates in SHADOW until independent evidence and owner promotion criteria are met.
+## DATA-SOURCE BLOCKER
+The hosted STC server cannot call ChatGPT TradingView MCP directly by ticker.
+Do not substitute another provider silently.
+Full one-click historical evaluation requires an authorized exact-provider worker/connector or supplied exact series.
+
+## RESEARCH CONTINUATION
+After the General Lab bridge:
+1. causal/repaint-safe audit and implementation priority:
+   - Lorentzian Classification;
+   - HalfTrend;
+   - VuManChu Cipher B;
+   - Trendilo;
+   - Nadaraya-Watson non-repainting mode;
+   - other high-use practical open-source composites found by review;
+2. run exact-provider frozen benchmark before any research weight;
+3. extend 5m/30m/1h/2h/4h/1D only when evidence floor is met;
+4. accumulate shadow/live outcomes, but recalibrate only on frozen batches/windows.
 
 ## NON-NEGOTIABLE
-- no automatic trade execution;
-- no live authority from research registry;
+- no lookahead;
+- no repainting evidence unless explicit non-repainting mode is verified;
 - no cross-symbol weight inheritance;
-- no review/popularity-based trading weights;
-- no silent gate weakening or provider substitution.
+- no popularity/review-based trading weights;
+- no live A+ or risk-rule weakening;
+- no automatic broker execution;
+- no provider substitution.
