@@ -2,104 +2,93 @@
 
 Updated: 2026-09-23
 
-## PRIMARY PRODUCT OBJECTIVE
-Operate and complete STC as a Hostinger-based competition control system, not as a research-only candle project.
+## PRIMARY OBJECTIVE
+Get STC operational for the active competitions now. The research subsystem is secondary.
 
-Primary flow:
-TradingView production feeds -> Hostinger/MySQL source of truth -> STC analysis/ranking -> Owner Console -> Telegram/mobile alert -> human approval -> manual competition order entry -> persistent open-position tracking -> HOLD/PROTECT/EXIT management -> competition progress/rule compliance.
+Primary runtime path:
+TradingView production alerts -> Hostinger/MySQL -> STC ranking/A+ gate -> Owner Console -> notification -> human approval -> manual order -> persistent position supervision.
 
-Historical research, feature calibration, and frozen unseen-data confirmation remain supporting subsystems only. They must improve evidence quality without displacing the product workflow.
-
-## VERIFIED LIVE PRODUCT
-Live console:
-- https://stc.feama.site/operator.php
-- Capital.com Africa lane: 10 monitored symbols.
-- AMP Futures lane: 16 monitored symbols.
-- Portfolio Supervisor: deployed.
-- Competition Progress: deployed.
-- Macro calendar gate: connected.
-- Browser/server notification center: deployed.
-- Auto refresh: deployed.
+## VERIFIED CURRENT LIVE STATE
+- 26 live cards: 10 Capital.com Africa + 16 AMP Futures.
+- Production webhook transport is healthy and returning HTTP 200.
+- Capital legacy production alert active.
+- AMP A/B legacy production alerts active.
 - Safe Mode=true.
 - Kill Switch=true.
-- No automatic broker/order execution exists.
-
-Latest authenticated readback: run 35813971595.
-- 26 current cards total.
-- 0 active opportunities at the readback instant.
+- 0 active A+ opportunities.
 - 0 manual-ready opportunities.
-- 0 recorded open positions.
-- Capital.com Africa progress: 0/3 qualifying days.
-- AMP Futures progress: 0/5 qualifying days.
-- Durable notification events: 35.
-- Telegram configured=false.
-- Email configured=false.
-- Notification deliveries: 0.
+- 0 open positions tracked.
 
-## ACTIVE COMPETITIONS
-1. The Leap by AMP Futures — September 2026
-   - competition_id: amp-futures-sep-2026
-   - initial balance: USD 250,000
-   - first prize: USD 10,000
-   - minimum trading days: 5
-   - scoring: realized P/L on closed positions
-   - futures leverage: 20:1
-   - current STC production feed: 16 core symbols
-2. The Leap by Capital.com Africa — September 2026
-   - competition_id: capital-africa-sep-2026
-   - initial balance: USD 100,000
-   - first prize: USD 3,000
-   - minimum trading days: 3
-   - scoring: realized P/L on closed positions
-   - leverage: forex 25:1, crypto 1:1, other 10:1
-   - commission: 0.01%
-   - current STC production feed: 10 symbols
+## ROOT CAUSE OF ZERO ACTIONABLE TRADES
+The A+ gate is correctly fail-closed because fresh legacy feed cards do not contain the required v1.1 live confirmation context:
+- 1h confirmation unavailable.
+- 2h trend unavailable.
+- 4h trend unavailable.
+- 1m trend unavailable.
+- family evidence unavailable.
 
-The current authoritative project contains exactly these two active competition profiles. Do not invent a third profile.
+Do NOT weaken the quality gate to compensate.
 
-## OWNER CONSOLE REQUIREMENTS
-The live page must continue to provide:
-- ranked active opportunities across both competitions;
-- separate Capital.com Africa and AMP Futures tabs;
-- explicit order type, quantity, risk, entry zone, Stop, and one Final TP;
-- persistent executed/open positions that cannot be replaced by later signals;
-- management state: HOLD / PROTECT / EXIT_NOW;
-- no operational TP1/TP2 split; target1 remains internal management checkpoint only and target2 is the owner-facing Final TP;
-- competition progress: qualifying days, days remaining, entries, open/closed trades, actions, realized P/L;
-- official competition-rule summary and official-rule link;
-- browser + Telegram/email notification status and delivery audit;
-- manual approval/manual execution only.
+## URGENT OWNER ACTION 1 — DEPLOY DASHBOARD PATCH
+Upload the current main version of:
+- hostinger_patch/operator.php
 
-## IMMEDIATE PRODUCT WORK
-1. Merge the competition-rules dashboard patch only after CI passes.
-2. Keep the live Owner Console as the primary operational surface.
-3. Preserve signal ranking/filtering and only surface active A+ locked opportunities as actionable.
-4. Preserve the 26-symbol dual-feed health: 10 Capital + 16 AMP.
-5. Keep Portfolio Supervisor persistent for executed trades.
-6. Continue background research only as support; do not change the product priority or enable 15m authority from research-only results.
+to the existing STC public_html directory, replacing only the deployed operator.php.
 
-## CURRENT OWNER-ONLY BLOCKERS
-### Telegram
-Telegram code and audit tables are deployed, but live Hostinger config currently has no Telegram credentials.
-Required private Hostinger config values:
+Expected visible additions:
+- Competition Watchlist — strongest blocked candidates.
+- MTF LIVE CONFIRMATION OFFLINE warning when required evidence is absent.
+
+Do not replace bridge/database files.
+
+## URGENT OWNER ACTION 2 — CREATE SIX v1.1 TRADINGVIEW ALERTS
+Follow:
+- docs/MTF_PRODUCTION_ACTIVATION.md
+
+Create these six fresh indicator alerts from the current scripts:
+1. STC CAPITAL MTF A v1.1 PROD
+2. STC CAPITAL MTF B v1.1 PROD
+3. STC AMP MTF A v1.1 PROD
+4. STC AMP MTF B v1.1 PROD
+5. STC AMP MTF C v1.1 PROD
+6. STC AMP MTF D v1.1 PROD
+
+Settings:
+- chart timeframe 15m;
+- Any alert() function call;
+- existing STC webhook;
+- keep legacy production alerts running in parallel;
+- do not disable Safe Mode/Kill Switch.
+
+After creation, immediately perform a full-cycle acceptance:
+- Capital A 5 events.
+- Capital B 5 events.
+- AMP A/B/C/D 4 events each.
+- all webhook HTTP 200.
+- no study_error/auto-stop.
+- fresh Hostinger cards must no longer show missing MTF/family evidence.
+
+Only then reassess current A+ opportunities.
+
+## CURRENT WATCH-ONLY CANDIDATES
+Not actionable and no locked plan:
+- CME_MINI:M6E1! bearish bias.
+- CAPITALCOM:ETHUSD bullish bias.
+- CAPITALCOM:SPX500 bullish bias.
+- CAPITALCOM:EURUSD bearish bias.
+- CAPITALCOM:BTCUSD bullish bias.
+
+Do not enter these from the watchlist.
+
+## TELEGRAM
+Telegram delivery remains blocked by missing private Hostinger config:
 - telegram_bot_token
 - telegram_chat_id
-Never paste these into chat or commit them to GitHub.
+Do not paste values into chat or commit them.
 
-### Historical/open trade ledger
-The live ledger currently contains zero positions and zero past trades. STC can import them, but exact platform records are required. Do not invent prior trades. Use actual competition screenshots/records to backfill:
-- competition
-- symbol
-- side
-- quantity
-- entry
-- original open time
-- final TP / stop if applicable
-- close time and realized P/L for closed trades
-
-## SAFETY
-- Safe Mode and Kill Switch stay ON until owner explicitly changes them after product validation.
-- Manual approval and manual execution remain mandatory.
-- No auto-trading.
-- New signals never replace an executed position.
-- Competition rule validation must match the real active competition.
+## EXECUTION BOUNDARY
+- No automatic trading.
+- A trade is actionable only after fresh v1.1 evidence produces an A+ locked plan.
+- Human approval and manual order entry remain mandatory.
+- Executed positions remain persistent and are managed by Portfolio Supervisor.
+- One Final TP only.
