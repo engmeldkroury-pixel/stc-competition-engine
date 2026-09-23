@@ -1631,3 +1631,31 @@ Owner intervention required now: YES — only for historical-data access, not fo
 - Same-dataset retuning remains prohibited.
 - No trade authorization or execution is permitted by this watch.
 - A user notification is required only for meaningful evidence/status changes or a genuine owner-only blocker.
+
+
+## Product-priority recovery and live control readback — 2026-09-23
+- Project-control drift was identified: NEXT_TASK had incorrectly elevated unseen-data research accumulation into the primary STC objective.
+- Correct product hierarchy restored:
+  1. Hostinger Owner Console / competition control plane is the primary product.
+  2. TradingView feeds, historical research, and frozen confirmation are supporting signal-quality subsystems.
+  3. Human approval and manual execution remain mandatory.
+- Verified live URL: https://stc.feama.site/operator.php
+  - HTTP 200 from Hostinger.
+  - The live shell exposes Capital.com Africa, AMP Futures, Portfolio Supervisor, General Lab, and Notification Center.
+- Authenticated live readback run: 35813971595.
+- Live product state at readback:
+  - 26 current signal cards: 10 Capital.com Africa + 16 AMP Futures.
+  - Safe Mode=true; Kill Switch=true.
+  - Macro calendar connected and healthy.
+  - Active opportunities at readback moment: 0.
+  - Manual-ready opportunities: 0.
+  - Open positions recorded in STC: 0.
+  - Capital.com Africa progress: 0/3 qualifying trading days; 0 entries; realized P/L USD 0.
+  - AMP Futures progress: 0/5 qualifying trading days; 0 entries; realized P/L USD 0.
+  - 35 notification events exist in the durable notification ledger from prior actionable plans.
+  - Telegram configured=false; email configured=false; no notification deliveries recorded.
+- Root cause of missing Telegram delivery is therefore confirmed: channel credentials are not configured in private Hostinger config.
+- Historical position tracking code is present and supports both open-position backfill and already-closed trade import, but no owner competition trades are currently recorded in the live ledger.
+- Live examples in notification ledger prove product-side opportunity generation and ticket formatting existed for AMP MCL/ZN/M6A and Capital AUDUSD, including quantity, risk, stop, management checkpoint, and one Final TP.
+- The hourly ChatGPT continuation watch was corrected from research-only accumulation to the full STC competition-control workflow. The older research-only daily watch was disabled to prevent duplicate scope drift.
+- This recovery patch adds explicit competition-rule summaries to the Owner Console so each competition lane shows the verified competition window, initial balance, first prize, minimum trading days, scoring basis, leverage, commission, monitored production-feed count, and official rules link.
