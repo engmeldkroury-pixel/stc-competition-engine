@@ -1564,3 +1564,19 @@ For immediate deeper history rather than waiting for future TradingView bars:
 - Without one of those owner-controlled sources, the only exact-provider path is future-bar accumulation.
 
 Owner intervention required now: YES — only for historical-data access, not for strategy decisions or code execution.
+
+
+## Capital.com secret-visibility blocker — 2026-09-23
+- Owner reported that the three Capital.com credentials had been added.
+- Discovery branch: capital-backfill/discover-gold-20260923.
+- Discovery commit: 2e380caadffdce891d66d58d83802f2da079b91a.
+- Workflow run: 35804984405.
+- Result: FAILED before any Capital.com network authentication request.
+- GitHub Actions environment showed all three required secret-backed variables as empty:
+  - CAPITAL_API_KEY
+  - CAPITAL_IDENTIFIER
+  - CAPITAL_PASSWORD
+- The CLI then failed closed with: Missing required environment variable: CAPITAL_API_KEY.
+- No credential value was exposed and no external trading/data action occurred.
+- Interpretation: the secrets are not available in the repository Actions context under the exact required names. Likely causes include wrong repository, wrong scope, wrong names, environment-only secrets without matching job environment, or values added as variables instead of repository Actions secrets.
+- Owner action required: make the three exact names available under this repository's Settings > Secrets and variables > Actions > Repository secrets. Do not paste values into chat.
