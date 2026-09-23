@@ -94,12 +94,14 @@ Otherwise continue future exact-provider accumulation.
 - No current result authorizes a 15m competition trade.
 
 ## Owner dependency — CURRENT
-Immediate deep-history work is now blocked only by user-controlled data access.
+Capital.com discovery infrastructure is ready, but workflow run 35804984405 proved that all three required secret-backed environment variables are currently empty in this repository Actions context. Immediate deep-history work is blocked only by making the existing credentials visible under the exact repository Actions secret names.
 
-For Capital.com workflow, set these GitHub Actions repository secrets securely:
+For Capital.com workflow, verify these exact names exist under this repository's Settings > Secrets and variables > Actions > Repository secrets:
 - CAPITAL_API_KEY
 - CAPITAL_IDENTIFIER
 - CAPITAL_PASSWORD
+
+Do not use plain Actions variables for these credentials. If they were added as Environment secrets, either move/copy them to Repository secrets or explicitly bind the workflow job to that environment before rerunning.
 
 Do not paste these values into ChatGPT or commit them to the repository.
 
