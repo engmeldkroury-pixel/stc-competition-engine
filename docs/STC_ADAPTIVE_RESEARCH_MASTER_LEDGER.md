@@ -512,3 +512,20 @@ Status: VERIFIED / MERGED.
   2. upload general_lab.php;
   3. replace operator.php.
 - Data-source boundary remains: Hostinger cannot itself call ChatGPT TradingView MCP; exact-provider history requires an authorized data worker/connector. No provider substitution.
+
+
+### WU-115 — Wave-two causal community adapters
+Status: VERIFIED / MERGED.
+- PR #118 merged as 485f6d03479846e9060d82fe6906d6a3de6501b0.
+- CI: 378 passed, 1 warning.
+- Added research-only causal adapters:
+  - Trendilo: percentage change -> ALMA -> RMS state transition.
+  - HalfTrend: documented swing-extreme/SMA transition state; confirmed flips only.
+  - Endpoint Nadaraya-Watson non-repainting: one-sided Gaussian endpoint estimate + causal MAD envelope.
+- Added TRAIN-only bounded parameter grids and prefix-invariance causality tests.
+- Added docs/COMMUNITY_WAVE2_AUDIT_20260924.md.
+- Original LuxAlgo Nadaraya-Watson repainting output remains excluded.
+- Lorentzian Classification remains pending exact semantic audit rather than being approximated.
+- VuManChu remains pending confirmation-delay/divergence audit.
+- Community implemented pool increases from 14 to 17 research components.
+- live_authority remains false.
