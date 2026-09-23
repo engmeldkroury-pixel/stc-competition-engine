@@ -31,14 +31,14 @@ def main() -> int:
     parser.add_argument(
         "--manifest",
         type=Path,
-        default=Path("research_hypotheses/frozen_15m_v1.json"),
+        default=Path("research_hypotheses/frozen_15m_v2.json"),
     )
     parser.add_argument("--root", type=Path, default=Path("."))
     parser.add_argument("--hypothesis", action="append", default=[])
     parser.add_argument(
         "--output",
         type=Path,
-        default=Path("confirmation_outputs/frozen_15m_v1.json"),
+        default=Path("confirmation_outputs/frozen_15m_v2.json"),
     )
     args = parser.parse_args()
 
@@ -55,7 +55,16 @@ def main() -> int:
     results = []
     for hypothesis in hypotheses:
         archive = _read_json(args.root / hypothesis.archive_path)
-        result = evaluate_frozen_hypothesis(archive, hypothesis)
+        context = (
+            _read_json(args.root / hypothesis.context_path)
+            if hypothesis.context_path
+            else None
+        )
+        result = evaluate_frozen_hypothesis(
+            archive,
+            hypothesis,
+            frozen_context_payload=context,
+        )
         row = confirmation_result_dict(result)
         results.append(row)
         print("STC_FROZEN_CONFIRMATION=" + json.dumps(row, sort_keys=True))
