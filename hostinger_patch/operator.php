@@ -1080,6 +1080,7 @@ function generalResultSummary(r){
    nativeStrategy:report.selected_strategy||entry.selected_strategy||'-',
    nativeTf:report.selected_timeframe||r.live_entry_timeframe||'-',
    community:candidates[0]||null,
+   shadowCount:Array.isArray(r.existing_shadow_records)?r.existing_shadow_records.length:0,
    liveAuthority:r.live_authority===true
  };
 }
@@ -1103,6 +1104,7 @@ function generalRequestCard(req){
  if(result){
    resultHtml='<div class="row"><span>Native research</span><span class="value">'+esc(result.nativeStatus)+' • '+esc(result.nativeStrategy)+' • '+esc(result.nativeTf)+'</span></div>'
     +(result.community?'<div class="row"><span>Top community research</span><span class="value">'+esc(result.community.component)+' • '+esc(result.community.tf)+' • '+num(result.community.weight*100,1)+'%</span></div>':'')
+    +'<div class="row"><span>Existing SHADOW records</span><span class="value">'+result.shadowCount+'</span></div>'
     +'<div class="row"><span>Live authority</span><span class="value '+(result.liveAuthority?'bad':'ok')+'">'+(result.liveAuthority?'UNEXPECTED TRUE':'FALSE • research only')+'</span></div>';
  }
  return '<div class="card">'
