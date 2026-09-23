@@ -1659,3 +1659,35 @@ Owner intervention required now: YES — only for historical-data access, not fo
 - Live examples in notification ledger prove product-side opportunity generation and ticket formatting existed for AMP MCL/ZN/M6A and Capital AUDUSD, including quantity, risk, stop, management checkpoint, and one Final TP.
 - The hourly ChatGPT continuation watch was corrected from research-only accumulation to the full STC competition-control workflow. The older research-only daily watch was disabled to prevent duplicate scope drift.
 - This recovery patch adds explicit competition-rule summaries to the Owner Console so each competition lane shows the verified competition window, initial balance, first prize, minimum trading days, scoring basis, leverage, commission, monitored production-feed count, and official rules link.
+
+
+## Urgent competition activation checkpoint — 2026-09-23
+- Product priority reconfirmed: competition operation is primary; research is supporting only.
+- Live TradingView production transport is healthy:
+  - Capital alert 5662088915 active, latest fire 2026-09-23T03:30:00Z.
+  - AMP Feed A alert 5664752419 active, latest fire 2026-09-23T03:30:04Z.
+  - AMP Feed B alert 5664684004 active, latest fire 2026-09-23T03:30:04Z.
+  - observed webhook deliveries HTTP 200.
+- Fresh authenticated Hostinger readback run 35814639023 at 2026-09-23T03:31:10Z:
+  - 26 current cards: 10 Capital + 16 AMP.
+  - 0 active A+ opportunities.
+  - 0 manual-ready.
+  - 0 tracked open positions.
+  - Safe Mode=true; Kill Switch=true.
+- Root cause of zero actionable opportunities identified:
+  current legacy production alerts do not provide the v1.1 live MTF/family inputs required by the A+ gate. Fresh cards show confirmation_1h, trend_2h, trend_4h, trend_1m, and family evidence unavailable; the gate therefore fails closed.
+- Strongest current WATCH-ONLY candidates at readback:
+  - CME_MINI:M6E1!: bearish bias, |score| about 0.684.
+  - CAPITALCOM:ETHUSD: bullish bias, score about 0.6195.
+  - CAPITALCOM:SPX500: bullish bias, score about 0.6165.
+  - CAPITALCOM:EURUSD: bearish bias, |score| about 0.5805.
+  - CAPITALCOM:BTCUSD: bullish bias, score about 0.5745.
+  These are not trade approvals and have no locked plan.
+- PR #97 merged as 13be5c766ab2fa19248a02a9827c8e9dbd4793bb:
+  - adds Competition Watchlist for strongest blocked candidates;
+  - adds MTF LIVE CONFIRMATION OFFLINE warning;
+  - adds docs/MTF_PRODUCTION_ACTIVATION.md with exact six-alert activation plan.
+  - CI: 336 passed, 2 warnings.
+- Live Hostinger operator.php does not auto-deploy from GitHub and still shows the pre-PR #97 shell. Latest operator.php must be uploaded manually.
+- TradingView Official MCP cannot create indicator/Pine alerts. Six fresh v1.1 alerts must be created manually from the current Pine scripts before live A+ confirmation can function.
+- Browser automation fallback was attempted but could not start because the connected TinyFish wallet is out of funds; no TradingView change occurred.
