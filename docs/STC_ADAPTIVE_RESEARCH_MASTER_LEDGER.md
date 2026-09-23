@@ -363,3 +363,24 @@ Status: IN VERIFICATION.
 - If the final 15% is smaller than the required confirmation sample floor, the run fails and requires more history instead of changing the split.
 - Final holdout can create only a research promotion candidate; live_authority=false.
 - CI run #374 pending.
+
+
+## Work-unit register update — 2026-09-24 00:05 EEST
+
+### WU-108 — exact frozen holdout implementation
+Status: VERIFIED / MERGED.
+- PR #108 merged as 71d338dc34ec3804b042811c66d98aa7f4b1d89f.
+- CI run #374 passed.
+- Exact 85/15 frozen split is mandatory.
+- Too-short final 15% fails closed; STC does not silently alter the split.
+- live_authority=false.
+
+### WU-109 — 26-symbol final unseen 15m confirmation
+Status: IN PROGRESS.
+- Branch: research/community-frozen-15m-20260924.
+- Workflow run id: 35919916518.
+- Inputs: same 26 exact-symbol TradingView 15m datasets, 5,000 bars each.
+- Development: first 4,250 bars.
+- Final unseen holdout: last 750 bars.
+- Only components that pass development OOS/forward are eligible for final replay.
+- Acceptance: 26 symbol jobs + combined artifact + archived pass/fail reasons; no live promotion in this work unit.
