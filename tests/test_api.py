@@ -273,3 +273,26 @@ def test_approval_missing_evidence_fails_closed():
     evidence_reasons = body["revalidation"]["execution_context"]["evidence_reasons"]
     assert "quote_evidence_missing" in evidence_reasons
     assert "market_evidence_missing" in evidence_reasons
+
+
+def test_general_lab_plan_routes_symbols_to_same_research_matrix():
+    r = client.post(
+        "/research/general-lab/plan",
+        json={"symbols": ["CAPITALCOM:BTCUSD", "CBOT:ZN1!"]},
+    )
+    assert r.status_code == 200
+    body = r.json()
+    assert body["execution"] == "research_only"
+    assert body["live_authority"] is False
+    assert body["symbols_requested"] == ["CAPITALCOM:BTCUSD", "CBOT:ZN1!"]
+    assert body["by_scope"]["general-lab"] > 0
+    assert "No weight is inherited from another symbol" in body["rule"]
+
+
+def test_general_lab_evaluate_requires_exact_provider_series():
+    r = client.post(
+        "/research/general-lab/evaluate",
+        json={"symbol": "CAPITALCOM:BTCUSD"},
+    )
+    assert r.status_code == 400
+    assert "requires exact-provider series" in r.json()["detail"]
