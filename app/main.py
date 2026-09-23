@@ -14,6 +14,7 @@ from .data_capabilities import get_capability, validate_provider_mapping
 from .competition_profiles import PROFILES, get_profile
 from .community_research_plan import community_research_plan_summary
 from .research_runner import run_symbol_research
+from .shadow_promotion_registry import public_shadow_record, shadow_candidates
 from .models import (
     CompetitionEligibilityRequest,
     FactorScores,
@@ -146,6 +147,24 @@ def general_lab_evaluate(payload: dict):
     result["live_authority"] = False
     result["promotion_required"] = True
     return result
+
+
+@app.get("/research/shadow-candidates")
+def research_shadow_candidates(symbol: str | None = None, state: str | None = None):
+    try:
+        rows = shadow_candidates(symbol=symbol, state=state)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return {
+        "records": [public_shadow_record(row) for row in rows],
+        "count": len(rows),
+        "execution": "research_only",
+        "live_authority": False,
+        "rule": (
+            "Frozen-pass community components remain shadow research evidence. "
+            "No record grants trade authority or modifies the live A+ gate."
+        ),
+    }
 
 
 @app.get("/data/capabilities/{symbol:path}")
