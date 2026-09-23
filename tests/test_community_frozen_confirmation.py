@@ -7,7 +7,7 @@ from app.community_indicator_catalog import indicator_by_id
 from app.models import Bar
 
 
-def _bars(count: int = 2000) -> list[Bar]:
+def _bars(count: int = 4000) -> list[Bar]:
     start = datetime(2025, 1, 1, tzinfo=UTC)
     rows: list[Bar] = []
     price = 100.0
