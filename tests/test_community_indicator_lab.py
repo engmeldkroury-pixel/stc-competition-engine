@@ -47,7 +47,7 @@ def _bars(count: int = 700) -> list[Bar]:
 def test_community_catalog_separates_research_popularity_from_live_weighting():
     summary = catalog_summary()
     assert summary["total"] >= 20
-    assert summary["implemented_or_proxy"] >= 13
+    assert summary["implemented_or_proxy"] >= 15
     assert "never become trading weights" in summary["rule"]
 
     ids = {x.indicator_id for x in eligible_indicators("rates", "15", implemented_only=True)}
@@ -74,6 +74,8 @@ def test_community_catalog_separates_research_popularity_from_live_weighting():
         "ssl_hybrid",
         "waddah_attar_explosion",
         "qqe_ssl_wae_composite",
+        "halftrend_everget",
+        "trendilo",
     ),
 )
 def test_community_indicator_adapters_are_causal(indicator_id: str):
@@ -111,6 +113,9 @@ def test_symbol_benchmark_runs_each_implemented_indicator_independently():
         "ssl_hybrid",
         "waddah_attar_explosion",
         "qqe_ssl_wae_composite",
+        "halftrend_everget",
+        "trendilo",
+        "nadaraya_watson_endpoint_nonrepaint",
     } <= ids
     assert all(trial.symbol == "CBOT:ZN1!" for trial in trials)
     assert all(trial.timeframe == "15" for trial in trials)
@@ -174,3 +179,54 @@ def test_general_lab_gets_same_matrix_engine_for_arbitrary_symbols():
     assert summary["symbols"] >= 28
     assert summary["by_scope"]["general-lab"] > 0
     assert "does not inherit weights from a different asset" in summary["general_lab_rule"]
+
+
+def test_nadaraya_endpoint_adapter_is_non_repainting_by_prefix_invariance():
+    bars = _bars(1300)
+    params = {
+        "window": 250,
+        "bandwidth": 8.0,
+        "multiplier": 2.5,
+        "deviation_length": 249,
+    }
+    full = indicator_signal_series(
+        "nadaraya_watson_endpoint_nonrepaint",
+        bars,
+        parameters=params,
+    )
+    prefix = indicator_signal_series(
+        "nadaraya_watson_endpoint_nonrepaint",
+        bars[:1001],
+        parameters=params,
+    )
+    assert {i: value for i, value in full.items() if i < 1000} == {
+        i: value for i, value in prefix.items() if i < 1000
+    }
+    assert all(-1.0 <= value <= 1.0 for value in full.values())
+
+
+def test_trendilo_default_method_emits_only_confirmed_state_transitions():
+    signals = indicator_signal_series(
+        "trendilo",
+        _bars(1200),
+        parameters={
+            "smoothing": 1,
+            "lookback": 50,
+            "alma_offset": 0.85,
+            "alma_sigma": 6.0,
+            "band_multiplier": 1.0,
+        },
+    )
+    assert all(value in (-1.0, 1.0) for value in signals.values())
+
+
+def test_halftrend_adapter_is_causal_and_alternates_confirmed_flip_direction():
+    bars = _bars(1200)
+    full = indicator_signal_series("halftrend_everget", bars, parameters={"amplitude": 2})
+    prefix = indicator_signal_series("halftrend_everget", bars[:901], parameters={"amplitude": 2})
+    assert {i: value for i, value in full.items() if i < 900} == {
+        i: value for i, value in prefix.items() if i < 900
+    }
+    values = list(full.values())
+    assert all(value in (-1.0, 1.0) for value in values)
+    assert all(a != b for a, b in zip(values, values[1:]))

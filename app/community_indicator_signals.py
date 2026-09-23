@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from math import sqrt
+from math import exp, sqrt
 from statistics import fmean
 
 from .models import Bar
@@ -34,6 +34,51 @@ def _wma_at(values: list[float], i: int, period: int) -> float | None:
     weights = range(1, period + 1)
     den = period * (period + 1) / 2.0
     return sum(v * w for v, w in zip(window, weights)) / den
+
+
+def _alma_full(
+    values: list[float],
+    period: int,
+    *,
+    offset: float = 0.85,
+    sigma: float = 6.0,
+) -> list[float | None]:
+    """Causal Arnaud Legoux moving average using only current/past samples."""
+    out: list[float | None] = [None] * len(values)
+    if period <= 0 or sigma <= 0 or len(values) < period:
+        return out
+    center = float(offset) * (period - 1)
+    scale = period / float(sigma)
+    weights = [exp(-((j - center) ** 2) / (2.0 * scale * scale)) for j in range(period)]
+    den = sum(weights)
+    if den <= 1e-15:
+        return out
+    for i in range(period - 1, len(values)):
+        window = values[i - period + 1 : i + 1]
+        out[i] = sum(value * weight for value, weight in zip(window, weights)) / den
+    return out
+
+
+def _endpoint_gaussian_kernel_full(
+    values: list[float],
+    *,
+    window: int,
+    bandwidth: float,
+) -> list[float | None]:
+    """One-sided endpoint Gaussian kernel estimate with no future samples."""
+    out: list[float | None] = [None] * len(values)
+    if window <= 1 or bandwidth <= 0:
+        return out
+    weights = [exp(-((lag * lag) / (2.0 * bandwidth * bandwidth))) for lag in range(window)]
+    den = sum(weights)
+    if den <= 1e-15:
+        return out
+    for i in range(window - 1, len(values)):
+        total = 0.0
+        for lag, weight in enumerate(weights):
+            total += values[i - lag] * weight
+        out[i] = total / den
+    return out
 
 
 def _hma_full(values: list[float], period: int) -> list[float | None]:
@@ -952,6 +997,147 @@ def qqe_ssl_wae_composite_signals(
     return out
 
 
+def halftrend_signals(
+    bars: list[Bar],
+    *,
+    amplitude: int = 2,
+) -> dict[int, float]:
+    """Confirmed HalfTrend swing/SMA state transitions.
+
+    The ATR/channel portion of HalfTrend is visual/risk context in the public
+    indicator; STC benchmarks only the causal trend flip state.
+    """
+    if amplitude < 1 or len(bars) < max(3, amplitude):
+        return {}
+
+    trend = 0
+    next_trend = 0
+    max_low_price = bars[0].low
+    min_high_price = bars[0].high
+    out: dict[int, float] = {}
+
+    for i in range(len(bars)):
+        start = max(0, i - amplitude + 1)
+        window = bars[start : i + 1]
+        if len(window) < amplitude:
+            continue
+
+        high_price = max(bar.high for bar in window)
+        low_price = min(bar.low for bar in window)
+        high_ma = fmean(bar.high for bar in window)
+        low_ma = fmean(bar.low for bar in window)
+        prev_low = bars[i - 1].low if i > 0 else bars[i].low
+        prev_high = bars[i - 1].high if i > 0 else bars[i].high
+        previous_trend = trend
+
+        if next_trend == 1:
+            max_low_price = max(low_price, max_low_price)
+            if high_ma < max_low_price and bars[i].close < prev_low:
+                trend = 1
+                next_trend = 0
+                min_high_price = high_price
+        else:
+            min_high_price = min(high_price, min_high_price)
+            if low_ma > min_high_price and bars[i].close > prev_high:
+                trend = 0
+                next_trend = 1
+                max_low_price = low_price
+
+        if trend != previous_trend:
+            out[i] = 1.0 if trend == 0 else -1.0
+
+    return out
+
+
+def trendilo_signals(
+    bars: list[Bar],
+    *,
+    smoothing: int = 1,
+    lookback: int = 50,
+    alma_offset: float = 0.85,
+    alma_sigma: float = 6.0,
+    band_multiplier: float = 1.0,
+    band_length: int | None = None,
+) -> dict[int, float]:
+    """Confirmed Trendilo state transitions with no future-bar inputs."""
+    if smoothing < 1 or lookback < 2:
+        return {}
+    closes = [bar.close for bar in bars]
+    pch = [0.0] * len(bars)
+    for i in range(smoothing, len(bars)):
+        current = closes[i]
+        if abs(current) <= 1e-15:
+            continue
+        pch[i] = (current - closes[i - smoothing]) / current * 100.0
+
+    avpch = _alma_full(pch, lookback, offset=alma_offset, sigma=alma_sigma)
+    rms_length = int(band_length or lookback)
+    state: list[int] = [0] * len(bars)
+    out: dict[int, float] = {}
+    for i in range(len(bars)):
+        if avpch[i] is None or i - rms_length + 1 < 0:
+            continue
+        window_values = avpch[i - rms_length + 1 : i + 1]
+        if any(value is None for value in window_values):
+            continue
+        rms = band_multiplier * sqrt(
+            sum(float(value) ** 2 for value in window_values if value is not None) / rms_length
+        )
+        value = float(avpch[i])
+        current_state = 1 if value > rms else -1 if value < -rms else 0
+        state[i] = current_state
+        prev_state = state[i - 1] if i > 0 else 0
+        if current_state in (-1, 1) and current_state != prev_state:
+            out[i] = float(current_state)
+    return out
+
+
+def nadaraya_watson_endpoint_signals(
+    bars: list[Bar],
+    *,
+    window: int = 500,
+    bandwidth: float = 8.0,
+    multiplier: float = 3.0,
+    deviation_length: int | None = None,
+) -> dict[int, float]:
+    """Non-repainting endpoint Nadaraya-Watson contrarian envelope crosses."""
+    if window < 10 or bandwidth <= 0 or multiplier <= 0:
+        return {}
+    closes = [bar.close for bar in bars]
+    basis = _endpoint_gaussian_kernel_full(closes, window=window, bandwidth=bandwidth)
+    dev_len = max(10, int(deviation_length or min(window, 499)))
+    upper: list[float | None] = [None] * len(bars)
+    lower: list[float | None] = [None] * len(bars)
+    abs_error: list[float | None] = [None] * len(bars)
+
+    for i, estimate in enumerate(basis):
+        if estimate is not None:
+            abs_error[i] = abs(closes[i] - float(estimate))
+
+    for i in range(len(bars)):
+        estimate = basis[i]
+        if estimate is None or i - dev_len + 1 < 0:
+            continue
+        errors = abs_error[i - dev_len + 1 : i + 1]
+        if any(value is None for value in errors):
+            continue
+        mae = fmean(float(value) for value in errors if value is not None) * multiplier
+        upper[i] = float(estimate) + mae
+        lower[i] = float(estimate) - mae
+
+    out: dict[int, float] = {}
+    for i in range(1, len(bars)):
+        if upper[i] is None or lower[i] is None or upper[i - 1] is None or lower[i - 1] is None:
+            continue
+        crossed_upper = closes[i - 1] <= float(upper[i - 1]) and closes[i] > float(upper[i])
+        crossed_lower = closes[i - 1] >= float(lower[i - 1]) and closes[i] < float(lower[i])
+        if crossed_upper:
+            out[i] = -1.0
+        elif crossed_lower:
+            out[i] = 1.0
+    return out
+
+
 def indicator_signal_series(
     indicator_id: str,
     bars: list[Bar],
@@ -987,4 +1173,10 @@ def indicator_signal_series(
         return waddah_attar_explosion_signals(bars, **params)
     if indicator_id == "qqe_ssl_wae_composite":
         return qqe_ssl_wae_composite_signals(bars, **params)
+    if indicator_id == "halftrend_everget":
+        return halftrend_signals(bars, **params)
+    if indicator_id == "trendilo":
+        return trendilo_signals(bars, **params)
+    if indicator_id == "nadaraya_watson_endpoint_nonrepaint":
+        return nadaraya_watson_endpoint_signals(bars, **params)
     raise KeyError(f"Community indicator is not implemented for causal benchmarking: {indicator_id}")

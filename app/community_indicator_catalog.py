@@ -183,8 +183,11 @@ INDICATORS: tuple[CommunityIndicatorSpec, ...] = (
         preferred_timeframes=("5", "15", "30", "60", "120", "240", "1D"),
         open_source=True,
         popularity_uses=415_742,
-        implementation_status="pending_exact_port",
-        notes=("High-priority trend candidate; exact swing/ATR transition semantics must be preserved.",),
+        implementation_status="implemented_conceptual",
+        notes=(
+            "Independent causal implementation of the published HalfTrend swing/SMA state-transition methodology.",
+            "Only confirmed trend flips are benchmarked; ATR channel visuals do not create extra entries.",
+        ),
     ),
     CommunityIndicatorSpec(
         indicator_id="ssl_hybrid",
@@ -244,8 +247,27 @@ INDICATORS: tuple[CommunityIndicatorSpec, ...] = (
         preferred_timeframes=("5", "15", "30", "60", "120", "240", "1D"),
         open_source=True,
         popularity_uses=55_235,
-        implementation_status="pending_exact_port",
-        notes=("ALMA-smoothed percentage-change trend state with RMS band; exact defaults still require source verification.",),
+        implementation_status="implemented_conceptual",
+        notes=(
+            "Confirmed-state adapter reproduces the published ALMA-smoothed percentage-change / RMS-band methodology independently.",
+            "Signals are emitted only when the confirmed trend state changes; no future bars are used.",
+        ),
+    ),
+    CommunityIndicatorSpec(
+        indicator_id="nadaraya_watson_endpoint_nonrepaint",
+        display_name="Endpoint Nadaraya-Watson Envelope — non-repainting research adapter",
+        author="STC independent implementation inspired by public endpoint NWE methodology",
+        source_url="https://www.tradingview.com/script/Iko0E2kL-Nadaraya-Watson-Envelope-LuxAlgo/",
+        signal_family="kernel_reversal",
+        suitable_asset_classes=("forex", "crypto", "indices", "metals", "energy", "rates"),
+        preferred_timeframes=("5", "15", "30", "60", "120", "240", "1D"),
+        open_source=True,
+        implementation_status="implemented_conceptual",
+        notes=(
+            "Uses a one-sided Gaussian endpoint estimator and causal mean-absolute-deviation envelope.",
+            "Only the non-repainting endpoint concept is benchmarked. The original LuxAlgo repainting mode is explicitly excluded.",
+            "Contrarian signals require confirmed crosses beyond the causal envelope and are evaluated next-bar.",
+        ),
     ),
     CommunityIndicatorSpec(
         indicator_id="nadaraya_watson_envelope_luxalgo",
