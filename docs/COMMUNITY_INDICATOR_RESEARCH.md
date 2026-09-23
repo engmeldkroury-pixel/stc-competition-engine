@@ -165,3 +165,24 @@ STC now exposes two research-only API routes:
 The plan route expands any supplied General Lab symbols through the same per-symbol/timeframe strategy + community-indicator research matrix.
 
 The evaluate route accepts exact-provider multi-timeframe OHLCV series and runs the same research runner used by STC. Output is explicitly research-only, live_authority=false, and requires later promotion before any live decision authority.
+
+
+## Composite indicator wave 3 — 2026-09-23
+
+The catalog now also benchmarks a practical composite stack frequently used as an executable public strategy:
+
+- QQE MOD — dual QQE agreement plus Bollinger-style zero-line confirmation.
+- SSL Hybrid — STC uses a causal baseline/SSL1 entry adapter for research; the full third-party script is not copied.
+- Waddah Attar Explosion — MACD/Bollinger momentum/explosion state with ATR dead-zone filtering.
+- QQE MOD + SSL Hybrid + Waddah Attar Explosion composite — entry is allowed only when the QQE direction change, SSL baseline state and WAE explosion direction agree on the same confirmed bar.
+
+Public TradingView descriptions explicitly document the composite strategy's long/short conditions and recommend parameter tuning/backtesting. The public author reports better behavior on longer timeframes than on the shortest intraday windows, so STC does not assume one universal timeframe; each symbol/timeframe must earn its own OOS/forward evidence.
+
+Source pages:
+- https://www.tradingview.com/script/TpUW4muw-QQE-MOD/
+- https://www.tradingview.com/script/C3MlAWCw-SSL-Hybrid/
+- https://www.tradingview.com/script/d9IjcYyS-Waddah-Attar-Explosion-V2-SHK/
+- https://www.tradingview.com/script/YCob5r03-QQE-MOD-SSL-Hybrid-Waddah-Attar-Explosion/
+- https://www.tradingview.com/script/as3c4gh4-QQE-MOD-SSL-Hybrid-Waddah-Attar-Explosion-Indicator/
+
+The adapters are independent causal research implementations. They must still pass the same train/test/forward gate before receiving any research weight.
