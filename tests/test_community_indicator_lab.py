@@ -74,6 +74,7 @@ def test_community_catalog_separates_research_popularity_from_live_weighting():
         "ssl_hybrid",
         "waddah_attar_explosion",
         "qqe_ssl_wae_composite",
+        "halftrend_everget",
         "trendilo",
     ),
 )
@@ -112,6 +113,7 @@ def test_symbol_benchmark_runs_each_implemented_indicator_independently():
         "ssl_hybrid",
         "waddah_attar_explosion",
         "qqe_ssl_wae_composite",
+        "halftrend_everget",
         "trendilo",
         "nadaraya_watson_endpoint_nonrepaint",
     } <= ids
@@ -216,3 +218,15 @@ def test_trendilo_default_method_emits_only_confirmed_state_transitions():
         },
     )
     assert all(value in (-1.0, 1.0) for value in signals.values())
+
+
+def test_halftrend_adapter_is_causal_and_alternates_confirmed_flip_direction():
+    bars = _bars(1200)
+    full = indicator_signal_series("halftrend_everget", bars, parameters={"amplitude": 2})
+    prefix = indicator_signal_series("halftrend_everget", bars[:901], parameters={"amplitude": 2})
+    assert {i: value for i, value in full.items() if i < 900} == {
+        i: value for i, value in prefix.items() if i < 900
+    }
+    values = list(full.values())
+    assert all(value in (-1.0, 1.0) for value in values)
+    assert all(a != b for a, b in zip(values, values[1:]))
