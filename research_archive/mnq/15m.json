@@ -2,7 +2,7 @@
   "success": true,
   "symbol": "CME_MINI:MNQ1!",
   "interval": "15m",
-  "count": 5018,
+  "count": 5019,
   "bars": [
     {
       "t": 1783501200,
@@ -40147,25 +40147,33 @@
       "l": 30983.25,
       "c": 31012.25,
       "v": 14240
+    },
+    {
+      "t": 1790130600,
+      "o": 31012.5,
+      "h": 31016,
+      "l": 30999.5,
+      "c": 31002.25,
+      "v": 6305
     }
   ],
   "archive": {
     "schema_version": "stc-ohlcv-archive-v1",
     "provider": "TradingView Official MCP",
-    "snapshots_merged": 3,
+    "snapshots_merged": 4,
     "coverage_first_t": 1783501200,
-    "coverage_last_t": 1790129700,
-    "latest_input_t": 1790130600,
-    "confirmed_through_t": 1790129700,
-    "withheld_unconfirmed_t": 1790130600,
+    "coverage_last_t": 1790130600,
+    "latest_input_t": 1790131500,
+    "confirmed_through_t": 1790130600,
+    "withheld_unconfirmed_t": 1790131500,
     "last_merge": {
       "incoming_bars": 5000,
       "confirmed_incoming_bars": 4999,
       "withheld_unconfirmed_bars": 1,
       "removed_existing_unconfirmed_bars": 0,
-      "added_bars": 19,
+      "added_bars": 1,
       "replaced_bars": 0,
-      "unchanged_overlap_bars": 4980
+      "unchanged_overlap_bars": 4998
     }
   },
   "notice": "Market data notice: bars are delayed 15+ minutes depending on the exchange — the last bar is not a live price and may still change; no pre/post-market bars; prices are split-adjusted only; some exchanges are served from an alternative or end-of-day feed. For the most recent quote use get_symbol_data (or get_symbol_data_batch) with the \"close\", \"change\" and \"update_mode\" columns."
