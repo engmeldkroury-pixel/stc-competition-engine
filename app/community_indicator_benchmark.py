@@ -48,6 +48,7 @@ class CommunityIndicatorTrial:
     symbol: str
     timeframe: str
     family: str
+    selected_parameters: dict
     train: IndicatorStats
     test: IndicatorStats
     forward: IndicatorStats
@@ -236,6 +237,67 @@ def _indicator_score(test: IndicatorStats, forward: IndicatorStats) -> float:
     return round(max(0.0, score) * (0.55 + 0.45 * sample_confidence), 4)
 
 
+def indicator_parameter_grid(indicator_id: str) -> tuple[dict, ...]:
+    grids: dict[str, tuple[dict, ...]] = {
+        "ut_bot_alerts": (
+            {"atr_period": 10, "key_value": 1.0},
+            {"atr_period": 10, "key_value": 1.5},
+            {"atr_period": 14, "key_value": 1.5},
+            {"atr_period": 14, "key_value": 2.0},
+        ),
+        "squeeze_momentum_lazybear": (
+            {"length": 20, "bb_mult": 2.0, "kc_mult": 1.5},
+            {"length": 20, "bb_mult": 2.0, "kc_mult": 2.0},
+            {"length": 14, "bb_mult": 2.0, "kc_mult": 1.5},
+        ),
+        "wavetrend_crosses": (
+            {"channel_length": 10, "average_length": 21, "signal_length": 4},
+            {"channel_length": 9, "average_length": 12, "signal_length": 3},
+            {"channel_length": 14, "average_length": 21, "signal_length": 4},
+        ),
+        "hull_suite": (
+            {"length": 34},
+            {"length": 55},
+            {"length": 89},
+        ),
+        "supertrend_kivanc": (
+            {"atr_period": 10, "multiplier": 2.0},
+            {"atr_period": 10, "multiplier": 3.0},
+            {"atr_period": 14, "multiplier": 3.0},
+            {"atr_period": 14, "multiplier": 4.0},
+        ),
+        "chandelier_exit_everget": (
+            {"period": 14, "multiplier": 2.0},
+            {"period": 14, "multiplier": 3.0},
+            {"period": 22, "multiplier": 2.0},
+            {"period": 22, "multiplier": 3.0},
+        ),
+        "schaff_trend_cycle": (
+            {"cycle_length": 10, "fast_length": 23, "slow_length": 50, "smoothing": 0.5},
+            {"cycle_length": 12, "fast_length": 26, "slow_length": 50, "smoothing": 0.5},
+            {"cycle_length": 10, "fast_length": 9, "slow_length": 30, "smoothing": 0.5},
+        ),
+        "range_filter_guikroth": (
+            {"sampling_period": 50, "range_multiplier": 2.0},
+            {"sampling_period": 50, "range_multiplier": 3.0},
+            {"sampling_period": 100, "range_multiplier": 2.0},
+            {"sampling_period": 100, "range_multiplier": 3.0},
+        ),
+    }
+    return grids.get(indicator_id, ({},))
+
+
+def _train_objective(stats: IndicatorStats) -> float:
+    if stats.trades < 15:
+        return -inf
+    return (
+        min(1.5, stats.expectancy_r) * 25.0
+        + min(3.0, stats.profit_factor) * 8.0
+        + stats.win_rate * 5.0
+        - min(15.0, stats.max_drawdown_r) * 1.2
+    )
+
+
 def benchmark_indicator(
     *,
     indicator_id: str,
@@ -253,6 +315,7 @@ def benchmark_indicator(
             symbol=symbol,
             timeframe=timeframe,
             family=family,
+            selected_parameters=dict(parameters or {}),
             train=empty,
             test=empty,
             forward=empty,
@@ -261,15 +324,24 @@ def benchmark_indicator(
             reasons=("insufficient_bars_300_minimum",),
         )
 
-    signals = indicator_signal_series(indicator_id, bars, parameters=parameters)
     n = len(bars)
     train_end = max(1, int(n * 0.60))
     test_end = max(train_end + 1, int(n * 0.80))
     warmup = min(250, max(60, int(n * 0.10)))
 
-    _, train = backtest_indicator_signals(
-        bars, signals, start_index=warmup, end_index=train_end - 1, params=params
-    )
+    grid = (parameters,) if parameters is not None else indicator_parameter_grid(indicator_id)
+    candidates: list[tuple[float, dict, dict[int, float], IndicatorStats]] = []
+    for candidate_params in grid:
+        signals = indicator_signal_series(indicator_id, bars, parameters=candidate_params)
+        _, train_stats = backtest_indicator_signals(
+            bars, signals, start_index=warmup, end_index=train_end - 1, params=params
+        )
+        candidates.append((_train_objective(train_stats), dict(candidate_params), signals, train_stats))
+
+    candidates.sort(key=lambda item: item[0], reverse=True)
+    if not candidates:
+        raise RuntimeError(f"No parameter candidates for {indicator_id}")
+    _, selected_parameters, signals, train = candidates[0]
     _, test = backtest_indicator_signals(
         bars, signals, start_index=train_end, end_index=test_end - 1, params=params
     )
@@ -283,6 +355,7 @@ def benchmark_indicator(
         symbol=symbol,
         timeframe=timeframe,
         family=family,
+        selected_parameters=selected_parameters,
         train=train,
         test=test,
         forward=forward,
