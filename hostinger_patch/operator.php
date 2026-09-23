@@ -526,6 +526,10 @@ function renderOverview(cards){
   +'<div class="card"><div class="small">ACTIVE opportunities now</div><div class="big">'+actionable.length+'</div></div>'
   +'<div class="card"><div class="small">Manual-ready now</div><div class="big">'+ready.length+'</div></div>'
   +'<div class="card"><div class="small">Open positions tracked</div><div class="big">'+positions.length+'</div></div>';
+ const missingMtf=cards.filter(c=>(c.reasons||[]).some(x=>/confirmation_1h=unavailable|trend_2h=unavailable|trend_4h=unavailable|family_evidence=unavailable/i.test(String(x)))).length;
+ if(missingMtf){
+   $('overview-summary').innerHTML+='<div class="card"><div class="small bad">MTF LIVE CONFIRMATION</div><div class="big bad">OFFLINE</div><div class="small">'+missingMtf+'/'+cards.length+' cards are missing higher-timeframe/family evidence. A+ opportunities can remain blocked until the v1.1 MTF production feeds are activated.</div></div>';
+ }
  const ranked=[...actionable].sort((a,b)=>Math.abs(Number(b.composite_score||0))-Math.abs(Number(a.composite_score||0)));
  const all=snapshot&&snapshot.cards?snapshot.cards:[];
  $('overview-cards').innerHTML=ranked.length
