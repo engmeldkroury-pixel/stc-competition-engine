@@ -1,0 +1,99 @@
+name: STC Live Product Readback
+
+on:
+  push:
+    branches:
+      - "ops/live-product-readback-*"
+    paths:
+      - ".github/workflows/stc-live-product-readback.yml"
+      - "ops_inputs/LIVE_READBACK"
+
+permissions:
+  contents: read
+
+jobs:
+  readback:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      STC_OWNER_TOKEN: ${{ secrets.STC_OWNER_TOKEN }}
+    steps:
+      - name: Verify owner secret
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$STC_OWNER_TOKEN"
+
+      - name: Read live Hostinger product state
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --silent --show-error \
+            -H "Authorization: Bearer $STC_OWNER_TOKEN" \
+            https://stc.feama.site/operator_snapshot.php \
+            -o snapshot.json
+          curl --fail --silent --show-error \
+            -H "Authorization: Bearer $STC_OWNER_TOKEN" \
+            https://stc.feama.site/notification.php \
+            -o notifications.json
+
+      - name: Build safe summary
+        shell: python
+        run: |
+          import json
+          from collections import Counter
+
+          with open("snapshot.json", encoding="utf-8") as fh:
+              s = json.load(fh)
+          with open("notifications.json", encoding="utf-8") as fh:
+              n = json.load(fh)
+
+          cards = s.get("cards") or []
+          positions = ((s.get("portfolio") or {}).get("positions") or [])
+          summary = {
+              "ok": bool(s.get("ok")) and bool(n.get("ok")),
+              "scope": s.get("scope"),
+              "observed_at_utc": s.get("observed_at_utc"),
+              "runtime_control": s.get("runtime_control"),
+              "macro_calendar_status": s.get("macro_calendar_status"),
+              "account_states": s.get("account_states"),
+              "competition_progress": s.get("competition_progress"),
+              "cards_total": len(cards),
+              "cards_by_competition": dict(Counter(c.get("competition_id") for c in cards)),
+              "active_opportunities": [
+                  {
+                      "competition_id": c.get("competition_id"),
+                      "symbol": c.get("symbol"),
+                      "recommendation": c.get("recommendation"),
+                      "setup_grade": c.get("setup_grade"),
+                      "quality_score": c.get("setup_quality_score"),
+                      "score": c.get("composite_score"),
+                      "expires_in_seconds": c.get("expires_in_seconds"),
+                      "manual_execution_ready": c.get("manual_execution_ready"),
+                      "has_open_position": c.get("has_open_position"),
+                      "order_instruction": c.get("order_instruction"),
+                      "position_sizing": c.get("position_sizing"),
+                  }
+                  for c in cards
+                  if c.get("opportunity_active")
+              ],
+              "manual_ready_count": sum(bool(c.get("manual_execution_ready")) for c in cards),
+              "open_positions_count": len(positions),
+              "open_positions": positions,
+              "portfolio_summary": (s.get("portfolio") or {}).get("summary"),
+              "notification_config": n.get("config"),
+              "notification_events_count": len(n.get("events") or []),
+              "recent_notification_events": (n.get("events") or [])[:10],
+              "recent_deliveries": (n.get("deliveries") or [])[:20],
+          }
+          with open("live_readback_summary.json", "w", encoding="utf-8") as fh:
+              json.dump(summary, fh, indent=2, ensure_ascii=False)
+          print("STC_LIVE_PRODUCT_SUMMARY=" + json.dumps(summary, sort_keys=True, ensure_ascii=False))
+
+      - name: Upload safe readback summary
+        uses: actions/upload-artifact@v4
+        with:
+          name: stc-live-product-readback-${{ github.run_id }}
+          path: live_readback_summary.json
+          if-no-files-found: error
+          retention-days: 7
