@@ -7,7 +7,7 @@ from typing import Iterable
 from .community_indicator_catalog import eligible_indicators
 from .community_indicator_signals import atr_by_index, indicator_signal_series
 from .models import Bar
-from .strategy_lab import StrategyTrial, robust_trial_score
+from .strategy_lab import STRATEGIES, StrategyTrial, robust_trial_score
 
 
 @dataclass(frozen=True)
@@ -428,10 +428,11 @@ def build_symbol_ensemble_profile(
         score = _core_component_score(trial)
         if score <= 0:
             continue
+        family = next((spec.family for spec in STRATEGIES if spec.strategy_id == trial.strategy_id), "native_strategy")
         rows.append({
             "component_id": trial.strategy_id,
             "source_type": "core_strategy",
-            "family": "native_strategy",
+            "family": family,
             "score": score,
             "test_trades": trial.test_trades,
             "forward_trades": trial.forward_trades,
@@ -466,7 +467,33 @@ def build_symbol_ensemble_profile(
             ),
         )
 
-    total = sum(float(row["score"]) for row in rows)
+    family_rows: dict[str, list[dict]] = {}
+    for row in rows:
+        family_rows.setdefault(str(row["family"]), []).append(row)
+
+    # Redundancy-aware normalization: evidence families receive diminishing
+    # returns before components split their family share. This prevents several
+    # correlated trend/momentum variants from overwhelming structurally
+    # independent evidence merely because many similar indicators were tested.
+    family_strength = {
+        family: sum(float(row["score"]) for row in members)
+        for family, members in family_rows.items()
+    }
+    family_power = 0.75
+    powered = {
+        family: max(0.0, strength) ** family_power
+        for family, strength in family_strength.items()
+    }
+    powered_total = sum(powered.values())
+
+    weighted_rows: list[tuple[float, dict]] = []
+    for family, members in family_rows.items():
+        family_share = powered[family] / powered_total if powered_total > 0 else 0.0
+        member_total = family_strength[family]
+        for row in members:
+            within = float(row["score"]) / member_total if member_total > 0 else 0.0
+            weighted_rows.append((family_share * within, row))
+
     components = tuple(
         EnsembleComponentWeight(
             component_id=str(row["component_id"]),
@@ -475,15 +502,15 @@ def build_symbol_ensemble_profile(
             symbol=symbol,
             timeframe=timeframe,
             raw_score=float(row["score"]),
-            normalized_weight=float(row["score"]) / total,
+            normalized_weight=weight,
             test_trades=int(row["test_trades"]),
             forward_trades=int(row["forward_trades"]),
             note=(
-                "Weight is driven by OOS/forward robustness with sample evidence. "
+                "Weight is driven by OOS/forward robustness and redundancy-aware family normalization. "
                 "Popularity/reviews are discovery metadata only."
             ),
         )
-        for row in sorted(rows, key=lambda item: float(item["score"]), reverse=True)
+        for weight, row in sorted(weighted_rows, key=lambda item: item[0], reverse=True)
     )
     community_share = sum(
         item.normalized_weight for item in components if item.source_type == "community_indicator"
@@ -497,6 +524,7 @@ def build_symbol_ensemble_profile(
         status="RESEARCH_PROFILE_READY",
         notes=(
             "Profile is symbol/timeframe specific.",
+            "Correlated evidence is normalized by family with diminishing returns before component weights are assigned.",
             "Live outcomes may be accumulated trade by trade, but weights must be recalibrated only on a frozen evaluation window.",
             "Do not chase the latest trade by changing weights after every single outcome.",
         ),
