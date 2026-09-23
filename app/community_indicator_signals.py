@@ -997,6 +997,58 @@ def qqe_ssl_wae_composite_signals(
     return out
 
 
+def halftrend_signals(
+    bars: list[Bar],
+    *,
+    amplitude: int = 2,
+) -> dict[int, float]:
+    """Confirmed HalfTrend swing/SMA state transitions.
+
+    The ATR/channel portion of HalfTrend is visual/risk context in the public
+    indicator; STC benchmarks only the causal trend flip state.
+    """
+    if amplitude < 1 or len(bars) < max(3, amplitude):
+        return {}
+
+    trend = 0
+    next_trend = 0
+    max_low_price = bars[0].low
+    min_high_price = bars[0].high
+    out: dict[int, float] = {}
+
+    for i in range(len(bars)):
+        start = max(0, i - amplitude + 1)
+        window = bars[start : i + 1]
+        if len(window) < amplitude:
+            continue
+
+        high_price = max(bar.high for bar in window)
+        low_price = min(bar.low for bar in window)
+        high_ma = fmean(bar.high for bar in window)
+        low_ma = fmean(bar.low for bar in window)
+        prev_low = bars[i - 1].low if i > 0 else bars[i].low
+        prev_high = bars[i - 1].high if i > 0 else bars[i].high
+        previous_trend = trend
+
+        if next_trend == 1:
+            max_low_price = max(low_price, max_low_price)
+            if high_ma < max_low_price and bars[i].close < prev_low:
+                trend = 1
+                next_trend = 0
+                min_high_price = high_price
+        else:
+            min_high_price = min(high_price, min_high_price)
+            if low_ma > min_high_price and bars[i].close > prev_high:
+                trend = 0
+                next_trend = 1
+                max_low_price = low_price
+
+        if trend != previous_trend:
+            out[i] = 1.0 if trend == 0 else -1.0
+
+    return out
+
+
 def trendilo_signals(
     bars: list[Bar],
     *,
@@ -1121,6 +1173,8 @@ def indicator_signal_series(
         return waddah_attar_explosion_signals(bars, **params)
     if indicator_id == "qqe_ssl_wae_composite":
         return qqe_ssl_wae_composite_signals(bars, **params)
+    if indicator_id == "halftrend_everget":
+        return halftrend_signals(bars, **params)
     if indicator_id == "trendilo":
         return trendilo_signals(bars, **params)
     if indicator_id == "nadaraya_watson_endpoint_nonrepaint":
