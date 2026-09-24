@@ -51,8 +51,12 @@ def test_console_keeps_recovery_path_when_signal_refreshes_after_manual_fill() -
     assert "newer_signal_not_aligned" in source
 
 
-def test_record_trade_competition_field_is_explicitly_read_only() -> None:
+def test_record_trade_competition_is_selected_from_allowed_values_and_capital_symbol_is_normalized() -> None:
     source = _source()
-    assert "Competition — selected automatically" in source
-    assert 'id="pos-competition-label" type="text" readonly aria-readonly="true"' in source
-    assert "Read-only on purpose. Do not type the competition name; STC binds the trade to the selected competition automatically." in source
+    assert 'id="pos-competition"' in source
+    assert '<option value="capital-africa-sep-2026">Capital.com Africa</option>' in source
+    assert '<option value="amp-futures-sep-2026">AMP Futures</option>' in source
+    assert "function normalizePositionSymbolForCompetition" in source
+    assert "return 'CAPITALCOM:'+raw" in source
+    assert "Select the competition first." in source
+    assert "Position target is not valid. Select the competition and use the supported symbol" in source
