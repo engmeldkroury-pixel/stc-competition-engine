@@ -2071,3 +2071,17 @@ Owner intervention required now: YES — only for historical-data access, not fo
   - #121 superseded by merged official Lorentzian PR #125;
   - #115 superseded by merged/reconciled wave-3 PRs #123/#124.
 - Live authority remains unchanged: research-only; no A+ gate/risk/competition/execution change.
+
+
+## Lorentzian benchmark integration defect found before acceptance — 2026-09-24 10:15 EEST
+- During WU-110 execution, an integration defect was found in the benchmark dispatcher:
+  - community_indicator_catalog.eligible_indicators() correctly considers implemented_official_port benchmarkable;
+  - community_indicator_benchmark.benchmark_symbol_indicators() still filtered to implementation_status == implemented_conceptual only.
+- Consequence: the official Lorentzian adapter from PR #125 could pass parity/causality tests but be silently omitted from the 26-symbol benchmark matrix.
+- Therefore workflow 35967884019 is superseded for Lorentzian evidence even if it completes successfully. Its non-Lorentzian outputs are not needed because the accepted reconciled baseline is already archived.
+- PR #129 opened to:
+  - admit implemented_official_port alongside implemented_conceptual in benchmark_symbol_indicators();
+  - continue excluding native_proxy_only from independent benchmark weight;
+  - add a regression test that Lorentzian is included and SMC native proxy is excluded;
+  - remove a duplicated Lorentzian causality-test parameter.
+- No live behavior was affected; this defect existed only in research matrix inclusion.
