@@ -6,7 +6,13 @@ Updated: 2026-09-24 11:30 UTC
 STC.
 
 ## URGENT PRODUCTION PRIORITY
-A fresh post-hotfix Capital opportunity is live: EURUSD SHORT, COMPETITION_OPPORTUNITY, quality 80/100, locked plan visible, Telegram HTTP 200. The immediate owner action is to confirm the current EURUSD price on the competition platform while the locked plan remains valid; if the price is still inside 1.13479407..1.13706593 and the ticket uses the expected quantity unit, complete owner approval and manual order entry.
+Deploy the new combined Hostinger hotfix containing PR #155 locked-plan persistence and PR #156 Record Trade competition-field clarity. After deployment:
+1. verify an unexpired locked plan remains visible when a newer same-direction monitor-only bar arrives;
+2. verify an incompatible latest bar shows the old plan as RECOVERY ONLY and blocks a new entry;
+3. use Record Trade only to register an already-open manual platform position;
+4. never duplicate the EURUSD order merely because STC has not yet recorded it.
+
+Current EURUSD recovery requires the actual platform position details (filled quantity, average fill price, current stop, current final TP) from Paper Trading > Positions before writing it into the STC ledger.
 
 ## VERIFIED LIVE EVIDENCE
 - Main includes PR #145 competition quality eligibility fix.
