@@ -2035,3 +2035,11 @@ Owner intervention required now: YES — only for historical-data access, not fo
   - newer Nadaraya alias is non-benchmarkable to prevent duplicate weight.
 - Any wave-3 benchmark started before this reconciliation is superseded.
 - Reconciled exact-data benchmark trigger commit: 8edb3edef2c26e6348e989d5b95632f50b803327.
+
+
+## Official Lorentzian Classification integrated — 2026-09-24
+- PR #125 merged as 445cf9e7a0f92567dac49a8a16e01e40d378d298 after 384 tests passed.
+- Instead of approximating Lorentzian logic, STC pins the official AI Edge MIT-licensed Python port at upstream commit 27776bd51cbd3e07b6383cfa468d4d33f4b50297.
+- STC benchmark adapter consumes official confirmed Buy/Sell events; official classifier/features/ANN/filters/kernel semantics stay upstream parity-tested.
+- TRAIN-only settings variants are allowed; TEST/FORWARD remain untouched.
+- Next exact-data step after the reconciled wave-3 run: rerun the 26-symbol matrix with Lorentzian included and compare incremental validated coverage.
