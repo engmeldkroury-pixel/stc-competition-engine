@@ -1,0 +1,51 @@
+name: STC Live Signal Readback Temp
+
+on:
+  push:
+    branches:
+      - "stc-live-readback-20260924-1115"
+    paths:
+      - ".github/workflows/stc-live-readback-temp.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  readback:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      STC_OWNER_TOKEN: ${{ secrets.STC_OWNER_TOKEN }}
+    steps:
+      - name: Read sanitized live owner snapshot
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "${STC_OWNER_TOKEN:-}"
+          curl -fsS --retry 2 --max-time 20 \
+            -H "Authorization: Bearer ${STC_OWNER_TOKEN}" \
+            "https://stc.feama.site/operator_snapshot.php" > /tmp/stc_snapshot.json
+          python - <<'PY'
+          import json
+          data=json.load(open('/tmp/stc_snapshot.json'))
+          rows=[]
+          for card in data.get('cards') or []:
+              if card.get('competition_id') != 'capital-africa-sep-2026':
+                  continue
+              rows.append({
+                  'symbol': card.get('symbol'),
+                  'source_time': card.get('source_time'),
+                  'recommendation': card.get('recommendation'),
+                  'pre_gate_recommendation': card.get('pre_gate_recommendation'),
+                  'setup_grade': card.get('setup_grade'),
+                  'setup_quality_score': card.get('setup_quality_score'),
+                  'quality_gate_passed_live_php': card.get('quality_gate_passed'),
+                  'quality_gate_failures': card.get('quality_gate_failures'),
+                  'locked_plan_present_live_php': card.get('locked_trade_plan') is not None,
+                  'opportunity_active_live_php': card.get('opportunity_active'),
+              })
+          rows.sort(key=lambda x: x['symbol'] or '')
+          print('STC_LIVE_CAPITAL_SIGNAL_READBACK='+json.dumps(rows,sort_keys=True))
+          print('STC_LIVE_RUNTIME_CONTROL='+json.dumps(data.get('runtime_control') or {},sort_keys=True))
+          print('STC_LIVE_COMPETITION_PROGRESS='+json.dumps((data.get('competition_progress') or {}).get('capital-africa-sep-2026') or {},sort_keys=True))
+          PY
