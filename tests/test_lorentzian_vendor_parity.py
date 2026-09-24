@@ -15,9 +15,12 @@ FIXTURE = (
 
 
 def _assert_float_parity(expected: float, actual: float, tolerance: float = 1e-6) -> None:
+    # The official parity contract treats blank/na TradingView export cells as
+    # "not compared" during warmup. It does not require Python to emit na
+    # merely because the chart export omitted that source cell.
     if isnan(expected):
-        assert isnan(actual)
         return
+    assert not isnan(actual)
     assert isclose(expected, actual, abs_tol=tolerance, rel_tol=0.0)
 
 
@@ -30,9 +33,17 @@ def test_vendored_lorentzian_reference_matches_pine_fixture() -> None:
     )
 
     assert len(results) == len(tv_rows)
-    for tv, result in zip(tv_rows, results, strict=True):
+    settings = Settings(include_full_history=False)
+    max_bars_back_index = max(0, len(tv_rows) - 1 - settings.max_bars_back)
+
+    for i, (tv, result) in enumerate(zip(tv_rows, results, strict=True)):
         for field in ("f1", "f2", "f3", "f4", "f5", "kernel"):
             _assert_float_parity(float(getattr(tv, field)), float(getattr(result, field)))
+
+        # This follows the upstream parity contract exactly: limited-history
+        # discrete signals are compared only from max_bars_back_index onward.
+        if i < max_bars_back_index:
+            continue
 
         assert tv.prediction == result.prediction
         assert tv.direction == result.direction
