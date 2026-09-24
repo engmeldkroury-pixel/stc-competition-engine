@@ -470,7 +470,7 @@ function cardHtml(c,i){
    :(active?'<span class="badge active">ACTIVE NOW</span>':'<span class="badge expired">EXPIRED</span>');
  let blockReason='';
  if(c.has_open_position)blockReason='An executed position is already tracked for this symbol. New signals are used to manage that position, not to create a replacement trade.';
- else if(c.quality_gate_passed===false&&c.pre_gate_recommendation&&c.pre_gate_recommendation!=='WAIT')blockReason='MONITOR ONLY: this directional candidate failed the A+ high-conviction gate and cannot be approved or notified as a trade.';
+ else if(c.quality_gate_passed===false&&c.pre_gate_recommendation&&c.pre_gate_recommendation!=='WAIT')blockReason='MONITOR ONLY: this directional candidate failed its required quality gate and cannot be approved or notified as a trade.';
  else if(!active&&c.recommendation!=='WAIT')blockReason='Expired opportunities are removed automatically from opportunity lists.';
  else if(!controlOpen)blockReason='SAFE MODE / KILL SWITCH is ON. Enable manual approval mode before approving.';
  else if(!sizingAllowed)blockReason='New entry blocked by sizing / risk capacity.';
@@ -537,7 +537,7 @@ function maybeNotify(cards){
    const body=c.symbol+' • A+ '+c.recommendation+' • Quality '+(Number.isFinite(Number(c.setup_quality_score))?Math.round(Number(c.setup_quality_score))+'/100':'-')+' • '+(oi.order_type||'ENTRY')+' • Entry '+formatPlatformPrice(c.symbol,c.locked_trade_plan.entry_min,'floor')+' - '+formatPlatformPrice(c.symbol,c.locked_trade_plan.entry_max,'ceil')+' • SL '+planPriceText(c,c.locked_trade_plan.initial_stop,'stop')+' • Final TP '+planPriceText(c,c.locked_trade_plan.target2,'target')+' • Expires '+formatLocalTime(c.locked_trade_plan.valid_until);
    document.title='A+ '+c.recommendation+' • '+c.symbol+' • STC';
    if('Notification' in window && Notification.permission==='granted'){
-     new Notification('STC A+ HIGH-CONVICTION PLAN',{body,tag:key,requireInteraction:true});
+     new Notification('STC QUALIFIED PLAN',{body,tag:key,requireInteraction:true});
      seenSignalPlans.add(key);
      persistSeenSet('stc_seen_signal_plans',seenSignalPlans);
    }
@@ -1000,7 +1000,7 @@ function approvalReasonText(reason){
    evidence_stale:'The price confirmation became stale; enter the current price again.',
    safe_mode_active:'Safe Mode is active.',
    kill_switch_active:'Kill Switch is active.',
-   high_conviction_gate_not_passed:'The A+ quality gate is no longer passed.',
+   quality_gate_not_passed:'The required setup quality gate is no longer passed.',
    macro_high_impact_blackout:'A high-impact macro blackout is active.',
    macro_calendar_unavailable_fail_closed:'Macro calendar is unavailable, so approval fails closed.',
    invalid_quote_price:'The entered price is invalid.',

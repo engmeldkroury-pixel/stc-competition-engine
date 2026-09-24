@@ -39,6 +39,20 @@ function stc_bool_input(mixed $value, string $field): bool {
     return $value;
 }
 
+
+function stc_signal_quality_gate_eligible(array $signal): bool {
+    if (($signal['quality_gate_passed'] ?? false) !== true) {
+        return false;
+    }
+    $grade = (string)($signal['setup_grade'] ?? '');
+    if ($grade === 'A_PLUS') {
+        return true;
+    }
+    return $grade === 'COMPETITION_OPPORTUNITY'
+        && (string)($signal['competition_id'] ?? '') === 'capital-africa-sep-2026'
+        && ($signal['competition_mode'] ?? false) === true;
+}
+
 function stc_provider_of_symbol(string $symbol): string {
     $parts = explode(':', $symbol, 2);
     return count($parts) === 2 ? strtoupper(trim($parts[0])) : '';

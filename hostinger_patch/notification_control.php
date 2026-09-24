@@ -222,8 +222,7 @@ function stc_notify_signal_event(PDO $pdo, array $config, string $eventId): arra
         return ['ok' => true, 'skipped' => true, 'reason' => 'wait_signal'];
     }
     $setupGrade = (string)($signal['setup_grade'] ?? '');
-    $allowedGrades = ['A_PLUS', 'COMPETITION_OPPORTUNITY'];
-    if (($signal['quality_gate_passed'] ?? false) !== true || !in_array($setupGrade, $allowedGrades, true)) {
+    if (!stc_signal_quality_gate_eligible($signal)) {
         return ['ok' => true, 'skipped' => true, 'reason' => 'quality_gate_not_passed'];
     }
 
