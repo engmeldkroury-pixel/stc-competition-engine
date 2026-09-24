@@ -283,10 +283,15 @@ function formatCountdown(seconds){
  if(m>=60){const h=Math.floor(m/60);return h+'h '+(m%60)+'m';}
  return m+'m '+String(s).padStart(2,'0')+'s';
 }
-function isOpportunityActive(c){
+function isLockedPlanVisible(c){
  if(!c||c.has_open_position||!c.locked_trade_plan||!(c.recommendation==='LONG'||c.recommendation==='SHORT'))return false;
  const left=secondsUntil(c.locked_trade_plan.valid_until);
  return left!==null && left>0;
+}
+function isOpportunityActive(c){
+ if(!isLockedPlanVisible(c))return false;
+ if(c.latest_signal_context&&c.latest_signal_context.approval_compatible_with_locked_plan===false)return false;
+ return c.opportunity_active!==false;
 }
 function deriveOrderInstruction(c,price){
  const p=c&&c.locked_trade_plan;
@@ -486,9 +491,10 @@ function cardHtml(c,i){
  const latestCompatible=!c.latest_signal_context||c.latest_signal_context.same_event||c.latest_signal_context.approval_compatible_with_locked_plan!==false;
  const canApprove=active&&(c.recommendation==='LONG'||c.recommendation==='SHORT')&&!!c.locked_trade_plan&&sizingAllowed&&macroAllowed&&controlOpen&&latestCompatible;
  const competitionLabel=c.competition_id==='amp-futures-sep-2026'?'AMP Futures':'Capital.com Africa';
+ const recoveryOnly=isLockedPlanVisible(c)&&!active;
  const statusBadge=c.recommendation==='WAIT'
    ?'<span class="badge blocked">WAIT</span>'
-   :(active?'<span class="badge active">ACTIVE NOW</span>':'<span class="badge expired">EXPIRED</span>');
+   :(active?'<span class="badge active">ACTIVE NOW</span>':recoveryOnly?'<span class="badge blocked">RECOVERY ONLY</span>':'<span class="badge expired">EXPIRED</span>');
  let blockReason='';
  if(c.has_open_position)blockReason='An executed position is already tracked for this symbol. New signals are used to manage that position, not to create a replacement trade.';
  else if(c.quality_gate_passed===false&&c.pre_gate_recommendation&&c.pre_gate_recommendation!=='WAIT')blockReason='MONITOR ONLY: this directional candidate failed its required quality gate and cannot be approved or notified as a trade.';
@@ -572,7 +578,7 @@ function competitionOf(c){
 }
 function renderCards(target,cards){
  const all=snapshot&&snapshot.cards?snapshot.cards:[];
- const visible=(cards||[]).filter(c=>c.recommendation==='WAIT'||isOpportunityActive(c));
+ const visible=(cards||[]).filter(c=>c.recommendation==='WAIT'||isLockedPlanVisible(c));
  $(target).innerHTML=visible.map(c=>cardHtml(c,all.indexOf(c))).join('')||'<div class="card">No current signals or active opportunities.</div>';
  for(const card of visible){
    const i=all.indexOf(card);
