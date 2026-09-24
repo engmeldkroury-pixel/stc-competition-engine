@@ -90,7 +90,11 @@ class NotificationFakeClient(FakeClient):
 
     def notify_signal(self, event_id):
         self.signal_notifications.append(event_id)
-        return {"ok": True}
+        return {
+            "ok": True,
+            "skipped": False,
+            "dispatch": {"delivered_any": True},
+        }
 
     def notify_portfolio(self):
         self.portfolio_notifications += 1
@@ -165,6 +169,10 @@ def test_actionable_locked_plan_triggers_fail_soft_signal_notification():
     result = run_serverless_once(client, worker_id="notify", limit=5)
     assert result.ingested == 1
     assert client.signal_notifications == ["evt-serverless-1"]
+    assert result.signal_notification_attempted == 1
+    assert result.signal_notification_delivered == 1
+    assert result.signal_notification_skipped == 0
+    assert result.signal_notification_errors == 0
 
 
 class DrainNotificationClient(DrainFakeClient):
@@ -182,3 +190,38 @@ def test_drain_triggers_one_portfolio_notification_evaluation_after_batching():
     result = run_serverless_drain(client, worker_id="notify-drain", limit=20, max_batches=5)
     assert result.ingested == 26
     assert client.portfolio_notifications == 1
+
+
+class SkippedNotificationClient(NotificationFakeClient):
+    def notify_signal(self, event_id):
+        self.signal_notifications.append(event_id)
+        return {
+            "ok": True,
+            "skipped": True,
+            "reason": "quality_gate_not_passed",
+        }
+
+
+def test_signal_notification_skip_reason_is_visible_without_failing_ingestion():
+    client = SkippedNotificationClient(_actionable_payload())
+    result = run_serverless_once(client, worker_id="notify-skip", limit=5)
+    assert result.ingested == 1
+    assert result.failed == 0
+    assert result.signal_notification_attempted == 1
+    assert result.signal_notification_skipped == 1
+    assert result.signal_notification_skip_reasons == {"quality_gate_not_passed": 1}
+
+
+class FailedNotificationClient(NotificationFakeClient):
+    def notify_signal(self, event_id):
+        self.signal_notifications.append(event_id)
+        raise RuntimeError("notification transport failed")
+
+
+def test_signal_notification_failure_is_counted_but_remains_fail_soft():
+    client = FailedNotificationClient(_actionable_payload())
+    result = run_serverless_once(client, worker_id="notify-fail", limit=5)
+    assert result.ingested == 1
+    assert result.failed == 0
+    assert result.signal_notification_attempted == 1
+    assert result.signal_notification_errors == 1
