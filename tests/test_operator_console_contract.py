@@ -37,3 +37,13 @@ def test_approval_preserves_block_reasons_instead_of_only_http_409() -> None:
     assert "price_outside_envelope:'Current price is outside the locked entry zone.'" in source
     assert "Approval blocked: '+text" in source
     assert 'placeholder="Current TradingView price — decimal or exchange quote"' in source
+
+
+def test_console_keeps_recovery_path_when_signal_refreshes_after_manual_fill() -> None:
+    source = _source()
+    assert "function latestLockedPlanContextHtml(c)" in source
+    assert "LOCKED PLAN PRESERVED" in source
+    assert "approval_compatible_with_locked_plan" in source
+    assert "Already filled on platform? Record position" in source
+    assert "If you already filled the trade and the signal card disappeared after a refresh, DO NOT enter the trade again." in source
+    assert "newer_signal_not_aligned" in source
