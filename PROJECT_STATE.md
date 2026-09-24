@@ -1978,3 +1978,20 @@ Owner intervention required now: YES — only for historical-data access, not fo
   FROZEN_PASS -> SHADOW -> MULTITF_CONFIRMED -> ELIGIBLE_FOR_OWNER_PROMOTION.
 - No component is currently MULTITF_CONFIRMED solely by the new Trendilo result.
 - Next evidence step: exact-provider multi-timeframe frozen confirmation for BTCUSD/Trendilo and MJY1!/Trendilo, then continue Lorentzian and VuManChu causal audits.
+
+
+## Trendilo multi-timeframe frozen confirmation completed — 2026-09-24
+- Workflow run 35947248551 completed successfully for CAPITALCOM:BTCUSD and CME_MINI:MJY1!.
+- Same exact-provider / frozen methodology was retained.
+- CME_MINI:MJY1! Trendilo independently passed 5m and 30m in addition to its existing 15m frozen pass.
+- MJY Trendilo therefore advances to MULTITF_CONFIRMED on 15m/5m/30m research records.
+- CAPITALCOM:BTCUSD Trendilo did not pass another tested timeframe and remains SHADOW.
+- New independent BTCUSD frozen candidates:
+  - 5m endpoint Nadaraya-Watson non-repainting;
+  - 1D Hull Suite.
+- MJY 5m Squeeze Momentum passed again and remains SHADOW.
+- Research shadow registry increases to 16 records.
+- live_authority=false for every record; no live A+/risk/competition/execution change.
+- Durable evidence:
+  - research_benchmarks/trendilo_multitf_frozen_run1_20260924.json
+  - docs/TRENDILO_MULTITF_FROZEN_RUN1_20260924.md
