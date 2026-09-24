@@ -55,11 +55,13 @@ def test_community_catalog_separates_research_popularity_from_live_weighting():
     assert "squeeze_momentum_lazybear" in ids
     assert "wavetrend_crosses" in ids
     assert "hull_suite" in ids
+    assert "lorentzian_classification" in ids
 
 
 @pytest.mark.parametrize(
     "indicator_id",
     (
+        "lorentzian_classification",
         "ut_bot_alerts",
         "squeeze_momentum_lazybear",
         "wavetrend_crosses",
@@ -99,6 +101,7 @@ def test_symbol_benchmark_runs_each_implemented_indicator_independently():
     )
     ids = {trial.indicator_id for trial in trials}
     assert {
+        "lorentzian_classification",
         "ut_bot_alerts",
         "squeeze_momentum_lazybear",
         "wavetrend_crosses",
@@ -230,3 +233,13 @@ def test_halftrend_adapter_is_causal_and_alternates_confirmed_flip_direction():
     values = list(full.values())
     assert all(value in (-1.0, 1.0) for value in values)
     assert all(a != b for a, b in zip(values, values[1:]))
+
+
+def test_lorentzian_research_profile_fails_closed_if_history_cap_is_not_causal():
+    bars = _bars(700)
+    with pytest.raises(ValueError, match="causal_history_cap must exceed"):
+        indicator_signal_series(
+            "lorentzian_classification",
+            bars,
+            parameters={"causal_history_cap": 700},
+        )
