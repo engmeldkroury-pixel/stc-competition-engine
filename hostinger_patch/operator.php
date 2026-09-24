@@ -312,7 +312,7 @@ function sizeModeText(c){
  const proposed=c&&c.position_sizing?Number(c.position_sizing.proposed_quantity):NaN;
  const q=Number.isFinite(approved)&&approved>0?approved:proposed;
  const qty=Number.isFinite(q)?num(q,6):'-';
- if(c&&c.competition_id==='amp-futures-sep-2026')return {qty,unit:'contracts',mode:'MAX STC QUANTITY — enter this number in Units / Contracts. NEVER use % balance, trade value, or margin.'};
+ if(c&&c.competition_id==='amp-futures-sep-2026')return {qty,unit:'contracts',mode:'TradingView size mode: Units / Contracts — NOT % balance. MAX STC QUANTITY — NEVER use % balance, trade value, or margin.'};
  return {qty,unit:'units',mode:'MAX STC QUANTITY — enter this number in the platform Units field. NEVER use % balance, trade value, or margin.'};
 }
 function savePriceDraft(i){
@@ -363,7 +363,7 @@ function sizingHtml(s,c){
  const limited=(s.risk_budget_limited_by||[]).join(', ');
  const riskPct=Number(s.equity_usd)>0?Number(s.risk_amount_usd)/Number(s.equity_usd)*100:0;
  const p=c&&c.locked_trade_plan?c.locked_trade_plan:null;
- return '<div class="orderbox"><div class="small">MAX STC QUANTITY • DO NOT EXCEED • smaller quantity is allowed</div>'
+ return '<div class="orderbox"><div class="small">STC POSITION SIZE • MAX STC QUANTITY • DO NOT EXCEED • smaller quantity is allowed</div>'
   +'<div class="ordername">'+num(s.proposed_quantity,6)+' units/contracts</div>'
   +'<div class="small bad"><b>Enter this as Units / Contracts only.</b> Never copy trade value, margin, leverage value, or % balance into the quantity field.</div>'
   +'<div class="row"><span>Risk on this trade</span><span class="value">$'+num(s.risk_amount_usd,2)+' • '+num(riskPct,3)+'%</span></div>'
