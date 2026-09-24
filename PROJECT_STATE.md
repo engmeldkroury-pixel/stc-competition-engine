@@ -2401,3 +2401,35 @@ Owner intervention required now: YES — only for historical-data access, not fo
 - Permanent Live Readback now also reports sanitized notification configuration and recent delivery status.
 - Capital account remains at 0 entries, 0/3 qualifying days and USD 0 realized P/L as of this verification.
 - Next live objective: wait only for a naturally generated fresh `COMPETITION_OPPORTUNITY`, verify locked-plan visibility + Telegram delivery, then present the manual owner order ticket while still valid.
+
+
+## First fresh post-hotfix Capital opportunity — 2026-09-24 13:30 UTC
+- TradingView source bar: 2026-09-24T13:15:00Z; source bar close: 13:30 UTC.
+- GitHub process run `36006084425`: claimed=26, ingested=26, rejected=0, failed=0.
+- Post-hotfix Live Readback run `36006396237`:
+  - symbol: CAPITALCOM:EURUSD;
+  - direction: SHORT;
+  - setup grade: COMPETITION_OPPORTUNITY;
+  - setup quality: 80/100;
+  - deployed Hostinger quality gate: true;
+  - locked plan present: true;
+  - opportunity active: true.
+- Telegram NEW_LOCKED_PLAN sent successfully at 2026-09-24 13:30:22 UTC with HTTP 200.
+- Locked plan:
+  - entry_min: 1.13479407;
+  - entry_mid/reference: 1.13593;
+  - entry_max: 1.13706593;
+  - initial stop: 1.13933779;
+  - management checkpoint: 1.130818315;
+  - final take profit: 1.127410525;
+  - valid_until: 2026-09-24T14:00:00Z.
+- STC sizing proposal:
+  - equity: USD 100,000;
+  - risk fraction: 0.50%;
+  - risk budget: USD 500;
+  - proposed quantity: 137552.49003;
+  - official max position used by profile: 800000;
+  - portfolio and cluster STC risk controls both allow the proposal.
+- Macro gate status: safe; no nearby high-impact EUR/USD blackout.
+- Current direct TradingView scanner quote attempt returned HTTP 429, so live execution price must be confirmed by the owner on the competition platform before approval/order entry.
+- Human approval and manual order entry remain mandatory.
