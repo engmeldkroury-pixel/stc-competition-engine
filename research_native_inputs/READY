@@ -1,3 +1,3 @@
-ready 2026-09-24T09:12:00+03:00
-all 26 exact-provider 15m datasets staged
-wave 3 community adapters synced
+ready 2026-09-24T09:28:00+03:00
+26 exact-provider 15m datasets staged
+reconciled wave2+wave3 component ids and parameters
