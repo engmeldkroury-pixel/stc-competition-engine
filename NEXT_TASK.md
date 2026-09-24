@@ -1,51 +1,49 @@
 # NEXT TASK
 
-Updated: 2026-09-24 11:39 EEST
+Updated: 2026-09-24 12:xx EEST
 
 ## CONTROLLING PROJECT
 STC.
 
-## READ FIRST
-- docs/STC_ADAPTIVE_RESEARCH_MASTER_LEDGER.md
-- PROJECT_STATE.md
-- docs/CORRECTED_LORENTZIAN_VUMANCHU_PARTIAL_20260924.md
-- research_benchmarks/corrected_lorentzian_vumanchu_partial_20260924.json
-- docs/NATIVE_COMMUNITY_WAVE3_RECONCILED_15M_20260924.md
-- research/community_shadow_registry.json
+## CURRENT URGENT PRIORITY
+Capital.com Africa September 2026 competition acceleration without automatic order execution.
 
-## VERIFIED / ACCEPTED CURRENT STATE
-- PR #138 merged: one centralized benchmarkable selector is used by normal community benchmark and frozen confirmation.
-- PR #137 merged: sealed frozen-batch shadow weight recalibration exists.
-- PR #139 merged: run_symbol_research now consumes optional sealed shadow batches and returns research-only recalibrated candidate weights.
-- Redundancy-aware family normalization already exists in the ensemble.
-- General Lab durable queue/status UI and exact-history completion helper already exist.
-- Research live authority remains false.
-
-## ACTIVE EXTERNAL BLOCKER
-GitHub Actions currently fails some/new jobs before any step starts (steps=null).
-Do not classify these as code/test failures.
-The nine deferred official-Lorentzian exact-data symbols remain pending the same pinned-port execution.
+## VERIFIED CURRENT STATE
+- TradingView Capital MTF feed is firing every confirmed 15m cycle and webhooks return HTTP 200.
+- Official leaderboard snapshot: rank 1 +38.08%; rank 60 +11.02%.
+- Competition ends 2026-10-02 08:00 UTC and ranks by realized P/L.
+- GitHub Actions quota/capacity is an external runtime blocker for private-repository workflows.
+- Repository is still private.
+- Branch stc-competition-mode-20260924 exists from main 126febe8a414caa89b445e80afa6d548ea72e5af.
+- Competition branch adds a Capital-only opportunity gate and keeps manual approval/manual execution.
+- Latest-live replay on the new baseline logic produced:
+  - EURUSD SHORT quality 83/100 -> PASS;
+  - XAUUSD SHORT quality 80/100 -> PASS;
+  - XAGUSD SHORT quality 75/100 -> BLOCK.
+- /process serverless endpoint now drains multiple batches per invocation on the branch.
 
 ## NEXT EXECUTABLE WORK
-1. Continue high-value community candidate source/repaint audits.
-2. Add the next causal component only where source semantics support confirmed-bar use.
-3. Treat Williams Vix Fix base as context/reversal evidence unless an audited filtered-alert variant supplies causal directional triggers.
-4. Audit adaptive/ML SuperTrend scripts for online-learning leakage before any benchmark participation.
-5. Continue General Lab data-worker protocol so exact TradingView series can be supplied to the durable queue automatically when a TradingView-capable worker is available.
-6. Extend shadow outcome capture so completed research/live-shadow observations can form sealed recalibration batches without manual reconstruction.
-7. Persist every accepted cycle in PROJECT_STATE and the master ledger.
+1. Complete branch verification and inspect full diff.
+2. Open PR for stc-competition-mode-20260924.
+3. Run CI if capacity permits; if private Actions remains blocked, make a safe public-runner decision only after secret/history review.
+4. Merge only after verification evidence is adequate.
+5. Deploy the merged serverless processor and confirm /health and /process behavior.
+6. Confirm Telegram/notification path emits a competition opportunity when a fresh locked plan exists.
+7. Keep TradingView order entry manual; no broker/order automation.
+8. After go-live, monitor opportunity frequency and false-positive rate without changing thresholds after one trade.
+9. Continue research tasks only after the competition runtime path is no longer blocked.
 
-## WHEN ACTIONS CAPACITY RETURNS
-1. Execute official pinned Lorentzian on the nine deferred symbols.
-2. Produce authoritative 26-symbol Lorentzian/VuManChu summary.
-3. Run 85/15 frozen confirmation for new survivors.
-4. Re-run current-main CI for recently merged research patches as post-merge evidence.
+## PUBLIC/PRIVATE REPOSITORY DECISION
+Owner authorizes public visibility for non-critical code and accepts strategy visibility.
+Do not expose:
+- credentials/tokens/secrets;
+- private owner/admin material;
+- any secret-bearing historical commit.
+Current screening is incomplete for full Git history, so repository visibility has not yet changed.
 
 ## LIVE BOUNDARY
 - human approval/manual execution only;
-- no automatic broker execution;
-- no live A+/risk/competition rule change from research alone;
-- reviews/popularity are discovery metadata only;
-- no cross-symbol weight inheritance;
-- no repainting/future-dependent component may enter live evidence;
-- no weight change after one trade; only sealed frozen-batch recalibration.
+- no automatic broker/order execution;
+- quality score is not win probability;
+- public leaderboard returns are descriptive, not evidence that STC can reproduce them;
+- do not promise a competition win.
