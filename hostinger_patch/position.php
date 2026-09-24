@@ -55,11 +55,16 @@ try {
     if ($action === 'IMPORT_CLOSED') {
         $competitionId = trim((string)($body['competition_id'] ?? ''));
         $symbol = trim((string)($body['symbol'] ?? ''));
-        if (!in_array($competitionId, ['capital-africa-sep-2026', 'amp-futures-sep-2026'], true)
-            || $symbol === ''
-            || stc_max_open_position($competitionId, $symbol) === null) {
-            stc_json(['ok' => false, 'error' => 'invalid_position_target'], 400);
+        $resolvedTarget = stc_resolve_position_target($competitionId, $symbol);
+        if ($resolvedTarget === null) {
+            stc_json([
+                'ok' => false,
+                'error' => 'invalid_position_target',
+                'detail' => 'Select a configured competition and use a supported TradingView/provider symbol.',
+            ], 400);
         }
+        $competitionId = (string)$resolvedTarget['competition_id'];
+        $symbol = (string)$resolvedTarget['symbol'];
 
         $side = stc_position_side($body['side'] ?? null);
         $quantity = stc_num($body['quantity'] ?? null, 'quantity');
@@ -167,9 +172,16 @@ try {
     if ($action === 'OPEN') {
         $competitionId = trim((string)($body['competition_id'] ?? ''));
         $symbol = trim((string)($body['symbol'] ?? ''));
-        if (!in_array($competitionId, ['capital-africa-sep-2026', 'amp-futures-sep-2026'], true) || $symbol === '') {
-            stc_json(['ok' => false, 'error' => 'invalid_position_target'], 400);
+        $resolvedTarget = stc_resolve_position_target($competitionId, $symbol);
+        if ($resolvedTarget === null) {
+            stc_json([
+                'ok' => false,
+                'error' => 'invalid_position_target',
+                'detail' => 'Select a configured competition and use a supported TradingView/provider symbol.',
+            ], 400);
         }
+        $competitionId = (string)$resolvedTarget['competition_id'];
+        $symbol = (string)$resolvedTarget['symbol'];
         $side = stc_position_side($body['side'] ?? null);
         $quantity = stc_num($body['quantity'] ?? null, 'quantity');
         $entryPrice = stc_num($body['entry_price'] ?? null, 'entry_price');
