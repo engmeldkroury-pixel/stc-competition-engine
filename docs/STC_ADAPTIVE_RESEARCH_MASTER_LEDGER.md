@@ -651,3 +651,55 @@ The program is not considered complete after adding indicators to a catalog. Com
 9. external trader/composite source audit pipeline;
 10. frozen-window recalibration from accumulated live outcomes;
 11. explicit promotion control that keeps live A+ behavior unchanged until validated.
+
+
+### WU-105 — verified native-vs-community 15m benchmark promoted
+Status: VERIFIED / MERGED.
+- Workflow run 35916027610: SUCCESS.
+- PR #122 merged as b37cee34362dba4a27c23994f8bd147d7523f3fe.
+- CI on clean promotion branch: 369 passed, 1 warning.
+- Scope: 26 competition symbols x 5,000 exact-provider TradingView 15m bars.
+- The promoted code includes 14 causal community benchmark components used in the successful workflow:
+  - UT Bot Alerts
+  - Squeeze Momentum
+  - WaveTrend
+  - Hull Suite
+  - SuperTrend
+  - Chandelier Exit
+  - Schaff Trend Cycle
+  - Range Filter
+  - AlphaTrend
+  - Optimized Trend Tracker
+  - QQE MOD
+  - SSL Hybrid
+  - Waddah Attar Explosion
+  - QQE + SSL + WAE composite
+- Native STC 15m outcome under the current robustness gates: 0 validated symbols across the tested native families.
+- Community ensemble research profiles: 10/26 symbols.
+- Cross-symbol community validation counts:
+  - SSL Hybrid 4/26
+  - Range Filter 4/26
+  - QQE MOD 4/26
+  - Schaff Trend Cycle 4/26
+  - Waddah Attar Explosion 3/26
+  - UT Bot 3/26
+  - Chandelier Exit 2/26
+  - AlphaTrend 2/26
+  - WaveTrend 1/26
+  - SuperTrend 1/26
+  - Squeeze Momentum 1/26
+  - Hull Suite 0/26
+  - QQE+SSL+WAE composite 0/26
+  - Optimized Trend Tracker 0/26
+- Redundancy-aware family normalization is now implemented so multiple correlated variants cannot gain unlimited ensemble weight simply by being numerous.
+- Result evidence is preserved in:
+  - research_benchmarks/native_community_15m_summary_20260923.json
+  - docs/NATIVE_COMMUNITY_15M_BENCHMARK_20260923.md
+- Live authority remains unchanged: research-only, no live A+ threshold/risk/execution change.
+
+### Facebook trader-source audit blocker
+Status: BLOCKED_EXTERNAL_ACCESS.
+- Direct public fetch of both owner-provided Facebook share URLs returned login_required.
+- Read-only browser automation was attempted with a browser profile, but TinyFish did not start because its wallet balance is negative.
+- No content from those Facebook posts has been inferred or fabricated.
+- The URLs remain registered in the research ledger for audit once browser access is available or the owner supplies screenshots/video/text from the posts.
