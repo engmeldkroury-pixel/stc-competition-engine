@@ -942,3 +942,16 @@ Status: ACCEPTED / MERGED WITH EXTERNAL CI BLOCKER DISCLOSED.
 - Unified diff independently reviewed before merge.
 - GitHub Actions did not execute any step (steps=null); therefore CI remains NOT RUN.
 - Scope is research eligibility only; no live authority was introduced.
+
+
+### WU-116 — shadow recalibration integrated with symbol research
+Status: ACCEPTED / MERGED WITH EXTERNAL CI BLOCKER DISCLOSED.
+- PR #139 merged: c944dc9d276080c691dc61b492380c7f646df90a.
+- Optional sealed shadow outcome batches now feed research-only candidate weight recalibration directly from run_symbol_research().
+- Prior weights come from the redundancy-aware symbol/timeframe ensemble.
+- Unsealed batches fail closed.
+- Samples below the existing minimum retain prior weights.
+- Per-step movement remains capped by the existing recalibration engine.
+- Output is separate from base ensemble and live_authority remains false.
+- GitHub Actions run 35976346795 did not execute steps; CI = NOT RUN.
+- Acceptance basis: bounded research-only diff, explicit fail-closed validation and independent diff review.
