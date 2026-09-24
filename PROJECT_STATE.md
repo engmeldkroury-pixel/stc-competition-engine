@@ -2383,3 +2383,21 @@ Owner intervention required now: YES — only for historical-data access, not fo
 - Critical CI passed.
 - Pine compilation inside TradingView and bar-by-bar parity against the frozen Python fixtures are still NOT VERIFIED.
 - Do not copy these components into the production Capital feed until compile + parity evidence is captured.
+
+
+## Hostinger hotfix live verification — 2026-09-24 13:27 UTC
+- Owner uploaded the six-file PR #145 Hostinger hotfix.
+- Post-upload Live Readback run `36005321334` completed successfully.
+- Latest completed Capital cycle at verification time was source bar `2026-09-24T13:00:00Z`; no current symbol passed the competition gate in that cycle.
+- Telegram configuration is active; email backup is not configured.
+- Notification readback confirmed prior Telegram deliveries with HTTP 200.
+- A one-time expired-opportunity probe was run against the historical EURUSD event:
+  - event id: `capital-africa-sep-2026|CAPITALCOM:EURUSD|15|1790247600000`;
+  - historical signal had already been proven as `COMPETITION_OPPORTUNITY`;
+  - deployed Hostinger response after upload: `{"ok":true,"skipped":true,"reason":"expired_plan"}`.
+- This result is decisive for the PR #145 eligibility fix: the deployed PHP accepted the competition grade and reached the expiry check. The old deployment would have returned `quality_gate_not_passed` before expiry evaluation.
+- Therefore the A_PLUS-only Hostinger deployment mismatch is CLOSED.
+- The one-time probe was removed from the permanent Live Readback workflow immediately after verification.
+- Permanent Live Readback now also reports sanitized notification configuration and recent delivery status.
+- Capital account remains at 0 entries, 0/3 qualifying days and USD 0 realized P/L as of this verification.
+- Next live objective: wait only for a naturally generated fresh `COMPETITION_OPPORTUNITY`, verify locked-plan visibility + Telegram delivery, then present the manual owner order ticket while still valid.
