@@ -73,8 +73,8 @@ def test_record_trade_blank_open_time_uses_server_time() -> None:
 
 
 def test_competition_tabs_expose_trade_inventory_open_pnl_and_recent_completed_trades():
-    snapshot = (PATCH / "operator_snapshot.php").read_text(encoding="utf-8")
-    ui = (PATCH / "operator.php").read_text(encoding="utf-8")
+    snapshot = (OPERATOR.parent / "operator_snapshot.php").read_text(encoding="utf-8")
+    ui = _source()
     assert "'open_unrealized_pnl_usd' => 0.0" in snapshot
     assert "'open_unrealized_known_positions' => 0" in snapshot
     assert "'open_unrealized_unknown_positions' => 0" in snapshot
