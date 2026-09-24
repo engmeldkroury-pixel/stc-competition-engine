@@ -308,10 +308,12 @@ function deriveOrderInstruction(c,price){
  return {order_type:'SELL STOP-LIMIT',side:'SELL',status:'wait_breakdown_into_zone',trigger_price:high,limit_price:low,explanation:'Price is above the zone. Enter only if price falls into it.'};
 }
 function sizeModeText(c){
- const q=c&&c.position_sizing?Number(c.position_sizing.proposed_quantity):NaN;
+ const approved=c&&c.approval&&c.approval.execution_ticket?Number(c.approval.execution_ticket.max_quantity):NaN;
+ const proposed=c&&c.position_sizing?Number(c.position_sizing.proposed_quantity):NaN;
+ const q=Number.isFinite(approved)&&approved>0?approved:proposed;
  const qty=Number.isFinite(q)?num(q,6):'-';
- if(c&&c.competition_id==='amp-futures-sep-2026')return {qty,unit:'contracts',mode:'TradingView size mode: Units / Contracts — NOT % balance'};
- return {qty,unit:'units',mode:'Use the platform quantity/units field — NOT % balance'};
+ if(c&&c.competition_id==='amp-futures-sep-2026')return {qty,unit:'contracts',mode:'MAX STC QUANTITY — enter this number in Units / Contracts. NEVER use % balance, trade value, or margin.'};
+ return {qty,unit:'units',mode:'MAX STC QUANTITY — enter this number in the platform Units field. NEVER use % balance, trade value, or margin.'};
 }
 function savePriceDraft(i){
  const c=snapshot&&snapshot.cards?snapshot.cards[i]:null;
@@ -361,8 +363,9 @@ function sizingHtml(s,c){
  const limited=(s.risk_budget_limited_by||[]).join(', ');
  const riskPct=Number(s.equity_usd)>0?Number(s.risk_amount_usd)/Number(s.equity_usd)*100:0;
  const p=c&&c.locked_trade_plan?c.locked_trade_plan:null;
- return '<div class="orderbox"><div class="small">STC POSITION SIZE • use this quantity unless the competition platform forces a smaller valid amount</div>'
+ return '<div class="orderbox"><div class="small">MAX STC QUANTITY • DO NOT EXCEED • smaller quantity is allowed</div>'
   +'<div class="ordername">'+num(s.proposed_quantity,6)+' units/contracts</div>'
+  +'<div class="small bad"><b>Enter this as Units / Contracts only.</b> Never copy trade value, margin, leverage value, or % balance into the quantity field.</div>'
   +'<div class="row"><span>Risk on this trade</span><span class="value">$'+num(s.risk_amount_usd,2)+' • '+num(riskPct,3)+'%</span></div>'
   +'<div class="row"><span>Configured risk budget</span><span class="value">$'+num(s.risk_budget_usd,2)+' • '+num(Number(s.risk_fraction)*100,3)+'%</span></div>'
   +'<div class="row"><span>Official max open position</span><span class="value">'+num(s.max_position,6)+'</span></div>'
@@ -482,6 +485,21 @@ function latestLockedPlanContextHtml(c){
    +' • failures: '+failures+'</div></div>';
 }
 
+function approvedExecutionTicketHtml(c){
+ const t=c&&c.approval&&c.approval.execution_ticket;
+ if(!t)return '';
+ const oi=t.order_instruction||{};
+ const order=(oi.side?oi.side+' ':'')+(oi.order_type||'ENTRY');
+ return '<div class="orderbox"><div class="small ok"><b>APPROVED EXECUTION TICKET</b> • valid only while the 60-second approval remains fresh</div>'
+  +'<div class="row"><span>MAX STC QUANTITY</span><span class="value ok">'+num(t.max_quantity,6)+'</span></div>'
+  +'<div class="row"><span>Order</span><span class="value">'+esc(order)+'</span></div>'
+  +'<div class="row"><span>Approved quote</span><span class="value">'+formatPlatformPrice(c.symbol,t.approved_quote_price)+'</span></div>'
+  +'<div class="row"><span>Stop loss</span><span class="value">'+formatPlatformPrice(c.symbol,t.initial_stop)+'</span></div>'
+  +'<div class="row"><span>Final take profit</span><span class="value">'+formatPlatformPrice(c.symbol,t.final_take_profit)+'</span></div>'
+  +'<div class="small bad"><b>Never exceed MAX STC QUANTITY.</b> Enter the number in Units / Contracts only. Smaller is allowed. If price/order conditions change, reconfirm instead of improvising.</div>'
+  +'</div>';
+}
+
 function cardHtml(c,i){
  const active=isOpportunityActive(c);
  const cls=c.recommendation==='LONG'?'long':c.recommendation==='SHORT'?'short':'wait';
@@ -489,9 +507,10 @@ function cardHtml(c,i){
  const reasons=(c.reasons||[]).slice(0,12).map(x=>'<span class="pill">'+esc(x)+'</span>').join('');
  const sizingAllowed=!c.position_sizing || (c.position_sizing.allowed_by_position_limit!==false && c.position_sizing.allowed_by_risk_policy!==false);
  const macroAllowed=!(c.macro_context&&c.macro_context.block_new_approval);
+ const cooldownActive=!!(c.loss_cooldown&&c.loss_cooldown.active);
  const controlOpen=!!(snapshot&&snapshot.runtime_control&&!snapshot.runtime_control.safe_mode&&!snapshot.runtime_control.kill_switch);
  const latestCompatible=!c.latest_signal_context||c.latest_signal_context.same_event||c.latest_signal_context.approval_compatible_with_locked_plan!==false;
- const canApprove=active&&(c.recommendation==='LONG'||c.recommendation==='SHORT')&&!!c.locked_trade_plan&&sizingAllowed&&macroAllowed&&controlOpen&&latestCompatible;
+ const canApprove=active&&(c.recommendation==='LONG'||c.recommendation==='SHORT')&&!!c.locked_trade_plan&&sizingAllowed&&macroAllowed&&!cooldownActive&&controlOpen&&latestCompatible;
  const competitionLabel=c.competition_id==='amp-futures-sep-2026'?'AMP Futures':'Capital.com Africa';
  const recoveryOnly=isLockedPlanVisible(c)&&!active;
  const statusBadge=c.recommendation==='WAIT'
@@ -503,6 +522,7 @@ function cardHtml(c,i){
  else if(!active&&c.recommendation!=='WAIT')blockReason='Expired opportunities are removed automatically from opportunity lists.';
  else if(active&&!latestCompatible)blockReason='The locked plan is still shown so an already-filled trade can be recorded, but the newest confirmed bar is no longer aligned. Do not create a new entry from this plan.';
  else if(!controlOpen)blockReason='SAFE MODE / KILL SWITCH is ON. Enable manual approval mode before approving.';
+ else if(cooldownActive)blockReason='ANTI-CHURN COOLDOWN: a recent losing trade in the same symbol/direction is too recent. Wait for a fresh setup after the cooldown.';
  else if(!sizingAllowed)blockReason='New entry blocked by sizing / risk capacity.';
  else if(!macroAllowed)blockReason='New entry blocked by macro-risk gate.';
 
@@ -546,7 +566,7 @@ function cardHtml(c,i){
    +'<div class="statusline">'+statusBadge+'<span class="pill">'+esc(competitionLabel)+'</span><span class="pill">'+esc(c.setup_grade||'MONITOR_ONLY')+'</span></div>'
    +'<div class="row"><span>Signal score</span><span class="value '+cls+'">'+esc(c.recommendation)+' '+num(c.composite_score,2)+'</span></div>'
    +'<div class="row"><span>Latest confirmed bar</span><span class="value">'+formatLocalTime(c.source_close_time||c.source_time)+' • '+formatAgeSeconds(c.source_age_seconds)+'</span></div>'
-   +convictionHtml(c)+planHtml(p,c)+sizingHtml(c.position_sizing,c)+macroHtml(c.macro_context)
+   +convictionHtml(c)+planHtml(p,c)+sizingHtml(c.position_sizing,c)+approvedExecutionTicketHtml(c)+macroHtml(c.macro_context)
    +'<div class="row"><span>Approval</span><span class="value">'+esc(a.decision||'not approved yet')+'</span></div>'
    +'<div class="row"><span>Ready to execute</span><span class="value '+(c.manual_execution_ready?'ok':'wait')+'">'+(c.manual_execution_ready?'YES':'NO')+'</span></div>'
    +(blockReason?'<div class="small wait" style="margin:8px 0">'+esc(blockReason)+'</div>':'')
@@ -1006,7 +1026,10 @@ function recordFilledPosition(i){
  $('pos-card-index').value=String(i);
  $('pos-symbol').value=normalizePositionSymbolForCompetition(c.competition_id,c.symbol);
  $('pos-side').value=p.direction;
- $('pos-qty').value=c.position_sizing&&c.position_sizing.proposed_quantity?c.position_sizing.proposed_quantity:'';
+ const approvedMax=c.approval&&c.approval.execution_ticket?Number(c.approval.execution_ticket.max_quantity):NaN;
+ $('pos-qty').value=Number.isFinite(approvedMax)&&approvedMax>0
+   ?approvedMax
+   :(c.position_sizing&&c.position_sizing.proposed_quantity?c.position_sizing.proposed_quantity:'');
  $('pos-entry').value=Number.isFinite(Number(c.current_price))?formatPlatformInput(c.symbol,c.current_price):formatPlatformInput(c.symbol,p.entry_mid);
  $('pos-stop').value=formatPlatformInput(c.symbol,p.initial_stop,planTickMode(p.direction,'stop'));
  $('pos-tp').value=formatPlatformInput(c.symbol,p.target2,planTickMode(p.direction,'target'));
@@ -1044,6 +1067,12 @@ async function submitPositionModal(){
    const c=cardIndex!==null&&snapshot&&snapshot.cards?snapshot.cards[cardIndex]:null;
    const p=c&&c.locked_trade_plan?c.locked_trade_plan:null;
    if(!c||!p||!c.approval||c.approval.decision!=='approved'){setPositionModalMessage('The approved STC plan is no longer available. Use the existing-manual-position workflow instead.');return;}
+   const approvedTicket=c.approval.execution_ticket||null;
+   const approvedMax=approvedTicket?Number(approvedTicket.max_quantity):NaN;
+   if(Number.isFinite(approvedMax)&&approvedMax>0&&qty>approvedMax+Math.max(1e-9,approvedMax*1e-8)){
+     setPositionModalMessage('BLOCKED: filled quantity exceeds the approved STC risk ticket. Maximum approved quantity is '+num(approvedMax,6)+'. If an oversized fill already happened on the platform, record it as an existing manual position for supervision; do not label it as an STC-compliant fill.');
+     return;
+   }
    body={action:'OPEN',origin:'stc_plan',competition_id:competitionId,symbol,side,quantity:qty,entry_price:entry,initial_stop:stop,current_stop:stop,target1:p.target1,target2:finalTp,source_plan_id:p.plan_id,opened_at_utc:openedUtc,note:'Owner-confirmed manual fill via inline form'};
  }else{
    const checkpoint=(entry+finalTp)/2;
@@ -1066,7 +1095,11 @@ async function submitPositionModal(){
          ?'The entered open time is before the configured competition start. Leave the field blank to use STC server time, or enter the real platform fill time.'
          :raw.includes('opened_at_out_of_range')
            ?'The entered open time is outside the allowed range. Leave it blank to use STC server time automatically.'
-           :raw;
+           :raw.includes('filled_quantity_exceeds_stc_risk_ticket')
+             ?'BLOCKED: the filled quantity is larger than the approved STC maximum. Record an already-executed oversized trade as an existing manual position for supervision, not as an STC-compliant fill.'
+             :raw.includes('stc_risk_capacity_unavailable_at_fill_record')
+               ?'STC risk capacity changed or is unavailable. Do not add risk. If the platform fill already happened, use the existing-manual-position recovery workflow.'
+               :raw;
    setPositionModalMessage('Position record failed: '+friendly);
  }finally{
    $('position-submit').disabled=false;
@@ -1113,6 +1146,10 @@ function approvalReasonText(reason){
    quality_gate_not_passed:'The required setup quality gate is no longer passed.',
    macro_high_impact_blackout:'A high-impact macro blackout is active.',
    macro_calendar_unavailable_fail_closed:'Macro calendar is unavailable, so approval fails closed.',
+   existing_open_position:'An open position already exists for this symbol. Manage it instead of opening another trade.',
+   same_direction_loss_cooldown:'A recent losing trade in the same symbol/direction is still inside the anti-churn cooldown. Wait for fresh confirmation.',
+   risk_capacity_unavailable:'Current STC portfolio/risk capacity does not permit a new fill.',
+   locked_plan_unavailable:'The locked plan is unavailable or no longer executable.',
    invalid_quote_price:'The entered price is invalid.',
    market_not_open:'The market is not open.'
  };
@@ -1133,7 +1170,15 @@ async function approveCard(i,decision){
  if(feedback)feedback.textContent='Submitting '+decision+'…';
  try{
    const r=await api('approval.php',{method:'POST',body:JSON.stringify(body)});
-   if(feedback)feedback.textContent='Decision: '+r.decision;
+   if(feedback){
+     const t=r.execution_ticket||null;
+     if(r.decision==='approved'&&t){
+       const oi=t.order_instruction||{};
+       feedback.textContent='APPROVED FOR 60s • MAX QTY '+num(t.max_quantity,6)+' • '+(oi.side?oi.side+' ':'')+(oi.order_type||'ENTRY')+' • SL '+formatPlatformPrice(c.symbol,t.initial_stop)+' • FINAL TP '+formatPlatformPrice(c.symbol,t.final_take_profit)+' • DO NOT EXCEED QUANTITY.';
+     }else{
+       feedback.textContent='Decision: '+r.decision;
+     }
+   }
    await refresh();
  }catch(e){
    const reasons=e.payload&&Array.isArray(e.payload.reasons)?e.payload.reasons:[];
