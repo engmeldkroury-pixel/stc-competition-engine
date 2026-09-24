@@ -282,23 +282,27 @@ try {
             } elseif ($hasOpenPosition) {
                 $pendingPlanAction = 'MANAGE_EXISTING_POSITION';
             } elseif (in_array($recommendation, ['LONG', 'SHORT'], true)) {
-                $opportunityActive = true;
-                try {
-                    $orderInstruction = stc_entry_order_instruction(
-                        $recommendation,
-                        (float)($payload['close'] ?? 0.0),
-                        (float)$lockedPlan['entry_min'],
-                        (float)$lockedPlan['entry_max']
-                    );
-                } catch (Throwable $e) {
-                    $orderInstruction = [
-                        'order_type' => 'UNKNOWN',
-                        'side' => null,
-                        'status' => 'instruction_unavailable',
-                        'trigger_price' => null,
-                        'limit_price' => null,
-                        'explanation' => 'Order instruction could not be derived safely.',
-                    ];
+                if ($latestApprovalCompatible) {
+                    $opportunityActive = true;
+                    try {
+                        $orderInstruction = stc_entry_order_instruction(
+                            $recommendation,
+                            (float)($payload['close'] ?? 0.0),
+                            (float)$lockedPlan['entry_min'],
+                            (float)$lockedPlan['entry_max']
+                        );
+                    } catch (Throwable $e) {
+                        $orderInstruction = [
+                            'order_type' => 'UNKNOWN',
+                            'side' => null,
+                            'status' => 'instruction_unavailable',
+                            'trigger_price' => null,
+                            'limit_price' => null,
+                            'explanation' => 'Order instruction could not be derived safely.',
+                        ];
+                    }
+                } else {
+                    $pendingPlanAction = 'PRESERVE_FOR_RECOVERY';
                 }
             }
         }
