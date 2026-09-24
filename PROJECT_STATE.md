@@ -2262,3 +2262,19 @@ Owner intervention required now: YES — only for historical-data access, not fo
   - competition-mode processing proven live end-to-end: NO;
   - Telegram COMPETITION_OPPORTUNITY delivery proven live: NO;
   - automatic broker execution: NO.
+
+
+## Latest Capital replay after merged competition logic — 2026-09-24 09:30 UTC
+- TradingView Capital MTF alerts emitted a fresh ten-symbol cycle with webhook HTTP 200.
+- Replayed the merged Capital competition gate against the latest confirmed payloads:
+  - CAPITALCOM:EURUSD: pre-gate SHORT, composite -0.622, setup quality 81/100 -> PASS.
+  - CAPITALCOM:XAUUSD: pre-gate SHORT, composite -0.415, setup quality 79/100 -> PASS.
+  - CAPITALCOM:XAGUSD: pre-gate SHORT, setup quality 74/100 -> BLOCK.
+  - CAPITALCOM:DOGEUSD: pre-gate SHORT, setup quality 72/100 -> BLOCK (intraday majority alignment not met).
+  - remaining Capital symbols -> WAIT/BLOCK.
+- EURUSD and XAUUSD therefore passed the competition gate on two consecutive observed 15m cycles (09:15 and 09:30 UTC) in replay.
+- Replay-only locked-plan calculations using the current source rules:
+  - EURUSD reference 1.13738; entry envelope 1.13624262..1.13851738; stop 1.14079214; checkpoint 1.13226179; final target 1.12884965.
+  - XAUUSD reference 4251.90; entry envelope 4247.6247..4256.1753; stop 4266.4360; checkpoint 4230.0960; final target 4215.5600.
+- These levels are historical replay evidence from the 09:30 UTC confirmed bar only. They are not live-persisted owner approvals and must not be treated as fresh orders after the plan validity window or outside the locked entry envelope.
+- Runtime blocker remains: private GitHub Actions allowance exhausted; live processing/Telegram path has not yet consumed these fresh events under the merged code.
