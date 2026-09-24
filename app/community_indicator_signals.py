@@ -1228,6 +1228,72 @@ def rsi_kernel_pivot_signals(
     return out
 
 
+def lorentzian_classification_signals(
+    bars: list[Bar],
+    *,
+    source: str = "close",
+    neighbors_count: int = 8,
+    max_bars_back: int = 2000,
+    feature_count: int = 5,
+    include_full_history: bool = False,
+    use_volatility_filter: bool = True,
+    use_regime_filter: bool = True,
+    regime_threshold: float = -0.1,
+    use_adx_filter: bool = False,
+    adx_threshold: int = 20,
+    use_kernel_filter: bool = True,
+    use_kernel_smoothing: bool = False,
+    kernel_h: int = 8,
+    kernel_r: float = 8.0,
+    kernel_x: int = 25,
+    kernel_lag: int = 2,
+) -> dict[int, float]:
+    """Exact official AI Edge Lorentzian Classification entry stream.
+
+    STC delegates the classifier/filter/kernel business logic to the official
+    parity-tested MIT-licensed Python port pinned in requirements.txt. STC only
+    maps confirmed Buy/Sell booleans into its {-1,+1} research signal format.
+    """
+    from lorentzian_classification import LorentzianClassification, Settings
+
+    records = [
+        {
+            "time": bar.timestamp.isoformat(),
+            "open": bar.open,
+            "high": bar.high,
+            "low": bar.low,
+            "close": bar.close,
+        }
+        for bar in bars
+    ]
+    settings = Settings(
+        source=source,
+        neighbors_count=neighbors_count,
+        max_bars_back=max_bars_back,
+        feature_count=feature_count,
+        include_full_history=include_full_history,
+        use_volatility_filter=use_volatility_filter,
+        use_regime_filter=use_regime_filter,
+        regime_threshold=regime_threshold,
+        use_adx_filter=use_adx_filter,
+        adx_threshold=adx_threshold,
+        use_kernel_filter=use_kernel_filter,
+        use_kernel_smoothing=use_kernel_smoothing,
+        kernel_h=kernel_h,
+        kernel_r=kernel_r,
+        kernel_x=kernel_x,
+        kernel_lag=kernel_lag,
+    )
+    model = LorentzianClassification(records, settings=settings)
+    out: dict[int, float] = {}
+    for i, row in enumerate(model.results):
+        if row.buy and not row.sell:
+            out[i] = 1.0
+        elif row.sell and not row.buy:
+            out[i] = -1.0
+    return out
+
+
 def indicator_signal_series(
     indicator_id: str,
     bars: list[Bar],
@@ -1235,6 +1301,8 @@ def indicator_signal_series(
     parameters: dict | None = None,
 ) -> dict[int, float]:
     params = dict(parameters or {})
+    if indicator_id == "lorentzian_classification":
+        return lorentzian_classification_signals(bars, **params)
     if indicator_id == "ut_bot_alerts":
         return ut_bot_signals(bars, **params)
     if indicator_id == "squeeze_momentum_lazybear":
