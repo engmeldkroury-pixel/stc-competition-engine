@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime
+import math
 from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
@@ -187,6 +188,22 @@ class TradingViewWebhook(BaseModel):
     history_momentum_126: float | None = None
     history_momentum_252: float | None = None
     history_volatility_20: float | None = None
+    community_component_signals: dict[str, float] | None = None
+
+    @model_validator(mode="after")
+    def validate_community_component_signals(self):
+        signals = self.community_component_signals
+        if signals is None:
+            return self
+        if len(signals) > 20:
+            raise ValueError("community component payload is limited to 20 signals")
+        for component, value in signals.items():
+            if not component or len(component) > 80:
+                raise ValueError("community component id is invalid")
+            number = float(value)
+            if not math.isfinite(number) or not -1.0 <= number <= 1.0:
+                raise ValueError(f"community component {component} must be finite and between -1 and 1")
+        return self
 
     @model_validator(mode="after")
     def validate_confirmation_context(self):

@@ -15,9 +15,9 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  test:
+  critical:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 8
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -31,5 +31,42 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Run automated tests
+      - name: Run competition-critical tests
+        run: >-
+          pytest -q
+          tests/test_api.py
+          tests/test_approval.py
+          tests/test_bridge_client.py
+          tests/test_bridge_worker.py
+          tests/test_cloud_approval.py
+          tests/test_cloud_readback_api.py
+          tests/test_event_decision.py
+          tests/test_execution_context.py
+          tests/test_hostinger_patch_contract.py
+          tests/test_notification_contract.py
+          tests/test_portfolio.py
+          tests/test_release_smoke.py
+          tests/test_risk.py
+          tests/test_serverless_app.py
+          tests/test_serverless_worker.py
+          tests/test_signals.py
+          tests/test_trade_plan.py
+
+  full:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run full automated test suite
         run: pytest -q

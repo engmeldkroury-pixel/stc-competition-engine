@@ -7,6 +7,7 @@ from pydantic import ValidationError
 from .approval import build_approval_envelope
 from .calibration_registry import calibration_to_public_dict, lookup_runtime_calibration
 from .competition_profiles import get_profile
+from .community_live_shadow import build_component_shadow_snapshot
 from .evidence_engine import aggregate_live_family_scores
 from .models import FactorScores, SignalEvaluationRequest, TradingViewWebhook
 from .pipeline_receipt import build_pipeline_receipt
@@ -250,6 +251,11 @@ def decide_bridge_event(event_id: str, payload: dict) -> dict:
     result_dict["quality_floor"] = quality_floor
     result_dict["pre_gate_recommendation"] = base_result.recommendation
     result_dict["quality_gate_failures"] = gate_failures
+    result_dict["community_component_shadow"] = build_component_shadow_snapshot(
+        tv.symbol,
+        str(tv.timeframe),
+        tv.community_component_signals,
+    )
     result_dict["live_family_evidence"] = None if family_evidence is None else {
         "score": family_evidence.score,
         "agreement_ratio": family_evidence.agreement_ratio,
