@@ -1,0 +1,7 @@
+test_id,status,scope,evidence
+T-STC-145,PASS,"PR145 full CI","Run 35987882608 completed success"
+T-STC-148-CRITICAL,PASS,"Competition-critical plus community-shadow boundary tests","Run 35993238769 critical: 155 passed 1 warning"
+T-STC-LIVE-READBACK,PASS,"Authenticated sanitized production snapshot","Run 35992932406 success"
+T-STC-LIVE-PROCESS,PASS,"Production bridge processing","Run 35991923114 claimed 25 ingested 25 rejected 0 failed 0"
+T-STC-PARITY,PASS,"Python community parity fixture generation","Run 35992849854: 6/6 fixture jobs + combine success"
+T-STC-HOTFIX-BUNDLE,PASS,"Six-file Hostinger bundle generation","Run 35993270128 success; local ZIP SHA-256 a4b3acddc468a9f95c3813dd3a18b201b31e12517ebb788445202fdbd1b3a93a"
