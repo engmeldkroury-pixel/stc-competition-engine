@@ -41,3 +41,10 @@ Do not promote community weights before exact parity evidence.
 - no silent provider substitution;
 - no setup-quality-as-win-probability claim;
 - no weight promotion without parity and separate acceptance.
+
+
+## Pine candidate status
+- PR #152 merged as `529f8efc3fa9bce06de16236dd8275cd6fb42c25`.
+- Diagnostic file: `tradingview/STC_COMMUNITY_SHADOW_PARITY_CANDIDATE.pine`.
+- Critical CI passed.
+- TradingView compile and exact event parity remain pending and are required before production-feed integration.
