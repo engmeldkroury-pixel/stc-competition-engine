@@ -13,25 +13,25 @@ Capital.com Africa September 2026 competition acceleration without automatic ord
 - Official leaderboard snapshot: rank 1 +38.08%; rank 60 +11.02%.
 - Competition ends 2026-10-02 08:00 UTC and ranks by realized P/L.
 - GitHub Actions quota/capacity is an external runtime blocker for private-repository workflows.
-- Repository is still private.
-- Branch stc-competition-mode-20260924 exists from main 126febe8a414caa89b445e80afa6d548ea72e5af.
-- Competition branch adds a Capital-only opportunity gate and keeps manual approval/manual execution.
+- Repository is still private; owner has authorized public visibility for non-critical code.
+- PR #140 is merged as 403db181e9ce43772b95215a8187f0dfcf0a4f78; Capital-only competition mode is now on main.
+- PR #141 is merged as d7664ec2492d36cdd6eb713b9e0769d387a77a54; Telegram/email now accepts COMPETITION_OPPORTUNITY plans in source.
 - Latest-live replay on the new baseline logic produced:
   - EURUSD SHORT quality 83/100 -> PASS;
   - XAUUSD SHORT quality 80/100 -> PASS;
   - XAGUSD SHORT quality 75/100 -> BLOCK.
-- /process serverless endpoint now drains multiple batches per invocation on the branch.
+- /process serverless endpoint now drains multiple batches per invocation on main.
+- Live Hostinger notification file and serverless deployment still require runtime deployment/verification.
 
 ## NEXT EXECUTABLE WORK
-1. Complete branch verification and inspect full diff.
-2. Open PR for stc-competition-mode-20260924.
-3. Run CI if capacity permits; if private Actions remains blocked, make a safe public-runner decision only after secret/history review.
-4. Merge only after verification evidence is adequate.
-5. Deploy the merged serverless processor and confirm /health and /process behavior.
-6. Confirm Telegram/notification path emits a competition opportunity when a fresh locked plan exists.
-7. Keep TradingView order entry manual; no broker/order automation.
-8. After go-live, monitor opportunity frequency and false-positive rate without changing thresholds after one trade.
-9. Continue research tasks only after the competition runtime path is no longer blocked.
+1. Change repository visibility to Public in GitHub Settings so standard GitHub-hosted Actions can run without the exhausted private-minutes allowance.
+2. Immediately confirm the new STC CI and STC Process Bridge Events jobs actually start with non-null steps.
+3. Deploy the merged serverless processor and hostinger_patch/notification_control.php to the live runtimes.
+4. Trigger/process a fresh Capital cycle and confirm a COMPETITION_OPPORTUNITY locked plan is persisted.
+5. Confirm Telegram delivery status is sent, not skipped, for that fresh plan.
+6. Keep TradingView order entry manual; no broker/order automation.
+7. Monitor opportunity frequency and false-positive rate without changing thresholds after one trade.
+8. Continue research tasks after the competition runtime path is operational.
 
 ## PUBLIC/PRIVATE REPOSITORY DECISION
 Owner authorizes public visibility for non-critical code and accepts strategy visibility.
