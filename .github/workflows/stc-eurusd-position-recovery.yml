@@ -1,0 +1,102 @@
+name: STC EURUSD Existing Position Recovery
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/stc-eurusd-position-recovery.yml"
+      - "ops/EURUSD_POSITION_RECOVERY_TRIGGER"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: stc-eurusd-position-recovery
+  cancel-in-progress: false
+
+jobs:
+  recover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      STC_OWNER_TOKEN: ${{ secrets.STC_OWNER_TOKEN }}
+    steps:
+      - name: Record existing EURUSD position idempotently
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "${STC_OWNER_TOKEN:-}"
+
+          curl -fsS --retry 2 --max-time 20 \
+            -H "Authorization: Bearer ${STC_OWNER_TOKEN}" \
+            "https://stc.feama.site/position.php?competition_id=capital-africa-sep-2026&status=OPEN" \
+            > /tmp/positions_before.json
+
+          python - <<'PY' > /tmp/recovery_action.txt
+          import json
+          data=json.load(open('/tmp/positions_before.json'))
+          found=[]
+          for p in data.get('positions') or []:
+              if p.get('competition_id')=='capital-africa-sep-2026' and p.get('symbol')=='CAPITALCOM:EURUSD' and p.get('status')=='OPEN':
+                  found.append(p)
+          print('SKIP' if found else 'CREATE')
+          if found:
+              p=found[0]
+              safe={k:p.get(k) for k in ('position_id','competition_id','symbol','side','quantity','entry_price','current_stop','target1','target2','opened_at_utc','status')}
+              print('STC_RECOVERY_EXISTING='+json.dumps(safe,sort_keys=True))
+          PY
+
+          action="$(head -n1 /tmp/recovery_action.txt)"
+          tail -n +2 /tmp/recovery_action.txt || true
+
+          if [ "${action}" = "CREATE" ]; then
+            cat >/tmp/recovery_payload.json <<'JSON'
+          {
+            "action": "OPEN",
+            "origin": "manual_external",
+            "competition_id": "capital-africa-sep-2026",
+            "symbol": "CAPITALCOM:EURUSD",
+            "side": "SHORT",
+            "quantity": 137552,
+            "entry_price": 1.13677,
+            "initial_stop": 1.13930,
+            "current_stop": 1.13930,
+            "target1": 1.130818315,
+            "target2": 1.12740,
+            "opened_at_utc": "2026-09-24T13:51:00Z",
+            "note": "Owner-confirmed existing TradingView Paper Trading position recovery from 2026-09-24 screenshots. STC did not place the broker order. Actual platform fill: SHORT 137552 @ 1.13677, SL 1.13930, final TP 1.12740. Management checkpoint retained from the original STC locked plan."
+          }
+          JSON
+
+            curl -fsS --retry 2 --max-time 20 \
+              -H "Authorization: Bearer ${STC_OWNER_TOKEN}" \
+              -H "Content-Type: application/json" \
+              -d @/tmp/recovery_payload.json \
+              "https://stc.feama.site/position.php" \
+              > /tmp/recovery_result.json
+
+            python - <<'PY'
+          import json
+          data=json.load(open('/tmp/recovery_result.json'))
+          p=data.get('position') or {}
+          safe={k:p.get(k) for k in ('position_id','competition_id','symbol','side','quantity','entry_price','current_stop','target1','target2','opened_at_utc','status')}
+          print('STC_RECOVERY_CREATED='+json.dumps(safe,sort_keys=True))
+          PY
+          fi
+
+          curl -fsS --retry 2 --max-time 20 \
+            -H "Authorization: Bearer ${STC_OWNER_TOKEN}" \
+            "https://stc.feama.site/position.php?competition_id=capital-africa-sep-2026&status=OPEN" \
+            > /tmp/positions_after.json
+
+          python - <<'PY'
+          import json
+          data=json.load(open('/tmp/positions_after.json'))
+          rows=[]
+          for p in data.get('positions') or []:
+              if p.get('competition_id')=='capital-africa-sep-2026' and p.get('symbol')=='CAPITALCOM:EURUSD':
+                  rows.append({k:p.get(k) for k in ('position_id','competition_id','symbol','side','quantity','entry_price','current_stop','target1','target2','opened_at_utc','status')})
+          print('STC_RECOVERY_VERIFY='+json.dumps(rows,sort_keys=True))
+          if len(rows)!=1:
+              raise SystemExit('expected exactly one open EURUSD position in STC after recovery')
+          PY
