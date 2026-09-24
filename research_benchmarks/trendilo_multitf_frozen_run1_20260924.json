@@ -1,0 +1,185 @@
+{
+  "schema": "stc-trendilo-multitf-frozen-v1",
+  "run_id": 35947248551,
+  "status": "SUCCESS",
+  "source": "TradingView Official MCP exact-symbol OHLCV; 2h derived from exact 1h",
+  "live_authority": false,
+  "symbols": [
+    {
+      "symbol": "CAPITALCOM:BTCUSD",
+      "trendilo_15m_supporting_timeframes": [],
+      "result": "NO_SAME_COMPONENT_MULTITF_CONFIRMATION",
+      "frozen_passes": [
+        {
+          "timeframe": "5",
+          "component_id": "nadaraya_watson_endpoint_nonrepaint",
+          "family": "kernel_reversal",
+          "selected_parameters": {
+            "bandwidth": 6,
+            "deviation_length": 499,
+            "multiplier": 2.5,
+            "window": 500
+          },
+          "development_test": {
+            "trades": 21,
+            "expectancy_r": 0.30337909599089896,
+            "profit_factor": 1.6081603448510942
+          },
+          "development_forward": {
+            "trades": 17,
+            "expectancy_r": 0.23439797796841463,
+            "profit_factor": 1.47086987257643
+          },
+          "frozen": {
+            "trades": 15,
+            "expectancy_r": 0.42584038471475455,
+            "profit_factor": 2.0236547709489288,
+            "max_drawdown_r": 2.0799999999999974
+          }
+        },
+        {
+          "timeframe": "1D",
+          "component_id": "hull_suite",
+          "family": "trend",
+          "selected_parameters": {
+            "length": 89
+          },
+          "development_test": {
+            "trades": 74,
+            "expectancy_r": 0.10337543548205477,
+            "profit_factor": 1.2147034375641625
+          },
+          "development_forward": {
+            "trades": 75,
+            "expectancy_r": 0.26458882079961055,
+            "profit_factor": 1.575332087568714
+          },
+          "frozen": {
+            "trades": 64,
+            "expectancy_r": 0.15120133438504166,
+            "profit_factor": 1.3281864356023445,
+            "max_drawdown_r": 11.157726715760916
+          }
+        }
+      ],
+      "insufficient_history": [
+        "120"
+      ],
+      "no_frozen_pass": [
+        "30",
+        "60",
+        "240"
+      ]
+    },
+    {
+      "symbol": "CME_MINI:MJY1!",
+      "result": "TRENDILO_MULTITF_CONFIRMED",
+      "same_component_support": {
+        "component_id": "trendilo",
+        "primary_timeframe": "15",
+        "supporting_timeframes": [
+          "5",
+          "30"
+        ]
+      },
+      "frozen_passes": [
+        {
+          "timeframe": "5",
+          "component_id": "trendilo",
+          "family": "adaptive_momentum",
+          "selected_parameters": {
+            "alma_offset": 0.85,
+            "alma_sigma": 6,
+            "band_multiplier": 1,
+            "lookback": 50,
+            "smoothing": 1
+          },
+          "development_test": {
+            "trades": 29,
+            "expectancy_r": 0.2245935054479893,
+            "profit_factor": 1.3914189698312343
+          },
+          "development_forward": {
+            "trades": 27,
+            "expectancy_r": 0.2549319482565778,
+            "profit_factor": 1.5076078615728352
+          },
+          "frozen": {
+            "trades": 25,
+            "expectancy_r": 0.2438447917708707,
+            "profit_factor": 1.431593858379226,
+            "max_drawdown_r": 3.844667614976516
+          }
+        },
+        {
+          "timeframe": "30",
+          "component_id": "trendilo",
+          "family": "adaptive_momentum",
+          "selected_parameters": {
+            "alma_offset": 0.85,
+            "alma_sigma": 6,
+            "band_multiplier": 1.25,
+            "lookback": 50,
+            "smoothing": 1
+          },
+          "development_test": {
+            "trades": 22,
+            "expectancy_r": 0.2503424086713001,
+            "profit_factor": 1.5040791103320825
+          },
+          "development_forward": {
+            "trades": 23,
+            "expectancy_r": 0.2383200194324719,
+            "profit_factor": 1.4054260685611515
+          },
+          "frozen": {
+            "trades": 18,
+            "expectancy_r": 0.1617347168329894,
+            "profit_factor": 1.2693390210145226,
+            "max_drawdown_r": 4.160000000000043
+          }
+        },
+        {
+          "timeframe": "5",
+          "component_id": "squeeze_momentum_lazybear",
+          "family": "volatility_momentum",
+          "selected_parameters": {
+            "bb_mult": 2,
+            "kc_mult": 1.5,
+            "length": 14
+          },
+          "development_test": {
+            "trades": 109,
+            "expectancy_r": 0.0936690140901353,
+            "profit_factor": 1.159742397377757
+          },
+          "development_forward": {
+            "trades": 105,
+            "expectancy_r": 0.3896615395337464,
+            "profit_factor": 1.8127800480734417
+          },
+          "frozen": {
+            "trades": 97,
+            "expectancy_r": 0.23796174019291497,
+            "profit_factor": 1.4542633981013884,
+            "max_drawdown_r": 5.654579122198392
+          }
+        }
+      ],
+      "insufficient_history": [
+        "120",
+        "1D"
+      ],
+      "no_frozen_pass": [
+        "60",
+        "240"
+      ]
+    }
+  ],
+  "interpretation": [
+    "MJY Trendilo independently passed frozen confirmation on 15m, 5m and 30m, satisfying the formal same-component multi-timeframe evidence condition.",
+    "BTCUSD Trendilo did not pass another tested timeframe; BTCUSD Trendilo remains SHADOW.",
+    "BTCUSD 5m endpoint Nadaraya-Watson non-repaint and BTCUSD 1D Hull are independent new SHADOW candidates, not confirmation of BTCUSD 15m Trendilo.",
+    "No live authority, A+ threshold, risk rule, competition rule or broker execution behavior changed."
+  ]
+}
