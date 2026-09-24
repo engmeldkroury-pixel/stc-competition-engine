@@ -20,13 +20,14 @@ This document is the durable inventory for the owner's request to study as many 
 
 Current catalog size: 32 candidate/component families.
 
-Implemented causal research pool: 17.
+Implemented causal research pool: 18.
 
 ### Implemented / benchmarkable
 
 | Component | Family | Approx. public use count recorded in catalog | Current role |
 |---|---|---:|---|
 | Squeeze Momentum [LazyBear] | volatility_momentum | 3,083,229 | benchmark |
+| Lorentzian Classification | machine_learning | 1,229,919 | exact pinned-reference benchmark |
 | SuperTrend | atr_trend | 2,226,640 | benchmark |
 | UT Bot Alerts | atr_trend | 1,605,966 | benchmark |
 | Chandelier Exit | atr_trend | 992,640 | benchmark |
@@ -57,7 +58,6 @@ Implemented causal research pool: 17.
 
 | Candidate | Family | Approx. use count | Blocking audit |
 |---|---|---:|---|
-| Lorentzian Classification | machine_learning | 1,229,919 | exact ANN/features/filters/kernel/Backtest Stream semantics |
 | VuManChu Cipher B + Divergences | composite_momentum | 616,385 | pivot/divergence confirmation delay |
 | RSI Kernel Optimized [Flux] | kernel_reversal | 226,304 | pivot confirmation delay |
 | VWAP Stdev Bands v2 | vwap_mean_reversion | 94,046 | exact session/VWAP reset semantics |
@@ -72,7 +72,7 @@ Implemented causal research pool: 17.
 ## Research priority — not profitability ranking
 
 Priority A:
-- Lorentzian Classification: very high use, explicit Backtest Stream, non-trivial independent information family.
+- Lorentzian Classification: exact parity gate completed; now benchmarkable research via pinned MIT reference.
 - VuManChu Cipher B: high-use composite; timing audit is the main blocker.
 - Nadaraya-Watson: non-repainting endpoint variant is now benchmarkable; exact third-party non-repaint parity remains separate.
 - HalfTrend/Trendilo: now causal and entering frozen benchmark.
