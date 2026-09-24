@@ -16,6 +16,7 @@ from .signals import (
     confirmation_score_from_tradingview,
     historical_regime_from_tradingview,
     high_conviction_assessment,
+    competition_opportunity_assessment,
     liquidity_quality_from_tradingview,
     setup_quality_score,
     short_term_score_from_tradingview,
@@ -143,23 +144,42 @@ def decide_bridge_event(event_id: str, payload: dict) -> dict:
         ),
     )
     base_result = evaluate(req).model_copy(update={"signal_id": deterministic_signal_id(event_id)})
-    gate_passed, gate_failures = high_conviction_assessment(
-        recommendation=base_result.recommendation,
-        composite_score=base_result.composite_score,
-        short_term_technical=short_term_technical,
-        historical_regime=historical_regime,
-        blended_technical=technical,
-        volatility_quality=volatility_quality,
-        liquidity_quality=liquidity_quality,
-        confirmation_score=confirmation_score,
-        trend_2h_score=tv.trend_2h_score,
-        trend_4h_score=tv.trend_4h_score,
-        trend_1m_score=tv.trend_1m_score,
-        family_evidence_score=None if family_evidence is None else family_evidence.score,
-        family_agreement_ratio=None if family_evidence is None else family_evidence.agreement_ratio,
-        family_aligned_count=None if family_evidence is None else family_evidence.aligned_families,
-        family_conflict_count=None if family_evidence is None else family_evidence.conflicting_families,
-    )
+    competition_mode = tv.competition_id == "capital-africa-sep-2026"
+    if competition_mode:
+        gate_passed, gate_failures = competition_opportunity_assessment(
+            recommendation=base_result.recommendation,
+            composite_score=base_result.composite_score,
+            short_term_technical=short_term_technical,
+            historical_regime=historical_regime,
+            blended_technical=technical,
+            volatility_quality=volatility_quality,
+            liquidity_quality=liquidity_quality,
+            confirmation_score=confirmation_score,
+            trend_2h_score=tv.trend_2h_score,
+            trend_4h_score=tv.trend_4h_score,
+            family_evidence_score=None if family_evidence is None else family_evidence.score,
+            family_agreement_ratio=None if family_evidence is None else family_evidence.agreement_ratio,
+            family_aligned_count=None if family_evidence is None else family_evidence.aligned_families,
+            family_conflict_count=None if family_evidence is None else family_evidence.conflicting_families,
+        )
+    else:
+        gate_passed, gate_failures = high_conviction_assessment(
+            recommendation=base_result.recommendation,
+            composite_score=base_result.composite_score,
+            short_term_technical=short_term_technical,
+            historical_regime=historical_regime,
+            blended_technical=technical,
+            volatility_quality=volatility_quality,
+            liquidity_quality=liquidity_quality,
+            confirmation_score=confirmation_score,
+            trend_2h_score=tv.trend_2h_score,
+            trend_4h_score=tv.trend_4h_score,
+            trend_1m_score=tv.trend_1m_score,
+            family_evidence_score=None if family_evidence is None else family_evidence.score,
+            family_agreement_ratio=None if family_evidence is None else family_evidence.agreement_ratio,
+            family_aligned_count=None if family_evidence is None else family_evidence.aligned_families,
+            family_conflict_count=None if family_evidence is None else family_evidence.conflicting_families,
+        )
 
     quality_score = setup_quality_score(
         recommendation=base_result.recommendation,
@@ -175,15 +195,22 @@ def decide_bridge_event(event_id: str, payload: dict) -> dict:
         family_evidence_score=None if family_evidence is None else family_evidence.score,
     )
 
-    final_gate_passed = gate_passed and quality_score >= 90
-    if gate_passed and quality_score < 90:
-        gate_failures = [*gate_failures, "setup_quality_below_90"]
+    quality_floor = 78 if competition_mode else 90
+    final_gate_passed = gate_passed and quality_score >= quality_floor
+    if gate_passed and quality_score < quality_floor:
+        gate_failures = [*gate_failures, f"setup_quality_below_{quality_floor}"]
     final_recommendation = base_result.recommendation if final_gate_passed else "WAIT"
-    gate_reason = "high_conviction_gate=PASSED" if final_gate_passed else "high_conviction_gate=BLOCKED"
+    gate_name = "competition_opportunity_gate" if competition_mode else "high_conviction_gate"
+    gate_reason = f"{gate_name}=PASSED" if final_gate_passed else f"{gate_name}=BLOCKED"
     gate_details = (
-        ["setup_grade=A_PLUS", f"setup_quality={quality_score}/100"]
+        [
+            "setup_grade=COMPETITION_OPPORTUNITY" if competition_mode else "setup_grade=A_PLUS",
+            f"setup_quality={quality_score}/100",
+            f"quality_floor={quality_floor}/100",
+        ]
         if final_gate_passed
-        else [f"gate_block={reason}" for reason in gate_failures] + [f"setup_quality={quality_score}/100"]
+        else [f"gate_block={reason}" for reason in gate_failures]
+        + [f"setup_quality={quality_score}/100", f"quality_floor={quality_floor}/100"]
     )
     extra_reasons = [
         f"short_term_technical={short_term_technical:+.2f}",
@@ -212,7 +239,15 @@ def decide_bridge_event(event_id: str, payload: dict) -> dict:
     result_dict["quality_gate_passed"] = final_gate_passed
     result_dict["setup_quality_score"] = quality_score
     result_dict["setup_quality_label"] = f"{quality_score}/100 setup quality; not a win probability"
-    result_dict["setup_grade"] = "A_PLUS" if final_gate_passed else "MONITOR_ONLY"
+    result_dict["setup_grade"] = (
+        "COMPETITION_OPPORTUNITY"
+        if final_gate_passed and competition_mode
+        else "A_PLUS"
+        if final_gate_passed
+        else "MONITOR_ONLY"
+    )
+    result_dict["competition_mode"] = competition_mode
+    result_dict["quality_floor"] = quality_floor
     result_dict["pre_gate_recommendation"] = base_result.recommendation
     result_dict["quality_gate_failures"] = gate_failures
     result_dict["live_family_evidence"] = None if family_evidence is None else {

@@ -2188,3 +2188,41 @@ Owner intervention required now: YES — only for historical-data access, not fo
 - shadow_recalibration_live_authority=false.
 - No live weight is written; no A+, risk, sizing, competition or manual-execution rule changed.
 - GitHub Actions run 35976346795 was pre-start blocked with steps=null, so CI is recorded as NOT RUN. The unified diff was independently reviewed before merge.
+
+
+## Capital Africa competition-mode acceleration — 2026-09-24 12:xx EEST
+- Owner priority: stop losing competition time while preserving human/manual execution.
+- Verified current TradingView production feed is active:
+  - Capital MTF A/B alerts active on 15m;
+  - latest observed Capital cycle at 2026-09-24T09:15:00Z;
+  - webhook deliveries returned HTTP 200.
+- Verified leaderboard snapshot on the official Capital.com Africa September 2026 page:
+  - rank 1: +38.08% realized;
+  - rank 60: +11.02% realized;
+  - competition ends 2026-10-02 08:00 UTC;
+  - score is realized P/L on closed competition positions;
+  - minimum trading activity is 3 days.
+- Root cause of low opportunity count:
+  - existing high-conviction gate requires unusually broad alignment including 1M context and setup quality >= 90/100;
+  - this is intentionally conservative but too sparse for a short competition.
+- Branch created from main commit 126febe8a414caa89b445e80afa6d548ea72e5af:
+  - stc-competition-mode-20260924
+- Branch changes:
+  - app/signals.py: added competition_opportunity_assessment;
+  - app/event_decision.py: Capital Africa uses competition-only opportunity gate while other competitions keep the A+ gate;
+  - competition gate requires directional composite, majority 1h/2h/4h alignment, family evidence, acceptable volatility/liquidity, and historical regime not strongly opposed;
+  - Capital competition quality floor is 78/100; existing A+ floor remains 90/100 elsewhere;
+  - 1M alignment is no longer a hard Capital competition blocker;
+  - human approval and manual order entry remain mandatory;
+  - api/index.py /process now drains multiple serverless batches per invocation rather than one small batch;
+  - tests/test_signals.py includes positive and negative competition-gate tests.
+- Live replay against the latest ten Capital payloads using the new baseline logic:
+  - CAPITALCOM:EURUSD pre-gate SHORT, setup quality 83/100 -> competition gate PASS;
+  - CAPITALCOM:XAUUSD pre-gate SHORT, setup quality 80/100 -> competition gate PASS;
+  - CAPITALCOM:XAGUSD pre-gate SHORT, setup quality 75/100 -> quality floor BLOCK;
+  - remaining symbols were blocked by direction/quality/alignment checks.
+- IMPORTANT: these replay results are evidence for gate behavior, not executed trades and not a guarantee of profit.
+- GitHub repository remains private at this checkpoint.
+- Public-repository migration is authorized in principle by owner, but no visibility change has yet been made.
+- Secret/tree screening so far found no obvious secret/token/credential filenames and no named hard-coded secret hits; this is not yet a complete history-level secret audit.
+- Production merge/deploy remains pending verification; do not describe competition mode as live yet.
