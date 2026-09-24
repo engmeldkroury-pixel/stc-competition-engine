@@ -613,3 +613,27 @@ Status: VERIFIED / COMPLETED / PENDING MERGE.
 3. Continue VuManChu divergence confirmation-delay audit.
 4. Preserve General Lab automatic full-process routing for every newly added symbol.
 5. Expand practical open-source candidates only after causal/repaint review.
+
+
+### WU-120 — Lorentzian exact-reference parity adapter
+Status: VERIFIED / CI-PASSED / PENDING MERGE.
+- Source pinned: artificial-intelligence-edge/lorentzian-classification @ 27776bd51cbd3e07b6383cfa468d4d33f4b50297.
+- License: MIT retained in vendored directory.
+- Exact upstream Python calculation vendored instead of approximated.
+- Official Pine/TradingView BTCUSD H1 parity fixture vendored.
+- Parity contract mirrors upstream warmup semantics and exact discrete signals.
+- STC causal benchmark wrapper uses the exact reference engine with a history cap above the full research series.
+- Bounded parameter selection remains TRAIN-only.
+- Catalog role: implemented_exact_reference / benchmarkable research.
+- CI: 384 passed, 1 warning.
+- live_authority=false.
+
+### Next exact-audit order after WU-120
+1. VuManChu Cipher B + Divergences:
+   - preserve its two-bar fractal confirmation delay;
+   - signal time is the confirmation bar, not the visually offset pivot bar;
+   - review the 2023 money-flow correction before exact adapter work.
+2. RSI Kernel Optimized / other pivot systems:
+   - same confirmation-time discipline.
+3. Machine-learning SuperTrend/KNN candidates:
+   - audit sample alignment/replay behavior.
