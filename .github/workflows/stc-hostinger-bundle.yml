@@ -1,0 +1,70 @@
+name: STC Hostinger Hotfix Bundle
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "ops/HOSTINGER_BUNDLE_TRIGGER"
+      - ".github/workflows/stc-hostinger-bundle.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: stc-hostinger-bundle
+  cancel-in-progress: true
+
+jobs:
+  bundle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Hostinger hotfix package
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p out/stc-hostinger-hotfix-145
+          for file in \
+            approval.php \
+            cloud_control.php \
+            notification_control.php \
+            operator.php \
+            operator_snapshot.php \
+            portfolio_control.php
+          do
+            cp "hostinger_patch/${file}" "out/stc-hostinger-hotfix-145/${file}"
+          done
+          cat > out/stc-hostinger-hotfix-145/UPLOAD_README.txt <<'EOF'
+          STC Hostinger hotfix after PR #145
+          =================================
+          Upload these six PHP files to the existing STC public_html directory.
+          Replace the files with the same names.
+
+          Files:
+          - approval.php
+          - cloud_control.php
+          - notification_control.php
+          - operator.php
+          - operator_snapshot.php
+          - portfolio_control.php
+
+          Do NOT upload config.php and do not change credentials.
+          No SQL migration is required for this hotfix.
+          This hotfix does not add automatic broker execution.
+          After upload, STC Live Readback must verify that a Capital
+          COMPETITION_OPPORTUNITY is quality-gate eligible and exposes its
+          locked plan through the deployed PHP runtime.
+          EOF
+          (
+            cd out
+            zip -qr stc-hostinger-hotfix-145.zip stc-hostinger-hotfix-145
+          )
+          sha256sum out/stc-hostinger-hotfix-145.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: stc-hostinger-hotfix-145-${{ github.run_id }}
+          path: out/stc-hostinger-hotfix-145.zip
+          if-no-files-found: error
+          retention-days: 30
