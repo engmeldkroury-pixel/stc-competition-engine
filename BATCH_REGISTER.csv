@@ -1,0 +1,7 @@
+batch_id,status,scope,evidence,next_action
+STC-B145,ACCEPTED,"Central Capital/Hostinger quality eligibility","PR #145 merge 9b3746d; CI success","Deploy PHP hotfix"
+STC-B146,ACCEPTED,"Corrected 26-symbol community evidence","PR #146 merge 9fbff89","Use symbol-specific profiles only"
+STC-B148,ACCEPTED_WITH_FULL_CI_FOLLOWUP,"Research-only community shadow plumbing","PR #148 merge a19bbc8; critical 155 passed","Observe main full CI; then implement Pine streams"
+STC-B149,ACCEPTED,"Permanent read-only live readback","PR #149 merge a9f7e6b; run 35992932406 success","Use after every production deploy"
+STC-B150,ACCEPTED,"Reproducible Hostinger hotfix bundle","PR #150 merge 47292a6; bundle run 35993270128 success","Owner uploads bundle"
+STC-PARITY-01,ACCEPTED_RESEARCH_EVIDENCE,"Six-symbol Python parity fixtures","Run 35992849854 6/6 fixture jobs plus combine success","Build Pine and compare bar-by-bar"
