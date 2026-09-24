@@ -40,6 +40,7 @@ jobs:
           tests/test_bridge_worker.py
           tests/test_cloud_approval.py
           tests/test_cloud_readback_api.py
+          tests/test_community_shadow.py
           tests/test_event_decision.py
           tests/test_execution_context.py
           tests/test_hostinger_patch_contract.py
