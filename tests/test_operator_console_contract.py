@@ -70,3 +70,25 @@ def test_record_trade_blank_open_time_uses_server_time() -> None:
     assert "opened_at_utc:openedUtc" in source
     assert "manual_position_open_time_outside_competition_window" in source
     assert "opened_at_out_of_range" in source
+
+
+def test_competition_tabs_expose_trade_inventory_open_pnl_and_recent_completed_trades():
+    snapshot = (OPERATOR.parent / "operator_snapshot.php").read_text(encoding="utf-8")
+    ui = _source()
+    assert "'open_unrealized_pnl_usd' => 0.0" in snapshot
+    assert "'open_unrealized_known_positions' => 0" in snapshot
+    assert "'open_unrealized_unknown_positions' => 0" in snapshot
+    assert "'closed_positions_recent' => $closedPositions" in snapshot
+    assert "WHERE status = 'CLOSED'" in snapshot
+    for label in (
+        "TRADE INVENTORY — THIS COMPETITION",
+        "Open trades",
+        "Completed trades",
+        "Open P/L estimate",
+        "Tracked P/L",
+        "Completed trades — recent",
+        "CLOSED • RECORDED",
+        "Latest market check — STC bar mark",
+        "not a broker live quote",
+    ):
+        assert label in ui

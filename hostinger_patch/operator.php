@@ -63,6 +63,7 @@ input{width:100%}button{cursor:pointer}.primary{background:#1d4ed8}.danger{backg
   <div class="bar"><div class="sectiontitle">Capital.com Africa</div><div class="small">Independent competition lane. Capital.com symbols, account rules, risk and position limits stay separate from AMP Futures.</div></div>
   <div id="capital-account" class="bar"></div>
   <div class="bar"><div class="sectiontitle">Open positions / Portfolio Supervisor</div><div class="small">Executed trades stay here until you record a manual close. New signals on the same symbol do not replace them.</div><button style="margin-top:10px" onclick="recordExistingPosition('capital-africa-sep-2026')">Record an existing manual position</button> <button style="margin-top:10px" onclick="recordClosedTradeHistory('capital-africa-sep-2026')">Import a past closed trade</button><div id="capital-positions" class="grid" style="margin-top:10px"></div></div>
+  <div class="bar"><div class="sectiontitle">Completed trades — recent</div><div class="small">Closed trades remain visible here with realized P/L so the competition record is easy to audit.</div><div id="capital-closed-positions" class="grid" style="margin-top:10px"></div></div>
   <div class="bar"><div class="sectiontitle">Latest signals</div><div id="capital-cards" class="grid"></div></div>
 </div>
 
@@ -70,6 +71,7 @@ input{width:100%}button{cursor:pointer}.primary{background:#1d4ed8}.danger{backg
   <div class="bar"><div class="sectiontitle">AMP Futures</div><div class="small">Independent futures lane. Futures symbols, contract limits, risk and position state stay separate from Capital.com Africa.</div></div>
   <div id="amp-account" class="bar"></div>
   <div class="bar"><div class="sectiontitle">Open positions / Portfolio Supervisor</div><div class="small">Executed trades stay here until you record a manual close. New signals on the same symbol do not replace them.</div><button style="margin-top:10px" onclick="recordExistingPosition('amp-futures-sep-2026')">Record an existing manual position</button> <button style="margin-top:10px" onclick="recordClosedTradeHistory('amp-futures-sep-2026')">Import a past closed trade</button><div id="amp-positions" class="grid" style="margin-top:10px"></div></div>
+  <div class="bar"><div class="sectiontitle">Completed trades — recent</div><div class="small">Closed trades remain visible here with realized P/L so the competition record is easy to audit.</div><div id="amp-closed-positions" class="grid" style="margin-top:10px"></div></div>
   <div class="bar"><div class="sectiontitle">Latest signals</div><div id="amp-cards" class="grid"></div></div>
 </div>
 
@@ -620,6 +622,33 @@ function progressHtml(competitionId){
   +'<div class="row"><span>Recorded trade actions</span><span class="value">'+esc(p.position_actions)+'</span></div>'
   +'<div class="row"><span>Realized competition P/L</span><span class="value">$'+num(p.realized_pnl_usd,2)+'</span></div></div>';
 }
+function tradeInventoryHtml(competitionId){
+ const p=snapshot&&snapshot.competition_progress?snapshot.competition_progress[competitionId]:null;
+ const s=riskSummaryFor(competitionId);
+ if(!p)return '';
+ const openCount=Number(p.open_positions||0);
+ const closedCount=Number(p.closed_positions||0);
+ const known=Number(s.open_unrealized_known_positions||0);
+ const unknown=Number(s.open_unrealized_unknown_positions||0);
+ const openPnl=Number(s.open_unrealized_pnl_usd||0);
+ const realized=Number(p.realized_pnl_usd||0);
+ let openPnlText='$0.00';
+ if(openCount>0){
+   openPnlText=known>0
+     ?'$'+num(openPnl,2)+(unknown>0?' • PARTIAL; '+unknown+' open trade(s) waiting for an STC mark':'')
+     :'Unavailable • waiting for an STC market mark';
+ }
+ const trackedPnl=unknown===0?realized+openPnl:null;
+ return '<div class="orderbox"><div class="small">TRADE INVENTORY — THIS COMPETITION</div>'
+  +'<div class="row"><span>Open trades</span><span class="value">'+openCount+'</span></div>'
+  +'<div class="row"><span>Completed trades</span><span class="value">'+closedCount+'</span></div>'
+  +'<div class="row"><span>Open P/L estimate</span><span class="value '+(known>0?(openPnl>=0?'ok':'bad'):'')+'">'+esc(openPnlText)+'</span></div>'
+  +'<div class="row"><span>Realized P/L</span><span class="value '+(realized>=0?'ok':'bad')+'">$'+num(realized,2)+'</span></div>'
+  +'<div class="row"><span>Tracked P/L</span><span class="value '+(trackedPnl==null?'wait':trackedPnl>=0?'ok':'bad')+'">'+(trackedPnl==null?'Incomplete — one or more open marks unavailable':'$'+num(trackedPnl,2))+'</span></div>'
+  +'<div class="small">Open P/L is an STC estimate using the latest confirmed STC bar close available for each tracked position. It is not a broker live quote and does not change official competition scoring, which uses realized P/L.</div>'
+  +'</div>';
+}
+
 function accountHtml(account,competitionId){
  if(!account)return '<div class="small">Account state unavailable.</div>';
  const s=riskSummaryFor(competitionId);
@@ -632,6 +661,7 @@ function accountHtml(account,competitionId){
    :'<span class="small">No open risk clusters.</span>';
  return rulesHtml(competitionId)
   +progressHtml(competitionId)
+  +tradeInventoryHtml(competitionId)
   +'<div class="row"><span>Owner-synced equity</span><span class="value">$'+num(account.equity_usd,2)+'</span></div>'
   +'<div class="row"><span>STC risk budget / trade</span><span class="value">'+num(Number(account.risk_fraction)*100,2)+'% • $'+num(tradeRisk,2)+'</span></div>'
   +'<div class="row"><span>Open initial risk</span><span class="value">$'+num(s.initial_risk_usd,2)+' / $'+num(portfolioCap,2)+'</span></div>'
@@ -662,10 +692,11 @@ function positionHtml(p){
   +'<div class="row"><span>Active stop</span><span class="value">'+formatPlatformPrice(p.symbol,p.current_stop)+'</span></div>'
   +'<div class="row"><span>Management checkpoint</span><span class="value">'+formatPlatformPrice(p.symbol,p.target1)+' • no partial close</span></div>'
   +'<div class="row"><span>Final take profit</span><span class="value">'+formatPlatformPrice(p.symbol,p.target2)+'</span></div>'
-  +(latest?'<div class="row"><span>Latest market check</span><span class="value">'+formatLocalTime(latest.time)+' • '+esc(latest.recommendation)+' '+num(latest.composite_score,2)+' @ '+num(latest.close)+'</span></div>':'')
+  +(latest?'<div class="row"><span>Latest market check — STC bar mark</span><span class="value">'+formatLocalTime(latest.time)+' • '+esc(latest.recommendation)+' '+num(latest.composite_score,2)+' @ '+formatPlatformPrice(p.symbol,latest.close)+'</span></div>':'<div class="small wait">No STC market mark is available yet for this open position.</div>')
   +'<div class="row"><span>What to do now</span><span class="value '+managementClass(m.action)+'">'+esc(m.action||'HOLD')+'</span></div>'
-  +'<div class="row"><span>R multiple</span><span class="value">'+num(m.r_multiple,2)+'</span></div>'
-  +'<div class="row"><span>Unrealized P/L</span><span class="value">'+(m.unrealized_pnl_usd==null?'-':'$'+num(m.unrealized_pnl_usd,2))+'</span></div>'
+  +'<div class="row"><span>R multiple</span><span class="value">'+(m.r_multiple==null?'-':num(m.r_multiple,2))+'</span></div>'
+  +'<div class="row"><span>Unrealized P/L estimate</span><span class="value '+(m.unrealized_pnl_usd==null?'wait':Number(m.unrealized_pnl_usd)>=0?'ok':'bad')+'">'+(m.unrealized_pnl_usd==null?'Unavailable':'$'+num(m.unrealized_pnl_usd,2))+'</span></div>'
+  +'<div class="small">The mark and open P/L above use STC confirmed bar data, not a broker live quote. Use the competition platform for the exact live P/L.</div>'
   +(m.suggested_stop?'<div class="row"><span>Suggested stop</span><span class="value">'+num(m.suggested_stop)+'</span></div>':'')
   +(rotation?'<div class="small">Rotation candidate: '+esc(rotation.to_symbol)+' '+esc(rotation.to_direction)+' • only after current thesis degradation.</div>':'')
   +'<div class="small" style="margin:8px 0">'+(m.reasons||[]).map(x=>'<span class="pill">'+esc(x)+'</span>').join('')+'</div>'
@@ -673,6 +704,21 @@ function positionHtml(p){
 }
 function renderPositions(target,positions){
  $(target).innerHTML=(positions||[]).map(positionHtml).join('')||'<div class="card">No open positions recorded in STC for this competition.</div>';
+}
+function closedPositionHtml(p){
+ return '<div class="card">'
+  +'<div class="statusline"><span class="badge">CLOSED • RECORDED</span><span class="pill">'+esc(p.origin==='manual_external'?'Imported manual trade':'STC plan fill')+'</span></div>'
+  +'<div class="row"><span>Symbol</span><span class="value">'+esc(p.symbol)+'</span></div>'
+  +'<div class="row"><span>Position</span><span class="value '+(p.side==='LONG'?'long':'short')+'">'+esc(p.side)+' × '+num(p.initial_quantity,6)+'</span></div>'
+  +'<div class="row"><span>Opened</span><span class="value">'+formatLocalTime(p.opened_at_utc)+'</span></div>'
+  +'<div class="row"><span>Closed</span><span class="value">'+formatLocalTime(p.closed_at_utc)+'</span></div>'
+  +'<div class="row"><span>Entry</span><span class="value">'+formatPlatformPrice(p.symbol,p.entry_price)+'</span></div>'
+  +'<div class="row"><span>Exit</span><span class="value">'+(p.exit_price==null?'-':formatPlatformPrice(p.symbol,p.exit_price))+'</span></div>'
+  +'<div class="row"><span>Realized P/L</span><span class="value '+(Number(p.realized_pnl_usd||0)>=0?'ok':'bad')+'">$'+num(p.realized_pnl_usd,2)+'</span></div>'
+  +'</div>';
+}
+function renderClosedPositions(target,positions){
+ $(target).innerHTML=(positions||[]).map(closedPositionHtml).join('')||'<div class="card">No completed trades recorded in STC for this competition yet.</div>';
 }
 
 function watchlistHtml(c){
@@ -735,6 +781,7 @@ function render(){
  const cards=snapshot.cards||[];
  const accounts=snapshot.account_states||[];
  const positions=(snapshot.portfolio&&snapshot.portfolio.positions)||[];
+ const closedPositions=(snapshot.portfolio&&snapshot.portfolio.closed_positions_recent)||[];
  renderOverview(cards);
  renderCards('capital-cards',cards.filter(c=>competitionOf(c)==='capital'));
  renderCards('amp-cards',cards.filter(c=>competitionOf(c)==='amp'));
@@ -742,6 +789,8 @@ function render(){
  $('amp-account').innerHTML=accountHtml(accounts.find(a=>a.competition_id==='amp-futures-sep-2026'),'amp-futures-sep-2026');
  renderPositions('capital-positions',positions.filter(p=>p.competition_id==='capital-africa-sep-2026'));
  renderPositions('amp-positions',positions.filter(p=>p.competition_id==='amp-futures-sep-2026'));
+ renderClosedPositions('capital-closed-positions',closedPositions.filter(p=>p.competition_id==='capital-africa-sep-2026'));
+ renderClosedPositions('amp-closed-positions',closedPositions.filter(p=>p.competition_id==='amp-futures-sep-2026'));
  maybeNotify(cards);
  maybeNotifyManagement(positions);
 }

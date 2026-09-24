@@ -372,9 +372,17 @@ try {
     }
 
     $positions = [];
+    $summaryTemplate = [
+        'open_positions' => 0,
+        'initial_risk_usd' => 0.0,
+        'open_unrealized_pnl_usd' => 0.0,
+        'open_unrealized_known_positions' => 0,
+        'open_unrealized_unknown_positions' => 0,
+        'clusters' => [],
+    ];
     $summary = [
-        'capital-africa-sep-2026' => ['open_positions' => 0, 'initial_risk_usd' => 0.0, 'clusters' => []],
-        'amp-futures-sep-2026' => ['open_positions' => 0, 'initial_risk_usd' => 0.0, 'clusters' => []],
+        'capital-africa-sep-2026' => $summaryTemplate,
+        'amp-futures-sep-2026' => $summaryTemplate,
     ];
     $rotationCandidates = [];
 
@@ -406,10 +414,16 @@ try {
         }
         $cid = (string)$positionRow['competition_id'];
         if (!isset($summary[$cid])) {
-            $summary[$cid] = ['open_positions' => 0, 'initial_risk_usd' => 0.0, 'clusters' => []];
+            $summary[$cid] = $summaryTemplate;
         }
         $summary[$cid]['open_positions'] += 1;
         $summary[$cid]['initial_risk_usd'] += $risk;
+        if (($advice['unrealized_pnl_usd'] ?? null) === null) {
+            $summary[$cid]['open_unrealized_unknown_positions'] += 1;
+        } else {
+            $summary[$cid]['open_unrealized_known_positions'] += 1;
+            $summary[$cid]['open_unrealized_pnl_usd'] += (float)$advice['unrealized_pnl_usd'];
+        }
         $cluster = stc_risk_cluster((string)$positionRow['symbol']);
         if (!isset($summary[$cid]['clusters'][$cluster])) {
             $summary[$cid]['clusters'][$cluster] = ['open_positions' => 0, 'initial_risk_usd' => 0.0];
@@ -465,6 +479,15 @@ try {
         $positions[] = $public;
     }
 
+    $closedPositions = [];
+    $closedStmt = $pdo->query(
+        "SELECT * FROM stc_positions WHERE status = 'CLOSED' "
+        . "ORDER BY closed_at_utc DESC, updated_at_utc DESC, id DESC LIMIT 40"
+    );
+    while (($closedRow = $closedStmt->fetch()) !== false) {
+        $closedPositions[] = stc_position_public($closedRow);
+    }
+
     stc_json([
         'ok' => true,
         'scope' => 'owner_console_dual_competition_portfolio_snapshot',
@@ -490,6 +513,7 @@ try {
         'cards' => $cards,
         'portfolio' => [
             'positions' => $positions,
+            'closed_positions_recent' => $closedPositions,
             'summary' => $summary,
             'risk_policy' => [
                 'per_trade_risk_fraction_source' => 'owner_configured',
