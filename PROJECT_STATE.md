@@ -2507,3 +2507,27 @@ Owner intervention required now: YES — only for historical-data access, not fo
   - artifact id: `10813792030`;
   - user ZIP SHA-256: `151724858788f83869bc49df42627594f0dcb487328c65abf5b8b34ebf858427`.
 - Production ledger recovery is complete. UI/server target-resolution deployment is still pending owner upload of the final seven-file bundle.
+
+
+## Record Trade open-time rejection incident — 2026-09-24 15:15 UTC
+- Owner reported another failed existing-position recovery for CAPITALCOM:XAGUSD with:
+  - side SHORT;
+  - quantity 1251.954769;
+  - entered average fill 63.255;
+  - stop 63.641724;
+  - final TP 62.288189;
+  - Record Trade error: manual_position_open_time_outside_competition_window.
+- Public Hostinger operator page was checked after the report and still exposed the older Record Trade UI, proving the latest Record Trade fixes had not yet been deployed there.
+- PR #158 merged as `841dc5715e0ba9c3c8e920beba1e7592e41533e7`.
+  - blank open time now resolves to Hostinger/STC server time;
+  - browser clock skew up to 5 minutes is clamped to server-now;
+  - larger future timestamps remain fail-closed;
+  - manual external positions fail only when genuinely before configured competition start;
+  - UI explains server-time fallback and gives readable errors.
+- Critical CI on PR #158: 168 passed, 1 warning.
+- Final 7-file Hostinger bundle built successfully:
+  - workflow run: 36018743649;
+  - artifact id: 10816070967;
+  - inner ZIP SHA-256: `9153f76fb6bb861400f5d07cac7fe54e5e653bba56907a275769f34505493ae6`;
+  - includes position.php in addition to the previously deployed six PHP files.
+- The XAGUSD trade has NOT been written to STC solely from the Record Trade form screenshot; platform position/history evidence is still required to determine whether it should be recorded as OPEN or imported as CLOSED.
