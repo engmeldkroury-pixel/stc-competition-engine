@@ -42,3 +42,19 @@ Required:
 - no automatic broker execution;
 - no A+/risk/competition-rule change from research alone;
 - reviews/popularity remain discovery metadata only.
+
+
+## FACEBOOK / EXTERNAL TRADER SOURCE AUDIT
+Audit the owner-supplied sources:
+- https://www.facebook.com/share/18ntSnCtXa/
+- https://www.facebook.com/share/p/1beB4M9ykK/
+
+Extract only reproducible logic:
+- indicator names/components;
+- buy/sell trigger rules;
+- exit/stop/target logic;
+- market-regime commentary;
+- asset/timeframe specialization;
+- claims that need independent verification.
+
+Do not copy live calls into STC. Convert useful concepts into research candidates, then require causal/OOS/forward validation before any weight.
