@@ -12,63 +12,83 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 3
     env:
-      STC_OWNER_TOKEN: ${{ secrets.STC_OWNER_TOKEN }}
+      STC_WORKER_TOKEN: ${{ secrets.STC_WORKER_TOKEN }}
     steps:
-      - name: Read sanitized runtime snapshot
+      - name: Read sanitized latest EURUSD persisted result
         shell: bash
         run: |
           python - <<'PY'
           import json
           import os
+          import urllib.parse
           import urllib.request
 
-          token = os.environ.get("STC_OWNER_TOKEN", "")
+          token = os.environ.get("STC_WORKER_TOKEN", "")
           if not token:
-              raise SystemExit("STC_OWNER_TOKEN missing")
+              raise SystemExit("STC_WORKER_TOKEN missing")
+          url = "https://stc.feama.site/inbox.php?" + urllib.parse.urlencode({
+              "status": "ingested",
+              "limit": 100,
+          })
+          req = urllib.request.Request(
+              url,
+              headers={
+                  "Authorization": f"Bearer {token}",
+                  "Accept": "application/json",
+                  "User-Agent": "STC-Private-Config-Audit/1.0",
+              },
+          )
+          with urllib.request.urlopen(req, timeout=15) as response:
+              data = json.load(response)
 
-          def get(path):
-              req = urllib.request.Request(
-                  "https://stc.feama.site/" + path,
-                  headers={
-                      "Authorization": f"Bearer {token}",
-                      "Accept": "application/json",
-                      "User-Agent": "STC-Private-Config-Audit/1.0",
-                  },
-              )
-              with urllib.request.urlopen(req, timeout=15) as response:
-                  return json.load(response)
+          selected = None
+          for item in data.get("events") or []:
+              payload = item.get("payload") or {}
+              if (
+                  payload.get("competition_id") == "capital-africa-sep-2026"
+                  and payload.get("symbol") == "CAPITALCOM:EURUSD"
+              ):
+                  selected = item
+                  break
 
-          notification = get("notification.php")
-          snapshot = get("operator_snapshot.php")
+          if selected is None:
+              print(json.dumps({"found": False}))
+              raise SystemExit(0)
 
-          deliveries = notification.get("deliveries") or []
-          status_counts = {}
-          for item in deliveries:
-              status = str(item.get("status") or "unknown")
-              status_counts[status] = status_counts.get(status, 0) + 1
-
-          cards = []
-          for card in snapshot.get("cards") or []:
-              if card.get("competition_id") != "capital-africa-sep-2026":
-                  continue
-              cards.append({
-                  "symbol": card.get("symbol"),
-                  "source_time": card.get("source_time"),
-                  "recommendation": card.get("recommendation"),
-                  "pre_gate_recommendation": card.get("pre_gate_recommendation"),
-                  "setup_grade": card.get("setup_grade"),
-                  "setup_quality_score": card.get("setup_quality_score"),
-                  "quality_gate_passed": card.get("quality_gate_passed"),
-                  "opportunity_active": card.get("opportunity_active"),
-                  "manual_execution_ready": card.get("manual_execution_ready"),
-                  "has_locked_plan": isinstance(card.get("locked_trade_plan"), dict),
-                  "quality_gate_failures": card.get("quality_gate_failures") or [],
-              })
-
+          result = selected.get("result") or {}
+          decision = result.get("decision") or {}
+          signal = decision.get("signal") or {}
+          plan = decision.get("locked_trade_plan")
+          envelope = decision.get("approval_envelope") or {}
           print(json.dumps({
-              "notification_config": notification.get("config") or {},
-              "delivery_status_counts": status_counts,
-              "runtime": snapshot.get("runtime_control") or {},
-              "capital_cards": cards,
+              "found": True,
+              "event_id": selected.get("event_id"),
+              "status": selected.get("status"),
+              "source_time": (selected.get("payload") or {}).get("time"),
+              "signal": {
+                  "recommendation": signal.get("recommendation"),
+                  "setup_grade": signal.get("setup_grade"),
+                  "setup_quality_score": signal.get("setup_quality_score"),
+                  "quality_gate_passed": signal.get("quality_gate_passed"),
+                  "quality_gate_failures": signal.get("quality_gate_failures") or [],
+                  "composite_score": signal.get("composite_score"),
+              },
+              "approval_envelope": {
+                  "reference_price": envelope.get("reference_price"),
+                  "entry_min": envelope.get("entry_min"),
+                  "entry_max": envelope.get("entry_max"),
+                  "valid_until": envelope.get("valid_until"),
+              },
+              "locked_trade_plan": None if not isinstance(plan, dict) else {
+                  "direction": plan.get("direction"),
+                  "entry_min": plan.get("entry_min"),
+                  "entry_max": plan.get("entry_max"),
+                  "entry_mid": plan.get("entry_mid"),
+                  "initial_stop": plan.get("initial_stop"),
+                  "target1": plan.get("target1"),
+                  "target2": plan.get("target2"),
+                  "valid_until": plan.get("valid_until"),
+                  "levels_locked": plan.get("levels_locked"),
+              },
           }, sort_keys=True))
           PY
