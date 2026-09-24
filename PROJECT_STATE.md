@@ -2369,3 +2369,17 @@ Owner intervention required now: YES — only for historical-data access, not fo
 4. Confirm Telegram delivery for the same fresh plan.
 5. Human approval/manual order entry remains mandatory.
 6. In parallel, continue Pine community-component implementation against the frozen parity fixtures; do not promote shadow weights until parity is proven.
+
+
+## First Pine community parity candidate — 2026-09-24 11:36 UTC
+- PR #152 merged as `529f8efc3fa9bce06de16236dd8275cd6fb42c25`.
+- Added `tradingview/STC_COMMUNITY_SHADOW_PARITY_CANDIDATE.pine`.
+- Candidate covers research-only parity implementations for:
+  - EURUSD Trendilo;
+  - ETHUSD SSL Hybrid;
+  - DOGEUSD Range Filter + Schaff Trend Cycle;
+  - NAS100 HalfTrend.
+- It emits no webhook and has no live authority.
+- Critical CI passed.
+- Pine compilation inside TradingView and bar-by-bar parity against the frozen Python fixtures are still NOT VERIFIED.
+- Do not copy these components into the production Capital feed until compile + parity evidence is captured.

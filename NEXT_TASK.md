@@ -47,12 +47,15 @@ Bundle SHA-256:
 - Lorentzian 3/26; VuManChu 0/26; QQE+SSL+WAE composite 0/26.
 - Research-only community shadow plumbing merged; no live authority.
 - Pine parity fixture run `35992849854` completed 6/6 successfully.
+- First diagnostic Pine candidate is merged as PR #152 / `529f8efc3fa9bce06de16236dd8275cd6fb42c25`.
+- It covers Trendilo, SSL Hybrid, Range Filter, Schaff Trend Cycle and HalfTrend only.
 - Next engineering batch:
-  1. implement Pine component streams with frozen selected parameters;
-  2. compare event timestamps/values bar-by-bar against the parity fixtures;
+  1. compile the diagnostic Pine candidate in TradingView;
+  2. compare event timestamps/values bar-by-bar against the frozen Python fixtures;
   3. fix every mismatch;
-  4. only after parity, collect shadow observations;
-  5. require a separate promotion decision before any weight can influence the live quality gate.
+  4. implement the remaining BTCUSD/USDZAR components only after the simpler set has parity;
+  5. only after parity, collect shadow observations;
+  6. require a separate promotion decision before any weight can influence the live quality gate.
 
 ## LIVE BOUNDARY
 - no automatic broker/order execution;

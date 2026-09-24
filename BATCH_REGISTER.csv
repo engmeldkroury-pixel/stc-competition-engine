@@ -5,3 +5,4 @@ STC-B148,MERGED_CRITICAL_PASS_FULL_CI_PENDING,"Research-only community shadow pl
 STC-B149,MERGED_READBACK_VERIFIED,"Permanent read-only live readback","PR #149 merge a9f7e6b; run 35992932406 success","Use after every production deploy"
 STC-B150,MERGED_BUNDLE_VERIFIED,"Reproducible Hostinger hotfix bundle","PR #150 merge 47292a6; bundle run 35993270128 success","Owner uploads bundle"
 STC-PARITY-01,RESEARCH_EVIDENCE_GENERATED,"Six-symbol Python parity fixtures","Run 35992849854 6/6 fixture jobs plus combine success","Build Pine and compare bar-by-bar"
+STC-PINE-01,MERGED_CANDIDATE_COMPILE_PARITY_PENDING,"First research-only Pine community parity diagnostic","PR #152 merge 529f8ef; critical CI pass","Compile in TradingView and compare against frozen event fixtures"
