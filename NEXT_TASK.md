@@ -1,20 +1,14 @@
 # NEXT TASK
 
-Updated: 2026-09-24 10:15 EEST
+Updated: 2026-09-24 10:25 EEST
 
-## IMMEDIATE BLOCKER — WU-110A
-PR #129 fixes a discovered research-dispatch defect: official ports such as Lorentzian were not admitted by benchmark_symbol_indicators() even though the catalog marked them implemented.
-
-Do not accept workflow 35967884019 as Lorentzian evidence.
-
-Immediate sequence:
-1. wait for PR #129 CI;
-2. merge if green;
-3. sync latest main into research/native-community-15m-20260923;
-4. retrigger the same 26-symbol / 5,000-bar exact-provider 15m benchmark;
-5. verify Lorentzian appears in per-symbol community_trials before interpreting results.
-
-Updated: 2026-09-24 10:10 EEST
+## IMMEDIATE SEQUENCE
+1. Sync current main (including PR #129 and PR #132) into research/native-community-15m-20260923.
+2. Retrigger the 26-symbol / 5,000-bar exact-provider 15m matrix.
+3. Verify artifacts contain both lorentzian_classification and vumanchu_cipher_b for compatible symbols.
+4. Compare incremental validated coverage against the accepted 13/26 reconciled wave-3 baseline.
+5. Run exact 85/15 frozen holdout only for new Lorentzian/VuManChu survivors.
+6. If PR #133 CI is green, merge native frozen confirmation and schedule apples-to-apples native final-holdout evidence.
 
 ## CONTROLLING PROJECT
 STC.
