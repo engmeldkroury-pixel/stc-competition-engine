@@ -155,7 +155,7 @@ function stc_validate_stc_plan_position(PDO $pdo, array $body): array {
 
     $signalId = (string)($signal['signal_id'] ?? '');
     $stmt = $pdo->prepare(
-        'SELECT decision, decided_at_utc FROM stc_signal_approvals '
+        'SELECT decision, decided_at_utc, quote_evidence_id FROM stc_signal_approvals '
         . 'WHERE signal_id = ? ORDER BY id DESC LIMIT 1'
     );
     $stmt->execute([$signalId]);
@@ -164,7 +164,28 @@ function stc_validate_stc_plan_position(PDO $pdo, array $body): array {
         stc_json(['ok' => false, 'error' => 'approved_signal_required'], 409);
     }
 
-    return ['plan' => $plan, 'signal_id' => $signalId];
+    $executionTicket = null;
+    $evidenceId = trim((string)($approval['quote_evidence_id'] ?? ''));
+    if ($evidenceId !== '') {
+        $evidenceStmt = $pdo->prepare(
+            'SELECT details_json FROM stc_execution_evidence WHERE evidence_id = ? LIMIT 1'
+        );
+        $evidenceStmt->execute([$evidenceId]);
+        $detailsRaw = $evidenceStmt->fetchColumn();
+        if (is_string($detailsRaw) && $detailsRaw !== '') {
+            $details = json_decode($detailsRaw, true);
+            if (is_array($details) && is_array($details['execution_ticket'] ?? null)) {
+                $executionTicket = $details['execution_ticket'];
+            }
+        }
+    }
+
+    return [
+        'plan' => $plan,
+        'signal_id' => $signalId,
+        'approved_at_utc' => $approval['decided_at_utc'] ?? null,
+        'execution_ticket' => $executionTicket,
+    ];
 }
 
 function stc_recent_signal_states(PDO $pdo, string $competitionId, string $symbol, int $limit = 3): array {
