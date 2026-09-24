@@ -1,0 +1,46 @@
+# STC public repository secret boundary
+# Never commit runtime credentials, tokens, database files, or private operator state.
+
+# Environment / runtime secrets
+.env
+.env.*
+!.env.example
+*.secret
+*.secrets
+*.token
+*.credentials
+
+# Private configuration
+config.php
+**/config.php
+private/
+secrets/
+credentials/
+
+# Keys and certificates
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+
+# Runtime databases / state / logs
+*.db
+*.sqlite
+*.sqlite3
+*.log
+data/
+runtime-data/
+backups/
+
+# Local tooling / caches
+.venv/
+venv/
+__pycache__/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.vscode/
+.idea/
+.DS_Store

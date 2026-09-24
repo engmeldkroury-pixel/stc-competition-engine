@@ -140,7 +140,7 @@ def _strong_history():
     }
 
 
-def test_high_conviction_gate_allows_only_a_plus_directional_plan():
+def test_capital_competition_gate_allows_directional_opportunity_plan():
     payload = {
         "event_id": "evt-a-plus",
         "event": "bar_close",
@@ -167,9 +167,11 @@ def test_high_conviction_gate_allows_only_a_plus_directional_plan():
     signal = result["decision"]["signal"]
     assert signal["recommendation"] == "LONG"
     assert signal["quality_gate_passed"] is True
-    assert signal["setup_grade"] == "A_PLUS"
+    assert signal["setup_grade"] == "COMPETITION_OPPORTUNITY"
+    assert signal["competition_mode"] is True
+    assert signal["quality_floor"] == 78
     assert result["decision"]["locked_trade_plan"] is not None
-    assert "high_conviction_gate=PASSED" in signal["reasons"]
+    assert "competition_opportunity_gate=PASSED" in signal["reasons"]
 
 
 def test_borderline_direction_is_downgraded_to_wait_and_has_no_plan():
@@ -309,15 +311,16 @@ def test_strong_mtf_candidate_without_family_breadth_fails_closed():
     assert result["decision"]["locked_trade_plan"] is None
 
 
-def test_three_strongly_conflicting_evidence_families_block_a_plus_plan():
+def test_four_strongly_conflicting_evidence_families_block_competition_plan():
     payload = _strong_directional_payload("evt-family-conflict")
     payload["family_momentum"] = -0.90
     payload["family_price_action"] = -0.85
     payload["family_microstructure"] = -0.80
+    payload["family_volatility"] = -0.75
     result = decide_bridge_event("evt-family-conflict", payload)
     signal = result["decision"]["signal"]
     assert signal["recommendation"] == "WAIT"
-    assert signal["live_family_evidence"]["conflicting_families"] >= 3
+    assert signal["live_family_evidence"]["conflicting_families"] >= 4
     assert "gate_block=family_conflicts" in signal["reasons"]
     assert result["decision"]["locked_trade_plan"] is None
 
