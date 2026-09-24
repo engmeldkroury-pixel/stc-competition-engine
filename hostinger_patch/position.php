@@ -52,6 +52,77 @@ $body = stc_json_body();
 $action = strtoupper(trim((string)($body['action'] ?? '')));
 
 try {
+    if ($action === 'VOID') {
+        $positionId = trim((string)($body['position_id'] ?? ''));
+        $reason = trim((string)($body['reason'] ?? ''));
+        $confirmed = ($body['confirm_void'] ?? false) === true;
+        if ($positionId === '' || !$confirmed || strlen($reason) < 8) {
+            stc_json([
+                'ok' => false,
+                'error' => 'void_confirmation_required',
+                'detail' => 'Provide position_id, confirm_void=true, and a specific reconciliation reason.',
+            ], 400);
+        }
+
+        $row = stc_position_row($pdo, $positionId);
+        if ((string)$row['status'] !== 'OPEN') {
+            stc_json(['ok' => false, 'error' => 'only_open_position_can_be_voided'], 409);
+        }
+        if ((string)$row['origin'] !== 'manual_external') {
+            stc_json([
+                'ok' => false,
+                'error' => 'void_restricted_to_manual_external',
+                'detail' => 'STC-plan positions must be closed through the normal audited close workflow.',
+            ], 409);
+        }
+
+        $quantity = (float)$row['quantity'];
+        $now = new DateTimeImmutable('now', new DateTimeZone('UTC'));
+        $note = trim((string)($row['note'] ?? ''));
+        $note = trim(($note !== '' ? $note . ' | ' : '')
+            . 'VOIDED ledger-only reconciliation record: ' . substr($reason, 0, 320)
+            . '. No broker action. No realized P/L.');
+
+        $pdo->beginTransaction();
+        $stmt = $pdo->prepare(
+            "UPDATE stc_positions SET status = 'VOID', quantity = 0, closed_at_utc = ?, "
+            . "realized_pnl_usd = 0, note = ? WHERE position_id = ? AND status = 'OPEN'"
+        );
+        $stmt->execute([
+            $now->format('Y-m-d H:i:s'),
+            $note,
+            $positionId,
+        ]);
+        if ($stmt->rowCount() !== 1) {
+            $pdo->rollBack();
+            stc_json(['ok' => false, 'error' => 'position_void_race'], 409);
+        }
+
+        $evt = $pdo->prepare(
+            'INSERT INTO stc_position_events '
+            . '(event_id, position_id, event_type, quantity_delta, price, realized_pnl_delta_usd, note, created_at_utc) '
+            . 'VALUES (?, ?, ?, ?, ?, 0, ?, ?)'
+        );
+        $evt->execute([
+            stc_position_event_id($positionId, 'VOID'),
+            $positionId,
+            'VOID',
+            -$quantity,
+            (float)$row['entry_price'],
+            'Owner-confirmed ledger reconciliation void. No broker action and no realized P/L.',
+            $now->format('Y-m-d H:i:s'),
+        ]);
+        $pdo->commit();
+
+        stc_json([
+            'ok' => true,
+            'position' => stc_position_public(stc_position_row($pdo, $positionId)),
+            'execution' => 'none',
+            'automatic_execution_available' => false,
+            'note' => 'Ledger record voided for reconciliation only. No broker action occurred.',
+        ]);
+    }
+
     if ($action === 'IMPORT_CLOSED') {
         $competitionId = trim((string)($body['competition_id'] ?? ''));
         $symbol = trim((string)($body['symbol'] ?? ''));
