@@ -1,0 +1,54 @@
+name: STC Hostinger Hotfix Package
+
+on:
+  push:
+    branches: [stc-hostinger-hotfix-package-20260924]
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build exact Hostinger hotfix package
+        run: |
+          mkdir -p package
+          cp hostinger_patch/cloud_control.php package/
+          cp hostinger_patch/operator_snapshot.php package/
+          cp hostinger_patch/approval.php package/
+          cp hostinger_patch/portfolio_control.php package/
+          cp hostinger_patch/notification_control.php package/
+          cp hostinger_patch/operator.php package/
+          cat > package/UPLOAD_TO_PUBLIC_HTML.txt <<'TXT'
+          STC Hostinger hotfix package - 2026-09-24
+
+          Upload/replace ONLY these six PHP files in the STC public_html directory:
+          - cloud_control.php
+          - operator_snapshot.php
+          - approval.php
+          - portfolio_control.php
+          - notification_control.php
+          - operator.php
+
+          No SQL migration is required for this hotfix.
+          Do not upload SECURITY.md, tests, .gitignore, or GitHub workflow files.
+
+          Purpose:
+          Make Capital COMPETITION_OPPORTUNITY plans pass consistently through
+          owner snapshot, manual approval, Telegram notification, and position recording.
+
+          Source main commit containing the merged fix:
+          9b3746d2be8e448d76f9f0ce76d7425d9fcc0d12
+          TXT
+
+      - name: Upload package
+        uses: actions/upload-artifact@v4
+        with:
+          name: STC_HOSTINGER_HOTFIX_20260924
+          path: package/
+          if-no-files-found: error
+          retention-days: 7
