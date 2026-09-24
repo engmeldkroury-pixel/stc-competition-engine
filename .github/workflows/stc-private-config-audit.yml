@@ -41,15 +41,19 @@ jobs:
           with urllib.request.urlopen(req, timeout=15) as response:
               data = json.load(response)
 
-          selected = None
+          candidates = []
           for item in data.get("events") or []:
               payload = item.get("payload") or {}
               if (
                   payload.get("competition_id") == "capital-africa-sep-2026"
                   and payload.get("symbol") == "CAPITALCOM:EURUSD"
               ):
-                  selected = item
-                  break
+                  candidates.append(item)
+          selected = max(
+              candidates,
+              key=lambda item: str((item.get("payload") or {}).get("time") or ""),
+              default=None,
+          )
 
           if selected is None:
               print(json.dumps({"found": False}))
