@@ -431,7 +431,9 @@ def test_mobile_signal_alert_contains_sizing_risk_and_single_tp_ticket():
     assert "'MAX STC QUANTITY: '" in notify
     assert "DO NOT EXCEED; smaller is allowed" in notify
     assert "Risk budget USD" in notify
-    assert "' | Official max: '" in notify
+    assert "' | Official max: '" not in notify
+    assert "Never use profile max, trade value, margin, leverage, or % balance as quantity." in notify
+    assert "This notification is NOT an execution approval." in notify
     assert "'Signal score: '" in notify
     assert "Single-TP mode: place only the final take-profit" in notify
 
