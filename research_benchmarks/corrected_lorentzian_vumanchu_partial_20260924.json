@@ -1,0 +1,99 @@
+{
+  "schema": "stc-corrected-lorentzian-vumanchu-partial-v1",
+  "created_utc": "2026-09-24T07:58:00Z",
+  "controlling_project": "STC",
+  "source_run": {
+    "workflow_run_id": 35969652488,
+    "trigger_commit": "2ed98f6b110cfbcb4f7a02c8af542109dd7362ab",
+    "branch": "research/native-community-15m-20260923",
+    "intended_scope": "26 competition symbols x 5000 exact-provider TradingView 15m bars",
+    "accepted_baseline": "WU-109 reconciled wave-3 = 13/26 community profile-ready, native 0/26"
+  },
+  "execution_status": {
+    "successful_current_artifacts": 17,
+    "deferred_prestart_jobs": 9,
+    "corrected_components_verified_in_successful_artifacts": [
+      "lorentzian_classification",
+      "vumanchu_cipher_b"
+    ],
+    "current_community_trial_count_per_successful_artifact": 20,
+    "successful_profile_ready_symbols": 9,
+    "successful_native_validated_symbols": 0,
+    "deferred_symbols": [
+      "CME_MINI:M6B1!",
+      "CME_MINI:M6E1!",
+      "CME_MINI:MES1!",
+      "CME_MINI:MJY1!",
+      "CME_MINI:MNQ1!",
+      "COMEX_MINI:SIL1!",
+      "COMEX_MINI:MGC1!",
+      "NYMEX:MCL1!",
+      "NYMEX:MNG1!"
+    ]
+  },
+  "lorentzian_classification": {
+    "evidence_status": "AUTHORITATIVE_PARTIAL_17_OF_26",
+    "validated_count_in_successful_artifacts": 2,
+    "validated_symbols": [
+      {
+        "symbol": "CAPITALCOM:USDZAR",
+        "selected_parameters": {},
+        "robust_score": 44.3006,
+        "test": {
+          "trades": 28,
+          "expectancy_r": 0.409118666027155,
+          "profit_factor": 2.0009383404483683,
+          "win_rate": 0.5357142857142857,
+          "max_drawdown_r": 2.199999999999978
+        },
+        "forward": {
+          "trades": 19,
+          "expectancy_r": 0.29438347794094843,
+          "profit_factor": 1.8119194827177136,
+          "win_rate": 0.5789473684210527,
+          "max_drawdown_r": 2.643061936882228
+        }
+      },
+      {
+        "symbol": "CBOT:ZB1!",
+        "selected_parameters": {},
+        "robust_score": 23.2508,
+        "test": {
+          "trades": 39,
+          "expectancy_r": 0.19617280652682884,
+          "profit_factor": 1.3994791987129969,
+          "win_rate": 0.46153846153846156,
+          "max_drawdown_r": 8.925515066777372
+        },
+        "forward": {
+          "trades": 36,
+          "expectancy_r": 0.15757253091257434,
+          "profit_factor": 1.2715640395838999,
+          "win_rate": 0.3888888888888889,
+          "max_drawdown_r": 8.038932298800463
+        }
+      }
+    ],
+    "missing_nine": "PENDING_OFFICIAL_PORT_EXECUTION",
+    "note": "Do not infer a 26-symbol Lorentzian pass rate until the same pinned official AI Edge port runs on the nine deferred symbols."
+  },
+  "vumanchu_cipher_b": {
+    "evidence_status": "FULL_26_DIAGNOSTIC_NO_SURVIVOR",
+    "validated_in_corrected_17_artifacts": 0,
+    "validated_in_independent_exact_provider_missing_9_check": 0,
+    "combined_validated_diagnostic": "0/26",
+    "note": "The nine-symbol completion used the current STC causal VuManChu semantics and TRAIN-only parameter grid against fresh exact TradingView 15m data. It is useful negative research evidence but remains diagnostic rather than a substitute for the blocked GitHub artifact run."
+  },
+  "infrastructure_blocker": {
+    "classification": "GITHUB_ACTIONS_PRESTART_RUNNER_OR_ACCOUNT_QUOTA",
+    "evidence": [
+      "Workflow 35969652488 attempts repeatedly produced the same nine failed matrix jobs with steps=null while 17 jobs completed normally.",
+      "Dedicated retry workflow 35971669454 produced steps=null for all nine jobs before checkout/setup.",
+      "Unrelated PR #135 and #136 CI jobs also failed with steps=null."
+    ],
+    "interpretation": "The deferred jobs did not execute application code; they must not be classified as strategy/test failures.",
+    "canonical_full_workflow_restored_on_research_branch_commit": "aa21f072ca5d1d0a2b2e5c92e17b3dee56ac5e13"
+  },
+  "live_authority": false,
+  "promotion_effect": "NONE"
+}
