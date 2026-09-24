@@ -6,13 +6,19 @@ Updated: 2026-09-24 11:30 UTC
 STC.
 
 ## URGENT PRODUCTION PRIORITY
-EURUSD is now recorded correctly in the STC portfolio and must NOT be entered again. The immediate production task is to deploy the final seven-file Hostinger bundle containing:
-- locked-plan persistence / RECOVERY ONLY behavior;
-- selectable Record Trade competition;
-- Capital bare-symbol normalization;
-- server-side position target resolution including position.php.
+Deploy the final 7-file Hostinger hotfix built after PR #158. This bundle includes:
+- locked-plan persistence/recovery;
+- selectable/normalized Record Trade competition + provider symbol;
+- position.php server-side target normalization;
+- server-time fallback for blank manual open time and small clock-skew tolerance.
 
-After upload, run STC Live Readback and visually verify the Record Trade selector and future preserved-plan behavior. Continue supervising the existing EURUSD position through Portfolio Supervisor; do not create a replacement EURUSD entry while it remains OPEN.
+After deployment:
+1. verify the live Record Trade form shows the updated competition selector and server-time guidance;
+2. verify a blank Original open time no longer produces manual_position_open_time_outside_competition_window;
+3. recover the owner’s XAGUSD trade only after confirming its actual platform state:
+   - if still OPEN: record the actual filled quantity/average fill/current SL/final TP;
+   - if already CLOSED: use historical closed-trade import instead;
+4. do not place a duplicate XAGUSD order merely because STC has not recorded it yet.
 
 ## VERIFIED LIVE EVIDENCE
 - Main includes PR #145 competition quality eligibility fix.
