@@ -2140,3 +2140,19 @@ Owner intervention required now: YES — only for historical-data access, not fo
 - Canonical full benchmark workflow restored on research branch commit `aa21f072ca5d1d0a2b2e5c92e17b3dee56ac5e13`.
 - PR #135 and #136 remain unmerged/completed-unverified until independent tests or GitHub CI can execute.
 - Live A+, risk, competition, sizing and manual-execution boundaries remain unchanged.
+
+
+## Benchmark eligibility clean replacement + Actions pre-start verification — 2026-09-24 11:18 EEST
+- PR #138 opened from current main as clean replacement for stale PR #135.
+- Scope:
+  - central benchmarkable_indicators() selector;
+  - independent benchmark eligibility includes implemented_conceptual + implemented_official_port;
+  - native_proxy_only remains discoverable but excluded from independent community weights;
+  - normal benchmark and community frozen confirmation now call the same selector;
+  - regression coverage includes official Lorentzian frozen eligibility and native SMC proxy exclusion.
+- PR #138 is mergeable.
+- GitHub Actions run 35974456534 failed before any step started; job steps=null.
+- Classification: external Actions pre-start infrastructure blocker, not a test assertion or application-code failure.
+- PR #136 remains superseded; clean replacement PR #137 already merged as c1254278f0159012dcabade8cf5bdcb0deca7cfc and provides sealed frozen-batch shadow weight recalibration.
+- Current main already contains redundancy-aware family normalization in build_symbol_ensemble_profile(); no duplicate implementation was added.
+- Live A+, risk, sizing, competition and manual-execution rules remain unchanged.
