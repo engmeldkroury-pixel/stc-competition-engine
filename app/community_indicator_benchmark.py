@@ -433,8 +433,9 @@ def benchmark_symbol_indicators(
     bars: list[Bar],
 ) -> tuple[CommunityIndicatorTrial, ...]:
     trials: list[CommunityIndicatorTrial] = []
+    benchmarkable_statuses = {"implemented_conceptual", "implemented_official_port"}
     for spec in eligible_indicators(asset_class, timeframe, implemented_only=True):
-        if spec.implementation_status != "implemented_conceptual":
+        if spec.implementation_status not in benchmarkable_statuses:
             continue
         trials.append(
             benchmark_indicator(
