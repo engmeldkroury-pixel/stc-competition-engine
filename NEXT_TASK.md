@@ -71,3 +71,18 @@ The two Facebook trader links are registered but not yet readable:
 - direct fetch -> login_required;
 - browser automation -> not started because TinyFish wallet balance is negative.
 Do not fabricate content. Resume when browser access is funded or when screenshots/video/text are supplied.
+
+
+## ACTIVE EVIDENCE TASK — WAVE 3 REBENCHMARK
+Rerun the same 26-symbol / 5,000-bar exact-provider 15m benchmark with the expanded implemented community set including:
+- Trendilo;
+- endpoint-only non-repainting Nadaraya-Watson;
+- causally delayed RSI Kernel Optimized.
+Compare against the prior verified workflow 35916027610.
+Record:
+- validated symbols per component;
+- incremental symbols covered;
+- robust scores;
+- whether any new component survives OOS+forward;
+- redundancy/family overlap.
+Failed components remain zero-weight.
