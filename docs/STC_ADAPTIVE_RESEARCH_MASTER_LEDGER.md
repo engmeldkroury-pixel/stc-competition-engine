@@ -852,3 +852,72 @@ Status: IN PROGRESS.
 - Workflow run: 35969652488.
 - Acceptance requires artifact-level proof that community_trials contains both lorentzian_classification and vumanchu_cipher_b on compatible symbols before interpreting performance.
 - Baseline for incremental comparison: 13/26 profile-ready symbols from WU-109.
+
+
+### WU-112 — native exact frozen confirmation clean replacement
+Status: VERIFIED / MERGED.
+- Replacement PR #133 merged to main as `3e0cf23195c4112da62a633b7f74d742c438a92a`.
+- Its CI had completed successfully before the later GitHub Actions pre-start outage.
+- Scope: exact final-unseen/frozen holdout machinery for native STC strategy candidates.
+- This supplies the apples-to-apples native final-holdout path required by the adaptive research program.
+- It does not grant any native strategy live authority by itself.
+
+### WU-113 — corrected Lorentzian + VuManChu exact-data rerun
+Status: PARTIALLY VERIFIED / INFRASTRUCTURE BLOCKED.
+- Corrected workflow run: 35969652488.
+- Trigger commit: `2ed98f6b110cfbcb4f7a02c8af542109dd7362ab`.
+- 17/26 symbol jobs completed and produced corrected current artifacts.
+- Artifact-level verification confirms each successful artifact contains 20 community trials including:
+  - `lorentzian_classification`;
+  - `vumanchu_cipher_b`.
+- Corrected 17-symbol native status: 0 validated native 15m strategies.
+- Corrected 17-symbol community profile-ready status: 9/17.
+- Official Lorentzian authoritative partial result:
+  - 2/17 validated;
+  - CAPITALCOM:USDZAR — robust score 44.3006;
+  - CBOT:ZB1! — robust score 23.2508.
+- Official Lorentzian must remain reported as 2/17 until the same pinned upstream port executes on the remaining nine symbols.
+- VuManChu:
+  - 0/17 in corrected workflow artifacts;
+  - independently completed on the nine deferred symbols using fresh exact TradingView 15m bars and the current causal STC VuManChu semantics / TRAIN-only parameter grid;
+  - 0/9 additional passes;
+  - full diagnostic 26-symbol result therefore 0/26 validated.
+- Durable checkpoint:
+  - `research_benchmarks/corrected_lorentzian_vumanchu_partial_20260924.json`;
+  - `docs/CORRECTED_LORENTZIAN_VUMANCHU_PARTIAL_20260924.md`.
+- Live authority remains false.
+
+### GitHub Actions pre-start infrastructure blocker — 2026-09-24
+Status: BLOCKED_EXTERNAL_INFRASTRUCTURE.
+- The same nine corrected benchmark jobs repeatedly returned `steps=null`, meaning no checkout/setup/test/application step started.
+- Dedicated retry workflow 35971669454 produced `steps=null` for all nine deferred jobs.
+- Unrelated PR #135 and PR #136 CI jobs also returned `steps=null`.
+- Classification: GitHub Actions hosted-runner/account/quota pre-start condition, not an STC strategy or unit-test failure.
+- Deferred symbols:
+  - CME_MINI:M6B1!;
+  - CME_MINI:M6E1!;
+  - CME_MINI:MES1!;
+  - CME_MINI:MJY1!;
+  - CME_MINI:MNQ1!;
+  - COMEX_MINI:SIL1!;
+  - COMEX_MINI:MGC1!;
+  - NYMEX:MCL1!;
+  - NYMEX:MNG1!.
+- The canonical full benchmark workflow was restored on the research branch at `aa21f072ca5d1d0a2b2e5c92e17b3dee56ac5e13` after an abandoned retry-edit attempt.
+- Do not endlessly retrigger until runner/account capacity is available.
+
+### WU-114 — centralized benchmark eligibility + frozen shadow recalibration
+Status: CODE PROPOSED / COMPLETED_UNVERIFIED / CI INFRASTRUCTURE BLOCKED.
+- PR #135 centralizes the independent benchmarkable implementation-status selector so normal benchmark and frozen confirmation use one rule:
+  - includes implemented conceptual and official-port components;
+  - excludes native proxies from independent community weight.
+- PR #136 implements the owner's frozen-batch adaptive-weight rule:
+  - only sealed batches;
+  - default minimum 30 exact symbol/timeframe/component observations;
+  - duplicate ids fail closed;
+  - expectancy, PF, directional hit rate and drawdown affect candidate research weight;
+  - hit rate is shrunk toward 50%;
+  - one recalibration step capped at 25% by default;
+  - negative expectancy or PF<1 cannot increase weight;
+  - output remains `live_authority=false`.
+- Both PR CI jobs failed before steps began because of the external Actions blocker. They are not accepted/merged on that basis yet.
