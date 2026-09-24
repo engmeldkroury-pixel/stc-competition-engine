@@ -2170,3 +2170,21 @@ Owner intervention required now: YES — only for historical-data access, not fo
 - GitHub Actions run 35974456534 remained pre-start blocked (steps=null), so CI is explicitly recorded as NOT RUN, not passed.
 - Acceptance basis: mergeable clean diff + independent source review + research-only boundary.
 - Live A+, risk, sizing, competition and manual execution behavior unchanged.
+
+
+## Shadow recalibration wired into research runner — 2026-09-24 11:39 EEST
+- PR #139 merged as c944dc9d276080c691dc61b492380c7f646df90a.
+- The previously standalone frozen-batch shadow recalibration engine is now reachable from normal symbol research.
+- Research payload may optionally contain a sealed shadow_batch.
+- Fail-closed rules:
+  - batch_id required;
+  - sealed must be true;
+  - observations must carry unique typed identity fields;
+  - directional_hit must be boolean;
+  - existing duplicate-id guard in shadow_weight_recalibration remains authoritative.
+- Recalibration starts from the symbol/timeframe ensemble's existing OOS/forward normalized research weights.
+- Existing minimum sealed sample rule remains active; small samples retain prior weights.
+- Candidate weights are returned separately under shadow_recalibration_profiles.
+- shadow_recalibration_live_authority=false.
+- No live weight is written; no A+, risk, sizing, competition or manual-execution rule changed.
+- GitHub Actions run 35976346795 was pre-start blocked with steps=null, so CI is recorded as NOT RUN. The unified diff was independently reviewed before merge.
