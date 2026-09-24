@@ -49,3 +49,10 @@ def test_console_keeps_recovery_path_when_signal_refreshes_after_manual_fill() -
     assert "Already filled on platform? Record position" in source
     assert "If you already filled the trade and the signal card disappeared after a refresh, DO NOT enter the trade again." in source
     assert "newer_signal_not_aligned" in source
+
+
+def test_record_trade_competition_field_is_explicitly_read_only() -> None:
+    source = _source()
+    assert "Competition — selected automatically" in source
+    assert 'id="pos-competition-label" type="text" readonly aria-readonly="true"' in source
+    assert "Read-only on purpose. Do not type the competition name; STC binds the trade to the selected competition automatically." in source
