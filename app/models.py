@@ -173,6 +173,7 @@ class TradingViewWebhook(BaseModel):
     family_smc_liquidity: float | None = None
     family_price_action: float | None = None
     family_microstructure: float | None = None
+    community_component_signals: dict[str, float] | None = None
     history_timeframe: str | None = None
     history_time: datetime | None = None
     history_close: float | None = None
@@ -252,6 +253,19 @@ class TradingViewWebhook(BaseModel):
         for name, value in zip(names, values):
             if value is not None and not -1.0 <= float(value) <= 1.0:
                 raise ValueError(f"{name} must be between -1 and 1")
+        return self
+
+    @model_validator(mode="after")
+    def validate_community_component_signals(self):
+        if self.community_component_signals is None:
+            return self
+        if not self.community_component_signals:
+            raise ValueError("community component signals must be non-empty or absent")
+        for name, value in self.community_component_signals.items():
+            if not isinstance(name, str) or not name.strip() or len(name) > 96:
+                raise ValueError("invalid community component signal name")
+            if not -1.0 <= float(value) <= 1.0:
+                raise ValueError(f"community component signal {name} must be between -1 and 1")
         return self
 
     @model_validator(mode="after")
