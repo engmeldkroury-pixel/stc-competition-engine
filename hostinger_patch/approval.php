@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
-require __DIR__ . '/macro_control.php';
+require_once __DIR__ . '/portfolio_control.php';
+require_once __DIR__ . '/macro_control.php';
 
 $pdo = stc_pdo($config);
 
@@ -81,6 +82,9 @@ try {
     $evidenceId = null;
     $macroContext = null;
     $latestSignalContext = null;
+    $lossCooldown = null;
+    $positionSizing = null;
+    $executionTicket = null;
 
     if ($requested === 'approve') {
         if ($control['safe_mode']) {
@@ -95,8 +99,45 @@ try {
         if (!stc_signal_quality_gate_eligible($signal)) {
             $reasons[] = 'quality_gate_not_passed';
         }
-        $validUntil = stc_parse_utc((string)($envelope['valid_until'] ?? ''));
+
+        $lockedPlan = $decision['locked_trade_plan'] ?? null;
+        if (!is_array($lockedPlan)
+            || ($lockedPlan['levels_locked'] ?? false) !== true
+            || ($lockedPlan['execution'] ?? '') !== 'manual_only') {
+            $reasons[] = 'locked_plan_unavailable';
+        }
+
+        $openStmt = $pdo->prepare(
+            "SELECT COALESCE(SUM(quantity), 0) FROM stc_positions "
+            . "WHERE competition_id = ? AND symbol = ? AND status = 'OPEN'"
+        );
+        $openStmt->execute([$competitionId, $symbol]);
+        if ((float)$openStmt->fetchColumn() > 1e-12) {
+            $reasons[] = 'existing_open_position';
+        }
+
+        $direction = strtoupper(trim((string)($signal['recommendation'] ?? 'WAIT')));
+        $decisionTimeframeMinutes = 15;
+        if (is_array($lockedPlan)) {
+            $rawTimeframe = trim((string)($lockedPlan['decision_timeframe'] ?? '15'));
+            if (preg_match('/^\d+$/', $rawTimeframe) === 1) {
+                $decisionTimeframeMinutes = max(1, (int)$rawTimeframe);
+            }
+        }
         $now = new DateTimeImmutable('now', new DateTimeZone('UTC'));
+        $lossCooldown = stc_recent_same_direction_loss_cooldown(
+            $pdo,
+            $competitionId,
+            $symbol,
+            $direction,
+            $now,
+            $decisionTimeframeMinutes
+        );
+        if (($lossCooldown['active'] ?? false) === true) {
+            $reasons[] = 'same_direction_loss_cooldown';
+        }
+
+        $validUntil = stc_parse_utc((string)($envelope['valid_until'] ?? ''));
         if ($validUntil === null || $now >= $validUntil) {
             $reasons[] = 'signal_expired';
         }
@@ -127,6 +168,54 @@ try {
         } else {
             $checked = stc_validate_owner_confirmation($confirmation, $envelope, $competitionId, $symbol);
             $reasons = array_values(array_unique(array_merge($reasons, $checked['reasons'])));
+
+            $checkedPrice = $checked['evidence']['quote_price'] ?? null;
+            if ($checkedPrice !== null && is_array($lockedPlan)) {
+                try {
+                    $positionSizing = stc_current_position_sizing_for_plan(
+                        $pdo,
+                        $competitionId,
+                        $symbol,
+                        (float)$checkedPrice,
+                        (float)$lockedPlan['initial_stop']
+                    );
+                    if (($positionSizing['allowed_by_position_limit'] ?? false) !== true
+                        || ($positionSizing['allowed_by_risk_policy'] ?? false) !== true
+                        || (float)($positionSizing['proposed_quantity'] ?? 0.0) <= 0.0) {
+                        $reasons[] = 'risk_capacity_unavailable';
+                    } else {
+                        $orderInstruction = stc_entry_order_instruction(
+                            (string)$lockedPlan['direction'],
+                            (float)$checkedPrice,
+                            (float)$lockedPlan['entry_min'],
+                            (float)$lockedPlan['entry_max']
+                        );
+                        $executionTicket = [
+                            'ticket_version' => 'stc-execution-ticket-v1',
+                            'competition_id' => $competitionId,
+                            'symbol' => $symbol,
+                            'direction' => (string)$lockedPlan['direction'],
+                            'approved_quote_price' => (float)$checkedPrice,
+                            'entry_min' => (float)$lockedPlan['entry_min'],
+                            'entry_max' => (float)$lockedPlan['entry_max'],
+                            'initial_stop' => (float)$lockedPlan['initial_stop'],
+                            'final_take_profit' => (float)$lockedPlan['target2'],
+                            'max_quantity' => (float)$positionSizing['proposed_quantity'],
+                            'risk_amount_usd' => (float)$positionSizing['risk_amount_usd'],
+                            'risk_budget_usd' => (float)$positionSizing['risk_budget_usd'],
+                            'risk_fraction' => (float)$positionSizing['risk_fraction'],
+                            'order_instruction' => $orderInstruction,
+                            'do_not_exceed_quantity' => true,
+                            'smaller_quantity_allowed' => true,
+                            'manual_execution_only' => true,
+                            'freshness_seconds' => 60,
+                        ];
+                    }
+                } catch (Throwable $e) {
+                    $reasons[] = 'risk_capacity_unavailable';
+                }
+            }
+
             if ($checked['evidence']['observed_at_utc'] !== null) {
                 $evidenceId = 'owner-' . bin2hex(random_bytes(16));
                 $insertEvidence = $pdo->prepare(
@@ -146,11 +235,15 @@ try {
                     json_encode([
                         'attestation' => 'owner_platform_confirmation',
                         'macro_context' => $macroContext,
+                        'loss_cooldown' => $lossCooldown,
+                        'position_sizing' => $positionSizing,
+                        'execution_ticket' => $executionTicket,
                     ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
                     'owner',
                 ]);
             }
         }
+        $reasons = array_values(array_unique($reasons));
         $status = $reasons === [] ? 'approved' : 'blocked';
     } else {
         $reasons[] = 'owner_rejected';
@@ -185,6 +278,9 @@ try {
         'runtime_control_version' => $control['version'],
         'macro_context' => $macroContext,
         'latest_signal_context' => $latestSignalContext,
+        'loss_cooldown' => $lossCooldown,
+        'position_sizing' => $positionSizing,
+        'execution_ticket' => $status === 'approved' ? $executionTicket : null,
         'execution' => 'manual_only',
     ], $status === 'blocked' ? 409 : 200);
 } catch (Throwable $e) {
