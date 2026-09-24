@@ -1,3 +1,4 @@
-ready 2026-09-24T10:08:00+03:00
+ready 2026-09-24T10:27:00+03:00
 all 26 exact-provider 15m datasets staged
-main synced through PR #125 official Lorentzian integration
+corrected official-port benchmark dispatch included
+VuManChu causal adapter included
