@@ -311,15 +311,16 @@ def test_strong_mtf_candidate_without_family_breadth_fails_closed():
     assert result["decision"]["locked_trade_plan"] is None
 
 
-def test_three_strongly_conflicting_evidence_families_block_a_plus_plan():
+def test_four_strongly_conflicting_evidence_families_block_competition_plan():
     payload = _strong_directional_payload("evt-family-conflict")
     payload["family_momentum"] = -0.90
     payload["family_price_action"] = -0.85
     payload["family_microstructure"] = -0.80
+    payload["family_volatility"] = -0.75
     result = decide_bridge_event("evt-family-conflict", payload)
     signal = result["decision"]["signal"]
     assert signal["recommendation"] == "WAIT"
-    assert signal["live_family_evidence"]["conflicting_families"] >= 3
+    assert signal["live_family_evidence"]["conflicting_families"] >= 4
     assert "gate_block=family_conflicts" in signal["reasons"]
     assert result["decision"]["locked_trade_plan"] is None
 
