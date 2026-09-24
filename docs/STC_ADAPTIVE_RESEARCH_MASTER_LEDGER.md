@@ -716,3 +716,21 @@ Status: VERIFIED / MERGED.
 - Added bounded TRAIN-only parameter grids for all three.
 - Expanded causality contract tests across the implemented community set.
 - Research-only boundary remains intact; no live A+ weight, risk rule, approval gate, or execution behavior changed.
+
+
+### WU-107 — frozen research contract reconciliation
+Status: VERIFIED / MERGED.
+- PR #124 merged as 6df403846a1d386816a1bf0ebe29db79fc27cd60.
+- CI: 381 passed, 1 warning.
+- A continuity regression was found and repaired before accepting new benchmark evidence:
+  - HalfTrend had reverted from implemented to pending after a later clean promotion.
+  - the canonical frozen Nadaraya component id used by the shadow registry had been replaced by a newer alias;
+  - Trendilo parameter names/semantics had drifted from the contract that produced existing frozen/shadow records.
+- Repairs:
+  - restored HalfTrend causal adapter + TRAIN-only grid;
+  - restored frozen-compatible Trendilo semantics and parameter schema;
+  - restored canonical id nadaraya_watson_endpoint_nonrepaint;
+  - retained nadaraya_watson_envelope_luxalgo only as a superseded compatibility/discovery alias, not a second benchmark component;
+  - preserved wave-3 RSI Kernel causal adapter.
+- Added tests that fail if historical shadow component ids or frozen Trendilo parameter contracts drift again.
+- Reconciled 26-symbol benchmark was re-triggered from exact staged data after the repair; pre-reconciliation benchmark output is superseded and must not be used for promotion.
