@@ -585,3 +585,31 @@ Status: VERIFIED / MERGED.
 5. Continue VuManChu divergence confirmation-delay audit.
 6. Preserve General Lab rule: every new symbol inherits the full process automatically, never another symbol's weights.
 7. Do not change live A+ gates/risk/competition rules without separate owner promotion.
+
+
+## Work-unit register update — 2026-09-24
+
+### WU-119 — Trendilo multi-timeframe frozen confirmation
+Status: VERIFIED / COMPLETED / PENDING MERGE.
+- Workflow run 35947248551: SUCCESS.
+- Symbols: CAPITALCOM:BTCUSD and CME_MINI:MJY1!.
+- Timeframes tested: 5m, 30m, 1h, derived 2h, 4h, 1D where exact-provider history met the frozen evidence floor.
+- Same-component result:
+  - MJY Trendilo passed 15m + 5m + 30m and is now MULTITF_CONFIRMED.
+  - BTCUSD Trendilo had no supporting timeframe pass and remains SHADOW.
+- New independent frozen candidates:
+  - BTCUSD 5m / endpoint Nadaraya-Watson non-repaint;
+  - BTCUSD 1D / Hull Suite.
+- Existing MJY 5m Squeeze Momentum passed again.
+- Registry after update:
+  - 16 total records;
+  - 3 MULTITF_CONFIRMED records, all MJY Trendilo at 15m/5m/30m;
+  - all records live_authority=false.
+- Promotion ladder is unchanged. MULTITF_CONFIRMED is still research-only and requires sufficient positive shadow observations before ELIGIBLE_FOR_OWNER_PROMOTION.
+
+### Controlling next research actions
+1. Begin formal shadow observation accumulation for MULTITF_CONFIRMED MJY Trendilo without changing live authority.
+2. Continue Lorentzian Classification exact semantic/parity audit using the official open-source Pine/Python reference.
+3. Continue VuManChu divergence confirmation-delay audit.
+4. Preserve General Lab automatic full-process routing for every newly added symbol.
+5. Expand practical open-source candidates only after causal/repaint review.
