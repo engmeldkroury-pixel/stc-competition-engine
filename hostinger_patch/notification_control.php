@@ -286,7 +286,10 @@ function stc_notify_signal_event(PDO $pdo, array $config, string $eventId): arra
                 : 0.0;
             $sizingText = 'MAX STC QUANTITY: ' . rtrim(rtrim(number_format((float)$sizing['proposed_quantity'], 6, '.', ''), '0'), '.')
                 . ' | DO NOT EXCEED; smaller is allowed'
-                . ' | Risk budget:             $sizingText = 'Sizing blocked: ' . $e->getMessage();
+                . ' | Risk budget USD ' . number_format((float)$sizing['risk_amount_usd'], 2, '.', '')
+                . ' (' . number_format($riskPct, 3, '.', '') . '%)';
+        } catch (Throwable $e) {
+            $sizingText = 'Sizing blocked: ' . $e->getMessage();
         }
     }
 
