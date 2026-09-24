@@ -2226,3 +2226,39 @@ Owner intervention required now: YES — only for historical-data access, not fo
 - Public-repository migration is authorized in principle by owner, but no visibility change has yet been made.
 - Secret/tree screening so far found no obvious secret/token/credential filenames and no named hard-coded secret hits; this is not yet a complete history-level secret audit.
 - Production merge/deploy remains pending verification; do not describe competition mode as live yet.
+
+
+## Competition mode merged + notification compatibility fix — 2026-09-24 12:15+ EEST
+- PR #140 merged to main as 403db181e9ce43772b95215a8187f0dfcf0a4f78.
+- Capital Africa now has a separate competition opportunity gate:
+  - preserves the original A+ gate for other competitions;
+  - requires directional strength, majority 1h/2h/4h alignment, family evidence, and acceptable execution quality;
+  - Capital quality floor is 78/100;
+  - 1M alignment is no longer a hard Capital entry blocker;
+  - human approval and manual order entry remain mandatory.
+- Serverless /process now drains multiple bridge batches per invocation.
+- Live replay of the latest ten Capital payloads under the merged logic:
+  - EURUSD SHORT 83/100 -> PASS;
+  - XAUUSD SHORT 80/100 -> PASS;
+  - XAGUSD SHORT 75/100 -> BLOCK.
+- A post-merge audit found a notification compatibility defect:
+  - notification_control.php accepted only setup_grade=A_PLUS;
+  - COMPETITION_OPPORTUNITY plans would therefore have been silently skipped by Telegram/email.
+- PR #141 merged to main as d7664ec2492d36cdd6eb713b9e0769d387a77a54:
+  - notification path now accepts A_PLUS and COMPETITION_OPPORTUNITY;
+  - notification body displays the actual setup grade;
+  - regression test added in tests/test_notification_contract.py.
+- GitHub Actions remains externally blocked:
+  - run 35982996430 failed before any useful execution because the repository is still private and the account Actions allowance is exhausted;
+  - prior process runs are cancelled/pre-start blocked rather than code-runtime failures.
+- Repository visibility is still private.
+- Owner has authorized making non-critical code public, but current GitHub connector does not expose a repository-visibility mutation.
+- TinyFish browser automation could not perform the settings change because the TinyFish wallet balance is negative; no browser run started.
+- Vercel connector currently exposes no accessible team/project for this account, so direct deployment from the connector is unavailable.
+- Hostinger web-file write access is not available through the current connectors; hostinger_patch/notification_control.php therefore still requires deployment to the live host before the notification fix is active there.
+- Current production classification:
+  - source code merged: YES;
+  - TradingView feed active: YES;
+  - competition-mode processing proven live end-to-end: NO;
+  - Telegram COMPETITION_OPPORTUNITY delivery proven live: NO;
+  - automatic broker execution: NO.
