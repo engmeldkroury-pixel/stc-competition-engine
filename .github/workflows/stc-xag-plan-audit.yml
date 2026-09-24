@@ -1,4 +1,4 @@
-name: STC XAG Plan Audit
+name: STC Loss Plan Audit
 
 on:
   push:
@@ -16,7 +16,7 @@ jobs:
     env:
       STC_OWNER_TOKEN: ${{ secrets.STC_OWNER_TOKEN }}
     steps:
-      - name: Read sanitized XAG notification plans
+      - name: Read sanitized loss-trade notification plans
         shell: bash
         run: |
           set -euo pipefail
@@ -28,8 +28,9 @@ jobs:
           import json, re
           data=json.load(open("/tmp/notifications.json",encoding="utf-8"))
           rows=[]
+          target_symbols={"CAPITALCOM:XAGUSD","CAPITALCOM:BTCUSD","CAPITALCOM:ETHUSD"}
           for e in data.get("events") or []:
-              if e.get("event_type")!="NEW_LOCKED_PLAN" or e.get("symbol")!="CAPITALCOM:XAGUSD":
+              if e.get("event_type")!="NEW_LOCKED_PLAN" or e.get("symbol") not in target_symbols:
                   continue
               created=str(e.get("created_at_utc") or "")
               body=str(e.get("body_text") or "")
@@ -40,6 +41,7 @@ jobs:
                   return None
               rows.append({
                   "created_at_utc":created,
+                  "symbol":e.get("symbol"),
                   "event_key":e.get("event_key"),
                   "quantity_line":line("Quantity: "),
                   "entry_zone":line("Entry zone: "),
@@ -50,5 +52,5 @@ jobs:
                   "mtf":line("MTF: "),
                   "evidence_families":line("Evidence families: "),
               })
-          print("STC_XAG_PLAN_AUDIT="+json.dumps(rows,sort_keys=True))
+          print("STC_LOSS_PLAN_AUDIT="+json.dumps(rows,sort_keys=True))
           PY
