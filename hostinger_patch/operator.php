@@ -124,7 +124,7 @@ input{width:100%}button{cursor:pointer}.primary{background:#1d4ed8}.danger{backg
       <div><label class="small">Actual average fill price</label><input id="pos-entry" type="text" autocomplete="off" oninput="updatePositionPricePreviews()"><div id="pos-entry-preview" class="fieldnote"></div></div>
       <div><label class="small">Current stop price</label><input id="pos-stop" type="text" autocomplete="off" oninput="updatePositionPricePreviews()"><div id="pos-stop-preview" class="fieldnote"></div></div>
       <div><label class="small">Final take-profit price (one TP only)</label><input id="pos-tp" type="text" autocomplete="off" oninput="updatePositionPricePreviews()"><div id="pos-tp-preview" class="fieldnote"></div></div>
-      <div><label class="small">Original open time if known</label><input id="pos-opened" type="datetime-local"><div class="fieldnote">Leave blank to use the current time.</div></div>
+      <div><label class="small">Original open time if known</label><input id="pos-opened" type="datetime-local"><div class="fieldnote">Leave blank to use the STC server time automatically. This avoids browser/time-zone clock mismatch.</div></div>
     </div>
     <div class="small" style="margin-top:10px">Treasury futures fields accept the exact TradingView quote, for example 105'12'5, or a tick-aligned decimal such as 105.390625. Values such as 105.13 are rejected for ZN because they are not valid ticks.</div>
     <div id="position-modal-message" class="hidden"></div>
@@ -987,17 +987,18 @@ async function submitPositionModal(){
  const geometryOk=side==='LONG'?(stop<entry&&finalTp>entry):(stop>entry&&finalTp<entry);
  if(!geometryOk){setPositionModalMessage('Stop / take-profit geometry does not match '+side+'.');return;}
  const openedText=$('pos-opened').value.trim();
- const openedAt=openedText?new Date(openedText):new Date();
- if(Number.isNaN(openedAt.getTime())){setPositionModalMessage('Open time is invalid.');return;}
+ const openedAt=openedText?new Date(openedText):null;
+ if(openedAt&&Number.isNaN(openedAt.getTime())){setPositionModalMessage('Open time is invalid.');return;}
+ const openedUtc=openedAt?openedAt.toISOString():null;
  let body;
  if(origin==='stc_plan'){
    const c=cardIndex!==null&&snapshot&&snapshot.cards?snapshot.cards[cardIndex]:null;
    const p=c&&c.locked_trade_plan?c.locked_trade_plan:null;
    if(!c||!p||!c.approval||c.approval.decision!=='approved'){setPositionModalMessage('The approved STC plan is no longer available. Use the existing-manual-position workflow instead.');return;}
-   body={action:'OPEN',origin:'stc_plan',competition_id:competitionId,symbol,side,quantity:qty,entry_price:entry,initial_stop:stop,current_stop:stop,target1:p.target1,target2:finalTp,source_plan_id:p.plan_id,opened_at_utc:openedAt.toISOString(),note:'Owner-confirmed manual fill via inline form'};
+   body={action:'OPEN',origin:'stc_plan',competition_id:competitionId,symbol,side,quantity:qty,entry_price:entry,initial_stop:stop,current_stop:stop,target1:p.target1,target2:finalTp,source_plan_id:p.plan_id,opened_at_utc:openedUtc,note:'Owner-confirmed manual fill via inline form'};
  }else{
    const checkpoint=(entry+finalTp)/2;
-   body={action:'OPEN',origin:'manual_external',competition_id:competitionId,symbol,side,quantity:qty,entry_price:entry,initial_stop:stop,current_stop:stop,target1:checkpoint,target2:finalTp,opened_at_utc:openedAt.toISOString(),note:'Backfilled existing manual position via inline form; single final TP'};
+   body={action:'OPEN',origin:'manual_external',competition_id:competitionId,symbol,side,quantity:qty,entry_price:entry,initial_stop:stop,current_stop:stop,target1:checkpoint,target2:finalTp,opened_at_utc:openedUtc,note:'Backfilled existing manual position via inline form; single final TP'};
  }
  $('position-submit').disabled=true;
  setPositionModalMessage('Saving position…','success');
@@ -1012,7 +1013,11 @@ async function submitPositionModal(){
      ?'Position target is not valid. Select the competition and use the supported symbol (for example CAPITALCOM:EURUSD).'
      :raw.includes('symbol_not_allowed')
        ?'That symbol is not enabled for the selected competition.'
-       :raw;
+       :raw.includes('manual_position_open_time_outside_competition_window')
+         ?'The entered open time is before the configured competition start. Leave the field blank to use STC server time, or enter the real platform fill time.'
+         :raw.includes('opened_at_out_of_range')
+           ?'The entered open time is outside the allowed range. Leave it blank to use STC server time automatically.'
+           :raw;
    setPositionModalMessage('Position record failed: '+friendly);
  }finally{
    $('position-submit').disabled=false;

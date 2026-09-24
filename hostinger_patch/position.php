@@ -223,16 +223,31 @@ try {
             ], 409);
         }
 
+        $now = new DateTimeImmutable('now', new DateTimeZone('UTC'));
         $openedRaw = trim((string)($body['opened_at_utc'] ?? ''));
-        $opened = stc_parse_utc($openedRaw);
+        $opened = $openedRaw === '' ? $now : stc_parse_utc($openedRaw);
         if ($opened === null) {
             stc_json(['ok' => false, 'error' => 'invalid_opened_at'], 400);
         }
-        $now = new DateTimeImmutable('now', new DateTimeZone('UTC'));
-        $age = $now->getTimestamp() - $opened->getTimestamp();
-        if ($age < -5) {
-            stc_json(['ok' => false, 'error' => 'opened_at_out_of_range'], 400);
+
+        // The Record Trade recovery form is often used immediately after a
+        // manual platform fill. If the owner leaves the field blank, use the
+        // Hostinger server time directly. If a browser clock is only slightly
+        // ahead, clamp it to server-now instead of rejecting a real fill.
+        $futureSkewSeconds = $opened->getTimestamp() - $now->getTimestamp();
+        if ($futureSkewSeconds > 300) {
+            stc_json([
+                'ok' => false,
+                'error' => 'opened_at_out_of_range',
+                'detail' => 'Open time is more than 5 minutes ahead of the STC server clock.',
+                'server_now_utc' => $now->format(DateTimeInterface::ATOM),
+            ], 400);
         }
+        if ($futureSkewSeconds > 0) {
+            $opened = $now;
+        }
+
+        $age = $now->getTimestamp() - $opened->getTimestamp();
         if ($origin === 'stc_plan' && $age > 86400) {
             stc_json(['ok' => false, 'error' => 'opened_at_out_of_range'], 400);
         }
@@ -240,8 +255,14 @@ try {
             $competitionStart = $competitionId === 'amp-futures-sep-2026'
                 ? new DateTimeImmutable('2026-09-01T08:00:00+00:00')
                 : new DateTimeImmutable('2026-09-16T08:00:00+00:00');
-            if ($opened < $competitionStart || $opened > $now) {
-                stc_json(['ok' => false, 'error' => 'manual_position_open_time_outside_competition_window'], 400);
+            if ($opened < $competitionStart) {
+                stc_json([
+                    'ok' => false,
+                    'error' => 'manual_position_open_time_outside_competition_window',
+                    'detail' => 'Open time is before the configured competition start.',
+                    'competition_start_utc' => $competitionStart->format(DateTimeInterface::ATOM),
+                    'server_now_utc' => $now->format(DateTimeInterface::ATOM),
+                ], 400);
             }
         }
 

@@ -626,3 +626,14 @@ def test_position_recovery_keeps_amp_resolution_fail_closed():
     control = (PATCH / "portfolio_control.php").read_text(encoding="utf-8")
     assert "if ($cid === 'amp-futures-sep-2026')" in control
     assert "stc_max_open_position($cid, $raw) !== null ? $raw : null" in control
+
+
+def test_manual_position_time_uses_server_now_and_tolerates_small_clock_skew():
+    position = (PATCH / "position.php").read_text(encoding="utf-8")
+    assert "$opened = $openedRaw === '' ? $now : stc_parse_utc($openedRaw);" in position
+    assert "$futureSkewSeconds > 300" in position
+    assert "if ($futureSkewSeconds > 0)" in position
+    assert "$opened = $now;" in position
+    assert "if ($opened < $competitionStart)" in position
+    assert "$opened < $competitionStart || $opened > $now" not in position
+    assert "server_now_utc" in position
