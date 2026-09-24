@@ -1,9 +1,9 @@
 {
   "schema_version": "stc-community-shadow-registry-v1",
-  "generated_at_utc": "2026-09-23T22:14:00Z",
-  "source_run_id": 35926880568,
+  "generated_at_utc": "2026-09-24T02:30:00Z",
+  "source_run_id": 35947248551,
   "live_authority": false,
-  "rule": "All frozen-pass candidates enter SHADOW with live_authority=false. MULTITF_CONFIRMED requires the same component to independently pass a supporting timeframe or a separately approved equivalence rule; no current record meets that condition. Wave-two Trendilo survivors were added from exact frozen run 35926880568.",
+  "rule": "Frozen-pass candidates remain research-only. Same-component support on an independent timeframe advances only to MULTITF_CONFIRMED; live_authority is always false. Run 35947248551 added BTCUSD 5m Nadaraya-Watson endpoint, BTCUSD 1D Hull, and confirmed MJY Trendilo across 15m/5m/30m.",
   "promotion_ladder": [
     "FROZEN_PASS",
     "SHADOW",
@@ -366,7 +366,7 @@
       "timeframe": "15",
       "component_id": "trendilo",
       "family": "adaptive_momentum",
-      "state": "SHADOW",
+      "state": "MULTITF_CONFIRMED",
       "selected_parameters": {
         "alma_offset": 0.85,
         "alma_sigma": 6,
@@ -389,17 +389,164 @@
       "live_authority": false,
       "shadow_observations": 0,
       "shadow_expectancy_r": null,
-      "supporting_timeframes": [],
+      "supporting_timeframes": [
+        "5",
+        "30"
+      ],
       "notes": [
         "Wave-two Trendilo final 15% unseen holdout passed.",
         "Independent adaptive-momentum family; existing MJY AlphaTrend/WAE/Squeeze candidates remain separate.",
+        "Research-only SHADOW entry; no live authority.",
+        "Same Trendilo component independently passed exact frozen confirmation on 5m and 30m in run 35947248551.",
+        "State advanced to MULTITF_CONFIRMED; live authority remains false and shadow evidence is still required before owner-promotion eligibility."
+      ]
+    },
+    {
+      "symbol": "CAPITALCOM:BTCUSD",
+      "timeframe": "5",
+      "component_id": "nadaraya_watson_endpoint_nonrepaint",
+      "family": "kernel_reversal",
+      "state": "SHADOW",
+      "selected_parameters": {
+        "bandwidth": 6,
+        "deviation_length": 499,
+        "multiplier": 2.5,
+        "window": 500
+      },
+      "development_test_trades": 21,
+      "development_test_expectancy_r": 0.30337909599089896,
+      "development_test_profit_factor": 1.6081603448510942,
+      "development_forward_trades": 17,
+      "development_forward_expectancy_r": 0.23439797796841463,
+      "development_forward_profit_factor": 1.47086987257643,
+      "frozen_trades": 15,
+      "frozen_expectancy_r": 0.42584038471475455,
+      "frozen_profit_factor": 2.0236547709489288,
+      "frozen_max_drawdown_r": 2.0799999999999974,
+      "source_run_id": 35947248551,
+      "source_date": "2026-09-24",
+      "live_authority": false,
+      "shadow_observations": 0,
+      "shadow_expectancy_r": null,
+      "supporting_timeframes": [],
+      "notes": [
+        "Independent BTCUSD 5m frozen pass from Trendilo multi-timeframe scan.",
+        "This is not same-component confirmation of the BTCUSD 15m Trendilo candidate.",
         "Research-only SHADOW entry; no live authority."
+      ]
+    },
+    {
+      "symbol": "CAPITALCOM:BTCUSD",
+      "timeframe": "1D",
+      "component_id": "hull_suite",
+      "family": "trend",
+      "state": "SHADOW",
+      "selected_parameters": {
+        "length": 89
+      },
+      "development_test_trades": 74,
+      "development_test_expectancy_r": 0.10337543548205477,
+      "development_test_profit_factor": 1.2147034375641625,
+      "development_forward_trades": 75,
+      "development_forward_expectancy_r": 0.26458882079961055,
+      "development_forward_profit_factor": 1.575332087568714,
+      "frozen_trades": 64,
+      "frozen_expectancy_r": 0.15120133438504166,
+      "frozen_profit_factor": 1.3281864356023445,
+      "frozen_max_drawdown_r": 11.157726715760916,
+      "source_run_id": 35947248551,
+      "source_date": "2026-09-24",
+      "live_authority": false,
+      "shadow_observations": 0,
+      "shadow_expectancy_r": null,
+      "supporting_timeframes": [],
+      "notes": [
+        "Independent BTCUSD 1D frozen pass from Trendilo multi-timeframe scan.",
+        "This is not same-component confirmation of the BTCUSD 15m Trendilo candidate.",
+        "Research-only SHADOW entry; no live authority."
+      ]
+    },
+    {
+      "symbol": "CME_MINI:MJY1!",
+      "timeframe": "5",
+      "component_id": "trendilo",
+      "family": "adaptive_momentum",
+      "state": "MULTITF_CONFIRMED",
+      "selected_parameters": {
+        "alma_offset": 0.85,
+        "alma_sigma": 6,
+        "band_multiplier": 1,
+        "lookback": 50,
+        "smoothing": 1
+      },
+      "development_test_trades": 29,
+      "development_test_expectancy_r": 0.2245935054479893,
+      "development_test_profit_factor": 1.3914189698312343,
+      "development_forward_trades": 27,
+      "development_forward_expectancy_r": 0.2549319482565778,
+      "development_forward_profit_factor": 1.5076078615728352,
+      "frozen_trades": 25,
+      "frozen_expectancy_r": 0.2438447917708707,
+      "frozen_profit_factor": 1.431593858379226,
+      "frozen_max_drawdown_r": 3.844667614976516,
+      "source_run_id": 35947248551,
+      "source_date": "2026-09-24",
+      "live_authority": false,
+      "shadow_observations": 0,
+      "shadow_expectancy_r": null,
+      "supporting_timeframes": [
+        "15",
+        "30"
+      ],
+      "notes": [
+        "Trendilo independently passed exact frozen confirmation on MJY 5m.",
+        "Same component also passed MJY 15m and 30m.",
+        "MULTITF_CONFIRMED is research-only; no live authority."
+      ]
+    },
+    {
+      "symbol": "CME_MINI:MJY1!",
+      "timeframe": "30",
+      "component_id": "trendilo",
+      "family": "adaptive_momentum",
+      "state": "MULTITF_CONFIRMED",
+      "selected_parameters": {
+        "alma_offset": 0.85,
+        "alma_sigma": 6,
+        "band_multiplier": 1.25,
+        "lookback": 50,
+        "smoothing": 1
+      },
+      "development_test_trades": 22,
+      "development_test_expectancy_r": 0.2503424086713001,
+      "development_test_profit_factor": 1.5040791103320825,
+      "development_forward_trades": 23,
+      "development_forward_expectancy_r": 0.2383200194324719,
+      "development_forward_profit_factor": 1.4054260685611515,
+      "frozen_trades": 18,
+      "frozen_expectancy_r": 0.1617347168329894,
+      "frozen_profit_factor": 1.2693390210145226,
+      "frozen_max_drawdown_r": 4.160000000000043,
+      "source_run_id": 35947248551,
+      "source_date": "2026-09-24",
+      "live_authority": false,
+      "shadow_observations": 0,
+      "shadow_expectancy_r": null,
+      "supporting_timeframes": [
+        "15",
+        "5"
+      ],
+      "notes": [
+        "Trendilo independently passed exact frozen confirmation on MJY 30m.",
+        "Same component also passed MJY 15m and 5m.",
+        "MULTITF_CONFIRMED is research-only; no live authority."
       ]
     }
   ],
   "source_run_ids": [
     35919916518,
     35921398218,
-    35926880568
+    35926880568,
+    35947248551
   ]
 }
