@@ -1,0 +1,67 @@
+name: STC Private Config Audit
+
+on:
+  push:
+    branches: [stc-private-config-audit-20260924]
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    env:
+      STC_OWNER_TOKEN: ${{ secrets.STC_OWNER_TOKEN }}
+    steps:
+      - name: Read sanitized notification configuration
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          import urllib.request
+
+          token = os.environ.get("STC_OWNER_TOKEN", "")
+          if not token:
+              raise SystemExit("STC_OWNER_TOKEN missing")
+          req = urllib.request.Request(
+              "https://stc.feama.site/notification.php",
+              headers={
+                  "Authorization": f"Bearer {token}",
+                  "Accept": "application/json",
+                  "User-Agent": "STC-Private-Config-Audit/1.0",
+              },
+          )
+          with urllib.request.urlopen(req, timeout=15) as response:
+              data = json.load(response)
+
+          deliveries = data.get("deliveries") or []
+          events = data.get("events") or []
+          status_counts = {}
+          channel_counts = {}
+          for item in deliveries:
+              status = str(item.get("status") or "unknown")
+              channel = str(item.get("channel") or "unknown")
+              status_counts[status] = status_counts.get(status, 0) + 1
+              channel_counts[channel] = channel_counts.get(channel, 0) + 1
+
+          latest = []
+          for item in deliveries[:10]:
+              latest.append({
+                  "channel": item.get("channel"),
+                  "status": item.get("status"),
+                  "http_code": item.get("http_code"),
+                  "attempted_at_utc": item.get("attempted_at_utc"),
+              })
+
+          print(json.dumps({
+              "ok": bool(data.get("ok")),
+              "config": data.get("config") or {},
+              "notification_event_count_returned": len(events),
+              "delivery_count_returned": len(deliveries),
+              "delivery_status_counts": status_counts,
+              "delivery_channel_counts": channel_counts,
+              "latest_delivery_metadata": latest,
+          }, sort_keys=True))
+          PY
