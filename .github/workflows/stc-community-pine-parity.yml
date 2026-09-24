@@ -1,0 +1,91 @@
+name: STC Community Pine Parity Fixtures
+
+on:
+  push:
+    branches:
+      - "research/native-community-15m-*"
+    paths:
+      - "research_native_inputs/PARITY_READY"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: stc-community-pine-parity-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  fixture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      max-parallel: 3
+      matrix:
+        dir:
+          - CAPITALCOM_BTCUSD
+          - CAPITALCOM_DOGEUSD
+          - CAPITALCOM_ETHUSD
+          - CAPITALCOM_EURUSD
+          - CAPITALCOM_NAS100
+          - CAPITALCOM_USDZAR
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Build Python reference fixture
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p parity_fixtures
+          python scripts/build_community_pine_parity_fixture.py \
+            "research_native_inputs/${{ matrix.dir }}" \
+            --output "parity_fixtures/${{ matrix.dir }}.json"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: stc-pine-parity-${{ matrix.dir }}
+          path: parity_fixtures/*.json
+          if-no-files-found: error
+          retention-days: 30
+
+  combine:
+    needs: fixture
+    if: always() && needs.fixture.result == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: stc-pine-parity-*
+          merge-multiple: true
+          path: parity_fixtures
+      - name: Build manifest
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          rows=[]
+          for path in sorted(Path("parity_fixtures").glob("*.json")):
+              d=json.loads(path.read_text())
+              rows.append({
+                  "symbol": d["symbol"],
+                  "dataset_sha256": d["dataset_sha256"],
+                  "bar_count": d["bar_count"],
+                  "component_event_counts": {
+                      k: v["event_count"] for k, v in d["components"].items()
+                  },
+              })
+          Path("parity_fixtures/manifest.json").write_text(
+              json.dumps({"schema":"stc-community-pine-parity-manifest-v1","symbols":rows},indent=2,sort_keys=True)+"\n"
+          )
+          print("STC_PARITY_MANIFEST="+json.dumps(rows,sort_keys=True))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: stc-community-pine-parity-combined-${{ github.run_id }}
+          path: parity_fixtures/*.json
+          if-no-files-found: error
+          retention-days: 30
