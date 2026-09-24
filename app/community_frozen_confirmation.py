@@ -8,7 +8,7 @@ from .community_indicator_benchmark import (
     backtest_indicator_signals,
     benchmark_indicator,
 )
-from .community_indicator_catalog import eligible_indicators
+from .community_indicator_catalog import benchmarkable_indicators
 from .community_indicator_signals import indicator_signal_series
 from .models import Bar
 
@@ -124,9 +124,7 @@ def confirm_community_symbol(
     development = bars[:cut]
     components: list[CommunityFrozenConfirmation] = []
 
-    for spec in eligible_indicators(asset_class, timeframe, implemented_only=True):
-        if spec.implementation_status != "implemented_conceptual":
-            continue
+    for spec in benchmarkable_indicators(asset_class, timeframe):
         trial = benchmark_indicator(
             indicator_id=spec.indicator_id,
             family=spec.signal_family,

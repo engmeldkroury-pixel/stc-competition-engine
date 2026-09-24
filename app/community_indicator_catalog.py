@@ -20,6 +20,12 @@ class CommunityIndicatorSpec:
     review_urls: tuple[str, ...] = ()
 
 
+BENCHMARKABLE_IMPLEMENTATION_STATUSES = frozenset({
+    "implemented_conceptual",
+    "implemented_official_port",
+})
+
+
 INDICATORS: tuple[CommunityIndicatorSpec, ...] = (
     CommunityIndicatorSpec(
         indicator_id="lorentzian_classification",
@@ -558,6 +564,22 @@ def eligible_indicators(
         if asset_class in spec.suitable_asset_classes
         and timeframe in spec.preferred_timeframes
         and (not implemented_only or spec.implementation_status in allowed)
+    )
+
+
+def benchmarkable_indicators(
+    asset_class: str,
+    timeframe: str,
+) -> tuple[CommunityIndicatorSpec, ...]:
+    """Independent research components eligible for benchmark/frozen confirmation.
+
+    Native proxies remain discoverable through eligible_indicators() but are
+    excluded here to prevent double-counting existing STC native evidence.
+    """
+    return tuple(
+        spec
+        for spec in eligible_indicators(asset_class, timeframe, implemented_only=True)
+        if spec.implementation_status in BENCHMARKABLE_IMPLEMENTATION_STATUSES
     )
 
 
