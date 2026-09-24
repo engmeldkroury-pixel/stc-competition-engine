@@ -6,13 +6,13 @@ Updated: 2026-09-24 11:30 UTC
 STC.
 
 ## URGENT PRODUCTION PRIORITY
-Deploy the new combined Hostinger hotfix containing PR #155 locked-plan persistence and PR #156 Record Trade competition-field clarity. After deployment:
-1. verify an unexpired locked plan remains visible when a newer same-direction monitor-only bar arrives;
-2. verify an incompatible latest bar shows the old plan as RECOVERY ONLY and blocks a new entry;
-3. use Record Trade only to register an already-open manual platform position;
-4. never duplicate the EURUSD order merely because STC has not yet recorded it.
+EURUSD is now recorded correctly in the STC portfolio and must NOT be entered again. The immediate production task is to deploy the final seven-file Hostinger bundle containing:
+- locked-plan persistence / RECOVERY ONLY behavior;
+- selectable Record Trade competition;
+- Capital bare-symbol normalization;
+- server-side position target resolution including position.php.
 
-Current EURUSD recovery requires the actual platform position details (filled quantity, average fill price, current stop, current final TP) from Paper Trading > Positions before writing it into the STC ledger.
+After upload, run STC Live Readback and visually verify the Record Trade selector and future preserved-plan behavior. Continue supervising the existing EURUSD position through Portfolio Supervisor; do not create a replacement EURUSD entry while it remains OPEN.
 
 ## VERIFIED LIVE EVIDENCE
 - Main includes PR #145 competition quality eligibility fix.
