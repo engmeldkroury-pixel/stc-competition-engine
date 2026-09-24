@@ -1,0 +1,5 @@
+{
+  "symbol": "CAPITALCOM:BTCUSD",
+  "source": "TradingView Official MCP exact-symbol OHLCV",
+  "purpose": "Trendilo multi-timeframe frozen confirmation"
+}
