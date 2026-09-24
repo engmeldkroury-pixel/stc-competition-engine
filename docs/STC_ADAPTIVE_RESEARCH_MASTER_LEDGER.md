@@ -529,3 +529,59 @@ Status: VERIFIED / MERGED.
 - VuManChu remains pending confirmation-delay/divergence audit.
 - Community implemented pool increases from 14 to 17 research components.
 - live_authority remains false.
+
+
+## Work-unit register update — 2026-09-24 05:21 EEST
+
+### WU-116 — wave-two expanded 17-component frozen 15m confirmation
+Status: VERIFIED / COMPLETED / ARCHIVED.
+- Workflow run 35926880568: SUCCESS.
+- 26/26 competition symbols evaluated on 5,000 exact-provider TradingView 15m bars each.
+- Exact frozen method retained:
+  - first 4,250 bars development;
+  - last 750 bars untouched final holdout.
+- New wave-two frozen survivors:
+  1. CAPITALCOM:BTCUSD / 15m / Trendilo.
+  2. CME_MINI:MJY1! / 15m / Trendilo.
+- BTCUSD Trendilo:
+  - dev TEST 21 trades, 0.0843R expectancy, PF 1.142;
+  - dev FORWARD 27 trades, 0.0955R expectancy, PF 1.188;
+  - frozen 22 trades, 0.1953R expectancy, PF 1.387, max DD 7.285R.
+- MJY Trendilo:
+  - dev TEST 26 trades, 0.1209R expectancy, PF 1.201;
+  - dev FORWARD 19 trades, 0.0621R expectancy, PF 1.103;
+  - frozen 22 trades, 0.1509R expectancy, PF 1.271, max DD 5.20R.
+- HalfTrend: no 15m frozen survivor.
+- endpoint Nadaraya-Watson non-repaint: no 15m frozen survivor.
+- Durable evidence:
+  - research_benchmarks/community_wave2_frozen_15m_run1_summary_20260924.json
+  - docs/COMMUNITY_WAVE2_FROZEN_15M_RUN1_20260924.md
+
+### WU-117 — durable 32-candidate community/composite inventory
+Status: VERIFIED / MERGED.
+- Main commit c45947f328aef83426ac54382535218f1efde707.
+- Durable matrix:
+  - docs/COMMUNITY_INDICATOR_CANDIDATE_MATRIX_20260924.md
+- Catalog inventory: 32 candidate/component families.
+- Implemented causal research pool: 17.
+- Native-overlap/context-only candidates remain non-independent until overlap audit.
+- Pending causal/exact-audit candidates include Lorentzian Classification, VuManChu Cipher B, RSI Kernel Optimized, VWAP Stdev Bands, ML Supertrend variants, AI-SuperTrend KNN, Tri-State Supertrend, Koncorde Plus and %R Trend Exhaustion.
+
+### WU-118 — wave-two SHADOW registry promotion
+Status: VERIFIED / MERGED.
+- Main commit 3112d3c3d82e96dc4f99312ab3f7a942980d5980.
+- Added BTCUSD/15m/Trendilo and MJY1!/15m/Trendilo to research/community_shadow_registry.json.
+- Shadow registry total: 12 research-only records.
+- live_authority=false remains enforced.
+- No owner/live promotion occurred.
+
+### Controlling next research order
+1. Run exact-provider multi-timeframe frozen scan for the two Trendilo survivors:
+   - CAPITALCOM:BTCUSD;
+   - CME_MINI:MJY1!.
+2. Seek same-component Trendilo confirmation on 5m/30m/1h/2h/4h/1D where exact history meets evidence floor.
+3. Update SHADOW registry only if new independent frozen evidence is produced; same-component support is required before MULTITF_CONFIRMED.
+4. Continue exact Lorentzian Classification semantic audit rather than approximating it.
+5. Continue VuManChu divergence confirmation-delay audit.
+6. Preserve General Lab rule: every new symbol inherits the full process automatically, never another symbol's weights.
+7. Do not change live A+ gates/risk/competition rules without separate owner promotion.
