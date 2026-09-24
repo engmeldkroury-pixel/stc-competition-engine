@@ -2024,3 +2024,14 @@ Owner intervention required now: YES — only for historical-data access, not fo
   - RSI Kernel Optimized with explicit delayed pivot confirmation to avoid lookahead.
 - All new parameters are tuned on TRAIN only and frozen for TEST/FORWARD.
 - Next evidence task: rerun the exact-provider 26-symbol 15m benchmark with the expanded adapter set, compare incremental information against the prior 14-component benchmark, and retain zero weight for failed components.
+
+
+## Frozen component identity reconciliation — 2026-09-24
+- PR #124 merged as 6df403846a1d386816a1bf0ebe29db79fc27cd60 after 381 tests passed.
+- Detected and fixed a cross-PR regression before using new research results:
+  - HalfTrend restored to implemented;
+  - Trendilo restored to the exact parameter/semantic contract used by existing frozen records;
+  - canonical Nadaraya id restored to nadaraya_watson_endpoint_nonrepaint so the BTCUSD 5m SHADOW record remains executable/reproducible;
+  - newer Nadaraya alias is non-benchmarkable to prevent duplicate weight.
+- Any wave-3 benchmark started before this reconciliation is superseded.
+- Reconciled exact-data benchmark trigger commit: 8edb3edef2c26e6348e989d5b95632f50b803327.
