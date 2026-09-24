@@ -43,6 +43,7 @@ jobs:
                   "created_at_utc":created,
                   "symbol":e.get("symbol"),
                   "event_key":e.get("event_key"),
+                  "order":line("Order: "),
                   "quantity_line":line("Quantity: "),
                   "entry_zone":line("Entry zone: "),
                   "stop":line("Stop: "),
