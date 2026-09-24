@@ -74,8 +74,9 @@ def test_community_catalog_separates_research_popularity_from_live_weighting():
         "ssl_hybrid",
         "waddah_attar_explosion",
         "qqe_ssl_wae_composite",
+        "halftrend_everget",
         "trendilo",
-        "nadaraya_watson_envelope_luxalgo",
+        "nadaraya_watson_endpoint_nonrepaint",
         "rsi_kernel_optimized_flux",
     ),
 )
@@ -114,8 +115,9 @@ def test_symbol_benchmark_runs_each_implemented_indicator_independently():
         "ssl_hybrid",
         "waddah_attar_explosion",
         "qqe_ssl_wae_composite",
+        "halftrend_everget",
         "trendilo",
-        "nadaraya_watson_envelope_luxalgo",
+        "nadaraya_watson_endpoint_nonrepaint",
         "rsi_kernel_optimized_flux",
     } <= ids
     assert all(trial.symbol == "CBOT:ZN1!" for trial in trials)
@@ -180,3 +182,22 @@ def test_general_lab_gets_same_matrix_engine_for_arbitrary_symbols():
     assert summary["symbols"] >= 28
     assert summary["by_scope"]["general-lab"] > 0
     assert "does not inherit weights from a different asset" in summary["general_lab_rule"]
+
+
+def test_historical_shadow_component_ids_remain_benchmarkable():
+    ids = {x.indicator_id for x in eligible_indicators("crypto", "5", implemented_only=True)}
+    assert "nadaraya_watson_endpoint_nonrepaint" in ids
+    assert "halftrend_everget" in ids
+    assert "nadaraya_watson_envelope_luxalgo" not in ids
+
+
+def test_trendilo_parameter_contract_matches_existing_shadow_registry():
+    from app.community_indicator_benchmark import indicator_parameter_grid
+
+    grid = indicator_parameter_grid("trendilo")
+    assert any(
+        row.get("smoothing") == 1
+        and row.get("lookback") == 50
+        and row.get("band_multiplier") == 1.25
+        for row in grid
+    )
