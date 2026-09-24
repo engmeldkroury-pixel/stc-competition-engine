@@ -13,7 +13,7 @@ from app.competition_profiles import PROFILES
 from app.community_research_plan import community_research_plan_summary
 from app.research_runner import run_symbol_research
 from app.shadow_promotion_registry import public_shadow_record, shadow_candidates
-from app.serverless_worker import run_serverless_once
+from app.serverless_worker import run_serverless_drain
 
 app = FastAPI(title="STC Serverless Processor", version="0.9.0")
 
@@ -53,7 +53,12 @@ def process_pending(authorization: str | None = Header(default=None)):
         limit = 5
     limit = max(1, min(limit, 20))
     client = BridgeClient(bridge_url, worker_token, timeout_seconds=8.0)
-    result = run_serverless_once(client, worker_id=worker_id, limit=limit)
+    result = run_serverless_drain(
+        client,
+        worker_id=worker_id,
+        limit=limit,
+        max_batches=3,
+    )
     return {"ok": True, **result.to_dict(), "execution": "manual_only"}
 
 
