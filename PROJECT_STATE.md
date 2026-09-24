@@ -1995,3 +1995,28 @@ Owner intervention required now: YES — only for historical-data access, not fo
 - Durable evidence:
   - research_benchmarks/trendilo_multitf_frozen_run1_20260924.json
   - docs/TRENDILO_MULTITF_FROZEN_RUN1_20260924.md
+
+
+## Lorentzian exact parity research adapter — 2026-09-24
+- STC rejected an approximate Lorentzian reimplementation and pinned the MIT reference repository artificial-intelligence-edge/lorentzian-classification at commit 27776bd51cbd3e07b6383cfa468d4d33f4b50297.
+- Vendored reference:
+  - app/_vendor/lorentzian_classification/core.py
+  - app/_vendor/lorentzian_classification/settings.py
+  - app/_vendor/lorentzian_classification/__init__.py
+  - original MIT LICENSE.md
+  - STC_VENDOR_NOTICE.md with provenance.
+- Official Pine/TradingView parity fixture vendored:
+  - tests/fixtures/lorentzian/pine_btcusd_h1_trimmed_limited_history.csv
+- Exact parity contract added:
+  - tests/test_lorentzian_vendor_parity.py
+  - numeric exported features/kernel tolerance 1e-6;
+  - discrete Prediction/Direction/Buy/Sell/StopBuy/StopSell/Backtest Stream exact match under upstream warmup semantics.
+- STC research adapter wraps only exact-reference confirmed buy/sell outputs.
+- Causality decision:
+  - upstream default limited-history chart mode is retained for parity proof;
+  - STC benchmark mode uses include_full_history=True and causal_history_cap=10,000 (> current 5,000-bar research datasets), failing closed if the cap is not above the series length;
+  - this prevents historical availability from depending on the final chart index without modifying classifier/filter mathematics.
+- Bounded TRAIN-only research grid starts with neighbors_count 6/8/12.
+- Lorentzian catalog state becomes implemented_exact_reference.
+- CI after parity correction: 384 passed, 1 warning.
+- live_authority=false; no A+/risk/competition/execution change.
