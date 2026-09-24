@@ -12,6 +12,8 @@ def test_eurusd_shadow_uses_symbol_specific_trendilo_weight_only():
     assert shadow["complete"] is True
     assert shadow["weighted_score"] == -0.75
     assert shadow["normalized_weights"] == {"trendilo": 1.0}
+    assert shadow["selected_parameters"]["trendilo"]["lookback"] == 50
+    assert shadow["selected_parameters"]["trendilo"]["alma_offset"] == 0.85
     assert shadow["live_authority"] is False
     assert shadow["used_in_quality_gate"] is False
     assert shadow["used_in_risk"] is False
