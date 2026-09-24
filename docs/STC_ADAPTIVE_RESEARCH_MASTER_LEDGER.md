@@ -703,3 +703,16 @@ Status: BLOCKED_EXTERNAL_ACCESS.
 - Read-only browser automation was attempted with a browser profile, but TinyFish did not start because its wallet balance is negative.
 - No content from those Facebook posts has been inferred or fabricated.
 - The URLs remain registered in the research ledger for audit once browser access is available or the owner supplies screenshots/video/text from the posts.
+
+
+### WU-106 — wave 3 causal adapter expansion
+Status: VERIFIED / MERGED.
+- PR #123 merged as 078f2552928b0167cd37c0eacf05bb193db0fe51.
+- CI: 378 passed, 1 warning.
+- Added three source-audited causal research adapters:
+  - Trendilo conceptual adapter: percentage-change -> ALMA smoothing -> RMS neutral band.
+  - Nadaraya-Watson Envelope: endpoint-only non-repainting kernel envelope; repainting mode is excluded.
+  - RSI Kernel Optimized family: pivot RSI samples enter the model only after the right-hand pivot-confirmation bars have closed, then causal density comparison is used.
+- Added bounded TRAIN-only parameter grids for all three.
+- Expanded causality contract tests across the implemented community set.
+- Research-only boundary remains intact; no live A+ weight, risk rule, approval gate, or execution behavior changed.
