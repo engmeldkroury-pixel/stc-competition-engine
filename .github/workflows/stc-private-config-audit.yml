@@ -14,7 +14,7 @@ jobs:
     env:
       STC_OWNER_TOKEN: ${{ secrets.STC_OWNER_TOKEN }}
     steps:
-      - name: Read sanitized notification configuration
+      - name: Read sanitized runtime snapshot
         shell: bash
         run: |
           python - <<'PY'
@@ -25,43 +25,50 @@ jobs:
           token = os.environ.get("STC_OWNER_TOKEN", "")
           if not token:
               raise SystemExit("STC_OWNER_TOKEN missing")
-          req = urllib.request.Request(
-              "https://stc.feama.site/notification.php",
-              headers={
-                  "Authorization": f"Bearer {token}",
-                  "Accept": "application/json",
-                  "User-Agent": "STC-Private-Config-Audit/1.0",
-              },
-          )
-          with urllib.request.urlopen(req, timeout=15) as response:
-              data = json.load(response)
 
-          deliveries = data.get("deliveries") or []
-          events = data.get("events") or []
+          def get(path):
+              req = urllib.request.Request(
+                  "https://stc.feama.site/" + path,
+                  headers={
+                      "Authorization": f"Bearer {token}",
+                      "Accept": "application/json",
+                      "User-Agent": "STC-Private-Config-Audit/1.0",
+                  },
+              )
+              with urllib.request.urlopen(req, timeout=15) as response:
+                  return json.load(response)
+
+          notification = get("notification.php")
+          snapshot = get("operator_snapshot.php")
+
+          deliveries = notification.get("deliveries") or []
           status_counts = {}
-          channel_counts = {}
           for item in deliveries:
               status = str(item.get("status") or "unknown")
-              channel = str(item.get("channel") or "unknown")
               status_counts[status] = status_counts.get(status, 0) + 1
-              channel_counts[channel] = channel_counts.get(channel, 0) + 1
 
-          latest = []
-          for item in deliveries[:10]:
-              latest.append({
-                  "channel": item.get("channel"),
-                  "status": item.get("status"),
-                  "http_code": item.get("http_code"),
-                  "attempted_at_utc": item.get("attempted_at_utc"),
+          cards = []
+          for card in snapshot.get("cards") or []:
+              if card.get("competition_id") != "capital-africa-sep-2026":
+                  continue
+              cards.append({
+                  "symbol": card.get("symbol"),
+                  "source_time": card.get("source_time"),
+                  "recommendation": card.get("recommendation"),
+                  "pre_gate_recommendation": card.get("pre_gate_recommendation"),
+                  "setup_grade": card.get("setup_grade"),
+                  "setup_quality_score": card.get("setup_quality_score"),
+                  "quality_gate_passed": card.get("quality_gate_passed"),
+                  "opportunity_active": card.get("opportunity_active"),
+                  "manual_execution_ready": card.get("manual_execution_ready"),
+                  "has_locked_plan": isinstance(card.get("locked_trade_plan"), dict),
+                  "quality_gate_failures": card.get("quality_gate_failures") or [],
               })
 
           print(json.dumps({
-              "ok": bool(data.get("ok")),
-              "config": data.get("config") or {},
-              "notification_event_count_returned": len(events),
-              "delivery_count_returned": len(deliveries),
+              "notification_config": notification.get("config") or {},
               "delivery_status_counts": status_counts,
-              "delivery_channel_counts": channel_counts,
-              "latest_delivery_metadata": latest,
+              "runtime": snapshot.get("runtime_control") or {},
+              "capital_cards": cards,
           }, sort_keys=True))
           PY
