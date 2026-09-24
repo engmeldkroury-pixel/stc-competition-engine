@@ -155,7 +155,7 @@ function stc_validate_stc_plan_position(PDO $pdo, array $body): array {
 
     $signalId = (string)($signal['signal_id'] ?? '');
     $stmt = $pdo->prepare(
-        'SELECT decision, decided_at_utc FROM stc_signal_approvals '
+        'SELECT decision, decided_at_utc, quote_evidence_id FROM stc_signal_approvals '
         . 'WHERE signal_id = ? ORDER BY id DESC LIMIT 1'
     );
     $stmt->execute([$signalId]);
@@ -164,7 +164,28 @@ function stc_validate_stc_plan_position(PDO $pdo, array $body): array {
         stc_json(['ok' => false, 'error' => 'approved_signal_required'], 409);
     }
 
-    return ['plan' => $plan, 'signal_id' => $signalId];
+    $executionTicket = null;
+    $evidenceId = trim((string)($approval['quote_evidence_id'] ?? ''));
+    if ($evidenceId !== '') {
+        $evidenceStmt = $pdo->prepare(
+            'SELECT details_json FROM stc_execution_evidence WHERE evidence_id = ? LIMIT 1'
+        );
+        $evidenceStmt->execute([$evidenceId]);
+        $detailsRaw = $evidenceStmt->fetchColumn();
+        if (is_string($detailsRaw) && $detailsRaw !== '') {
+            $details = json_decode($detailsRaw, true);
+            if (is_array($details) && is_array($details['execution_ticket'] ?? null)) {
+                $executionTicket = $details['execution_ticket'];
+            }
+        }
+    }
+
+    return [
+        'plan' => $plan,
+        'signal_id' => $signalId,
+        'approved_at_utc' => $approval['decided_at_utc'] ?? null,
+        'execution_ticket' => $executionTicket,
+    ];
 }
 
 function stc_recent_signal_states(PDO $pdo, string $competitionId, string $symbol, int $limit = 3): array {
@@ -687,6 +708,140 @@ function stc_propose_position_size(
         'allowed_by_risk_policy' => $riskPolicyAllowed,
         'provisional_risk_setting' => true,
         'note' => 'STC sizing proposal only. Portfolio and correlation-cluster caps are STC risk controls, not official competition limits. Human approval and manual order entry required.',
+    ];
+}
+
+
+function stc_current_position_sizing_for_plan(
+    PDO $pdo,
+    string $competitionId,
+    string $symbol,
+    float $entryPrice,
+    float $stopPrice
+): array {
+    $accountStmt = $pdo->prepare(
+        'SELECT equity_usd, risk_fraction, source, updated_at_utc FROM stc_account_state '
+        . 'WHERE competition_id = ? LIMIT 1'
+    );
+    $accountStmt->execute([$competitionId]);
+    $account = $accountStmt->fetch();
+    if ($account === false) {
+        throw new RuntimeException('account_state_unavailable');
+    }
+
+    $qtyStmt = $pdo->prepare(
+        "SELECT COALESCE(SUM(quantity), 0) AS qty FROM stc_positions "
+        . "WHERE status = 'OPEN' AND competition_id = ? AND symbol = ?"
+    );
+    $qtyStmt->execute([$competitionId, $symbol]);
+    $qtyRow = $qtyStmt->fetch() ?: [];
+    $currentOpenQuantity = (float)($qtyRow['qty'] ?? 0.0);
+
+    $portfolioOpenRiskUsd = 0.0;
+    $clusterOpenRiskUsd = 0.0;
+    $targetCluster = stc_risk_cluster($symbol);
+    $riskStmt = $pdo->prepare(
+        "SELECT symbol, quantity, entry_price, initial_stop FROM stc_positions "
+        . "WHERE status = 'OPEN' AND competition_id = ?"
+    );
+    $riskStmt->execute([$competitionId]);
+    while (($row = $riskStmt->fetch()) !== false) {
+        try {
+            $positionSymbol = (string)$row['symbol'];
+            $value = stc_price_value_usd(
+                $competitionId,
+                $positionSymbol,
+                (float)$row['entry_price']
+            );
+            $risk = abs((float)$row['entry_price'] - (float)$row['initial_stop'])
+                * (float)$row['quantity'] * $value;
+        } catch (Throwable $e) {
+            $risk = 0.0;
+        }
+        $portfolioOpenRiskUsd += $risk;
+        if (stc_risk_cluster((string)$row['symbol']) === $targetCluster) {
+            $clusterOpenRiskUsd += $risk;
+        }
+    }
+
+    $sizing = stc_propose_position_size(
+        $competitionId,
+        $symbol,
+        (float)$account['equity_usd'],
+        (float)$account['risk_fraction'],
+        $entryPrice,
+        $stopPrice,
+        $currentOpenQuantity,
+        $portfolioOpenRiskUsd,
+        $clusterOpenRiskUsd
+    );
+    $sizing['account_state_source'] = (string)($account['source'] ?? '');
+    $sizing['account_state_updated_at_utc'] = $account['updated_at_utc'] ?? null;
+    return $sizing;
+}
+
+function stc_recent_same_direction_loss_cooldown(
+    PDO $pdo,
+    string $competitionId,
+    string $symbol,
+    string $side,
+    DateTimeImmutable $now,
+    int $decisionTimeframeMinutes = 15
+): array {
+    $side = strtoupper(trim($side));
+    if (!in_array($side, ['LONG', 'SHORT'], true)) {
+        return [
+            'active' => false,
+            'cooldown_minutes' => 0,
+            'remaining_seconds' => 0,
+            'last_loss_position_id' => null,
+            'last_loss_closed_at_utc' => null,
+        ];
+    }
+
+    $cooldownMinutes = max(30, max(1, $decisionTimeframeMinutes) * 2);
+    $stmt = $pdo->prepare(
+        'SELECT position_id, closed_at_utc, realized_pnl_usd FROM stc_positions '
+        . "WHERE competition_id = ? AND symbol = ? AND side = ? AND status = 'CLOSED' "
+        . 'AND closed_at_utc IS NOT NULL AND realized_pnl_usd < 0 '
+        . 'ORDER BY closed_at_utc DESC, id DESC LIMIT 1'
+    );
+    $stmt->execute([$competitionId, $symbol, $side]);
+    $row = $stmt->fetch();
+    if ($row === false) {
+        return [
+            'active' => false,
+            'cooldown_minutes' => $cooldownMinutes,
+            'remaining_seconds' => 0,
+            'last_loss_position_id' => null,
+            'last_loss_closed_at_utc' => null,
+        ];
+    }
+
+    try {
+        $closed = new DateTimeImmutable((string)$row['closed_at_utc'], new DateTimeZone('UTC'));
+        $closed = $closed->setTimezone(new DateTimeZone('UTC'));
+    } catch (Throwable $e) {
+        return [
+            'active' => false,
+            'cooldown_minutes' => $cooldownMinutes,
+            'remaining_seconds' => 0,
+            'last_loss_position_id' => (string)$row['position_id'],
+            'last_loss_closed_at_utc' => (string)$row['closed_at_utc'],
+        ];
+    }
+
+    $ageSeconds = $now->getTimestamp() - $closed->getTimestamp();
+    $cooldownSeconds = $cooldownMinutes * 60;
+    $active = $ageSeconds >= 0 && $ageSeconds < $cooldownSeconds;
+    return [
+        'active' => $active,
+        'cooldown_minutes' => $cooldownMinutes,
+        'remaining_seconds' => $active ? max(0, $cooldownSeconds - $ageSeconds) : 0,
+        'last_loss_position_id' => (string)$row['position_id'],
+        'last_loss_closed_at_utc' => $closed->format(DateTimeInterface::ATOM),
+        'last_loss_realized_pnl_usd' => (float)$row['realized_pnl_usd'],
+        'reason' => $active ? 'same_direction_loss_cooldown' : null,
     ];
 }
 

@@ -637,3 +637,47 @@ def test_manual_position_time_uses_server_now_and_tolerates_small_clock_skew():
     assert "if ($opened < $competitionStart)" in position
     assert "$opened < $competitionStart || $opened > $now" not in position
     assert "server_now_utc" in position
+
+
+def test_execution_guardrails_enforce_authoritative_quantity_and_same_direction_loss_cooldown():
+    control = (PATCH / "portfolio_control.php").read_text(encoding="utf-8")
+    approval = (PATCH / "approval.php").read_text(encoding="utf-8")
+    position = (PATCH / "position.php").read_text(encoding="utf-8")
+    snapshot = (PATCH / "operator_snapshot.php").read_text(encoding="utf-8")
+    ui = (PATCH / "operator.php").read_text(encoding="utf-8")
+
+    assert "function stc_current_position_sizing_for_plan" in control
+    assert "function stc_recent_same_direction_loss_cooldown" in control
+    assert "same_direction_loss_cooldown" in approval
+    assert "existing_open_position" in approval
+    assert "risk_capacity_unavailable" in approval
+    assert "'execution_ticket' => $status === 'approved' ? $executionTicket : null" in approval
+    assert "'do_not_exceed_quantity' => true" in approval
+    assert "'freshness_seconds' => 60" in approval
+
+    assert "filled_quantity_exceeds_stc_risk_ticket" in position
+    assert "stc_risk_capacity_unavailable_at_fill_record" in position
+    assert "$allowedQuantity = min($approvedMaxQuantity, $currentMaxQuantity);" in position
+    assert "manual_external" in position
+
+    assert "position_sizing_at_approval" in snapshot
+    assert "loss_cooldown" in snapshot
+    assert "WAIT_SAME_DIRECTION_LOSS_COOLDOWN" in snapshot
+
+    assert "MAX STC QUANTITY" in ui
+    assert "DO NOT EXCEED" in ui
+    assert "NEVER use % balance, trade value, or margin" in ui
+    assert "approvedExecutionTicketHtml" in ui
+    assert "ANTI-CHURN COOLDOWN" in ui
+    assert "filled quantity exceeds the approved STC risk ticket" in ui
+
+
+def test_execution_guardrails_remain_manual_only_and_do_not_add_broker_execution():
+    combined = "\n".join(
+        (PATCH / name).read_text(encoding="utf-8")
+        for name in ("approval.php", "portfolio_control.php", "position.php", "operator_snapshot.php", "operator.php")
+    )
+    assert "manual_execution_only" in combined
+    assert "manual_only" in combined
+    for forbidden in ("place_order", "submit_order", "broker_order", "strategy.entry"):
+        assert forbidden not in combined

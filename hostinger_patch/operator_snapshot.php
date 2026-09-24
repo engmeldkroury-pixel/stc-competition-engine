@@ -205,6 +205,27 @@ try {
         if (is_array($approval)) {
             $approval['reasons'] = json_decode((string)($approval['reason_json'] ?? '[]'), true) ?: [];
             unset($approval['reason_json']);
+            $approval['execution_ticket'] = null;
+            $approval['position_sizing_at_approval'] = null;
+            $evidenceId = trim((string)($approval['quote_evidence_id'] ?? ''));
+            if ($evidenceId !== '') {
+                $evidenceStmt = $pdo->prepare(
+                    'SELECT details_json FROM stc_execution_evidence WHERE evidence_id = ? LIMIT 1'
+                );
+                $evidenceStmt->execute([$evidenceId]);
+                $detailsRaw = $evidenceStmt->fetchColumn();
+                if (is_string($detailsRaw) && $detailsRaw !== '') {
+                    $details = json_decode($detailsRaw, true);
+                    if (is_array($details)) {
+                        if (is_array($details['execution_ticket'] ?? null)) {
+                            $approval['execution_ticket'] = $details['execution_ticket'];
+                        }
+                        if (is_array($details['position_sizing'] ?? null)) {
+                            $approval['position_sizing_at_approval'] = $details['position_sizing'];
+                        }
+                    }
+                }
+            }
         }
 
         $validUntil = stc_parse_utc((string)($envelope['valid_until'] ?? ''));
@@ -229,12 +250,29 @@ try {
             && ($lockedPlan['levels_locked'] ?? false) === true
             && ($lockedPlan['execution'] ?? '') === 'manual_only';
 
+        $decisionTimeframeMinutes = 15;
+        if (is_array($lockedPlan)) {
+            $rawTimeframe = trim((string)($lockedPlan['decision_timeframe'] ?? '15'));
+            if (preg_match('/^\d+$/', $rawTimeframe) === 1) {
+                $decisionTimeframeMinutes = max(1, (int)$rawTimeframe);
+            }
+        }
+        $lossCooldown = stc_recent_same_direction_loss_cooldown(
+            $pdo,
+            $competitionId,
+            $symbol,
+            $recommendation,
+            $now,
+            $decisionTimeframeMinutes
+        );
+
         $manualReady = !$runtime['safe_mode']
             && !$runtime['kill_switch']
             && in_array($recommendation, ['LONG', 'SHORT'], true)
             && !$hasOpenPosition
             && $planValid
             && $latestApprovalCompatible
+            && (($lossCooldown['active'] ?? false) !== true)
             && $approvalFresh
             && $validUntil !== null
             && $now < $validUntil;
@@ -281,6 +319,8 @@ try {
                 $pendingPlanAction = 'CANCEL_PENDING_PLAN';
             } elseif ($hasOpenPosition) {
                 $pendingPlanAction = 'MANAGE_EXISTING_POSITION';
+            } elseif (($lossCooldown['active'] ?? false) === true) {
+                $pendingPlanAction = 'WAIT_SAME_DIRECTION_LOSS_COOLDOWN';
             } elseif (in_array($recommendation, ['LONG', 'SHORT'], true)) {
                 if ($latestApprovalCompatible) {
                     $opportunityActive = true;
@@ -349,6 +389,7 @@ try {
             'locked_trade_plan' => $planValid ? $lockedPlan : null,
             'position_sizing' => $sizing,
             'macro_context' => $macroContext,
+            'loss_cooldown' => $lossCooldown,
             'approval' => $approval,
             'manual_execution_ready' => $manualReady,
             'has_open_position' => $hasOpenPosition,

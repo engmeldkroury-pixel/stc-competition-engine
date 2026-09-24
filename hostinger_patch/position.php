@@ -284,6 +284,48 @@ try {
                 || abs($target2 - (float)$plan['target2']) > max(1e-9, abs((float)$plan['target2']) * 1e-8)) {
                 stc_json(['ok' => false, 'error' => 'targets_must_match_locked_plan'], 409);
             }
+
+            $currentSizing = stc_current_position_sizing_for_plan(
+                $pdo,
+                $competitionId,
+                $symbol,
+                $entryPrice,
+                $initialStop
+            );
+            $approvedTicket = is_array($validated['execution_ticket'] ?? null)
+                ? $validated['execution_ticket']
+                : null;
+            $approvedMaxQuantity = $approvedTicket === null
+                ? (float)($currentSizing['proposed_quantity'] ?? 0.0)
+                : (float)($approvedTicket['max_quantity'] ?? 0.0);
+            $currentMaxQuantity = (float)($currentSizing['proposed_quantity'] ?? 0.0);
+            $allowedQuantity = min($approvedMaxQuantity, $currentMaxQuantity);
+            $qtyTolerance = max(1e-9, abs($allowedQuantity) * 1e-8);
+
+            if (($currentSizing['allowed_by_position_limit'] ?? false) !== true
+                || ($currentSizing['allowed_by_risk_policy'] ?? false) !== true
+                || $allowedQuantity <= 0.0) {
+                stc_json([
+                    'ok' => false,
+                    'error' => 'stc_risk_capacity_unavailable_at_fill_record',
+                    'approved_max_quantity' => $approvedMaxQuantity,
+                    'current_max_quantity' => $currentMaxQuantity,
+                    'filled_quantity' => $quantity,
+                ], 409);
+            }
+            if ($quantity > $allowedQuantity + $qtyTolerance) {
+                stc_json([
+                    'ok' => false,
+                    'error' => 'filled_quantity_exceeds_stc_risk_ticket',
+                    'filled_quantity' => $quantity,
+                    'approved_max_quantity' => $approvedMaxQuantity,
+                    'current_max_quantity' => $currentMaxQuantity,
+                    'allowed_quantity' => $allowedQuantity,
+                    'risk_amount_usd_at_allowed_quantity' => (float)($currentSizing['risk_amount_usd'] ?? 0.0),
+                    'risk_budget_usd' => (float)($currentSizing['risk_budget_usd'] ?? 0.0),
+                    'detail' => 'Record this as manual_external for supervision if the platform fill already exceeded the STC ticket. Do not label the oversized fill as an STC-compliant plan fill.',
+                ], 409);
+            }
         }
 
         $positionId = stc_position_id();
