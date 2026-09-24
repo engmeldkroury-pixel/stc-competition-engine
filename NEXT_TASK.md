@@ -1,6 +1,6 @@
 # NEXT TASK
 
-Updated: 2026-09-24
+Updated: 2026-09-24 05:21 EEST
 
 ## CONTROLLING PROJECT
 STC.
@@ -8,47 +8,56 @@ STC.
 ## READ FIRST
 - docs/STC_ADAPTIVE_RESEARCH_MASTER_LEDGER.md
 - PROJECT_STATE.md
-- docs/COMMUNITY_WAVE2_AUDIT_20260924.md
+- docs/COMMUNITY_INDICATOR_CANDIDATE_MATRIX_20260924.md
+- docs/COMMUNITY_WAVE2_FROZEN_15M_RUN1_20260924.md
+- research/community_shadow_registry.json
 
 ## VERIFIED COMPLETE
-- General Lab durable research queue/runtime bridge merged in PR #117; Hostinger deployment pending owner action.
-- Wave-two causal research adapters merged in PR #118; CI 378 passed.
-- Community/composite implemented research pool: 17 components.
-- Research/live authority remains false.
+- General Lab durable queue/runtime bridge merged; Hostinger deployment remains an owner-side deployment action.
+- Durable 32-candidate community/composite inventory merged.
+- Implemented causal/composite research pool = 17.
+- Wave-two 26-symbol 15m exact frozen run completed successfully.
+- New 15m frozen survivors:
+  - CAPITALCOM:BTCUSD / Trendilo;
+  - CME_MINI:MJY1! / Trendilo.
+- Both are SHADOW only.
+- Shadow registry now has 12 records.
+- live_authority=false.
 
 ## ACTIVE RESEARCH WORK UNIT
-Run exact-provider 26-symbol 15m frozen confirmation for the expanded 17-component community pool using the already captured 5,000-bar TradingView datasets.
+Run exact-provider multi-timeframe frozen confirmation for the two Trendilo survivors.
 
-Required method:
-1. first 85% = complete development dataset;
-2. bounded parameter selection only inside development;
-3. internal TEST/FORWARD must pass inside development;
-4. final 15% remains untouched frozen confirmation;
-5. same-bar ambiguity = stop first;
-6. failed/undersampled components get zero promotion status;
-7. compare new survivors with prior SHADOW registry;
-8. create SHADOW records only for new frozen survivors; live_authority=false.
+Symbols:
+- CAPITALCOM:BTCUSD
+- CME_MINI:MJY1!
 
-## AFTER FROZEN RUN
-- Run multi-timeframe confirmation for any new survivors where 5m/30m/1h/2h/4h/1D exact history meets evidence floor.
-- Continue Lorentzian exact semantic audit.
-- Continue VuManChu divergence confirmation-delay audit.
-- Add more practical open-source composites only after causal/repaint audit.
+Timeframes where exact history/evidence floor permits:
+- 5m
+- 30m
+- 1h
+- derived 2h only from exact 1h
+- 4h
+- 1D
 
-## GENERAL LAB HOSTINGER DEPLOYMENT
-Run once:
-- hostinger_patch/migrations/004_general_lab_queue.sql
-Upload:
-- hostinger_patch/general_lab.php
-- hostinger_patch/operator.php
+Method:
+1. same Trendilo component;
+2. bounded TRAIN-only parameter selection;
+3. internal OOS TEST/FORWARD;
+4. exact final 15% frozen holdout;
+5. insufficient history fails closed;
+6. same-bar ambiguity -> STOP first;
+7. no provider substitution;
+8. SHADOW only unless same-component support independently passes.
 
-No secret/config change is required.
+## AFTER MULTITF
+- If Trendilo independently passes a supporting timeframe for the same symbol, update supporting_timeframes and promotion state only according to the formal ladder.
+- Continue Lorentzian Classification exact semantic audit.
+- Continue VuManChu divergence-confirmation timing audit.
+- Expand high-value open-source candidates only after causal/repaint audit.
+- Extend General Lab automation and compact reporting without copying weights across symbols.
 
-## NON-NEGOTIABLE
-- no lookahead;
-- no repainting evidence;
-- no silent provider substitution;
-- no popularity/review-based trading weights;
-- no cross-symbol weight inheritance;
+## LIVE BOUNDARY
+- human approval/manual execution only;
 - no automatic broker execution;
-- no live A+/risk-rule changes from research alone.
+- no research-driven A+/risk/competition-rule change;
+- popularity/reviews remain discovery metadata only.
