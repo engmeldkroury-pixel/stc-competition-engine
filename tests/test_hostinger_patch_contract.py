@@ -430,7 +430,7 @@ def test_mobile_signal_alert_contains_sizing_risk_and_single_tp_ticket():
     notify = (PATCH / "notification_control.php").read_text(encoding="utf-8")
     assert "'MAX STC QUANTITY: '" in notify
     assert "DO NOT EXCEED; smaller is allowed" in notify
-    assert "' | Risk: $'" in notify
+    assert "Risk budget USD" in notify
     assert "' | Official max: '" in notify
     assert "'Signal score: '" in notify
     assert "Single-TP mode: place only the final take-profit" in notify
