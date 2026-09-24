@@ -33,7 +33,7 @@ def _bars(count: int = 4000) -> list[Bar]:
 
 def test_frozen_confirmation_keeps_final_holdout_out_of_development(monkeypatch):
     spec = indicator_by_id("ut_bot_alerts")
-    monkeypatch.setattr(cfc, "eligible_indicators", lambda *args, **kwargs: (spec,))
+    monkeypatch.setattr(cfc, "benchmarkable_indicators", lambda *args, **kwargs: (spec,))
 
     bars = _bars()
     cut = int(len(bars) * 0.85)
@@ -73,7 +73,7 @@ def test_frozen_confirmation_keeps_final_holdout_out_of_development(monkeypatch)
 
 def test_confirmation_pass_never_grants_live_authority(monkeypatch):
     spec = indicator_by_id("ut_bot_alerts")
-    monkeypatch.setattr(cfc, "eligible_indicators", lambda *args, **kwargs: (spec,))
+    monkeypatch.setattr(cfc, "benchmarkable_indicators", lambda *args, **kwargs: (spec,))
     report = cfc.confirm_community_symbol(
         symbol="TEST:X",
         asset_class="forex",
@@ -99,3 +99,17 @@ def test_frozen_confirmation_requires_a_real_holdout():
         assert "Need at least" in str(exc)
     else:
         raise AssertionError("Expected a minimum-history failure")
+
+
+def test_frozen_confirmation_selector_allows_official_ports(monkeypatch):
+    spec = indicator_by_id("lorentzian_classification")
+    monkeypatch.setattr(cfc, "benchmarkable_indicators", lambda *args, **kwargs: (spec,))
+    report = cfc.confirm_community_symbol(
+        symbol="TEST:X",
+        asset_class="rates",
+        timeframe="15",
+        bars=_bars(),
+    )
+    assert report.components
+    assert report.components[0].indicator_id == "lorentzian_classification"
+    assert report.live_authority is False
