@@ -219,3 +219,22 @@ Required follow-up:
 3. add an explicit pending-entry-order lifecycle / reservation control so an unfilled entry plan blocks new same-symbol entry authorization until cancelled, filled, or expired-and-confirmed-cancelled;
 4. on plan expiry, surface a clear **CANCEL UNFILLED ENTRY ORDER** instruction rather than silently letting the broker order survive;
 5. never count a pending entry order as an open position.
+
+
+### NAS100 pending-order reconciliation against live STC plans
+
+A read-only STC notification audit at 19:31 UTC shows the latest NAS100 locked plan was generated at 19:30:20 UTC:
+- direction/order: BUY MARKET;
+- entry zone: 30424.471576332 to 30494.328423668;
+- proposed quantity: 4.004853;
+- stop: 30340.643359527;
+- final target: 30756.291601182;
+- setup quality: 83/100;
+- score: +0.66.
+
+Earlier plans included:
+- 19:00:26 UTC, quantity 3.862057, stop 30364.432890339, target 30796.217774152;
+- 18:45:20 UTC, quantity 3.797603, stop 30319.126958827, target 30758.632602933;
+- 18:00:23 UTC, quantity 3.792997, stop 30282.759842977, target 30722.850392557.
+
+The two working broker Buy Limit orders visible in the owner screenshot are 3.7 @ 30357.7 and 3.7 @ 30407.8. They correspond to older plan families and are not the current 19:30 BUY MARKET instruction. Because 15-minute STC plans expire after 30 minutes, these old working limits should be treated as stale pending exposure, not current authorization.
