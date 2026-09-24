@@ -21,16 +21,13 @@ STC.
 - BTCUSD Trendilo remains SHADOW.
 - Registry target after WU-119: 16 records; live_authority=false.
 
-## ACTIVE RESEARCH WORK UNIT
-Lorentzian Classification exact semantic/parity audit.
-
-Required:
-1. use the official open-source reference, not an approximate imitation;
-2. preserve confirmed-bar causality and original Backtest Stream semantics;
-3. audit feature definitions, ANN neighbor cadence, Lorentzian distance, filters, kernel regression and exit logic;
-4. verify parity on public reference fixtures before adding the component to STC benchmarkable pool;
-5. add bounded TRAIN-only parameter grid only after parity baseline is established;
-6. keep live_authority=false.
+## COMPLETED RESEARCH WORK UNIT — LORENTZIAN
+- PR #125 merged.
+- Official AI Edge parity-tested Python port pinned to exact upstream commit.
+- STC maps official confirmed Buy/Sell stream only.
+- Adapter parity contract test passed in CI.
+- live_authority=false.
+- Next: exact-provider 26-symbol benchmark/frozen evidence before any shadow participation.
 
 ## PARALLEL FOLLOW-UP
 - Audit VuManChu Cipher B pivot/divergence confirmation delay.
@@ -93,3 +90,14 @@ Use only benchmark results generated after PR #124 / commit 6df403846a1d386816a1
 Any wave-3 result produced before the canonical HalfTrend/Trendilo/Nadaraya contract reconciliation is superseded.
 Current exact-data trigger commit on research/native-community-15m-20260923:
 - 8edb3edef2c26e6348e989d5b95632f50b803327
+
+
+## LORENTZIAN EXACT-DATA FOLLOW-UP
+After the reconciled wave-3 benchmark completes, sync PR #125 to the exact-data research branch and run the same 26-symbol / 5,000-bar 15m matrix with Lorentzian enabled.
+Record:
+- validated symbols;
+- TRAIN-selected official settings;
+- TEST/FORWARD metrics;
+- incremental coverage versus existing community pool;
+- family redundancy;
+- final frozen holdout only for survivors.
