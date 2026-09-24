@@ -2043,3 +2043,31 @@ Owner intervention required now: YES — only for historical-data access, not fo
 - STC benchmark adapter consumes official confirmed Buy/Sell events; official classifier/features/ANN/filters/kernel semantics stay upstream parity-tested.
 - TRAIN-only settings variants are allowed; TEST/FORWARD remain untouched.
 - Next exact-data step after the reconciled wave-3 run: rerun the 26-symbol matrix with Lorentzian included and compare incremental validated coverage.
+
+
+## Reconciled wave-3 benchmark archived + Lorentzian exact-data run started — 2026-09-24 10:10 EEST
+- Workflow run 35964596933 completed successfully after PR #124 identity reconciliation.
+- PR #126 merged as 598f14b0a8d4c907fe88ffdb391ea433d5638c31 after CI: 384 passed, 1 warning.
+- Durable reconciled wave-3 evidence:
+  - research_benchmarks/native_community_wave3_reconciled_15m_summary_20260924.json
+  - docs/NATIVE_COMMUNITY_WAVE3_RECONCILED_15M_20260924.md
+- Scope: 26 symbols x 5,000 exact-provider TradingView 15m bars; 18 community components; native matrix on the same windows.
+- Result:
+  - native STC validated 15m strategies: 0/26;
+  - community research-profile-ready symbols: 13/26, up from 10/26 in the prior 14-component benchmark;
+  - incremental coverage: CAPITALCOM:BTCUSD, CAPITALCOM:EURUSD, CAPITALCOM:NAS100.
+- New/reconciled component OOS+forward evidence:
+  - HalfTrend 2/26: NAS100, ZB1!;
+  - Trendilo 2/26: EURUSD, MJY1!;
+  - endpoint Nadaraya-Watson non-repaint 1/26: USDZAR;
+  - delayed RSI Kernel Optimized 1/26: BTCUSD.
+- PR #127 merged main into research/native-community-15m-20260923 without merging staged raw research data into main.
+- The research branch now includes merged PR #125 official Lorentzian integration.
+- New exact-data benchmark run 35967884019 started from commit e95ce289bbcca93ab13c6035772eb986c6674bde:
+  - same 26 symbols;
+  - same staged 5,000-bar 15m exact-provider windows;
+  - Lorentzian enabled alongside the reconciled community pool.
+- Superseded PRs closed:
+  - #121 superseded by merged official Lorentzian PR #125;
+  - #115 superseded by merged/reconciled wave-3 PRs #123/#124.
+- Live authority remains unchanged: research-only; no A+ gate/risk/competition/execution change.
