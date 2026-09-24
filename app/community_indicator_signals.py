@@ -4,6 +4,11 @@ from math import exp, sqrt
 from statistics import fmean
 
 from .models import Bar
+from ._vendor.lorentzian_classification import (
+    Bar as LorentzianBar,
+    LorentzianClassification,
+    Settings as LorentzianSettings,
+)
 
 
 def _ema_full(values: list[float], period: int) -> list[float | None]:
@@ -1138,6 +1143,82 @@ def nadaraya_watson_endpoint_signals(
     return out
 
 
+
+def lorentzian_classification_signals(
+    bars: list[Bar],
+    *,
+    neighbors_count: int = 8,
+    feature_count: int = 5,
+    use_adx_filter: bool = False,
+    adx_threshold: int = 20,
+    use_ema_filter: bool = False,
+    ema_period: int = 200,
+    use_sma_filter: bool = False,
+    sma_period: int = 200,
+    use_kernel_filter: bool = True,
+    use_kernel_smoothing: bool = False,
+    kernel_h: int = 8,
+    kernel_r: float = 8.0,
+    kernel_x: int = 25,
+    kernel_lag: int = 2,
+    causal_history_cap: int = 10_000,
+) -> dict[int, float]:
+    """Exact-reference Lorentzian Classification buy/sell signals.
+
+    STC vendors the parity-tested MIT reference implementation and wraps only
+    its confirmed buy/sell outputs. The causal history cap is intentionally
+    larger than the current 5,000-bar research datasets. The upstream default
+    max_bars_back=2000 uses the final chart index to suppress earlier
+    predictions; that is faithful to the TradingView display but unsuitable
+    for a no-lookahead research series. Using an explicit cap above the entire
+    supported dataset plus include_full_history=True preserves the exact
+    classifier/filter semantics while removing final-chart-length dependence.
+    """
+    if not bars:
+        return {}
+    if causal_history_cap <= len(bars):
+        raise ValueError(
+            "Lorentzian causal_history_cap must exceed the research series length "
+            "so historical signals cannot depend on the final chart index"
+        )
+
+    settings = LorentzianSettings(
+        neighbors_count=neighbors_count,
+        max_bars_back=causal_history_cap,
+        feature_count=feature_count,
+        include_full_history=True,
+        use_adx_filter=use_adx_filter,
+        adx_threshold=adx_threshold,
+        use_ema_filter=use_ema_filter,
+        ema_period=ema_period,
+        use_sma_filter=use_sma_filter,
+        sma_period=sma_period,
+        use_kernel_filter=use_kernel_filter,
+        use_kernel_smoothing=use_kernel_smoothing,
+        kernel_h=kernel_h,
+        kernel_r=kernel_r,
+        kernel_x=kernel_x,
+        kernel_lag=kernel_lag,
+    )
+    reference_bars = [
+        LorentzianBar(
+            time=bar.timestamp.isoformat(),
+            open=float(bar.open),
+            high=float(bar.high),
+            low=float(bar.low),
+            close=float(bar.close),
+        )
+        for bar in bars
+    ]
+    model = LorentzianClassification(reference_bars, settings=settings, price_scale=0.0)
+    out: dict[int, float] = {}
+    for i, row in enumerate(model.data):
+        if row.buy:
+            out[i] = 1.0
+        elif row.sell:
+            out[i] = -1.0
+    return out
+
 def indicator_signal_series(
     indicator_id: str,
     bars: list[Bar],
@@ -1179,4 +1260,6 @@ def indicator_signal_series(
         return trendilo_signals(bars, **params)
     if indicator_id == "nadaraya_watson_endpoint_nonrepaint":
         return nadaraya_watson_endpoint_signals(bars, **params)
+    if indicator_id == "lorentzian_classification":
+        return lorentzian_classification_signals(bars, **params)
     raise KeyError(f"Community indicator is not implemented for causal benchmarking: {indicator_id}")
