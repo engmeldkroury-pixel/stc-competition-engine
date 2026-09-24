@@ -2014,3 +2014,13 @@ Owner intervention required now: YES — only for historical-data access, not fo
 - Family redundancy normalization is active in the research ensemble.
 - No live A+ weights or execution behavior changed.
 - Facebook trader-source audit is registered but blocked by Facebook login plus unavailable TinyFish browser funds; no claims from those links were assumed.
+
+
+## Community research wave 3 merged — 2026-09-24
+- PR #123 merged as 078f2552928b0167cd37c0eacf05bb193db0fe51 after 378 tests passed.
+- New implemented conceptual adapters:
+  - Trendilo;
+  - Nadaraya-Watson Envelope in endpoint-only non-repainting mode;
+  - RSI Kernel Optimized with explicit delayed pivot confirmation to avoid lookahead.
+- All new parameters are tuned on TRAIN only and frozen for TEST/FORWARD.
+- Next evidence task: rerun the exact-provider 26-symbol 15m benchmark with the expanded adapter set, compare incremental information against the prior 14-component benchmark, and retain zero weight for failed components.
