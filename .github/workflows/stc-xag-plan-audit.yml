@@ -1,0 +1,54 @@
+name: STC XAG Plan Audit
+
+on:
+  push:
+    branches: ["ops/xag-plan-audit-20260924"]
+    paths:
+      - ".github/workflows/stc-xag-plan-audit.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      STC_OWNER_TOKEN: ${{ secrets.STC_OWNER_TOKEN }}
+    steps:
+      - name: Read sanitized XAG notification plans
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "${STC_OWNER_TOKEN:-}"
+          curl -fsS --retry 2 --max-time 20 \
+            -H "Authorization: Bearer ${STC_OWNER_TOKEN}" \
+            "https://stc.feama.site/notification.php" > /tmp/notifications.json
+          python - <<'PY'
+          import json, re
+          data=json.load(open("/tmp/notifications.json",encoding="utf-8"))
+          rows=[]
+          for e in data.get("events") or []:
+              if e.get("event_type")!="NEW_LOCKED_PLAN" or e.get("symbol")!="CAPITALCOM:XAGUSD":
+                  continue
+              created=str(e.get("created_at_utc") or "")
+              body=str(e.get("body_text") or "")
+              def line(prefix):
+                  for x in body.splitlines():
+                      if x.startswith(prefix):
+                          return x[len(prefix):].strip()
+                  return None
+              rows.append({
+                  "created_at_utc":created,
+                  "event_key":e.get("event_key"),
+                  "quantity_line":line("Quantity: "),
+                  "entry_zone":line("Entry zone: "),
+                  "stop":line("Stop: "),
+                  "final_take_profit":line("Final take profit: "),
+                  "setup_quality":line("Setup quality: "),
+                  "signal_score":line("Signal score: "),
+                  "mtf":line("MTF: "),
+                  "evidence_families":line("Evidence families: "),
+              })
+          print("STC_XAG_PLAN_AUDIT="+json.dumps(rows,sort_keys=True))
+          PY
