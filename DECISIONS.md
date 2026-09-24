@@ -30,3 +30,9 @@
 - Future manual fills should use the STC proposed quantity exactly or a smaller valid quantity when the platform requires it; larger discretionary sizing is outside the STC risk ticket.
 - Do not promote community/shadow indicators merely because the current live strategy experienced drawdown; promotion still requires parity and evidence.
 - Before changing live weights or symbol rules, backfill the visible closed trades and attribute each one to its actual STC source evidence where possible.
+
+## 2026-09-24 — Pending entry orders are first-class risk
+- A broker/platform pending entry order is not an open position, but it is latent exposure and must block additional same-symbol entry authorization until explicitly cancelled, filled, or reconciled.
+- Expired STC plans must not leave silent working broker orders. The owner workflow must surface a cancel-unfilled-entry instruction.
+- Never backfill an unfilled pending order as an OPEN position.
+- Protective stop-loss/take-profit orders attached to an actual open position remain valid management orders and must not be confused with new entry orders.
