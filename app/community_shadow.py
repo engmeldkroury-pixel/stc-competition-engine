@@ -31,6 +31,71 @@ CAPITAL_COMMUNITY_15M_PROFILES: dict[str, dict[str, float]] = {
     },
 }
 
+CAPITAL_COMMUNITY_15M_PARAMETERS: dict[str, dict[str, dict[str, float | int]]] = {
+    "CAPITALCOM:BTCUSD": {
+        "rsi_kernel_optimized_flux": {
+            "rsi_period": 21,
+            "pivot_length": 12,
+            "bandwidth": 6.0,
+            "min_samples": 12,
+            "dominance_ratio": 1.35,
+        },
+    },
+    "CAPITALCOM:DOGEUSD": {
+        "range_filter_guikroth": {
+            "sampling_period": 100,
+            "range_multiplier": 3.0,
+        },
+        "schaff_trend_cycle": {
+            "cycle_length": 12,
+            "fast_length": 26,
+            "slow_length": 50,
+            "smoothing": 0.5,
+        },
+    },
+    "CAPITALCOM:ETHUSD": {
+        "ssl_hybrid": {
+            "baseline_length": 60,
+            "ssl_length": 15,
+        },
+    },
+    "CAPITALCOM:EURUSD": {
+        "trendilo": {
+            "smoothing": 1,
+            "lookback": 50,
+            "alma_offset": 0.85,
+            "alma_sigma": 6.0,
+            "band_multiplier": 1.0,
+        },
+    },
+    "CAPITALCOM:NAS100": {
+        "halftrend_everget": {
+            "amplitude": 5,
+        },
+    },
+    "CAPITALCOM:USDZAR": {
+        "lorentzian_classification": {},
+        "nadaraya_watson_endpoint_nonrepaint": {
+            "window": 500,
+            "bandwidth": 8.0,
+            "multiplier": 3.0,
+            "deviation_length": 499,
+        },
+        "alphatrend": {
+            "period": 20,
+            "coefficient": 1.0,
+        },
+        "supertrend_kivanc": {
+            "atr_period": 14,
+            "multiplier": 3.0,
+        },
+        "ut_bot_alerts": {
+            "atr_period": 14,
+            "key_value": 1.5,
+        },
+    },
+}
+
 CAPITAL_NO_VALIDATED_COMMUNITY_PROFILE = frozenset(
     {
         "CAPITALCOM:AUDUSD",
@@ -79,6 +144,7 @@ def build_community_component_shadow(
             "evidence_source": EVIDENCE_SOURCE,
             "expected_components": [],
             "normalized_weights": {},
+            "selected_parameters": {},
             "observed_signals": {},
             "missing_components": [],
             "unexpected_components_ignored": sorted(supplied),
@@ -118,6 +184,7 @@ def build_community_component_shadow(
         "evidence_source": EVIDENCE_SOURCE,
         "expected_components": list(profile),
         "normalized_weights": dict(profile),
+        "selected_parameters": dict(CAPITAL_COMMUNITY_15M_PARAMETERS.get(symbol, {})),
         "observed_signals": observed,
         "missing_components": missing,
         "unexpected_components_ignored": unexpected,
