@@ -244,8 +244,11 @@ INDICATORS: tuple[CommunityIndicatorSpec, ...] = (
         preferred_timeframes=("5", "15", "30", "60", "120", "240", "1D"),
         open_source=True,
         popularity_uses=55_235,
-        implementation_status="pending_exact_port",
-        notes=("ALMA-smoothed percentage-change trend state with RMS band; exact defaults still require source verification.",),
+        implementation_status="implemented_conceptual",
+        notes=(
+            "Causal conceptual adapter uses percentage change, ALMA smoothing and an RMS neutral band.",
+            "Bounded parameters are selected on TRAIN only; this is not a copy of third-party source code.",
+        ),
     ),
     CommunityIndicatorSpec(
         indicator_id="nadaraya_watson_envelope_luxalgo",
@@ -256,10 +259,10 @@ INDICATORS: tuple[CommunityIndicatorSpec, ...] = (
         suitable_asset_classes=("forex", "crypto", "indices", "metals", "energy", "rates"),
         preferred_timeframes=("5", "15", "30", "60", "120", "240", "1D"),
         open_source=True,
-        implementation_status="pending_non_repaint_port",
+        implementation_status="implemented_conceptual",
         notes=(
-            "The script supports both repainting and non-repainting modes.",
-            "STC may benchmark only the explicitly non-repainting mode.",
+            "The public script supports repainting and non-repainting modes.",
+            "STC implements endpoint-only causal kernel smoothing and benchmarks the non-repainting concept only.",
         ),
     ),
     CommunityIndicatorSpec(
@@ -386,10 +389,10 @@ INDICATORS: tuple[CommunityIndicatorSpec, ...] = (
         preferred_timeframes=("5", "15", "30", "60", "120", "240", "1D"),
         open_source=True,
         popularity_uses=226_304,
-        implementation_status="pending_confirmation_delay_audit",
+        implementation_status="implemented_conceptual",
         notes=(
-            "Uses RSI plus KDE around pivot distributions.",
-            "Pivot labels depend on bars after the pivot; STC must shift evidence to the actual confirmation bar to avoid lookahead.",
+            "Uses RSI plus KDE-like density around previously confirmed pivot distributions.",
+            "STC adds pivot samples only on the actual confirmation bar after the required right-hand bars have closed, preventing lookahead.",
         ),
         review_urls=("https://www.reddit.com/r/TradingView/comments/1lqg6ra/best_tradingview_indicators_3_years_experience/",),
     ),

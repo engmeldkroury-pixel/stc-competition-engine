@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from math import sqrt
+from math import exp, sqrt
 from statistics import fmean
 
 from .models import Bar
@@ -57,6 +57,47 @@ def _hma_full(values: list[float], period: int) -> list[float | None]:
         den = root * (root + 1) / 2.0
         out[i] = sum(v * w for v, w in zip(clean, weights)) / den
     return out
+
+
+def _alma_full(
+    values: list[float],
+    period: int,
+    *,
+    offset: float = 0.85,
+    sigma: float = 6.0,
+) -> list[float | None]:
+    out: list[float | None] = [None] * len(values)
+    if period <= 0:
+        return out
+    m = offset * (period - 1)
+    s = period / max(sigma, 1e-9)
+    weights = [exp(-((i - m) ** 2) / (2.0 * s * s)) for i in range(period)]
+    den = sum(weights)
+    if den <= 1e-12:
+        return out
+    for i in range(period - 1, len(values)):
+        window = values[i - period + 1 : i + 1]
+        out[i] = sum(v * w for v, w in zip(window, weights)) / den
+    return out
+
+
+def _endpoint_nadaraya_watson(
+    values: list[float],
+    i: int,
+    *,
+    lookback: int,
+    bandwidth: float,
+) -> float | None:
+    start = i - lookback + 1
+    if lookback <= 1 or start < 0:
+        return None
+    h = max(0.25, float(bandwidth))
+    weights = [exp(-0.5 * (lag / h) ** 2) for lag in range(lookback)]
+    den = sum(weights)
+    if den <= 1e-12:
+        return None
+    # lag 0 is the current confirmed bar; larger lags are progressively older.
+    return sum(values[i - lag] * weights[lag] for lag in range(lookback)) / den
 
 
 def _atr_full(bars: list[Bar], period: int = 14) -> list[float | None]:
@@ -952,6 +993,166 @@ def qqe_ssl_wae_composite_signals(
     return out
 
 
+def trendilo_signals(
+    bars: list[Bar],
+    *,
+    change_period: int = 1,
+    alma_length: int = 10,
+    alma_offset: float = 0.85,
+    alma_sigma: float = 6.0,
+    rms_length: int = 20,
+    band_multiplier: float = 1.0,
+) -> dict[int, float]:
+    """Causal Trendilo-family adapter.
+
+    Uses percentage price change, ALMA smoothing and an RMS envelope. Signals
+    are emitted only when the smoothed momentum leaves the neutral RMS band.
+    """
+    closes = [bar.close for bar in bars]
+    pct = [0.0] * len(bars)
+    for i in range(change_period, len(bars)):
+        base = closes[i - change_period]
+        if abs(base) > 1e-12:
+            pct[i] = 100.0 * (closes[i] - base) / base
+    alma = _alma_full(
+        pct,
+        alma_length,
+        offset=alma_offset,
+        sigma=alma_sigma,
+    )
+    out: dict[int, float] = {}
+    state = 0
+    for i in range(len(bars)):
+        if alma[i] is None or i - rms_length + 1 < 0:
+            continue
+        window = [
+            float(alma[j])
+            for j in range(i - rms_length + 1, i + 1)
+            if alma[j] is not None
+        ]
+        if len(window) < rms_length:
+            continue
+        rms = sqrt(sum(x * x for x in window) / len(window)) * band_multiplier
+        current = 1 if float(alma[i]) > rms else -1 if float(alma[i]) < -rms else 0
+        if current != 0 and current != state:
+            out[i] = float(current)
+        state = current if current != 0 else state
+    return out
+
+
+def nadaraya_watson_nonrepaint_signals(
+    bars: list[Bar],
+    *,
+    lookback: int = 50,
+    bandwidth: float = 8.0,
+    deviation_length: int = 50,
+    envelope_multiplier: float = 2.5,
+) -> dict[int, float]:
+    """Endpoint-only non-repainting Nadaraya-Watson envelope adapter.
+
+    Only past and current confirmed bars are used. The signal is contrarian:
+    crossing below the lower envelope emits LONG; crossing above the upper
+    envelope emits SHORT.
+    """
+    closes = [bar.close for bar in bars]
+    estimate: list[float | None] = [None] * len(bars)
+    abs_error: list[float | None] = [None] * len(bars)
+    upper: list[float | None] = [None] * len(bars)
+    lower: list[float | None] = [None] * len(bars)
+    out: dict[int, float] = {}
+
+    for i in range(len(bars)):
+        est = _endpoint_nadaraya_watson(
+            closes,
+            i,
+            lookback=lookback,
+            bandwidth=bandwidth,
+        )
+        if est is None:
+            continue
+        estimate[i] = est
+        abs_error[i] = abs(closes[i] - est)
+        start = i - deviation_length + 1
+        if start < 0:
+            continue
+        errors = [x for x in abs_error[start : i + 1] if x is not None]
+        if len(errors) < deviation_length:
+            continue
+        width = fmean(float(x) for x in errors) * envelope_multiplier
+        upper[i] = est + width
+        lower[i] = est - width
+        if i == 0 or upper[i - 1] is None or lower[i - 1] is None:
+            continue
+        if closes[i - 1] >= float(lower[i - 1]) and closes[i] < float(lower[i]):
+            out[i] = 1.0
+        elif closes[i - 1] <= float(upper[i - 1]) and closes[i] > float(upper[i]):
+            out[i] = -1.0
+    return out
+
+
+def rsi_kernel_pivot_signals(
+    bars: list[Bar],
+    *,
+    rsi_period: int = 14,
+    pivot_length: int = 12,
+    bandwidth: float = 4.0,
+    min_samples: int = 12,
+    dominance_ratio: float = 1.30,
+) -> dict[int, float]:
+    """Causal RSI/KDE pivot-family adapter.
+
+    Pivot RSI samples enter the training pool only when the required right-hand
+    bars have already closed. Current-bar KDE similarity is therefore computed
+    from previously confirmed pivot samples only; no future bars leak into the
+    live decision.
+    """
+    closes = [bar.close for bar in bars]
+    rsi = _rsi_full(closes, rsi_period)
+    low_samples: list[float] = []
+    high_samples: list[float] = []
+    out: dict[int, float] = {}
+    state = 0
+    h = max(0.25, float(bandwidth))
+
+    def density(value: float, samples: list[float]) -> float:
+        if not samples:
+            return 0.0
+        return fmean(exp(-0.5 * ((value - sample) / h) ** 2) for sample in samples)
+
+    for i in range(len(bars)):
+        pivot_i = i - pivot_length
+        if pivot_i >= pivot_length and rsi[pivot_i] is not None:
+            lo_start = pivot_i - pivot_length
+            hi_end = i
+            pivot_low = bars[pivot_i].low
+            pivot_high = bars[pivot_i].high
+            is_low = all(pivot_low <= bars[j].low for j in range(lo_start, hi_end + 1) if j != pivot_i)
+            is_high = all(pivot_high >= bars[j].high for j in range(lo_start, hi_end + 1) if j != pivot_i)
+            if is_low:
+                low_samples.append(float(rsi[pivot_i]))
+            if is_high:
+                high_samples.append(float(rsi[pivot_i]))
+            # Bound memory so the model adapts without using an ever-growing pool.
+            if len(low_samples) > 300:
+                low_samples = low_samples[-300:]
+            if len(high_samples) > 300:
+                high_samples = high_samples[-300:]
+
+        if rsi[i] is None or len(low_samples) < min_samples or len(high_samples) < min_samples:
+            continue
+        value = float(rsi[i])
+        low_d = density(value, low_samples)
+        high_d = density(value, high_samples)
+        bullish = low_d > high_d * dominance_ratio
+        bearish = high_d > low_d * dominance_ratio
+        current = 1 if bullish else -1 if bearish else 0
+        if current != 0 and current != state:
+            out[i] = float(current)
+        if current != 0:
+            state = current
+    return out
+
+
 def indicator_signal_series(
     indicator_id: str,
     bars: list[Bar],
@@ -987,4 +1188,10 @@ def indicator_signal_series(
         return waddah_attar_explosion_signals(bars, **params)
     if indicator_id == "qqe_ssl_wae_composite":
         return qqe_ssl_wae_composite_signals(bars, **params)
+    if indicator_id == "trendilo":
+        return trendilo_signals(bars, **params)
+    if indicator_id == "nadaraya_watson_envelope_luxalgo":
+        return nadaraya_watson_nonrepaint_signals(bars, **params)
+    if indicator_id == "rsi_kernel_optimized_flux":
+        return rsi_kernel_pivot_signals(bars, **params)
     raise KeyError(f"Community indicator is not implemented for causal benchmarking: {indicator_id}")

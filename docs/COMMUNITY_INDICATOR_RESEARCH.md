@@ -141,3 +141,14 @@ This preserves the intended per-symbol specialization without letting the same o
 ## Expanded popularity/discovery snapshot
 
 The current discovery catalog includes several widely used open-source scripts, including SuperTrend, Chandelier Exit, AlphaTrend, VuManChu Cipher B, SSL Hybrid, Range Filter, HalfTrend, and Williams Vix Fix. Popularity can move a script higher in the research queue, but cannot improve its benchmark score or ensemble weight.
+
+
+## Wave 3 source-audited conceptual adapters
+
+Added after reviewing the public TradingView descriptions:
+
+- Trendilo: percentage change -> ALMA smoothing -> RMS neutral band. STC emits only confirmed transitions outside the neutral band.
+- Nadaraya-Watson Envelope: STC uses endpoint-only kernel smoothing with past/current bars only. The repainting mode is excluded. Signals are contrarian envelope crosses.
+- RSI Kernel Optimized family: STC delays every pivot sample until the right-hand confirmation bars have closed, then builds a causal density model from previously confirmed pivot RSI samples. This prevents future-bar leakage.
+
+These are independent research implementations, not copied third-party source code. Their parameters are selected on TRAIN only, then frozen before TEST/FORWARD.
