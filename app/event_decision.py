@@ -7,6 +7,7 @@ from pydantic import ValidationError
 from .approval import build_approval_envelope
 from .calibration_registry import calibration_to_public_dict, lookup_runtime_calibration
 from .competition_profiles import get_profile
+from .community_shadow import build_community_component_shadow
 from .evidence_engine import aggregate_live_family_scores
 from .models import FactorScores, SignalEvaluationRequest, TradingViewWebhook
 from .pipeline_receipt import build_pipeline_receipt
@@ -97,6 +98,11 @@ def decide_bridge_event(event_id: str, payload: dict) -> dict:
             "note": "Valid competition event stored, but payload is insufficient for signal evaluation.",
         }
 
+    community_component_shadow = build_community_component_shadow(
+        tv.symbol,
+        str(tv.timeframe),
+        tv.community_component_signals,
+    )
     short_term_technical = short_term_score_from_tradingview(tv)
     confirmation_score = confirmation_score_from_tradingview(tv)
     historical_regime = historical_regime_from_tradingview(tv)
@@ -250,6 +256,7 @@ def decide_bridge_event(event_id: str, payload: dict) -> dict:
     result_dict["quality_floor"] = quality_floor
     result_dict["pre_gate_recommendation"] = base_result.recommendation
     result_dict["quality_gate_failures"] = gate_failures
+    result_dict["community_component_shadow"] = community_component_shadow
     result_dict["live_family_evidence"] = None if family_evidence is None else {
         "score": family_evidence.score,
         "agreement_ratio": family_evidence.agreement_ratio,
