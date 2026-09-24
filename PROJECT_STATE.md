@@ -2114,3 +2114,29 @@ Owner intervention required now: YES — only for historical-data access, not fo
   - official Lorentzian via corrected implemented_official_port dispatch;
   - causal VuManChu Cipher B adapter.
 - Prior run 35967884019 completed successfully but remains superseded for Lorentzian evidence because it used the pre-fix dispatcher.
+
+
+## Corrected Lorentzian/VuManChu partial evidence + native frozen merge — 2026-09-24 10:58 EEST
+- PR #133 native frozen-holdout confirmation merged as `3e0cf23195c4112da62a633b7f74d742c438a92a`.
+- Corrected workflow 35969652488 produced 17 valid current artifacts before an external GitHub Actions pre-start blocker affected the remaining nine matrix entries.
+- Successful corrected artifacts were inspected and each contains 20 community trials including both official `lorentzian_classification` and causal `vumanchu_cipher_b`.
+- Official Lorentzian current authoritative evidence:
+  - 2/17 validated;
+  - CAPITALCOM:USDZAR score 44.3006;
+  - CBOT:ZB1! score 23.2508;
+  - nine symbols remain pending official-port execution, so no 26-symbol Lorentzian rate may be claimed yet.
+- VuManChu current evidence:
+  - 0/17 corrected artifacts;
+  - independent exact-provider completion of the nine deferred symbols with the current causal adapter and TRAIN-only grid produced 0/9 additional passes;
+  - diagnostic full-26 result is 0/26 validated.
+- Durable evidence:
+  - `research_benchmarks/corrected_lorentzian_vumanchu_partial_20260924.json`;
+  - `docs/CORRECTED_LORENTZIAN_VUMANCHU_PARTIAL_20260924.md`.
+- GitHub Actions blocker evidence:
+  - the same nine jobs repeatedly had `steps=null`;
+  - retry run 35971669454 also had `steps=null` for all nine;
+  - PR #135/#136 CI jobs likewise had `steps=null`;
+  - this is classified as runner/account/quota pre-start infrastructure, not strategy/test failure.
+- Canonical full benchmark workflow restored on research branch commit `aa21f072ca5d1d0a2b2e5c92e17b3dee56ac5e13`.
+- PR #135 and #136 remain unmerged/completed-unverified until independent tests or GitHub CI can execute.
+- Live A+, risk, competition, sizing and manual-execution boundaries remain unchanged.
