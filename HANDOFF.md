@@ -48,3 +48,16 @@ Do not promote community weights before exact parity evidence.
 - Diagnostic file: `tradingview/STC_COMMUNITY_SHADOW_PARITY_CANDIDATE.pine`.
 - Critical CI passed.
 - TradingView compile and exact event parity remain pending and are required before production-feed integration.
+
+
+## Current live owner action — EURUSD
+- Fresh post-hotfix opportunity verified at 13:30 UTC.
+- SHORT / COMPETITION_OPPORTUNITY / 80/100.
+- Entry zone: 1.13479407..1.13706593.
+- Stop: 1.13933779.
+- Final TP: 1.127410525.
+- STC proposed quantity: 137552.49003.
+- Valid until: 14:00 UTC.
+- Telegram delivery: sent HTTP 200.
+- Direct scanner quote: unavailable due TradingView 429.
+- Next required human input: current EURUSD competition-platform price (and screenshot if the quantity field is shown as lots rather than units).
