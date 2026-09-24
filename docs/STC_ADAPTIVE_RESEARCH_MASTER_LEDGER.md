@@ -750,3 +750,43 @@ Status: VERIFIED / MERGED.
 - Direct contract test verifies STC's adapter output equals the official-port Buy/Sell output.
 - Third-party attribution is documented in docs/THIRD_PARTY_LORENTZIAN.md.
 - Research-only authority; no live A+ gate/risk/execution change.
+
+
+### WU-109 — reconciled wave-3 exact-provider 15m benchmark
+Status: VERIFIED / ARCHIVED / MERGED.
+- Workflow run: 35964596933 — SUCCESS.
+- Evidence PR: #126 — merged as 598f14b0a8d4c907fe88ffdb391ea433d5638c31.
+- CI on evidence PR: 384 passed, 1 warning.
+- Scope: 26 competition symbols, 5,000 exact TradingView 15m bars each, 18 community components, same-window native matrix.
+- Native 15m: 0/26 validated under current gates.
+- Community profile-ready coverage: 13/26 versus 10/26 in prior verified 14-component run.
+- Incremental symbols covered: BTCUSD, EURUSD, NAS100.
+- New/reconciled component validated counts:
+  - HalfTrend 2/26;
+  - Trendilo 2/26;
+  - endpoint Nadaraya-Watson non-repaint 1/26;
+  - delayed RSI Kernel Optimized 1/26.
+- Durable artifacts:
+  - research_benchmarks/native_community_wave3_reconciled_15m_summary_20260924.json
+  - docs/NATIVE_COMMUNITY_WAVE3_RECONCILED_15M_20260924.md
+- This work unit excludes Lorentzian because its workflow began before PR #125 merged.
+
+### WU-110 — official Lorentzian exact-provider 15m benchmark
+Status: IN PROGRESS.
+- Research branch: research/native-community-15m-20260923.
+- PR #127 merged current main into the research branch so the branch contains PR #125 official Lorentzian integration while retaining staged exact-provider datasets outside main.
+- Trigger commit: e95ce289bbcca93ab13c6035772eb986c6674bde.
+- Workflow run: 35967884019.
+- Required outputs:
+  1. Lorentzian validated symbol count;
+  2. TRAIN-selected official settings per survivor;
+  3. TEST/FORWARD metrics;
+  4. incremental profile-ready coverage versus WU-109;
+  5. redundancy/family overlap;
+  6. untouched frozen holdout only for Lorentzian survivors.
+- No live authority may be granted from this run alone.
+
+### Repository hygiene decision — 2026-09-24
+- PR #121 closed as superseded by merged PR #125 official Lorentzian integration.
+- PR #115 closed as superseded by PRs #123/#124 canonical wave-3 implementation/reconciliation.
+- PR #116 native frozen confirmation remains open because the apples-to-apples final-holdout objective is still relevant and is not yet superseded by an accepted main-branch artifact.
