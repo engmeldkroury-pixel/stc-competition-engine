@@ -15,10 +15,10 @@ from app.shadow_promotion_registry import (
 def test_default_shadow_registry_is_research_only():
     load_shadow_registry.cache_clear()
     rows = load_shadow_registry()
-    assert len(rows) == 12
-    assert {x.state for x in rows} == {"SHADOW"}
+    assert len(rows) == 16
+    assert {x.state for x in rows} == {"SHADOW", "MULTITF_CONFIRMED"}
     assert all(x.live_authority is False for x in rows)
-    assert all(next_research_state(x) == "SHADOW" for x in rows)
+    assert all(next_research_state(x) in {"SHADOW", "MULTITF_CONFIRMED"} for x in rows)
 
 
 def test_shadow_registry_rejects_live_authority(tmp_path):
@@ -67,13 +67,23 @@ def test_public_shadow_record_never_grants_execution():
     )
 
 
-def test_wave2_trendilo_records_remain_shadow_only():
+def test_trendilo_multitf_confirmation_is_research_only():
     load_shadow_registry.cache_clear()
-    rows = [
-        row for row in load_shadow_registry()
-        if row.component_id == "trendilo" and row.timeframe == "15"
-    ]
-    assert {row.symbol for row in rows} == {"CAPITALCOM:BTCUSD", "CME_MINI:MJY1!"}
-    assert all(row.state == "SHADOW" for row in rows)
-    assert all(row.live_authority is False for row in rows)
-    assert all(next_research_state(row) == "SHADOW" for row in rows)
+    rows = [row for row in load_shadow_registry() if row.component_id == "trendilo"]
+    btc = [row for row in rows if row.symbol == "CAPITALCOM:BTCUSD"]
+    mjy = [row for row in rows if row.symbol == "CME_MINI:MJY1!"]
+
+    assert len(btc) == 1
+    assert btc[0].timeframe == "15"
+    assert btc[0].state == "SHADOW"
+    assert next_research_state(btc[0]) == "SHADOW"
+
+    assert {row.timeframe for row in mjy} == {"5", "15", "30"}
+    assert all(row.state == "MULTITF_CONFIRMED" for row in mjy)
+    assert all(row.live_authority is False for row in mjy)
+    assert all(next_research_state(row) == "MULTITF_CONFIRMED" for row in mjy)
+    assert {row.timeframe: set(row.supporting_timeframes) for row in mjy} == {
+        "15": {"5", "30"},
+        "5": {"15", "30"},
+        "30": {"15", "5"},
+    }
