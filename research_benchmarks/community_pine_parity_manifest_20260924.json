@@ -1,0 +1,65 @@
+{
+  "schema": "stc-community-pine-parity-manifest-v1",
+  "created_utc": "2026-09-24T11:25:27Z",
+  "workflow_run_id": 35992849854,
+  "research_head_sha": "dc40a5d530609156d17b64e5c2fc637c52f21f19",
+  "combined_artifact_id": 10804853153,
+  "combined_artifact_digest": "sha256:e0357abc68949b88d5554e636cb376f70c004bac7fb8e4da213cb1a33c67cce7",
+  "symbols": [
+    {
+      "symbol": "CAPITALCOM:BTCUSD",
+      "bar_count": 5000,
+      "dataset_sha256": "525f0457e3269cfc838ac0b3972a1bccdd07d0d16e7ead08a729cfbc68a21c53",
+      "component_event_counts": {
+        "rsi_kernel_optimized_flux": 252
+      }
+    },
+    {
+      "symbol": "CAPITALCOM:DOGEUSD",
+      "bar_count": 5000,
+      "dataset_sha256": "572ec71fd73ad9da4d73be2e4077751e5daa3f8088a6a079bb6603bf8fa1e4b0",
+      "component_event_counts": {
+        "range_filter_guikroth": 149,
+        "schaff_trend_cycle": 609
+      }
+    },
+    {
+      "symbol": "CAPITALCOM:ETHUSD",
+      "bar_count": 5000,
+      "dataset_sha256": "946cc18500f634fa2fa82a0ca15a47e4e8bb384dc391d9c1fc47f5a8b43b7dea",
+      "component_event_counts": {
+        "ssl_hybrid": 210
+      }
+    },
+    {
+      "symbol": "CAPITALCOM:EURUSD",
+      "bar_count": 5000,
+      "dataset_sha256": "f12b627d4b5b8b031cb1b6c75af731cb55b1d221e7e68dcca1122b2a44c5c8bc",
+      "component_event_counts": {
+        "trendilo": 225
+      }
+    },
+    {
+      "symbol": "CAPITALCOM:NAS100",
+      "bar_count": 5000,
+      "dataset_sha256": "129b462f040c61516b72de03d4fda0b29cb0e4f7a1b57ef3650464de84c09913",
+      "component_event_counts": {
+        "halftrend_everget": 133
+      }
+    },
+    {
+      "symbol": "CAPITALCOM:USDZAR",
+      "bar_count": 5000,
+      "dataset_sha256": "5b41458d1c220d4cf7601044be1bd427b5df1adc7b29ad47b1af8b9cdefed1e7",
+      "component_event_counts": {
+        "lorentzian_classification": 47,
+        "nadaraya_watson_endpoint_nonrepaint": 76,
+        "alphatrend": 363,
+        "supertrend_kivanc": 142,
+        "ut_bot_alerts": 383
+      }
+    }
+  ],
+  "live_authority": false,
+  "purpose": "Durable manifest for regenerating/verifying exact Python community-component event streams before Pine/live promotion."
+}
