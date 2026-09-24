@@ -150,3 +150,72 @@ A later STC plan at 18:30:24 UTC proposed only 19.636645 units with final target
 3. The second SPX500 entry demonstrates a separate anti-churn/oversizing failure: it was opened ~20 minutes after the stop and at ~2x the nearest STC sizing ticket.
 4. PR #161 directly addresses both execution failure modes by persisting an approval-time MAX STC QUANTITY, rejecting oversized STC-plan fill records, blocking duplicate open-symbol entries, and applying a same-symbol/same-direction loss cooldown.
 5. Indicator weights and the competition quality floor should not be changed from these few trades alone. The next research priority is trade-level attribution and stop/entry sensitivity using no-lookahead evidence.
+
+## Order-state follow-up — owner screenshots at approximately 19:23 UTC / 22:23 EEST
+
+The platform screenshot now provides direct evidence for the active exit orders and exposes a pending-order lifecycle gap.
+
+### Active positions and protective exits
+
+**SPX500 LONG**
+- quantity: 39.2;
+- average fill: 7697.1;
+- active take profit: 7765.6 for 39.2;
+- active stop loss: 7690.8 for 39.2;
+- last price shown: about 7706.3;
+- unrealized P/L shown: about USD +360.64.
+
+Gross price risk from average entry to the active stop is approximately:
+- (7697.1 - 7690.8) x 39.2 = USD 246.96, before exit commission.
+
+The current position is still larger than the nearest single STC ticket, but the active tightened stop materially reduces current downside versus using the wider later-plan stop.
+
+The order history also shows a **filled SPX500 Buy Limit for 19.6 units**, limit 7707.0, fill 7705.8, with TP 7765.6 and SL 7690.8. This is consistent with the current 39.2-unit aggregate position having been increased by another 19.6-unit tranche.
+
+**EURUSD SHORT**
+- quantity: 137,552;
+- average fill: 1.13677;
+- active take profit: 1.12740 for 137,552;
+- active stop loss: 1.13930 for 137,552;
+- last price shown: about 1.13738;
+- unrealized P/L shown: about USD -83.91.
+
+### Working-order inventory
+
+TradingView shows:
+- All orders: 13;
+- Working: 6;
+- Inactive: 4;
+- Filled: 1;
+- Cancelled: 2.
+
+The six working orders can be reconciled from the screenshots as:
+1. EURUSD protective stop-loss;
+2. EURUSD take-profit;
+3. SPX500 protective stop-loss for 39.2;
+4. SPX500 take-profit for 39.2;
+5. NAS100 Buy Limit 3.7 at 30357.7;
+6. NAS100 Buy Limit 3.7 at 30407.8.
+
+The NAS100 limit orders have separate inactive child brackets visible:
+- one bracket around TP 30722.9 / SL 30282.8;
+- another around TP 30758.6 / SL 30319.1.
+
+There is **no open NAS100 position on the platform**, so the two working NAS100 entry orders represent latent future exposure. If both fill, the resulting 7.4-unit NAS100 position would stack two separate plans/orders.
+
+### New control gap
+
+STC currently models open positions but does not authoritatively know whether an owner has left an unfilled broker/platform entry order working. Therefore:
+- a plan can expire while its TradingView pending order remains live;
+- a newer plan can create another pending order on the same symbol;
+- multiple pending entries can stack before any position exists;
+- STC may incorrectly backfill a pending order as though it were an open position.
+
+This is now a production-safety issue, not merely a UI improvement.
+
+Required follow-up:
+1. cancel/reconcile stale NAS100 working entry orders on the platform before any new NAS100 entry is permitted;
+2. void mistaken STC manual_external open records for symbols that are not actually open on the platform;
+3. add an explicit pending-entry-order lifecycle / reservation control so an unfilled entry plan blocks new same-symbol entry authorization until cancelled, filled, or expired-and-confirmed-cancelled;
+4. on plan expiry, surface a clear **CANCEL UNFILLED ENTRY ORDER** instruction rather than silently letting the broker order survive;
+5. never count a pending entry order as an open position.
