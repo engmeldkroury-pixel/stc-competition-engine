@@ -42,6 +42,8 @@ def test_approval_preserves_block_reasons_instead_of_only_http_409() -> None:
 def test_console_keeps_recovery_path_when_signal_refreshes_after_manual_fill() -> None:
     source = _source()
     assert "function latestLockedPlanContextHtml(c)" in source
+    assert "function isLockedPlanVisible(c)" in source
+    assert "RECOVERY ONLY" in source
     assert "LOCKED PLAN PRESERVED" in source
     assert "approval_compatible_with_locked_plan" in source
     assert "Already filled on platform? Record position" in source
