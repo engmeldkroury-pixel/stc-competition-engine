@@ -10,7 +10,7 @@ from app.community_indicator_benchmark import (
     benchmark_symbol_indicators,
     build_symbol_ensemble_profile,
 )
-from app.community_indicator_catalog import catalog_summary, eligible_indicators
+from app.community_indicator_catalog import benchmarkable_indicators, catalog_summary, eligible_indicators
 from app.community_indicator_signals import indicator_signal_series
 from app.community_research_plan import community_research_plan_summary
 from app.models import Bar
@@ -277,3 +277,10 @@ def test_vumanchu_divergence_is_emitted_on_confirmation_bar_not_backdated():
     )
     assert 7 not in events
     assert events[9] < 0
+
+
+def test_benchmarkable_selector_includes_official_ports_and_excludes_native_proxies():
+    ids = {spec.indicator_id for spec in benchmarkable_indicators("rates", "15")}
+    assert "lorentzian_classification" in ids
+    assert "smart_money_concepts_luxalgo" not in ids
+    assert "vumanchu_cipher_b" in ids
