@@ -16,6 +16,7 @@ from .research_report import build_strategy_research_report, report_to_dict
 from .mtf_research import validate_mtf_policies
 from .regime_research import validate_strategy_by_regime, validate_strategy_by_regime_pools
 from .strategy_lab import STRATEGIES, classify_trial_status, robust_trial_score, trial_rejection_reasons
+from .shadow_weight_recalibration import FrozenOutcomeBatch, ShadowOutcome, recalibrate_profile
 from .walkforward import MatrixSelection, materialize_feature_series, matrix_selections_by_timeframe, strategy_matrix
 
 
@@ -100,6 +101,80 @@ def _calibrate_selection_features(
         )
         for feature in _strategy_feature_names(selection.strategy_id)
     ]
+
+
+def _shadow_batch_from_payload(payload: dict[str, Any]) -> FrozenOutcomeBatch | None:
+    raw = payload.get("shadow_batch")
+    if raw is None:
+        return None
+    if not isinstance(raw, dict):
+        raise ValueError("shadow_batch must be an object")
+    batch_id = str(raw.get("batch_id") or "").strip()
+    if not batch_id:
+        raise ValueError("shadow_batch requires batch_id")
+    sealed = raw.get("sealed")
+    if sealed is not True:
+        raise ValueError("shadow_batch must be sealed before recalibration")
+    observations_raw = raw.get("observations")
+    if not isinstance(observations_raw, list):
+        raise ValueError("shadow_batch observations must be a list")
+    observations: list[ShadowOutcome] = []
+    for row in observations_raw:
+        if not isinstance(row, dict):
+            raise ValueError("shadow_batch observation must be an object")
+        observation_id = str(row.get("observation_id") or "").strip()
+        symbol = str(row.get("symbol") or "").strip()
+        timeframe = str(row.get("timeframe") or "").strip()
+        component_id = str(row.get("component_id") or "").strip()
+        if not all((observation_id, symbol, timeframe, component_id)):
+            raise ValueError(
+                "shadow_batch observation requires observation_id, symbol, timeframe and component_id"
+            )
+        try:
+            result_r = float(row.get("result_r"))
+        except (TypeError, ValueError) as exc:
+            raise ValueError("shadow_batch observation result_r must be numeric") from exc
+        directional_hit = row.get("directional_hit")
+        if not isinstance(directional_hit, bool):
+            raise ValueError("shadow_batch observation directional_hit must be boolean")
+        observations.append(
+            ShadowOutcome(
+                observation_id=observation_id,
+                symbol=symbol,
+                timeframe=timeframe,
+                component_id=component_id,
+                result_r=result_r,
+                directional_hit=directional_hit,
+            )
+        )
+    return FrozenOutcomeBatch(
+        batch_id=batch_id,
+        sealed=True,
+        observations=tuple(observations),
+    )
+
+
+def _recalibrate_ensemble_profiles(
+    *,
+    symbol: str,
+    profiles: dict[str, Any],
+    batch: FrozenOutcomeBatch | None,
+) -> dict[str, Any]:
+    if batch is None:
+        return {}
+    out: dict[str, Any] = {}
+    for timeframe, profile in profiles.items():
+        prior_weights = {
+            item.component_id: float(item.normalized_weight)
+            for item in profile.components
+        }
+        out[timeframe] = recalibrate_profile(
+            symbol=symbol,
+            timeframe=timeframe,
+            prior_weights=prior_weights,
+            batch=batch,
+        )
+    return out
 
 
 def _select_mtf_candidate_ids(validations, *, limit: int = 3) -> tuple[str, ...]:
@@ -228,6 +303,13 @@ def run_symbol_research(
             community_trials=trials,
         )
         community_ensemble_profiles[timeframe] = profile
+    shadow_batch = _shadow_batch_from_payload(payload)
+    shadow_recalibration_profiles = _recalibrate_ensemble_profiles(
+        symbol=symbol,
+        profiles=community_ensemble_profiles,
+        batch=shadow_batch,
+    )
+
     live_entry_selection = timeframe_selections.get(
         "15",
         MatrixSelection(
@@ -468,6 +550,14 @@ def run_symbol_research(
         "community_ensemble_profiles": {
             key: asdict(value) for key, value in community_ensemble_profiles.items()
         },
+        "shadow_recalibration_profiles": {
+            key: asdict(value) for key, value in shadow_recalibration_profiles.items()
+        },
+        "shadow_recalibration_live_authority": False,
+        "shadow_recalibration_rule": (
+            "Optional sealed shadow batches may update research candidate weights only. "
+            "Unsealed batches fail closed; small samples retain prior weights; live authority remains false."
+        ),
         "community_indicator_live_authority": False,
         "community_indicator_weighting_rule": (
             "OOS/forward robustness only. Reviews/popularity prioritize research discovery and "
