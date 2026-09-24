@@ -449,7 +449,7 @@ def test_historical_closed_trade_import_is_manual_audited_and_counts_original_da
     assert "ALREADY CLOSED historical competition activity" in ui
     assert "sends no order" in ui
 
-def test_high_conviction_gate_is_enforced_across_console_approval_notifications_and_fill_recording():
+def test_quality_gate_is_enforced_across_console_approval_notifications_and_fill_recording():
     snapshot = (PATCH / "operator_snapshot.php").read_text(encoding="utf-8")
     approval = (PATCH / "approval.php").read_text(encoding="utf-8")
     notify = (PATCH / "notification_control.php").read_text(encoding="utf-8")
@@ -458,8 +458,9 @@ def test_high_conviction_gate_is_enforced_across_console_approval_notifications_
     assert "quality_gate_passed" in snapshot
     assert "A_PLUS" in snapshot
     assert "high_conviction_gate_not_passed" in approval
-    assert "high_conviction_gate_not_passed" in notify
-    assert "source_plan_not_high_conviction" in control
+    assert "quality_gate_not_passed" in notify
+    assert "stc_signal_quality_gate_eligible($signal)" in notify
+    assert "source_plan_quality_gate_not_passed" in control
     assert "MONITOR ONLY" in ui
     assert "STC A+ HIGH-CONVICTION PLAN" in ui
 
@@ -560,3 +561,17 @@ def test_general_lab_queue_is_additive_research_only_and_audited():
     assert "general_lab.php" in ui
     assert "Exact-provider history is mandatory" in ui
     assert "Weights are symbol/timeframe-specific" in ui
+
+
+def test_competition_opportunity_grade_is_centralized_end_to_end():
+    cloud = (PATCH / "cloud_control.php").read_text(encoding="utf-8")
+    snapshot = (PATCH / "operator_snapshot.php").read_text(encoding="utf-8")
+    approval = (PATCH / "approval.php").read_text(encoding="utf-8")
+    notify = (PATCH / "notification_control.php").read_text(encoding="utf-8")
+    control = (PATCH / "portfolio_control.php").read_text(encoding="utf-8")
+    assert "function stc_signal_quality_gate_eligible" in cloud
+    assert "COMPETITION_OPPORTUNITY" in cloud
+    assert "capital-africa-sep-2026" in cloud
+    assert "competition_mode" in cloud
+    for text in (snapshot, approval, notify, control):
+        assert "stc_signal_quality_gate_eligible($signal)" in text
