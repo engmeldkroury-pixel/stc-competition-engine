@@ -32,10 +32,10 @@ INDICATORS: tuple[CommunityIndicatorSpec, ...] = (
         open_source=True,
         editor_pick=True,
         popularity_uses=1_229_919,
-        implementation_status="pending_exact_port",
+        implementation_status="implemented_official_port",
         notes=(
-            "Candidate is high priority because it publishes a backtest stream and explicit ANN/Lorentzian logic.",
-            "Do not approximate the classifier in production; exact causal semantics must be verified first.",
+            "STC uses the official AI Edge MIT-licensed Python port pinned to an exact upstream commit.",
+            "Classifier/features/ANN/filters/kernel semantics remain upstream parity-tested; STC maps confirmed Buy/Sell events only.",
         ),
         review_urls=(
             "https://www.tradingview.com/script/Pu38F2pB-Backtest-Adapter/",
@@ -550,7 +550,7 @@ def eligible_indicators(
     *,
     implemented_only: bool = True,
 ) -> tuple[CommunityIndicatorSpec, ...]:
-    allowed = {"implemented_conceptual", "native_proxy_only"}
+    allowed = {"implemented_conceptual", "implemented_official_port", "native_proxy_only"}
     return tuple(
         spec
         for spec in INDICATORS
@@ -565,7 +565,7 @@ def catalog_summary() -> dict:
         "total": len(INDICATORS),
         "implemented_or_proxy": sum(
             1 for spec in INDICATORS
-            if spec.implementation_status in {"implemented_conceptual", "native_proxy_only"}
+            if spec.implementation_status in {"implemented_conceptual", "implemented_official_port", "native_proxy_only"}
         ),
         "pending_exact_port": sum(1 for spec in INDICATORS if spec.implementation_status == "pending_exact_port"),
         "discovery_only": sum(1 for spec in INDICATORS if spec.implementation_status == "discovery_only"),

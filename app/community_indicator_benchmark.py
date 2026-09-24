@@ -239,6 +239,12 @@ def _indicator_score(test: IndicatorStats, forward: IndicatorStats) -> float:
 
 def indicator_parameter_grid(indicator_id: str) -> tuple[dict, ...]:
     grids: dict[str, tuple[dict, ...]] = {
+        "lorentzian_classification": (
+            {},
+            {"source": "hlc3"},
+            {"neighbors_count": 12},
+            {"use_adx_filter": True, "adx_threshold": 20},
+        ),
         "ut_bot_alerts": (
             {"atr_period": 10, "key_value": 1.0},
             {"atr_period": 10, "key_value": 1.5},

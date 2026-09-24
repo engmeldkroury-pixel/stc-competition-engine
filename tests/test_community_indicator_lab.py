@@ -60,6 +60,8 @@ def test_community_catalog_separates_research_popularity_from_live_weighting():
 @pytest.mark.parametrize(
     "indicator_id",
     (
+        "lorentzian_classification",
+        "lorentzian_classification",
         "ut_bot_alerts",
         "squeeze_momentum_lazybear",
         "wavetrend_crosses",
@@ -91,6 +93,31 @@ def test_community_indicator_adapters_are_causal(indicator_id: str):
     }
     assert all(-1.0 <= value <= 1.0 for value in full.values())
 
+
+
+def test_lorentzian_adapter_maps_official_port_buy_sell_stream_exactly():
+    from lorentzian_classification import LorentzianClassification, Settings
+
+    bars = _bars(900)
+    records = [
+        {
+            "time": bar.timestamp.isoformat(),
+            "open": bar.open,
+            "high": bar.high,
+            "low": bar.low,
+            "close": bar.close,
+        }
+        for bar in bars
+    ]
+    official = LorentzianClassification(records, settings=Settings())
+    expected = {}
+    for i, row in enumerate(official.results):
+        if row.buy and not row.sell:
+            expected[i] = 1.0
+        elif row.sell and not row.buy:
+            expected[i] = -1.0
+
+    assert indicator_signal_series("lorentzian_classification", bars) == expected
 
 def test_symbol_benchmark_runs_each_implemented_indicator_independently():
     trials = benchmark_symbol_indicators(
