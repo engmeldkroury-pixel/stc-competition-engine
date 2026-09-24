@@ -613,3 +613,41 @@ Status: VERIFIED / COMPLETED / PENDING MERGE.
 3. Continue VuManChu divergence confirmation-delay audit.
 4. Preserve General Lab automatic full-process routing for every newly added symbol.
 5. Expand practical open-source candidates only after causal/repaint review.
+
+
+## New owner instruction — external trader/composite-indicator intelligence layer
+Date: 2026-09-24
+
+The owner supplied two Facebook trader/source links for review:
+- https://www.facebook.com/share/18ntSnCtXa/
+- https://www.facebook.com/share/p/1beB4M9ykK/
+
+The purpose is not to copy recommendations blindly. STC must inspect these sources for:
+- composite indicators used by the traders;
+- explicit buy/sell or entry/exit logic;
+- market-regime commentary;
+- risk/stop/target conventions;
+- timeframe/asset specialization;
+- recurring qualitative concepts that can be translated into measurable features;
+- evidence of repainting, hindsight-only presentation, selective screenshots, or unverifiable performance claims.
+
+Any useful concept enters a separate research queue first. It must be:
+DISCOVERED -> SOURCE_AUDITED -> RULE_EXTRACTED -> CAUSALIZED -> BACKTESTED -> OOS_PASSED -> FORWARD_PASSED -> SHADOW_WEIGHT -> FROZEN_CONFIRMATION -> EXPLICIT_PROMOTION.
+
+Social-source claims, reviews, follower counts, screenshots, recommendations and trader reputation never become trading weights directly.
+
+If a trader's composite logic overlaps with existing STC/community families, STC must measure information overlap before adding weight to avoid double counting.
+
+## Completion requirement for the current adaptive-strategy program
+The program is not considered complete after adding indicators to a catalog. Completion requires:
+1. durable project-state/ledger documentation;
+2. full 26-symbol community benchmark;
+3. native-vs-community same-window benchmark;
+4. symbol/timeframe-specific research weights;
+5. correlation/diversity penalty for overlapping evidence;
+6. exact/repaint-safe ports of the highest-priority pending composite indicators;
+7. additional timeframe expansion where history is sufficient;
+8. General Lab automatic research bridge for newly added symbols;
+9. external trader/composite source audit pipeline;
+10. frozen-window recalibration from accumulated live outcomes;
+11. explicit promotion control that keeps live A+ behavior unchanged until validated.
