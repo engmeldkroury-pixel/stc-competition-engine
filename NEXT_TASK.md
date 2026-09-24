@@ -6,7 +6,7 @@ Updated: 2026-09-24 11:30 UTC
 STC.
 
 ## URGENT PRODUCTION PRIORITY
-The six-file Hostinger PR #145 hotfix is deployed and verified. The current priority is the next naturally generated fresh Capital `COMPETITION_OPPORTUNITY`: confirm deployed quality eligibility, locked-plan visibility and Telegram delivery, then present the still-valid manual order ticket to Mohamed.
+A fresh post-hotfix Capital opportunity is live: EURUSD SHORT, COMPETITION_OPPORTUNITY, quality 80/100, locked plan visible, Telegram HTTP 200. The immediate owner action is to confirm the current EURUSD price on the competition platform while the locked plan remains valid; if the price is still inside 1.13479407..1.13706593 and the ticket uses the expected quantity unit, complete owner approval and manual order entry.
 
 ## VERIFIED LIVE EVIDENCE
 - Main includes PR #145 competition quality eligibility fix.
