@@ -61,7 +61,6 @@ def test_community_catalog_separates_research_popularity_from_live_weighting():
     "indicator_id",
     (
         "lorentzian_classification",
-        "lorentzian_classification",
         "ut_bot_alerts",
         "squeeze_momentum_lazybear",
         "wavetrend_crosses",
@@ -128,6 +127,7 @@ def test_symbol_benchmark_runs_each_implemented_indicator_independently():
     )
     ids = {trial.indicator_id for trial in trials}
     assert {
+        "lorentzian_classification",
         "ut_bot_alerts",
         "squeeze_momentum_lazybear",
         "wavetrend_crosses",
@@ -228,3 +228,15 @@ def test_trendilo_parameter_contract_matches_existing_shadow_registry():
         and row.get("band_multiplier") == 1.25
         for row in grid
     )
+
+
+def test_benchmark_matrix_includes_official_ports_but_not_native_proxy_only():
+    trials = benchmark_symbol_indicators(
+        symbol="CBOT:ZN1!",
+        asset_class="rates",
+        timeframe="15",
+        bars=_bars(900),
+    )
+    ids = {trial.indicator_id for trial in trials}
+    assert "lorentzian_classification" in ids
+    assert "smart_money_concepts_luxalgo" not in ids
