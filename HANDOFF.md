@@ -61,3 +61,11 @@ Do not promote community weights before exact parity evidence.
 - Telegram delivery: sent HTTP 200.
 - Direct scanner quote: unavailable due TradingView 429.
 - Next required human input: current EURUSD competition-platform price (and screenshot if the quantity field is shown as lots rather than units).
+
+
+## Locked-plan recovery incident
+- EURUSD was manually entered on TradingView, but STC approval was not completed before the next bar refresh.
+- Do NOT place a duplicate EURUSD order.
+- Root cause fixed in PR #155; Record Trade competition-field clarity fixed in PR #156.
+- New combined Hostinger ZIP SHA-256: `560ecbd32ecc82280ee385cedca179930904999c992e55b3d66bba33e9c585b7`.
+- Before recording the existing EURUSD position in STC, obtain the actual TradingView position row showing quantity, average fill, and whether SL/TP are truly attached.
