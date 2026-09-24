@@ -239,6 +239,11 @@ def _indicator_score(test: IndicatorStats, forward: IndicatorStats) -> float:
 
 def indicator_parameter_grid(indicator_id: str) -> tuple[dict, ...]:
     grids: dict[str, tuple[dict, ...]] = {
+        "lorentzian_classification": (
+            {"neighbors_count": 6, "causal_history_cap": 10_000},
+            {"neighbors_count": 8, "causal_history_cap": 10_000},
+            {"neighbors_count": 12, "causal_history_cap": 10_000},
+        ),
         "ut_bot_alerts": (
             {"atr_period": 10, "key_value": 1.0},
             {"atr_period": 10, "key_value": 1.5},
@@ -423,7 +428,7 @@ def benchmark_symbol_indicators(
 ) -> tuple[CommunityIndicatorTrial, ...]:
     trials: list[CommunityIndicatorTrial] = []
     for spec in eligible_indicators(asset_class, timeframe, implemented_only=True):
-        if spec.implementation_status != "implemented_conceptual":
+        if spec.implementation_status not in {"implemented_conceptual", "implemented_exact_reference"}:
             continue
         trials.append(
             benchmark_indicator(
