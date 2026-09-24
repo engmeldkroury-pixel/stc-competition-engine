@@ -53,6 +53,68 @@ function stc_signal_quality_gate_eligible(array $signal): bool {
         && ($signal['competition_mode'] ?? false) === true;
 }
 
+
+function stc_signal_direction_context(array $signal): string {
+    $preGate = strtoupper(trim((string)($signal['pre_gate_recommendation'] ?? '')));
+    if (in_array($preGate, ['LONG', 'SHORT'], true)) {
+        return $preGate;
+    }
+    $recommendation = strtoupper(trim((string)($signal['recommendation'] ?? '')));
+    return in_array($recommendation, ['LONG', 'SHORT'], true) ? $recommendation : 'WAIT';
+}
+
+function stc_locked_plan_latest_signal_compatibility(array $lockedSignal, array $latestSignal): array {
+    $lockedDirection = strtoupper(trim((string)($lockedSignal['recommendation'] ?? 'WAIT')));
+    $latestDirection = stc_signal_direction_context($latestSignal);
+    $compatible = in_array($lockedDirection, ['LONG', 'SHORT'], true)
+        && $latestDirection === $lockedDirection;
+    return [
+        'compatible' => $compatible,
+        'locked_direction' => $lockedDirection,
+        'latest_direction' => $latestDirection,
+        'latest_recommendation' => (string)($latestSignal['recommendation'] ?? 'WAIT'),
+        'latest_pre_gate_recommendation' => (string)($latestSignal['pre_gate_recommendation'] ?? ($latestSignal['recommendation'] ?? 'WAIT')),
+        'latest_setup_grade' => (string)($latestSignal['setup_grade'] ?? 'MONITOR_ONLY'),
+        'latest_setup_quality_score' => isset($latestSignal['setup_quality_score'])
+            ? (int)$latestSignal['setup_quality_score']
+            : null,
+        'latest_quality_gate_failures' => is_array($latestSignal['quality_gate_failures'] ?? null)
+            ? $latestSignal['quality_gate_failures']
+            : [],
+    ];
+}
+
+function stc_latest_signal_context(PDO $pdo, string $competitionId, string $symbol): ?array {
+    $stmt = $pdo->prepare(
+        'SELECT id, event_id, payload_json, result_json, analysis_completed_at_utc '
+        . 'FROM stc_webhook_events '
+        . "WHERE status = 'ingested' "
+        . "AND JSON_UNQUOTE(JSON_EXTRACT(result_json, '$.decision.action')) = 'signal_created' "
+        . "AND JSON_UNQUOTE(JSON_EXTRACT(payload_json, '$.competition_id')) = ? "
+        . "AND JSON_UNQUOTE(JSON_EXTRACT(payload_json, '$.symbol')) = ? "
+        . 'ORDER BY id DESC LIMIT 1'
+    );
+    $stmt->execute([$competitionId, $symbol]);
+    $row = $stmt->fetch();
+    if ($row === false) {
+        return null;
+    }
+    $payload = json_decode((string)$row['payload_json'], true);
+    $result = json_decode((string)$row['result_json'], true);
+    $decision = is_array($result) ? ($result['decision'] ?? null) : null;
+    $signal = is_array($decision) ? ($decision['signal'] ?? null) : null;
+    if (!is_array($payload) || !is_array($result) || !is_array($decision) || !is_array($signal)) {
+        return null;
+    }
+    return [
+        'id' => (int)$row['id'],
+        'event_id' => (string)$row['event_id'],
+        'analysis_completed_at_utc' => $row['analysis_completed_at_utc'],
+        'payload' => $payload,
+        'signal' => $signal,
+    ];
+}
+
 function stc_provider_of_symbol(string $symbol): string {
     $parts = explode(':', $symbol, 2);
     return count($parts) === 2 ? strtoupper(trim($parts[0])) : '';
