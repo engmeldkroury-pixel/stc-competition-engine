@@ -1,65 +1,103 @@
 # NEXT TASK
 
-Updated: 2026-09-23
+Updated: 2026-09-24
 
-## PRIMARY OBJECTIVE
-Execute the new community-indicator research matrix on real exact-provider historical data for the 26 competition symbols, then expand the verified indicator catalog without changing live trading weights on the same evidence used for discovery.
+## CONTROLLING PROJECT
+STC.
 
-## VERIFIED CURRENT STATE
-- Live Owner Console PR #100 is deployed; Record Trade and simplified EXECUTION TICKET are visible.
-- Six v1.1 MTF production alerts remain the live evidence path.
-- Human approval/manual order entry remains mandatory.
-- Community indicator research framework PR #101 is merged.
-- CI for PR #101: 347 passed.
-- community_indicator_live_authority=false.
+## READ FIRST
+- docs/STC_ADAPTIVE_RESEARCH_MASTER_LEDGER.md
+- PROJECT_STATE.md
+- docs/COMMUNITY_INDICATOR_CANDIDATE_MATRIX_20260924.md
+- docs/TRENDILO_MULTITF_FROZEN_RUN1_20260924.md
+- research/community_shadow_registry.json
 
-## RESEARCH MATRIX RULE
-For every symbol/timeframe:
-1. benchmark each implemented community indicator independently;
-2. keep train/test/forward separated;
-3. use confirmed-bar / next-bar causal execution;
-4. compare validated community trials with native STC StrategyTrial results;
-5. derive symbol/timeframe-specific research weights from OOS/forward robustness;
-6. allow a community component to outrank a native strategy only when robust evidence is stronger;
-7. do not use popularity/reviews as trading weights;
-8. accumulate new live outcomes continuously, but recalibrate only on frozen batches/windows.
+## VERIFIED COMPLETE
+- 32-candidate durable community/composite inventory.
+- 17 implemented causal/composite research components.
+- Wave-two 26-symbol 15m frozen run.
+- Trendilo multi-timeframe frozen run 35947248551.
+- MJY Trendilo is MULTITF_CONFIRMED across 15m/5m/30m.
+- BTCUSD Trendilo remains SHADOW.
+- Registry target after WU-119: 16 records; live_authority=false.
 
-## CURRENT IMPLEMENTED COMMUNITY ADAPTERS
-- UT Bot Alerts family.
-- Squeeze Momentum [LazyBear] family.
-- WaveTrend with Crosses family.
-- Hull Suite family.
+## COMPLETED RESEARCH WORK UNIT — LORENTZIAN
+- PR #125 merged.
+- Official AI Edge parity-tested Python port pinned to exact upstream commit.
+- STC maps official confirmed Buy/Sell stream only.
+- Adapter parity contract test passed in CI.
+- live_authority=false.
+- Next: exact-provider 26-symbol benchmark/frozen evidence before any shadow participation.
 
-## NEXT IMPLEMENTATION QUEUE
-Exact causal/repaint-safe ports and tests:
-1. Lorentzian Classification + published Backtest Stream semantics.
-2. QQE MOD.
-3. Optimized Trend Tracker confirmed reversals.
-4. expand discovery catalog with additional practical open-source community scripts.
-5. audit LuxAlgo SMC versus STC native structure/liquidity families for information overlap before any added weight.
+## PARALLEL FOLLOW-UP
+- Audit VuManChu Cipher B pivot/divergence confirmation delay.
+- Accumulate MJY Trendilo shadow observations; no weight/live promotion until the registry threshold is satisfied.
+- General Lab continues to inherit the full research PROCESS for every new symbol, never another symbol's weights.
 
-## DATA EXECUTION
-Run the matrix first on 15m for all 26 competition symbols using the largest exact-provider history available, then extend to 5m/30m/1h/2h/4h/1D where history is sufficient.
-- Prefer >=900 bars for the existing walk-forward strategy comparison.
-- Community adapter benchmark can produce diagnostics from >=300 bars, but promotion still requires robust OOS/forward evidence.
-- Do not promote a same-dataset winner directly to live production.
+## LIVE BOUNDARY
+- human approval/manual execution only;
+- no automatic broker execution;
+- no A+/risk/competition-rule change from research alone;
+- reviews/popularity remain discovery metadata only.
 
-## GENERAL LAB
-Any symbol added to General Lab must be routed through the same matrix:
-asset classification -> indicator/strategy benchmark -> OOS/forward comparison -> symbol-specific weight profile.
-No cross-symbol weight inheritance.
 
-## REVIEW RESEARCH
-Continue sourcing TradingView open-source pages and community discussions to discover candidates and identify:
-- repaint/lookahead concerns;
-- confirmed vs potential signals;
-- asset/timeframe-specific behavior;
-- parameter sensitivity;
-- known implementation bugs.
-Reviews are qualitative evidence only.
+## FACEBOOK / EXTERNAL TRADER SOURCE AUDIT
+Audit the owner-supplied sources:
+- https://www.facebook.com/share/18ntSnCtXa/
+- https://www.facebook.com/share/p/1beB4M9ykK/
 
-## EXECUTION BOUNDARY
-- No automatic trading.
-- No live community-indicator authority yet.
-- Do not weaken A+ gates.
-- Do not alter risk limits or competition rules from research results without frozen confirmation and explicit promotion.
+Extract only reproducible logic:
+- indicator names/components;
+- buy/sell trigger rules;
+- exit/stop/target logic;
+- market-regime commentary;
+- asset/timeframe specialization;
+- claims that need independent verification.
+
+Do not copy live calls into STC. Convert useful concepts into research candidates, then require causal/OOS/forward validation before any weight.
+
+
+## ACTIVE NEXT WORK UNIT — GENERAL LAB AUTOMATION
+Build the runtime bridge so every symbol added to General Lab invokes the same research PROCESS automatically:
+asset classification -> data quality -> native matrix -> community matrix -> OOS/forward -> redundancy-aware ensemble -> compact report.
+The symbol must inherit process only, never weights.
+The bridge must fail clearly when exact historical data is unavailable instead of substituting another provider silently.
+
+## EXTERNAL SOURCE BLOCKER
+The two Facebook trader links are registered but not yet readable:
+- direct fetch -> login_required;
+- browser automation -> not started because TinyFish wallet balance is negative.
+Do not fabricate content. Resume when browser access is funded or when screenshots/video/text are supplied.
+
+
+## ACTIVE EVIDENCE TASK — WAVE 3 REBENCHMARK
+Rerun the same 26-symbol / 5,000-bar exact-provider 15m benchmark with the expanded implemented community set including:
+- Trendilo;
+- endpoint-only non-repainting Nadaraya-Watson;
+- causally delayed RSI Kernel Optimized.
+Compare against the prior verified workflow 35916027610.
+Record:
+- validated symbols per component;
+- incremental symbols covered;
+- robust scores;
+- whether any new component survives OOS+forward;
+- redundancy/family overlap.
+Failed components remain zero-weight.
+
+
+## RECONCILIATION CONTROL
+Use only benchmark results generated after PR #124 / commit 6df403846a1d386816a1bf0ebe29db79fc27cd60.
+Any wave-3 result produced before the canonical HalfTrend/Trendilo/Nadaraya contract reconciliation is superseded.
+Current exact-data trigger commit on research/native-community-15m-20260923:
+- 8edb3edef2c26e6348e989d5b95632f50b803327
+
+
+## LORENTZIAN EXACT-DATA FOLLOW-UP
+After the reconciled wave-3 benchmark completes, sync PR #125 to the exact-data research branch and run the same 26-symbol / 5,000-bar 15m matrix with Lorentzian enabled.
+Record:
+- validated symbols;
+- TRAIN-selected official settings;
+- TEST/FORWARD metrics;
+- incremental coverage versus existing community pool;
+- family redundancy;
+- final frozen holdout only for survivors.

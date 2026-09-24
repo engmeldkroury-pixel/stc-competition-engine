@@ -12,6 +12,9 @@ from .approval import revalidate_envelope
 from .execution_context import derive_execution_context
 from .data_capabilities import get_capability, validate_provider_mapping
 from .competition_profiles import PROFILES, get_profile
+from .community_research_plan import community_research_plan_summary
+from .research_runner import run_symbol_research
+from .shadow_promotion_registry import public_shadow_record, shadow_candidates
 from .models import (
     CompetitionEligibilityRequest,
     FactorScores,
@@ -104,6 +107,64 @@ def competition(competition_id: str):
     result = asdict(p)
     result["allowed_symbols"] = list(p.allowed_symbols)
     return result
+
+
+@app.post("/research/general-lab/plan")
+def general_lab_plan(payload: dict):
+    raw_symbols = payload.get("symbols") or []
+    if not isinstance(raw_symbols, list):
+        raise HTTPException(status_code=400, detail="symbols must be a list")
+    symbols = tuple(dict.fromkeys(str(x).strip() for x in raw_symbols if str(x).strip()))
+    if not symbols:
+        raise HTTPException(status_code=400, detail="At least one General Lab symbol is required")
+    if len(symbols) > 50:
+        raise HTTPException(status_code=400, detail="General Lab plan supports at most 50 symbols per request")
+    result = community_research_plan_summary(lab_symbols=symbols)
+    result["symbols_requested"] = list(symbols)
+    result["execution"] = "research_only"
+    result["live_authority"] = False
+    result["rule"] = (
+        "Every General Lab symbol receives the same symbol/timeframe-specific native strategy "
+        "and community-indicator research matrix. No weight is inherited from another symbol."
+    )
+    return result
+
+
+@app.post("/research/general-lab/evaluate")
+def general_lab_evaluate(payload: dict):
+    symbol = str(payload.get("symbol") or "").strip()
+    if not symbol:
+        raise HTTPException(status_code=400, detail="General Lab payload requires symbol")
+    series = payload.get("series")
+    if not isinstance(series, dict):
+        raise HTTPException(status_code=400, detail="General Lab payload requires exact-provider series")
+    try:
+        result = run_symbol_research(payload)
+    except (KeyError, TypeError, ValueError) as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    result["general_lab"] = True
+    result["execution"] = "research_only"
+    result["live_authority"] = False
+    result["promotion_required"] = True
+    return result
+
+
+@app.get("/research/shadow-candidates")
+def research_shadow_candidates(symbol: str | None = None, state: str | None = None):
+    try:
+        rows = shadow_candidates(symbol=symbol, state=state)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return {
+        "records": [public_shadow_record(row) for row in rows],
+        "count": len(rows),
+        "execution": "research_only",
+        "live_authority": False,
+        "rule": (
+            "Frozen-pass community components remain shadow research evidence. "
+            "No record grants trade authority or modifies the live A+ gate."
+        ),
+    }
 
 
 @app.get("/data/capabilities/{symbol:path}")

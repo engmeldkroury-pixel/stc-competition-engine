@@ -1,0 +1,519 @@
+{
+  "schema": "stc-native-community-15m-summary-v1",
+  "generated_from_workflow_run": 35916027610,
+  "workflow_head_sha": "c371f89e3f722515261cc9a462bf8175ec304057",
+  "source": "TradingView Official MCP exact-provider OHLCV staged on research branch",
+  "interval": "15m",
+  "bars_per_symbol": 5000,
+  "symbol_count": 26,
+  "validation_method": "native STC walk-forward + community train-only parameter selection, OOS test, forward confirmation; research-only",
+  "community_leaderboard": [
+    {
+      "avg_validated_score": 32.804125,
+      "indicator_id": "ssl_hybrid",
+      "tested": 26,
+      "validated": 4,
+      "validation_rate": 0.15384615384615385
+    },
+    {
+      "avg_validated_score": 30.908900000000003,
+      "indicator_id": "range_filter_guikroth",
+      "tested": 26,
+      "validated": 4,
+      "validation_rate": 0.15384615384615385
+    },
+    {
+      "avg_validated_score": 27.665675,
+      "indicator_id": "qqe_mod",
+      "tested": 26,
+      "validated": 4,
+      "validation_rate": 0.15384615384615385
+    },
+    {
+      "avg_validated_score": 20.606225000000002,
+      "indicator_id": "schaff_trend_cycle",
+      "tested": 26,
+      "validated": 4,
+      "validation_rate": 0.15384615384615385
+    },
+    {
+      "avg_validated_score": 35.90513333333333,
+      "indicator_id": "waddah_attar_explosion",
+      "tested": 26,
+      "validated": 3,
+      "validation_rate": 0.11538461538461539
+    },
+    {
+      "avg_validated_score": 24.207666666666668,
+      "indicator_id": "ut_bot_alerts",
+      "tested": 26,
+      "validated": 3,
+      "validation_rate": 0.11538461538461539
+    },
+    {
+      "avg_validated_score": 46.9911,
+      "indicator_id": "chandelier_exit_everget",
+      "tested": 26,
+      "validated": 2,
+      "validation_rate": 0.07692307692307693
+    },
+    {
+      "avg_validated_score": 22.621000000000002,
+      "indicator_id": "alphatrend",
+      "tested": 26,
+      "validated": 2,
+      "validation_rate": 0.07692307692307693
+    },
+    {
+      "avg_validated_score": 30.2613,
+      "indicator_id": "wavetrend_crosses",
+      "tested": 26,
+      "validated": 1,
+      "validation_rate": 0.038461538461538464
+    },
+    {
+      "avg_validated_score": 27.6163,
+      "indicator_id": "supertrend_kivanc",
+      "tested": 26,
+      "validated": 1,
+      "validation_rate": 0.038461538461538464
+    },
+    {
+      "avg_validated_score": 14.5333,
+      "indicator_id": "squeeze_momentum_lazybear",
+      "tested": 26,
+      "validated": 1,
+      "validation_rate": 0.038461538461538464
+    },
+    {
+      "avg_validated_score": 0,
+      "indicator_id": "hull_suite",
+      "tested": 26,
+      "validated": 0,
+      "validation_rate": 0
+    },
+    {
+      "avg_validated_score": 0,
+      "indicator_id": "qqe_ssl_wae_composite",
+      "tested": 26,
+      "validated": 0,
+      "validation_rate": 0
+    },
+    {
+      "avg_validated_score": 0,
+      "indicator_id": "optimized_trend_tracker",
+      "tested": 26,
+      "validated": 0,
+      "validation_rate": 0
+    }
+  ],
+  "native_leaderboard": [
+    {
+      "avg_validated_score": 0,
+      "strategy_id": "smc_structure_liquidity",
+      "tested": 26,
+      "validated": 0,
+      "validation_rate": 0
+    },
+    {
+      "avg_validated_score": 0,
+      "strategy_id": "trend_pullback",
+      "tested": 26,
+      "validated": 0,
+      "validation_rate": 0
+    },
+    {
+      "avg_validated_score": 0,
+      "strategy_id": "breakout_expansion",
+      "tested": 24,
+      "validated": 0,
+      "validation_rate": 0
+    },
+    {
+      "avg_validated_score": 0,
+      "strategy_id": "mean_reversion",
+      "tested": 19,
+      "validated": 0,
+      "validation_rate": 0
+    },
+    {
+      "avg_validated_score": 0,
+      "strategy_id": "vwap_intraday",
+      "tested": 24,
+      "validated": 0,
+      "validation_rate": 0
+    },
+    {
+      "avg_validated_score": 0,
+      "strategy_id": "microtrend_scalp",
+      "tested": 24,
+      "validated": 0,
+      "validation_rate": 0
+    },
+    {
+      "avg_validated_score": 0,
+      "strategy_id": "momentum_continuation",
+      "tested": 24,
+      "validated": 0,
+      "validation_rate": 0
+    },
+    {
+      "avg_validated_score": 0,
+      "strategy_id": "volatility_squeeze",
+      "tested": 24,
+      "validated": 0,
+      "validation_rate": 0
+    },
+    {
+      "avg_validated_score": 0,
+      "strategy_id": "range_rotation",
+      "tested": 19,
+      "validated": 0,
+      "validation_rate": 0
+    },
+    {
+      "avg_validated_score": 0,
+      "strategy_id": "adx_ema_trend",
+      "tested": 26,
+      "validated": 0,
+      "validation_rate": 0
+    },
+    {
+      "avg_validated_score": 0,
+      "strategy_id": "donchian_structure_breakout",
+      "tested": 26,
+      "validated": 0,
+      "validation_rate": 0
+    },
+    {
+      "avg_validated_score": 0,
+      "strategy_id": "bollinger_mean_reversion",
+      "tested": 26,
+      "validated": 0,
+      "validation_rate": 0
+    },
+    {
+      "avg_validated_score": 0,
+      "strategy_id": "vwap_reversion",
+      "tested": 24,
+      "validated": 0,
+      "validation_rate": 0
+    },
+    {
+      "avg_validated_score": 0,
+      "strategy_id": "liquidity_sweep_reversal",
+      "tested": 26,
+      "validated": 0,
+      "validation_rate": 0
+    },
+    {
+      "avg_validated_score": 0,
+      "strategy_id": "failed_breakout_reversal",
+      "tested": 26,
+      "validated": 0,
+      "validation_rate": 0
+    },
+    {
+      "avg_validated_score": 0,
+      "strategy_id": "fvg_displacement_continuation",
+      "tested": 24,
+      "validated": 0,
+      "validation_rate": 0
+    },
+    {
+      "avg_validated_score": 0,
+      "strategy_id": "volume_confirmed_breakout",
+      "tested": 24,
+      "validated": 0,
+      "validation_rate": 0
+    }
+  ],
+  "symbols": [
+    {
+      "asset_class": "forex",
+      "community_weight_share": 0,
+      "core_weight_share": 0,
+      "ensemble_status": "NO_VALIDATED_COMPONENTS",
+      "native_score": null,
+      "native_status": "NO_VALIDATED_STRATEGY",
+      "native_strategy": null,
+      "symbol": "CAPITALCOM:AUDUSD",
+      "top_component": null
+    },
+    {
+      "asset_class": "crypto",
+      "community_weight_share": 0,
+      "core_weight_share": 0,
+      "ensemble_status": "NO_VALIDATED_COMPONENTS",
+      "native_score": null,
+      "native_status": "NO_VALIDATED_STRATEGY",
+      "native_strategy": null,
+      "symbol": "CAPITALCOM:BTCUSD",
+      "top_component": null
+    },
+    {
+      "asset_class": "crypto",
+      "community_weight_share": 1,
+      "core_weight_share": 0,
+      "ensemble_status": "RESEARCH_PROFILE_READY",
+      "native_score": null,
+      "native_status": "NO_VALIDATED_STRATEGY",
+      "native_strategy": null,
+      "symbol": "CAPITALCOM:DOGEUSD",
+      "top_component": "range_filter_guikroth"
+    },
+    {
+      "asset_class": "crypto",
+      "community_weight_share": 1,
+      "core_weight_share": 0,
+      "ensemble_status": "RESEARCH_PROFILE_READY",
+      "native_score": null,
+      "native_status": "NO_VALIDATED_STRATEGY",
+      "native_strategy": null,
+      "symbol": "CAPITALCOM:ETHUSD",
+      "top_component": "ssl_hybrid"
+    },
+    {
+      "asset_class": "forex",
+      "community_weight_share": 0,
+      "core_weight_share": 0,
+      "ensemble_status": "NO_VALIDATED_COMPONENTS",
+      "native_score": null,
+      "native_status": "NO_VALIDATED_STRATEGY",
+      "native_strategy": null,
+      "symbol": "CAPITALCOM:EURUSD",
+      "top_component": null
+    },
+    {
+      "asset_class": "indices",
+      "community_weight_share": 0,
+      "core_weight_share": 0,
+      "ensemble_status": "NO_VALIDATED_COMPONENTS",
+      "native_score": null,
+      "native_status": "NO_VALIDATED_STRATEGY",
+      "native_strategy": null,
+      "symbol": "CAPITALCOM:NAS100",
+      "top_component": null
+    },
+    {
+      "asset_class": "indices",
+      "community_weight_share": 0,
+      "core_weight_share": 0,
+      "ensemble_status": "NO_VALIDATED_COMPONENTS",
+      "native_score": null,
+      "native_status": "NO_VALIDATED_STRATEGY",
+      "native_strategy": null,
+      "symbol": "CAPITALCOM:SPX500",
+      "top_component": null
+    },
+    {
+      "asset_class": "forex",
+      "community_weight_share": 1,
+      "core_weight_share": 0,
+      "ensemble_status": "RESEARCH_PROFILE_READY",
+      "native_score": null,
+      "native_status": "NO_VALIDATED_STRATEGY",
+      "native_strategy": null,
+      "symbol": "CAPITALCOM:USDZAR",
+      "top_component": "alphatrend"
+    },
+    {
+      "asset_class": "metals",
+      "community_weight_share": 0,
+      "core_weight_share": 0,
+      "ensemble_status": "NO_VALIDATED_COMPONENTS",
+      "native_score": null,
+      "native_status": "NO_VALIDATED_STRATEGY",
+      "native_strategy": null,
+      "symbol": "CAPITALCOM:XAGUSD",
+      "top_component": null
+    },
+    {
+      "asset_class": "metals",
+      "community_weight_share": 0,
+      "core_weight_share": 0,
+      "ensemble_status": "NO_VALIDATED_COMPONENTS",
+      "native_score": null,
+      "native_status": "NO_VALIDATED_STRATEGY",
+      "native_strategy": null,
+      "symbol": "CAPITALCOM:XAUUSD",
+      "top_component": null
+    },
+    {
+      "asset_class": "indices",
+      "community_weight_share": 0,
+      "core_weight_share": 0,
+      "ensemble_status": "NO_VALIDATED_COMPONENTS",
+      "native_score": null,
+      "native_status": "NO_VALIDATED_STRATEGY",
+      "native_strategy": null,
+      "symbol": "CBOT_MINI:MYM1!",
+      "top_component": null
+    },
+    {
+      "asset_class": "rates",
+      "community_weight_share": 1,
+      "core_weight_share": 0,
+      "ensemble_status": "RESEARCH_PROFILE_READY",
+      "native_score": null,
+      "native_status": "NO_VALIDATED_STRATEGY",
+      "native_strategy": null,
+      "symbol": "CBOT:ZB1!",
+      "top_component": "range_filter_guikroth"
+    },
+    {
+      "asset_class": "rates",
+      "community_weight_share": 1,
+      "core_weight_share": 0,
+      "ensemble_status": "RESEARCH_PROFILE_READY",
+      "native_score": null,
+      "native_status": "NO_VALIDATED_STRATEGY",
+      "native_strategy": null,
+      "symbol": "CBOT:ZN1!",
+      "top_component": "schaff_trend_cycle"
+    },
+    {
+      "asset_class": "crypto",
+      "community_weight_share": 0,
+      "core_weight_share": 0,
+      "ensemble_status": "NO_VALIDATED_COMPONENTS",
+      "native_score": null,
+      "native_status": "NO_VALIDATED_STRATEGY",
+      "native_strategy": null,
+      "symbol": "CME:MBT1!",
+      "top_component": null
+    },
+    {
+      "asset_class": "crypto",
+      "community_weight_share": 1,
+      "core_weight_share": 0,
+      "ensemble_status": "RESEARCH_PROFILE_READY",
+      "native_score": null,
+      "native_status": "NO_VALIDATED_STRATEGY",
+      "native_strategy": null,
+      "symbol": "CME:MET1!",
+      "top_component": "waddah_attar_explosion"
+    },
+    {
+      "asset_class": "indices",
+      "community_weight_share": 0,
+      "core_weight_share": 0,
+      "ensemble_status": "NO_VALIDATED_COMPONENTS",
+      "native_score": null,
+      "native_status": "NO_VALIDATED_STRATEGY",
+      "native_strategy": null,
+      "symbol": "CME_MINI:M2K1!",
+      "top_component": null
+    },
+    {
+      "asset_class": "forex",
+      "community_weight_share": 0,
+      "core_weight_share": 0,
+      "ensemble_status": "NO_VALIDATED_COMPONENTS",
+      "native_score": null,
+      "native_status": "NO_VALIDATED_STRATEGY",
+      "native_strategy": null,
+      "symbol": "CME_MINI:M6A1!",
+      "top_component": null
+    },
+    {
+      "asset_class": "forex",
+      "community_weight_share": 0,
+      "core_weight_share": 0,
+      "ensemble_status": "NO_VALIDATED_COMPONENTS",
+      "native_score": null,
+      "native_status": "NO_VALIDATED_STRATEGY",
+      "native_strategy": null,
+      "symbol": "CME_MINI:M6B1!",
+      "top_component": null
+    },
+    {
+      "asset_class": "forex",
+      "community_weight_share": 0,
+      "core_weight_share": 0,
+      "ensemble_status": "NO_VALIDATED_COMPONENTS",
+      "native_score": null,
+      "native_status": "NO_VALIDATED_STRATEGY",
+      "native_strategy": null,
+      "symbol": "CME_MINI:M6E1!",
+      "top_component": null
+    },
+    {
+      "asset_class": "indices",
+      "community_weight_share": 0,
+      "core_weight_share": 0,
+      "ensemble_status": "NO_VALIDATED_COMPONENTS",
+      "native_score": null,
+      "native_status": "NO_VALIDATED_STRATEGY",
+      "native_strategy": null,
+      "symbol": "CME_MINI:MES1!",
+      "top_component": null
+    },
+    {
+      "asset_class": "forex",
+      "community_weight_share": 1,
+      "core_weight_share": 0,
+      "ensemble_status": "RESEARCH_PROFILE_READY",
+      "native_score": null,
+      "native_status": "NO_VALIDATED_STRATEGY",
+      "native_strategy": null,
+      "symbol": "CME_MINI:MJY1!",
+      "top_component": "wavetrend_crosses"
+    },
+    {
+      "asset_class": "indices",
+      "community_weight_share": 0,
+      "core_weight_share": 0,
+      "ensemble_status": "NO_VALIDATED_COMPONENTS",
+      "native_score": null,
+      "native_status": "NO_VALIDATED_STRATEGY",
+      "native_strategy": null,
+      "symbol": "CME_MINI:MNQ1!",
+      "top_component": null
+    },
+    {
+      "asset_class": "metals",
+      "community_weight_share": 1,
+      "core_weight_share": 0,
+      "ensemble_status": "RESEARCH_PROFILE_READY",
+      "native_score": null,
+      "native_status": "NO_VALIDATED_STRATEGY",
+      "native_strategy": null,
+      "symbol": "COMEX_MINI:MGC1!",
+      "top_component": "qqe_mod"
+    },
+    {
+      "asset_class": "metals",
+      "community_weight_share": 0,
+      "core_weight_share": 0,
+      "ensemble_status": "NO_VALIDATED_COMPONENTS",
+      "native_score": null,
+      "native_status": "NO_VALIDATED_STRATEGY",
+      "native_strategy": null,
+      "symbol": "COMEX_MINI:SIL1!",
+      "top_component": null
+    },
+    {
+      "asset_class": "energy",
+      "community_weight_share": 0.9999999999999999,
+      "core_weight_share": 1.1102230246251565e-16,
+      "ensemble_status": "RESEARCH_PROFILE_READY",
+      "native_score": null,
+      "native_status": "NO_VALIDATED_STRATEGY",
+      "native_strategy": null,
+      "symbol": "NYMEX:MCL1!",
+      "top_component": "ssl_hybrid"
+    },
+    {
+      "asset_class": "energy",
+      "community_weight_share": 1,
+      "core_weight_share": 0,
+      "ensemble_status": "RESEARCH_PROFILE_READY",
+      "native_score": null,
+      "native_status": "NO_VALIDATED_STRATEGY",
+      "native_strategy": null,
+      "symbol": "NYMEX:MNG1!",
+      "top_component": "range_filter_guikroth"
+    }
+  ]
+}
