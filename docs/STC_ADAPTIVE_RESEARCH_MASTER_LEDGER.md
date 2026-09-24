@@ -924,7 +924,7 @@ Status: CODE PROPOSED / COMPLETED_UNVERIFIED / CI INFRASTRUCTURE BLOCKED.
 
 
 ### WU-115 — benchmark eligibility clean replacement
-Status: COMPLETED_UNVERIFIED / EXTERNAL CI BLOCKED.
+Status: ACCEPTED / MERGED WITH EXTERNAL CI BLOCKER DISCLOSED.
 - Clean current-main replacement PR #138 opened for stale PR #135.
 - Centralizes benchmarkable community implementation status selection.
 - Normal benchmark and final community frozen confirmation use the same selector.
@@ -934,3 +934,11 @@ Status: COMPLETED_UNVERIFIED / EXTERNAL CI BLOCKED.
 - GitHub Actions run 35974456534 has steps=null, so no CI step executed.
 - This must not be labeled test failure; independent code review is continuing.
 - Live authority remains false.
+
+
+### WU-115 acceptance evidence
+- PR #138 merged: cd458d2eb20cebcb4bbc34fa822edfcd5cda0233.
+- PR #135 closed as superseded.
+- Unified diff independently reviewed before merge.
+- GitHub Actions did not execute any step (steps=null); therefore CI remains NOT RUN.
+- Scope is research eligibility only; no live authority was introduced.
