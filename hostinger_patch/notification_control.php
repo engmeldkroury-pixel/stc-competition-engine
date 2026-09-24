@@ -221,8 +221,10 @@ function stc_notify_signal_event(PDO $pdo, array $config, string $eventId): arra
     if (!in_array($direction, ['LONG', 'SHORT'], true)) {
         return ['ok' => true, 'skipped' => true, 'reason' => 'wait_signal'];
     }
-    if (($signal['quality_gate_passed'] ?? false) !== true || ($signal['setup_grade'] ?? '') !== 'A_PLUS') {
-        return ['ok' => true, 'skipped' => true, 'reason' => 'high_conviction_gate_not_passed'];
+    $setupGrade = (string)($signal['setup_grade'] ?? '');
+    $allowedGrades = ['A_PLUS', 'COMPETITION_OPPORTUNITY'];
+    if (($signal['quality_gate_passed'] ?? false) !== true || !in_array($setupGrade, $allowedGrades, true)) {
+        return ['ok' => true, 'skipped' => true, 'reason' => 'quality_gate_not_passed'];
     }
 
     $validUntil = stc_parse_utc((string)($plan['valid_until'] ?? ''));
@@ -340,7 +342,7 @@ function stc_notify_signal_event(PDO $pdo, array $config, string $eventId): arra
         'Management checkpoint (no partial TP): ' . $plan['target1'],
         'Final take profit: ' . $plan['target2'],
         $sizingText,
-        'Setup grade: A+ (high-conviction gate passed)',
+        'Setup grade: ' . $setupGrade . ' (quality gate passed)',
         'Setup quality: ' . ($qualityScore === null ? '-' : $qualityScore . '/100'),
         'Empirical win probability: ' . $probabilityText,
         'Research strategy: ' . $researchText,
