@@ -20,7 +20,7 @@ This document is the durable inventory for the owner's request to study as many 
 
 Current catalog size: 32 candidate/component families.
 
-Implemented causal research pool: 17.
+Implemented causal research pool: 20.
 
 ### Implemented / benchmarkable
 
@@ -42,6 +42,7 @@ Implemented causal research pool: 17.
 | QQE + SSL + WAE composite | multi_indicator_composite | 149,806 | benchmark |
 | Schaff Trend Cycle | momentum_cycle | 134,434 | benchmark |
 | Trendilo | adaptive_momentum | 55,235 | benchmark |
+| VuManChu Cipher B + Divergences | composite_momentum | 616,385 | source-audited causal benchmark; divergence emitted at true +2-bar confirmation |
 | Endpoint Nadaraya-Watson non-repaint | kernel_reversal | independent STC adapter | benchmark |
 
 ### Native-overlap / context only
@@ -58,7 +59,7 @@ Implemented causal research pool: 17.
 | Candidate | Family | Approx. use count | Blocking audit |
 |---|---|---:|---|
 | Lorentzian Classification | machine_learning | 1,229,919 | exact ANN/features/filters/kernel/Backtest Stream semantics |
-| VuManChu Cipher B + Divergences | composite_momentum | 616,385 | pivot/divergence confirmation delay |
+
 | RSI Kernel Optimized [Flux] | kernel_reversal | 226,304 | pivot confirmation delay |
 | VWAP Stdev Bands v2 | vwap_mean_reversion | 94,046 | exact session/VWAP reset semantics |
 | Machine Learning Supertrend [Aslan] | adaptive_trend_ml | 81,568 | adaptive/replay behavior |
@@ -73,7 +74,7 @@ Implemented causal research pool: 17.
 
 Priority A:
 - Lorentzian Classification: very high use, explicit Backtest Stream, non-trivial independent information family.
-- VuManChu Cipher B: high-use composite; timing audit is the main blocker.
+- VuManChu Cipher B: source-audited causal adapter now excludes lookahead-on MTF paths and shifts divergence to its true confirmation bar.
 - Nadaraya-Watson: non-repainting endpoint variant is now benchmarkable; exact third-party non-repaint parity remains separate.
 - HalfTrend/Trendilo: now causal and entering frozen benchmark.
 
