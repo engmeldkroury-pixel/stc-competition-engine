@@ -13,3 +13,4 @@ T-STC-LOCKED-PLAN-PERSIST,PASS,"Locked-plan persistence and recovery-only lifecy
 T-STC-RECORD-COMPETITION-READONLY,PASS,"Record Trade competition identity remains readonly and explicitly labeled","PR #156 critical CI success"
 T-STC-POSITION-TARGET-FIX,PASS,"Competition selector and canonical position target resolution","PR #157 critical CI: 166 passed 1 warning"
 T-STC-EURUSD-RECOVERY,PASS,"Existing EURUSD position recorded exactly once in STC ledger","Recovery run 36013822127 created one position; Live Readback 36014399954 confirms exactly one open position and total_entries=1"
+T-STC-RECORD-TIME-FALLBACK,PASS,"Record Trade blank open-time server fallback and clock-skew guard","PR #158 critical CI: 168 passed 1 warning"
