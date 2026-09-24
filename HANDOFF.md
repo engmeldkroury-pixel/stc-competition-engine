@@ -69,3 +69,11 @@ Do not promote community weights before exact parity evidence.
 - Root cause fixed in PR #155; Record Trade competition-field clarity fixed in PR #156.
 - New combined Hostinger ZIP SHA-256: `560ecbd32ecc82280ee385cedca179930904999c992e55b3d66bba33e9c585b7`.
 - Before recording the existing EURUSD position in STC, obtain the actual TradingView position row showing quantity, average fill, and whether SL/TP are truly attached.
+
+
+## EURUSD position is now recorded
+- Do NOT open another EURUSD trade merely to make STC recognize it.
+- STC position id: `pos-d105686e5a029f0ef9d23cfbd44b48c0f0f826f1`.
+- Verified open position: SHORT 137552 @ 1.13677, stop 1.13930, management checkpoint 1.130818315, final TP 1.12740.
+- Live Readback run 36014399954 confirms open_positions=1 and total_entries=1.
+- The invalid_position_target defect is fixed in PR #157, but the final seven-file Hostinger bundle still requires owner upload before the UI/server fix is live.
