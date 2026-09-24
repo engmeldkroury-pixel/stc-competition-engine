@@ -117,7 +117,7 @@ input{width:100%}button{cursor:pointer}.primary{background:#1d4ed8}.danger{backg
     <div class="record-guide"><b>One form only.</b> Fill everything here at once. Auto-refresh will not erase these fields while this page is open.</div>
     <input id="pos-origin" type="hidden"><input id="pos-competition" type="hidden"><input id="pos-card-index" type="hidden">
     <div class="formgrid" style="margin-top:14px">
-      <div><label class="small">Competition</label><input id="pos-competition-label" type="text" readonly></div>
+      <div><label class="small">Competition — selected automatically</label><input id="pos-competition-label" type="text" readonly aria-readonly="true" title="Selected automatically from the competition section or signal card"><div class="fieldnote">Read-only on purpose. Do not type the competition name; STC binds the trade to the selected competition automatically.</div></div>
       <div><label class="small">Symbol</label><input id="pos-symbol" type="text" autocomplete="off" placeholder="Example: CBOT:ZN1!" oninput="updatePositionPricePreviews()"></div>
       <div><label class="small">Side</label><select id="pos-side"><option>LONG</option><option>SHORT</option></select></div>
       <div><label class="small">Quantity actually filled</label><input id="pos-qty" type="number" min="0" step="any"><div id="pos-qty-note" class="fieldnote"></div></div>
