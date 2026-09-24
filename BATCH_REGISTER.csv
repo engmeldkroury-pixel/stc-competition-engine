@@ -1,5 +1,5 @@
 batch_id,status,scope,evidence,next_action
-STC-B145,MERGED_VERIFIED,"Central Capital/Hostinger quality eligibility","PR #145 merge 9b3746d; CI success","Deploy PHP hotfix"
+STC-B145,DEPLOYED_VERIFIED,"Central Capital/Hostinger quality eligibility","PR #145 merge 9b3746d; post-upload expired EURUSD probe returned expired_plan","Verify next fresh natural Capital opportunity + Telegram"
 STC-B146,MERGED_EVIDENCE_ONLY,"Corrected 26-symbol community evidence","PR #146 merge 9fbff89","Use symbol-specific profiles only"
 STC-B148,MERGED_CRITICAL_PASS_FULL_CI_PENDING,"Research-only community shadow plumbing","PR #148 merge a19bbc8; critical 155 passed","Observe main full CI; then implement Pine streams"
 STC-B149,MERGED_READBACK_VERIFIED,"Permanent read-only live readback","PR #149 merge a9f7e6b; run 35992932406 success","Use after every production deploy"
