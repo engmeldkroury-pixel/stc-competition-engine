@@ -1,0 +1,91 @@
+name: STC Native + Community 15m Retry Subset
+
+on:
+  push:
+    branches:
+      - "research/native-community-15m-*"
+    paths:
+      - "research_native_inputs/RETRY_READY"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: stc-native-community-15m-retry-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      max-parallel: 3
+      matrix:
+        dir:
+          - CME_MINI_M6B1
+          - CME_MINI_M6E1
+          - CME_MINI_MES1
+          - CME_MINI_MJY1
+          - CME_MINI_MNQ1
+          - COMEX_MINI_SIL1
+          - COMEX_MINI_MGC1
+          - NYMEX_MCL1
+          - NYMEX_MNG1
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Run one symbol
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p research_retry_outputs
+          python scripts/run_native_community_15m.py "research_native_inputs/${{ matrix.dir }}" --output "research_retry_outputs/${{ matrix.dir }}.json"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: stc-retry-result-${{ matrix.dir }}
+          path: research_retry_outputs/*.json
+          if-no-files-found: error
+          retention-days: 14
+
+  combine:
+    needs: benchmark
+    if: always() && needs.benchmark.result == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: stc-retry-result-*
+          merge-multiple: true
+          path: research_retry_outputs
+      - name: Build retry summary
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          files=sorted(Path("research_retry_outputs").glob("*.json"))
+          rows=[]
+          for path in files:
+              d=json.loads(path.read_text())
+              rows.append({
+                  "symbol": d["symbol"],
+                  "native_selection": d.get("native_selection"),
+                  "ensemble_profile": d.get("ensemble_profile"),
+                  "community_trials": d.get("community_trials"),
+              })
+          Path("research_retry_outputs/retry_summary.json").write_text(
+              json.dumps({"symbol_count":len(rows),"symbols":rows},indent=2,sort_keys=True)
+          )
+          print("STC_RETRY_SUMMARY="+json.dumps({"symbol_count":len(rows)},sort_keys=True))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: stc-native-community-15m-retry-combined-${{ github.run_id }}
+          path: research_retry_outputs/*.json
+          if-no-files-found: error
+          retention-days: 14
