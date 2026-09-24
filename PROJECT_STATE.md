@@ -2003,3 +2003,14 @@ Owner intervention required now: YES — only for historical-data access, not fo
 - Social recommendations and reputation are discovery evidence only; they cannot directly alter live weights.
 - Any extracted concept must pass source audit, causal rule extraction, backtest, OOS/forward validation and frozen confirmation before promotion.
 - Information-overlap testing is mandatory before combining trader-derived features with existing STC/community families.
+
+
+## Native/community 15m benchmark promoted — 2026-09-24
+- Workflow 35916027610 completed successfully across all 26 competition symbols using 5,000 exact TradingView 15m bars each.
+- PR #122 merged as b37cee34362dba4a27c23994f8bd147d7523f3fe after 369 automated tests passed.
+- Native STC strategy matrix produced 0 validated 15m strategies under current gates in this exact run.
+- Community components produced research-ready profiles on 10/26 symbols.
+- The strongest cross-symbol validation counts were SSL Hybrid, Range Filter, QQE MOD and Schaff Trend Cycle at 4/26 each.
+- Family redundancy normalization is active in the research ensemble.
+- No live A+ weights or execution behavior changed.
+- Facebook trader-source audit is registered but blocked by Facebook login plus unavailable TinyFish browser funds; no claims from those links were assumed.
