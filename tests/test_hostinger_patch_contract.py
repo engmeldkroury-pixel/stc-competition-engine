@@ -75,7 +75,7 @@ def test_owner_console_auto_refresh_and_actionable_browser_notifications():
     ui = (PATCH / "operator.php").read_text(encoding="utf-8")
     assert "setInterval(()=>{secondsToRefresh=30;refresh()},30000)" in ui
     assert "Notification.requestPermission()" in ui
-    assert "STC A+ HIGH-CONVICTION PLAN" in ui
+    assert "STC QUALIFIED PLAN" in ui
     assert "LONG" in ui and "SHORT" in ui
     assert "WAIT" in ui
     assert "Decision timeframe" in ui
@@ -334,7 +334,7 @@ def test_browser_notifications_do_not_suppress_active_plan_on_first_load():
     ui = (PATCH / "operator.php").read_text(encoding="utf-8")
     assert "stc_seen_signal_plans" in ui
     assert "persistSeenSet('stc_seen_signal_plans'" in ui
-    assert "STC A+ HIGH-CONVICTION PLAN" in ui
+    assert "STC QUALIFIED PLAN" in ui
     assert "if(!initializedSignals)" not in ui
     assert "if(snapshot)maybeNotify(snapshot.cards||[])" in ui
 
@@ -456,13 +456,13 @@ def test_quality_gate_is_enforced_across_console_approval_notifications_and_fill
     control = (PATCH / "portfolio_control.php").read_text(encoding="utf-8")
     ui = (PATCH / "operator.php").read_text(encoding="utf-8")
     assert "quality_gate_passed" in snapshot
-    assert "A_PLUS" in snapshot
-    assert "high_conviction_gate_not_passed" in approval
+    assert "stc_signal_quality_gate_eligible($signal)" in snapshot
+    assert "quality_gate_not_passed" in approval
     assert "quality_gate_not_passed" in notify
     assert "stc_signal_quality_gate_eligible($signal)" in notify
     assert "source_plan_quality_gate_not_passed" in control
     assert "MONITOR ONLY" in ui
-    assert "STC A+ HIGH-CONVICTION PLAN" in ui
+    assert "STC QUALIFIED PLAN" in ui
 
 
 
