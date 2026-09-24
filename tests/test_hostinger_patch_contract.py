@@ -314,7 +314,10 @@ def test_owner_console_hides_expired_opportunities_and_formats_readable_local_ti
     assert "ACTIVE NOW" in ui
     assert "Expired opportunities are removed automatically" in ui
     assert "const actionable=cards.filter(c=>isOpportunityActive(c));" in ui
-    assert "c.recommendation==='WAIT'||isLockedPlanVisible(c)" in ui
+    assert "function shouldShowSignalCard(c)" in ui
+    assert "if(c.recommendation==='WAIT')return true;" in ui
+    assert "if(c.has_open_position)return true;" in ui
+    assert "return isLockedPlanVisible(c);" in ui
     assert "function isLockedPlanVisible(c)" in ui
     assert "RECOVERY ONLY" in ui
     assert "updateLiveCountdowns()" in ui
