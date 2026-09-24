@@ -27,6 +27,9 @@ jobs:
           curl -fsS --retry 2 --max-time 20 \
             -H "Authorization: Bearer ${STC_OWNER_TOKEN}" \
             "https://stc.feama.site/position.php?status=ALL&competition_id=capital-africa-sep-2026" > /tmp/positions.json
+          curl -fsS --retry 2 --max-time 20 \
+            -H "Authorization: Bearer ${STC_OWNER_TOKEN}" \
+            "https://stc.feama.site/operator_snapshot.php" > /tmp/snapshot.json
           python - <<'PY'
           import json, re
           data=json.load(open("/tmp/notifications.json",encoding="utf-8"))
@@ -78,4 +81,25 @@ jobs:
                   "realized_pnl_usd":p.get("realized_pnl_usd"),
               })
           print("STC_CAPITAL_POSITION_LEDGER="+json.dumps(ps,sort_keys=True))
+          snap=json.load(open("/tmp/snapshot.json",encoding="utf-8"))
+          cards=[]
+          for c in snap.get("cards") or []:
+              cards.append({
+                  "competition_id":c.get("competition_id"),
+                  "symbol":c.get("symbol"),
+                  "source_time":c.get("source_time"),
+                  "recommendation":c.get("recommendation"),
+                  "setup_quality_score":c.get("setup_quality_score"),
+                  "quality_gate_passed":c.get("quality_gate_passed"),
+                  "has_open_position":c.get("has_open_position"),
+                  "opportunity_active":c.get("opportunity_active"),
+                  "manual_execution_ready":c.get("manual_execution_ready"),
+                  "expires_in_seconds":c.get("expires_in_seconds"),
+                  "pending_plan_action":c.get("pending_plan_action"),
+                  "entry_blocked_reason":c.get("entry_blocked_reason"),
+                  "order_instruction":c.get("order_instruction"),
+              })
+          print("STC_LIVE_OPERATOR_CARDS="+json.dumps(cards,sort_keys=True))
+          print("STC_LIVE_RUNTIME="+json.dumps(snap.get("runtime_control"),sort_keys=True))
+          print("STC_LIVE_SNAPSHOT_OBSERVED_AT="+json.dumps(snap.get("observed_at_utc")))
           PY
