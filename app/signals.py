@@ -206,6 +206,65 @@ def high_conviction_assessment(
 
 
 
+def competition_opportunity_assessment(
+    *,
+    recommendation: str,
+    composite_score: float,
+    short_term_technical: float,
+    historical_regime: float | None,
+    blended_technical: float,
+    volatility_quality: float,
+    liquidity_quality: float,
+    confirmation_score: float | None,
+    trend_2h_score: float | None,
+    trend_4h_score: float | None,
+    family_evidence_score: float | None,
+    family_agreement_ratio: float | None,
+    family_aligned_count: int | None,
+    family_conflict_count: int | None,
+) -> tuple[bool, list[str]]:
+    """Competition-only opportunity gate.
+
+    This gate is intentionally less restrictive than the A+ gate so a short
+    paper-trading competition does not require every long-horizon timeframe to
+    agree. It still requires directional strength, majority intraday alignment,
+    family confirmation, and non-poor execution quality. Human approval remains
+    mandatory and this gate does not imply a probability of profit.
+    """
+    if recommendation not in {"LONG", "SHORT"}:
+        return False, ["base_recommendation_not_directional"]
+
+    sign = 1.0 if recommendation == "LONG" else -1.0
+    intraday = (
+        confirmation_score,
+        trend_2h_score,
+        trend_4h_score,
+    )
+    aligned_intraday = sum(
+        1 for value in intraday
+        if value is not None and sign * value >= 0.35
+    )
+
+    checks: list[tuple[str, bool]] = [
+        ("historical_context_present", historical_regime is not None),
+        ("confirmation_context_present", confirmation_score is not None),
+        ("intraday_majority_alignment", aligned_intraday >= 2),
+        ("short_term_strength", sign * short_term_technical >= 0.55),
+        ("blended_technical_strength", sign * blended_technical >= 0.45),
+        ("composite_strength", sign * composite_score >= 0.35),
+        ("historical_not_strongly_opposed", historical_regime is not None and sign * historical_regime >= -0.15),
+        ("family_evidence_present", family_evidence_score is not None),
+        ("family_direction_alignment", family_evidence_score is not None and sign * family_evidence_score >= 0.25),
+        ("family_agreement", family_agreement_ratio is not None and family_agreement_ratio >= 0.55),
+        ("family_breadth", family_aligned_count is not None and family_aligned_count >= 4),
+        ("family_conflicts", family_conflict_count is not None and family_conflict_count <= 3),
+        ("volatility_quality", sign * volatility_quality >= 0.0),
+        ("liquidity_quality", sign * liquidity_quality >= 0.0),
+    ]
+    failed = [name for name, ok in checks if not ok]
+    return failed == [], failed
+
+
 def setup_quality_score(
     *,
     recommendation: str,
