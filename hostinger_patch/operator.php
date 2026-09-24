@@ -363,7 +363,7 @@ function sizingHtml(s,c){
  const limited=(s.risk_budget_limited_by||[]).join(', ');
  const riskPct=Number(s.equity_usd)>0?Number(s.risk_amount_usd)/Number(s.equity_usd)*100:0;
  const p=c&&c.locked_trade_plan?c.locked_trade_plan:null;
- return '<div class="orderbox"><div class="small">STC POSITION SIZE • MAX STC QUANTITY • DO NOT EXCEED • smaller quantity is allowed</div>'
+ return '<div class="orderbox"><div class="small">STC POSITION SIZE • use this quantity unless the competition platform forces a smaller valid amount • MAX STC QUANTITY • DO NOT EXCEED</div>'
   +'<div class="ordername">'+num(s.proposed_quantity,6)+' units/contracts</div>'
   +'<div class="small bad"><b>Enter this as Units / Contracts only.</b> Never copy trade value, margin, leverage value, or % balance into the quantity field.</div>'
   +'<div class="row"><span>Risk on this trade</span><span class="value">$'+num(s.risk_amount_usd,2)+' • '+num(riskPct,3)+'%</span></div>'
