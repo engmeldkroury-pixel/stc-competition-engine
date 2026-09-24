@@ -1,0 +1,181 @@
+//@version=6
+indicator("STC Community Shadow Advanced Parity Candidate v0.1", overlay=false, max_bars_back=5000)
+
+// Research/diagnostic only.
+// NO webhook, NO order action, NO live quality-gate authority.
+// Purpose: compare Pine events against frozen Python parity fixtures.
+
+profile = input.string(
+    "CAPITALCOM:BTCUSD",
+    "Frozen profile",
+    options=["CAPITALCOM:BTCUSD", "CAPITALCOM:USDZAR"]
+)
+
+f_rsi_kernel_event() =>
+    rsiPeriod = 21
+    pivotLength = 12
+    bandwidth = 6.0
+    minSamples = 12
+    dominanceRatio = 1.35
+
+    rsiValue = ta.rsi(close, rsiPeriod)
+    var lowSamples = array.new_float()
+    var highSamples = array.new_float()
+    var int state = 0
+
+    if bar_index >= pivotLength * 2 and not na(rsiValue[pivotLength])
+        pivotLow = low[pivotLength]
+        pivotHigh = high[pivotLength]
+        windowLow = ta.lowest(low, pivotLength * 2 + 1)
+        windowHigh = ta.highest(high, pivotLength * 2 + 1)
+        if pivotLow <= windowLow
+            array.push(lowSamples, rsiValue[pivotLength])
+            if array.size(lowSamples) > 300
+                array.shift(lowSamples)
+        if pivotHigh >= windowHigh
+            array.push(highSamples, rsiValue[pivotLength])
+            if array.size(highSamples) > 300
+                array.shift(highSamples)
+
+    float lowDensity = 0.0
+    float highDensity = 0.0
+    if not na(rsiValue) and array.size(lowSamples) >= minSamples and array.size(highSamples) >= minSamples
+        for j = 0 to array.size(lowSamples) - 1
+            sample = array.get(lowSamples, j)
+            z = (rsiValue - sample) / bandwidth
+            lowDensity += math.exp(-0.5 * z * z)
+        lowDensity /= array.size(lowSamples)
+
+        for j = 0 to array.size(highSamples) - 1
+            sample = array.get(highSamples, j)
+            z = (rsiValue - sample) / bandwidth
+            highDensity += math.exp(-0.5 * z * z)
+        highDensity /= array.size(highSamples)
+
+        bullish = lowDensity > highDensity * dominanceRatio
+        bearish = highDensity > lowDensity * dominanceRatio
+        current = bullish ? 1 : bearish ? -1 : 0
+        event = current != 0 and current != state ? current : 0
+        if current != 0
+            state := current
+        event
+    else
+        0
+
+f_nw_endpoint_event() =>
+    lookback = 500
+    bandwidth = 8.0
+    deviationLength = 499
+    multiplier = 3.0
+
+    float estimate = na
+    if bar_index >= lookback - 1
+        float weighted = 0.0
+        float denom = 0.0
+        for lag = 0 to lookback - 1
+            weight = math.exp(-0.5 * math.pow(lag / bandwidth, 2))
+            weighted += close[lag] * weight
+            denom += weight
+        estimate := denom > 1e-12 ? weighted / denom : na
+
+    absError = not na(estimate) ? math.abs(close - estimate) : na
+    width = not na(absError) ? ta.sma(absError, deviationLength) * multiplier : na
+    upper = not na(estimate) and not na(width) ? estimate + width : na
+    lower = not na(estimate) and not na(width) ? estimate - width : na
+
+    longEvent = not na(lower) and not na(lower[1]) and close[1] >= lower[1] and close < lower
+    shortEvent = not na(upper) and not na(upper[1]) and close[1] <= upper[1] and close > upper
+    longEvent ? 1.0 : shortEvent ? -1.0 : 0.0
+
+f_alphatrend_event() =>
+    period = 20
+    coefficient = 1.0
+
+    atrValue = ta.atr(period)
+    // Frozen USDZAR 5,000-bar dataset has zero_volume_fraction = 0,
+    // therefore Python selects MFI rather than its RSI fallback.
+    mfiValue = ta.mfi(hlc3, period)
+    up = low - atrValue * coefficient
+    down = high + atrValue * coefficient
+
+    float line = na
+    prevLine = line[1]
+    if not na(atrValue) and not na(mfiValue)
+        line := mfiValue >= 50.0 ? (na(prevLine) ? up : math.max(up, prevLine)) :
+             (na(prevLine) ? down : math.min(down, prevLine))
+
+    nowDiff = not na(line) and not na(line[2]) ? line - line[2] : na
+    prevDiff = not na(line[1]) and not na(line[3]) ? line[1] - line[3] : na
+    longEvent = not na(nowDiff) and not na(prevDiff) and prevDiff <= 0 and nowDiff > 0
+    shortEvent = not na(nowDiff) and not na(prevDiff) and prevDiff >= 0 and nowDiff < 0
+    longEvent ? 1.0 : shortEvent ? -1.0 : 0.0
+
+f_supertrend_event() =>
+    atrPeriod = 14
+    multiplier = 3.0
+
+    atrValue = ta.atr(atrPeriod)
+    basicUpper = hl2 + multiplier * atrValue
+    basicLower = hl2 - multiplier * atrValue
+
+    float finalUpper = na
+    float finalLower = na
+    int trend = 1
+
+    if not na(atrValue)
+        if na(finalUpper[1]) or na(finalLower[1])
+            finalUpper := basicUpper
+            finalLower := basicLower
+            trend := 1
+        else
+            finalUpper := basicUpper < finalUpper[1] or close[1] > finalUpper[1] ? basicUpper : finalUpper[1]
+            finalLower := basicLower > finalLower[1] or close[1] < finalLower[1] ? basicLower : finalLower[1]
+            prevTrend = nz(trend[1], 1)
+            trend := prevTrend < 0 and close > finalUpper ? 1 :
+                 prevTrend > 0 and close < finalLower ? -1 : prevTrend
+
+    previousTrend = nz(trend[1], 1)
+    not na(atrValue) and trend != previousTrend ? float(trend) : 0.0
+
+f_ut_bot_event() =>
+    atrPeriod = 14
+    keyValue = 1.5
+    atrValue = ta.atr(atrPeriod)
+    loss = keyValue * atrValue
+
+    float trail = na
+    previousTrail = trail[1]
+    previousClose = close[1]
+
+    if not na(atrValue)
+        if na(previousTrail)
+            trail := close - loss
+        else if close > previousTrail and previousClose > previousTrail
+            trail := math.max(previousTrail, close - loss)
+        else if close < previousTrail and previousClose < previousTrail
+            trail := math.min(previousTrail, close + loss)
+        else if close > previousTrail
+            trail := close - loss
+        else
+            trail := close + loss
+
+    longEvent = not na(previousTrail) and previousClose <= previousTrail and close > previousTrail
+    shortEvent = not na(previousTrail) and previousClose >= previousTrail and close < previousTrail
+    longEvent ? 1.0 : shortEvent ? -1.0 : 0.0
+
+btcRsiKernelEvent = profile == "CAPITALCOM:BTCUSD" ? f_rsi_kernel_event() : 0.0
+usdNwEvent = profile == "CAPITALCOM:USDZAR" ? f_nw_endpoint_event() : 0.0
+usdAlphaEvent = profile == "CAPITALCOM:USDZAR" ? f_alphatrend_event() : 0.0
+usdSupertrendEvent = profile == "CAPITALCOM:USDZAR" ? f_supertrend_event() : 0.0
+usdUtBotEvent = profile == "CAPITALCOM:USDZAR" ? f_ut_bot_event() : 0.0
+
+plot(profile == "CAPITALCOM:BTCUSD" ? btcRsiKernelEvent : na, "RSI Kernel event", style=plot.style_columns)
+plot(profile == "CAPITALCOM:USDZAR" ? usdNwEvent : na, "Nadaraya-Watson event", display=display.data_window)
+plot(profile == "CAPITALCOM:USDZAR" ? usdAlphaEvent : na, "AlphaTrend event", display=display.data_window)
+plot(profile == "CAPITALCOM:USDZAR" ? usdSupertrendEvent : na, "Supertrend event", display=display.data_window)
+plot(profile == "CAPITALCOM:USDZAR" ? usdUtBotEvent : na, "UT Bot event", display=display.data_window)
+
+// Lorentzian is intentionally excluded from this Pine candidate.
+// The Python research stream delegates to the official pinned parity-tested
+// library; a separate exact Pine/library parity path is required before it can
+// complete the USDZAR ensemble shadow score.
