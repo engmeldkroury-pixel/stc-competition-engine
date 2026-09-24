@@ -22,3 +22,11 @@
 - Permanent read-only Live Readback workflow is accepted for production evidence.
 - Readback may expose sanitized signals, runtime controls and competition progress only.
 - It never approves or places orders.
+
+## 2026-09-24 — Performance incident and execution discipline
+- The owner-supplied Capital trade history is controlling evidence for realized competition performance until STC is reconciled.
+- Current visible realized P/L is negative and the visible XAGUSD trade dominates the drawdown; signal quality and execution/risk deviation must be diagnosed separately.
+- Do not loosen quality thresholds or increase per-trade risk to recover losses.
+- Future manual fills should use the STC proposed quantity exactly or a smaller valid quantity when the platform requires it; larger discretionary sizing is outside the STC risk ticket.
+- Do not promote community/shadow indicators merely because the current live strategy experienced drawdown; promotion still requires parity and evidence.
+- Before changing live weights or symbol rules, backfill the visible closed trades and attribute each one to its actual STC source evidence where possible.
