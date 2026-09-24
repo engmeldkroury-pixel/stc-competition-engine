@@ -343,6 +343,12 @@ def indicator_parameter_grid(indicator_id: str) -> tuple[dict, ...]:
             {"rsi_period": 14, "pivot_length": 12, "bandwidth": 4.0, "min_samples": 12, "dominance_ratio": 1.30},
             {"rsi_period": 21, "pivot_length": 12, "bandwidth": 6.0, "min_samples": 12, "dominance_ratio": 1.35},
         ),
+        "vumanchu_cipher_b": (
+            {"channel_length": 9, "average_length": 12, "signal_length": 3, "overbought": 53.0, "oversold": -53.0, "include_divergence": True},
+            {"channel_length": 9, "average_length": 12, "signal_length": 3, "overbought": 60.0, "oversold": -60.0, "include_divergence": True},
+            {"channel_length": 10, "average_length": 21, "signal_length": 4, "overbought": 53.0, "oversold": -53.0, "include_divergence": True},
+            {"channel_length": 9, "average_length": 12, "signal_length": 3, "overbought": 53.0, "oversold": -53.0, "include_divergence": False},
+        ),
     }
     return grids.get(indicator_id, ({},))
 

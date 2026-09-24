@@ -1228,6 +1228,150 @@ def rsi_kernel_pivot_signals(
     return out
 
 
+def _vumanchu_confirmed_divergence_events(
+    bars: list[Bar],
+    oscillator: list[float | None],
+    *,
+    bearish_min: float = 45.0,
+    bullish_max: float = -65.0,
+    strength: float = 0.75,
+) -> dict[int, float]:
+    """Return regular divergence events on the bar where the pivot is known.
+
+    The public VuManChu Pine source detects a five-bar fractal centered two bars
+    in the past and visually plots the divergence with offset=-2. A real-time
+    system cannot know that pivot until the two right-hand bars have closed.
+    STC therefore emits the event at confirmation index pivot + 2 and never
+    backdates the signal to the pivot candle.
+    """
+    out: dict[int, float] = {}
+    previous_top: tuple[float, float] | None = None
+    previous_bottom: tuple[float, float] | None = None
+
+    for confirm_i in range(4, len(bars)):
+        pivot_i = confirm_i - 2
+        window = oscillator[pivot_i - 2 : pivot_i + 3]
+        if len(window) != 5 or any(value is None for value in window):
+            continue
+        values = [float(value) for value in window if value is not None]
+        pivot_osc = values[2]
+
+        is_top = (
+            values[0] < pivot_osc
+            and values[1] < pivot_osc
+            and pivot_osc > values[3]
+            and pivot_osc > values[4]
+        )
+        is_bottom = (
+            values[0] > pivot_osc
+            and values[1] > pivot_osc
+            and pivot_osc < values[3]
+            and pivot_osc < values[4]
+        )
+
+        if is_top and pivot_osc >= bearish_min:
+            current_price = float(bars[pivot_i].high)
+            if previous_top is not None:
+                previous_osc, previous_price = previous_top
+                if current_price > previous_price and pivot_osc < previous_osc:
+                    out[confirm_i] = -abs(float(strength))
+            previous_top = (pivot_osc, current_price)
+
+        if is_bottom and pivot_osc <= bullish_max:
+            current_price = float(bars[pivot_i].low)
+            if previous_bottom is not None:
+                previous_osc, previous_price = previous_bottom
+                if current_price < previous_price and pivot_osc > previous_osc:
+                    out[confirm_i] = abs(float(strength))
+            previous_bottom = (pivot_osc, current_price)
+
+    return out
+
+
+def vumanchu_cipher_b_signals(
+    bars: list[Bar],
+    *,
+    channel_length: int = 9,
+    average_length: int = 12,
+    signal_length: int = 3,
+    overbought: float = 53.0,
+    oversold: float = -53.0,
+    divergence_bearish_min: float = 45.0,
+    divergence_bullish_max: float = -65.0,
+    include_divergence: bool = True,
+    divergence_strength: float = 0.75,
+) -> dict[int, float]:
+    """Causal research adapter for VuManChu Cipher B + Divergences.
+
+    This independent implementation follows the public source's explicit large
+    buy/sell-dot intent:
+      * bullish: WaveTrend cross up while the signal wave is oversold;
+      * bearish: WaveTrend cross down while the signal wave is overbought.
+
+    Optional regular WaveTrend divergence is treated as weaker evidence and is
+    emitted only when the centered pivot is actually confirmed two bars later.
+    Public Sommi/HTF code paths using lookahead_on are intentionally omitted.
+    """
+    if not bars:
+        return {}
+    typical = [(bar.high + bar.low + bar.close) / 3.0 for bar in bars]
+    esa = _ema_full(typical, max(1, int(channel_length)))
+    deviation_input = [
+        0.0 if esa[i] is None else abs(typical[i] - float(esa[i]))
+        for i in range(len(bars))
+    ]
+    deviation = _ema_full(deviation_input, max(1, int(channel_length)))
+
+    ci: list[float] = [0.0] * len(bars)
+    ci_valid: list[bool] = [False] * len(bars)
+    for i in range(len(bars)):
+        if esa[i] is None or deviation[i] is None or float(deviation[i]) <= 1e-12:
+            continue
+        ci[i] = (typical[i] - float(esa[i])) / (0.015 * float(deviation[i]))
+        ci_valid[i] = True
+
+    wt1 = _ema_full(ci, max(1, int(average_length)))
+    wt2: list[float | None] = [None] * len(bars)
+    sig_len = max(1, int(signal_length))
+    for i in range(sig_len - 1, len(bars)):
+        window = wt1[i - sig_len + 1 : i + 1]
+        if any(value is None for value in window):
+            continue
+        wt2[i] = fmean(float(value) for value in window if value is not None)
+
+    out: dict[int, float] = {}
+    for i in range(1, len(bars)):
+        if (
+            not ci_valid[i]
+            or wt1[i] is None
+            or wt2[i] is None
+            or wt1[i - 1] is None
+            or wt2[i - 1] is None
+        ):
+            continue
+        previous_diff = float(wt1[i - 1]) - float(wt2[i - 1])
+        current_diff = float(wt1[i]) - float(wt2[i])
+        cross_up = previous_diff <= 0.0 < current_diff
+        cross_down = previous_diff >= 0.0 > current_diff
+        if cross_up and float(wt2[i]) <= float(oversold):
+            out[i] = 1.0
+        elif cross_down and float(wt2[i]) >= float(overbought):
+            out[i] = -1.0
+
+    if include_divergence:
+        divergence = _vumanchu_confirmed_divergence_events(
+            bars,
+            wt2,
+            bearish_min=float(divergence_bearish_min),
+            bullish_max=float(divergence_bullish_max),
+            strength=float(divergence_strength),
+        )
+        for index, value in divergence.items():
+            out.setdefault(index, value)
+
+    return out
+
+
 def lorentzian_classification_signals(
     bars: list[Bar],
     *,
@@ -1341,4 +1485,6 @@ def indicator_signal_series(
         return nadaraya_watson_nonrepaint_signals(bars, **params)
     if indicator_id == "rsi_kernel_optimized_flux":
         return rsi_kernel_pivot_signals(bars, **params)
+    if indicator_id == "vumanchu_cipher_b":
+        return vumanchu_cipher_b_signals(bars, **params)
     raise KeyError(f"Community indicator is not implemented for causal benchmarking: {indicator_id}")

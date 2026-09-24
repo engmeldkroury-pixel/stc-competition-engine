@@ -231,10 +231,11 @@ INDICATORS: tuple[CommunityIndicatorSpec, ...] = (
         preferred_timeframes=("5", "15", "30", "60", "120", "240", "1D"),
         open_source=True,
         popularity_uses=616_385,
-        implementation_status="pending_exact_port",
+        implementation_status="implemented_conceptual",
         notes=(
-            "Composite WaveTrend/RSI/money-flow/divergence family with explicit buy/sell dots.",
-            "Pivot/divergence confirmation timing must be modeled causally before benchmark use.",
+            "Source-audited causal adapter preserves the explicit WaveTrend oversold/overbought cross dots.",
+            "Regular WaveTrend divergence is emitted only on the true confirmation bar, two bars after the pivot; visual backdating is never used for execution.",
+            "Sommi/higher-timeframe paths that use lookahead_on in the public source are excluded from STC research signals.",
         ),
     ),
     CommunityIndicatorSpec(
