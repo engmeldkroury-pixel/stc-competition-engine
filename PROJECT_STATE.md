@@ -2433,3 +2433,29 @@ Owner intervention required now: YES — only for historical-data access, not fo
 - Macro gate status: safe; no nearby high-impact EUR/USD blackout.
 - Current direct TradingView scanner quote attempt returned HTTP 429, so live execution price must be confirmed by the owner on the competition platform before approval/order entry.
 - Human approval and manual order entry remain mandatory.
+
+
+## Locked-plan disappearance incident and Record Trade UX fix — 2026-09-24 14:10 UTC
+- Owner manually executed the EURUSD competition trade before STC approval, then the STC card disappeared on the next 15m refresh.
+- Live evidence confirmed the root cause:
+  - original EURUSD locked plan: SHORT, setup quality 80/100, valid until 14:00 UTC;
+  - next confirmed EURUSD bar at 13:30 UTC: pre-gate SHORT, setup quality 78/100, monitor-only due family_direction_alignment;
+  - previous operator snapshot selected only the newest signal row, so the still-unexpired locked plan vanished from the UI.
+- PR #155 merged as `207a56428a9acc9222c9a0054f1f4ab179f6445b`.
+  - newest still-valid locked plan is preserved across newer monitor-only bars;
+  - newest bar is exposed separately as latest_signal_context;
+  - same-direction newer context may keep approval available while valid;
+  - incompatible/opposite latest context keeps the plan visible as RECOVERY ONLY and blocks a new entry;
+  - existing-manual-position recovery remains available to avoid duplicate orders;
+  - critical CI: 163 passed, 1 warning.
+- Owner also reported that the Competition field on Record Trade could not be typed into.
+- This is intentional: competition identity is safety-bound from the selected competition/card and must not be free text.
+- PR #156 merged as `73ed5808075208134678d6fb521f60a3a7df32fb`.
+  - UI now says Competition — selected automatically;
+  - field remains readonly/aria-readonly;
+  - helper text explicitly tells the owner not to type the competition name.
+- Combined Hostinger bundle built from main after both fixes:
+  - workflow run: 36010835262;
+  - artifact id: 10811854877;
+  - inner ZIP SHA-256: `560ecbd32ecc82280ee385cedca179930904999c992e55b3d66bba33e9c585b7`.
+- Required next external action: upload/replace the six PHP files from the new combined bundle before relying on preserved-plan UI in production.
