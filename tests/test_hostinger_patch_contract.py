@@ -681,3 +681,15 @@ def test_execution_guardrails_remain_manual_only_and_do_not_add_broker_execution
     assert "manual_only" in combined
     for forbidden in ("place_order", "submit_order", "broker_order", "strategy.entry"):
         assert forbidden not in combined
+
+
+def test_console_keeps_telegram_events_visible_and_shows_open_position_signal_context():
+    ui = (PATCH / "operator.php").read_text(encoding="utf-8")
+    assert "Recent Telegram / server events" in ui
+    assert "server-notify-events" in ui
+    assert "function notificationEventHtml" in ui
+    assert "renderNotificationEvents(notificationStatus.events||[])" in ui
+    assert "function shouldShowSignalCard" in ui
+    assert "if(c.has_open_position)return true;" in ui
+    assert "POSITION CONTEXT — NO NEW ENTRY" in ui
+    assert "Telegram/server signal received, but STC already tracks an open position for this symbol." in ui
