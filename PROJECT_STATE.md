@@ -1995,3 +1995,11 @@ Owner intervention required now: YES — only for historical-data access, not fo
 - Durable evidence:
   - research_benchmarks/trendilo_multitf_frozen_run1_20260924.json
   - docs/TRENDILO_MULTITF_FROZEN_RUN1_20260924.md
+
+
+## External trader/composite source research added — 2026-09-24
+- Owner supplied two Facebook trader/source links for audit.
+- New research objective: extract composite-indicator logic, market-regime concepts, entry/exit structure, risk conventions and potentially useful measurable features.
+- Social recommendations and reputation are discovery evidence only; they cannot directly alter live weights.
+- Any extracted concept must pass source audit, causal rule extraction, backtest, OOS/forward validation and frozen confirmation before promotion.
+- Information-overlap testing is mandatory before combining trader-derived features with existing STC/community families.
