@@ -993,51 +993,126 @@ def qqe_ssl_wae_composite_signals(
     return out
 
 
+def halftrend_signals(
+    bars: list[Bar],
+    *,
+    amplitude: int = 2,
+) -> dict[int, float]:
+    """Confirmed HalfTrend swing/SMA state transitions.
+
+    The ATR/channel portion of HalfTrend is visual/risk context in the public
+    indicator; STC benchmarks only the causal trend flip state.
+    """
+    if amplitude < 1 or len(bars) < max(3, amplitude):
+        return {}
+
+    trend = 0
+    next_trend = 0
+    max_low_price = bars[0].low
+    min_high_price = bars[0].high
+    out: dict[int, float] = {}
+
+    for i in range(len(bars)):
+        start_i = max(0, i - amplitude + 1)
+        window = bars[start_i : i + 1]
+        if len(window) < amplitude:
+            continue
+
+        high_price = max(bar.high for bar in window)
+        low_price = min(bar.low for bar in window)
+        high_ma = fmean(bar.high for bar in window)
+        low_ma = fmean(bar.low for bar in window)
+        prev_low = bars[i - 1].low if i > 0 else bars[i].low
+        prev_high = bars[i - 1].high if i > 0 else bars[i].high
+        previous_trend = trend
+
+        if next_trend == 1:
+            max_low_price = max(low_price, max_low_price)
+            if high_ma < max_low_price and bars[i].close < prev_low:
+                trend = 1
+                next_trend = 0
+                min_high_price = high_price
+        else:
+            min_high_price = min(high_price, min_high_price)
+            if low_ma > min_high_price and bars[i].close > prev_high:
+                trend = 0
+                next_trend = 1
+                max_low_price = low_price
+
+        if trend != previous_trend:
+            out[i] = 1.0 if trend == 0 else -1.0
+
+    return out
+
+
 def trendilo_signals(
     bars: list[Bar],
     *,
-    change_period: int = 1,
-    alma_length: int = 10,
+    smoothing: int = 1,
+    lookback: int = 50,
     alma_offset: float = 0.85,
     alma_sigma: float = 6.0,
-    rms_length: int = 20,
     band_multiplier: float = 1.0,
+    band_length: int | None = None,
 ) -> dict[int, float]:
-    """Causal Trendilo-family adapter.
+    """Confirmed Trendilo state transitions with no future-bar inputs.
 
-    Uses percentage price change, ALMA smoothing and an RMS envelope. Signals
-    are emitted only when the smoothed momentum leaves the neutral RMS band.
+    This preserves the parameter/semantic contract used by the frozen Trendilo
+    research records already stored in the STC shadow registry.
     """
+    if smoothing < 1 or lookback < 2:
+        return {}
     closes = [bar.close for bar in bars]
-    pct = [0.0] * len(bars)
-    for i in range(change_period, len(bars)):
-        base = closes[i - change_period]
-        if abs(base) > 1e-12:
-            pct[i] = 100.0 * (closes[i] - base) / base
-    alma = _alma_full(
-        pct,
-        alma_length,
-        offset=alma_offset,
-        sigma=alma_sigma,
-    )
+    pch = [0.0] * len(bars)
+    for i in range(smoothing, len(bars)):
+        current = closes[i]
+        if abs(current) <= 1e-15:
+            continue
+        pch[i] = (current - closes[i - smoothing]) / current * 100.0
+
+    avpch = _alma_full(pch, lookback, offset=alma_offset, sigma=alma_sigma)
+    rms_length = int(band_length or lookback)
+    state: list[int] = [0] * len(bars)
     out: dict[int, float] = {}
-    state = 0
     for i in range(len(bars)):
-        if alma[i] is None or i - rms_length + 1 < 0:
+        if avpch[i] is None or i - rms_length + 1 < 0:
             continue
-        window = [
-            float(alma[j])
-            for j in range(i - rms_length + 1, i + 1)
-            if alma[j] is not None
-        ]
-        if len(window) < rms_length:
+        window_values = avpch[i - rms_length + 1 : i + 1]
+        if any(value is None for value in window_values):
             continue
-        rms = sqrt(sum(x * x for x in window) / len(window)) * band_multiplier
-        current = 1 if float(alma[i]) > rms else -1 if float(alma[i]) < -rms else 0
-        if current != 0 and current != state:
-            out[i] = float(current)
-        state = current if current != 0 else state
+        rms = band_multiplier * sqrt(
+            sum(float(value) ** 2 for value in window_values if value is not None) / rms_length
+        )
+        value = float(avpch[i])
+        current_state = 1 if value > rms else -1 if value < -rms else 0
+        state[i] = current_state
+        prev_state = state[i - 1] if i > 0 else 0
+        if current_state in (-1, 1) and current_state != prev_state:
+            out[i] = float(current_state)
     return out
+
+
+def nadaraya_watson_endpoint_signals(
+    bars: list[Bar],
+    *,
+    window: int = 500,
+    bandwidth: float = 8.0,
+    multiplier: float = 3.0,
+    deviation_length: int | None = None,
+) -> dict[int, float]:
+    """Canonical endpoint-only non-repainting Nadaraya-Watson adapter.
+
+    The component id and parameter schema intentionally match the frozen
+    research/shadow records already stored by STC.
+    """
+    dev_len = max(10, int(deviation_length or min(window, 499)))
+    return nadaraya_watson_nonrepaint_signals(
+        bars,
+        lookback=window,
+        bandwidth=bandwidth,
+        deviation_length=dev_len,
+        envelope_multiplier=multiplier,
+    )
 
 
 def nadaraya_watson_nonrepaint_signals(
@@ -1072,10 +1147,10 @@ def nadaraya_watson_nonrepaint_signals(
             continue
         estimate[i] = est
         abs_error[i] = abs(closes[i] - est)
-        start = i - deviation_length + 1
-        if start < 0:
+        start_i = i - deviation_length + 1
+        if start_i < 0:
             continue
-        errors = [x for x in abs_error[start : i + 1] if x is not None]
+        errors = [x for x in abs_error[start_i : i + 1] if x is not None]
         if len(errors) < deviation_length:
             continue
         width = fmean(float(x) for x in errors) * envelope_multiplier
@@ -1188,8 +1263,12 @@ def indicator_signal_series(
         return waddah_attar_explosion_signals(bars, **params)
     if indicator_id == "qqe_ssl_wae_composite":
         return qqe_ssl_wae_composite_signals(bars, **params)
+    if indicator_id == "halftrend_everget":
+        return halftrend_signals(bars, **params)
     if indicator_id == "trendilo":
         return trendilo_signals(bars, **params)
+    if indicator_id == "nadaraya_watson_endpoint_nonrepaint":
+        return nadaraya_watson_endpoint_signals(bars, **params)
     if indicator_id == "nadaraya_watson_envelope_luxalgo":
         return nadaraya_watson_nonrepaint_signals(bars, **params)
     if indicator_id == "rsi_kernel_optimized_flux":
