@@ -286,7 +286,376 @@ function stc_notify_signal_event(PDO $pdo, array $config, string $eventId): arra
                 : 0.0;
             $sizingText = 'MAX STC QUANTITY: ' . rtrim(rtrim(number_format((float)$sizing['proposed_quantity'], 6, '.', ''), '0'), '.')
                 . ' | DO NOT EXCEED; smaller is allowed'
-                . ' | Risk budget:         } catch (Throwable $e) {
+                . ' | Risk budget:             $sizingText = 'Sizing blocked: ' . $e->getMessage();
+        }
+    }
+
+    $order = stc_entry_order_instruction(
+        $direction,
+        (float)($payload['close'] ?? 0.0),
+        (float)$plan['entry_min'],
+        (float)$plan['entry_max']
+    );
+    $orderText = trim(((string)($order['side'] ?? '')) . ' ' . (string)($order['order_type'] ?? 'ENTRY'));
+    if (($order['trigger_price'] ?? null) !== null) {
+        $orderText .= ' | trigger ' . $order['trigger_price'];
+    }
+    if (($order['limit_price'] ?? null) !== null) {
+        $orderText .= ' | limit ' . $order['limit_price'];
+    }
+
+    $label = $competitionId === 'amp-futures-sep-2026' ? 'AMP Futures' : 'Capital.com Africa';
+    $title = 'STC NEW PLAN • ' . $label . ' • ' . $direction;
+    $qualityScore = isset($signal['setup_quality_score']) ? (int)$signal['setup_quality_score'] : null;
+    $tf = is_array($signal['timeframe_confirmation'] ?? null) ? $signal['timeframe_confirmation'] : [];
+    $tfParts = [];
+    foreach ([
+        ['15m', 'entry_score'],
+        ['1H', '1h_score'],
+        ['2H', '2h_score'],
+        ['4H', '4h_score'],
+        ['1D', '1d_score'],
+        ['1M', '1m_score'],
+    ] as $tfDef) {
+        [$tfLabel, $tfKey] = $tfDef;
+        if (array_key_exists($tfKey, $tf) && $tf[$tfKey] !== null) {
+            $value = (float)$tf[$tfKey];
+            $tfParts[] = $tfLabel . ' ' . ($value >= 0 ? '+' : '') . number_format($value, 2, '.', '');
+        } else {
+            $tfParts[] = $tfLabel . ' -';
+        }
+    }
+    $probability = is_array($signal['empirical_win_probability'] ?? null) ? $signal['empirical_win_probability'] : [];
+    $family = is_array($signal['live_family_evidence'] ?? null) ? $signal['live_family_evidence'] : [];
+    $familyText = 'UNAVAILABLE';
+    if ($family !== []) {
+        $familyText = (isset($family['score']) ? number_format((float)$family['score'], 2, '.', '') : '-')
+            . ' | agreement ' . number_format((float)($family['agreement_ratio'] ?? 0.0) * 100.0, 0, '.', '') . '%'
+            . ' | aligned ' . (int)($family['aligned_families'] ?? 0) . '/9'
+            . ' | conflicts ' . (int)($family['conflicting_families'] ?? 0);
+    }
+    $probabilityText = 'NOT CALIBRATED';
+    if (isset($probability['estimated_probability']) && is_numeric($probability['estimated_probability'])) {
+        $probabilityText = number_format((float)$probability['estimated_probability'] * 100.0, 1, '.', '')
+            . '% • n=' . (int)($probability['sample_size'] ?? 0);
+    }
+    $research = is_array($signal['research_calibration'] ?? null) ? $signal['research_calibration'] : [];
+    $researchText = 'NO MATCHING LIVE-TIMEFRAME CALIBRATION';
+    $featureText = 'NONE';
+    if (($research['status'] ?? '') === 'AVAILABLE_INFORMATIONAL' || isset($research['strategy_id'])) {
+        $researchText = (string)($research['strategy_id'] ?? '-')
+            . ' @ ' . (string)($research['timeframe'] ?? '-')
+            . ' | robust ' . number_format((float)($research['robust_score'] ?? 0.0), 2, '.', '');
+        $weights = is_array($research['feature_weights'] ?? null) ? $research['feature_weights'] : [];
+        arsort($weights, SORT_NUMERIC);
+        $top = [];
+        foreach (array_slice($weights, 0, 5, true) as $feature => $weight) {
+            $top[] = $feature . ' ' . number_format((float)$weight * 100.0, 1, '.', '') . '%';
+        }
+        if ($top !== []) {
+            $featureText = implode(' | ', $top);
+        }
+    }
+    $body = implode("\n", [
+        $symbol,
+        'STATUS: ACTIVE • ' . $minutesLeft . ' min left',
+        'Order: ' . $orderText,
+        'Entry zone: ' . $plan['entry_min'] . ' - ' . $plan['entry_max'],
+        'Stop: ' . $plan['initial_stop'],
+        'Management checkpoint (no partial TP): ' . $plan['target1'],
+        'Final take profit: ' . $plan['target2'],
+        $sizingText,
+        'Setup grade: ' . $setupGrade . ' (quality gate passed)',
+        'Setup quality: ' . ($qualityScore === null ? '-' : $qualityScore . '/100'),
+        'Empirical win probability: ' . $probabilityText,
+        'Research strategy: ' . $researchText,
+        'Top validated features: ' . $featureText,
+        'MTF: ' . implode(' | ', $tfParts),
+        'Evidence families: ' . $familyText,
+        'Signal score: ' . number_format((float)($signal['composite_score'] ?? 0.0), 2, '.', ''),
+        'Single-TP mode: place only the final take-profit; STC uses the checkpoint for protection logic.',
+        'IMPORTANT: MAX STC QUANTITY is the risk-controlled size. Never use profile max, trade value, margin, leverage, or % balance as quantity.',
+        'Reconfirm the live price before approval.',
+        'This notification is NOT an execution approval. Obtain the fresh STC approval ticket before manual entry.',
+        'Manual approval + manual order entry only.',
+    ]);
+
+    return [
+        'ok' => true,
+        'skipped' => false,
+        'dispatch' => stc_dispatch_notification($pdo, $config, [
+            'event_key' => 'plan:' . (string)$plan['plan_id'],
+            'event_type' => 'NEW_LOCKED_PLAN',
+            'competition_id' => $competitionId,
+            'symbol' => $symbol,
+            'position_id' => null,
+            'severity' => 'high',
+            'title' => $title,
+            'body' => $body,
+        ]),
+    ];
+}
+
+function stc_state_hash(PDO $pdo, string $stateKey): ?string {
+    $stmt = $pdo->prepare('SELECT state_hash FROM stc_notification_state WHERE state_key = ?');
+    $stmt->execute([$stateKey]);
+    $value = $stmt->fetchColumn();
+    return $value === false ? null : (string)$value;
+}
+
+function stc_set_state_hash(PDO $pdo, string $stateKey, string $hash): void {
+    $stmt = $pdo->prepare(
+        'INSERT INTO stc_notification_state (state_key, state_hash) VALUES (?, ?) '
+        . 'ON DUPLICATE KEY UPDATE state_hash = VALUES(state_hash), updated_at_utc = CURRENT_TIMESTAMP'
+    );
+    $stmt->execute([$stateKey, $hash]);
+}
+
+function stc_notify_portfolio(PDO $pdo, array $config): array {
+    $notifications = [];
+    $stmt = $pdo->query("SELECT * FROM stc_positions WHERE status = 'OPEN' ORDER BY id ASC");
+    while (($position = $stmt->fetch()) !== false) {
+        $history = stc_recent_signal_states(
+            $pdo,
+            (string)$position['competition_id'],
+            (string)$position['symbol'],
+            3
+        );
+        $advice = stc_supervise_position($position, $history);
+        if (($advice['action'] ?? 'HOLD') === 'HOLD') {
+            continue;
+        }
+        $stateKey = 'position:' . (string)$position['position_id'] . ':management';
+        $fingerprint = hash('sha256', json_encode([
+            'action' => $advice['action'],
+            'suggested_stop' => $advice['suggested_stop'] === null ? null : round((float)$advice['suggested_stop'], 8),
+            'partial' => $advice['suggested_partial_fraction'],
+            'reasons' => $advice['reasons'],
+        ], JSON_UNESCAPED_SLASHES));
+        if (stc_state_hash($pdo, $stateKey) === $fingerprint) {
+            continue;
+        }
+
+        $title = 'STC POSITION • ' . (string)$advice['action'] . ' • ' . (string)$position['symbol'];
+        $bodyLines = [
+            'Competition: ' . (string)$position['competition_id'],
+            'Position: ' . (string)$position['side'] . ' x ' . (string)$position['quantity'],
+            'R multiple: ' . ($advice['r_multiple'] === null ? '-' : number_format((float)$advice['r_multiple'], 2, '.', '')),
+            'Unrealized P/L: ' . ($advice['unrealized_pnl_usd'] === null ? '-' : '$' . number_format((float)$advice['unrealized_pnl_usd'], 2, '.', '')),
+        ];
+        if ($advice['suggested_stop'] !== null) {
+            $bodyLines[] = 'Suggested stop: ' . (string)$advice['suggested_stop'];
+        }
+        if ($advice['suggested_partial_fraction'] !== null) {
+            $bodyLines[] = 'Suggested partial: ' . number_format((float)$advice['suggested_partial_fraction'] * 100, 0) . '%';
+        }
+        $bodyLines[] = 'Reason: ' . implode(', ', $advice['reasons']);
+        $bodyLines[] = 'Take action manually in the competition platform, then record it in STC.';
+
+        $dispatch = stc_dispatch_notification($pdo, $config, [
+            'event_key' => 'position:' . (string)$position['position_id'] . ':' . $fingerprint,
+            'event_type' => 'POSITION_MANAGEMENT',
+            'competition_id' => (string)$position['competition_id'],
+            'symbol' => (string)$position['symbol'],
+            'position_id' => (string)$position['position_id'],
+            'severity' => ($advice['action'] === 'EXIT_NOW' ? 'critical' : 'high'),
+            'title' => $title,
+            'body' => implode("\n", $bodyLines),
+        ]);
+        $notifications[] = $dispatch;
+        if ($dispatch['delivered_any']) {
+            stc_set_state_hash($pdo, $stateKey, $fingerprint);
+        }
+    }
+    return ['ok' => true, 'notifications' => $notifications];
+}
+ . number_format((float)$sizing['risk_amount_usd'], 2, '.', '')
+                . ' (' . number_format($riskPct, 3, '.', '') . '%)';
+        } catch (Throwable $e) {
+            $sizingText = 'Sizing blocked: ' . $e->getMessage();
+        }
+    }
+
+    $order = stc_entry_order_instruction(
+        $direction,
+        (float)($payload['close'] ?? 0.0),
+        (float)$plan['entry_min'],
+        (float)$plan['entry_max']
+    );
+    $orderText = trim(((string)($order['side'] ?? '')) . ' ' . (string)($order['order_type'] ?? 'ENTRY'));
+    if (($order['trigger_price'] ?? null) !== null) {
+        $orderText .= ' | trigger ' . $order['trigger_price'];
+    }
+    if (($order['limit_price'] ?? null) !== null) {
+        $orderText .= ' | limit ' . $order['limit_price'];
+    }
+
+    $label = $competitionId === 'amp-futures-sep-2026' ? 'AMP Futures' : 'Capital.com Africa';
+    $title = 'STC NEW PLAN • ' . $label . ' • ' . $direction;
+    $qualityScore = isset($signal['setup_quality_score']) ? (int)$signal['setup_quality_score'] : null;
+    $tf = is_array($signal['timeframe_confirmation'] ?? null) ? $signal['timeframe_confirmation'] : [];
+    $tfParts = [];
+    foreach ([
+        ['15m', 'entry_score'],
+        ['1H', '1h_score'],
+        ['2H', '2h_score'],
+        ['4H', '4h_score'],
+        ['1D', '1d_score'],
+        ['1M', '1m_score'],
+    ] as $tfDef) {
+        [$tfLabel, $tfKey] = $tfDef;
+        if (array_key_exists($tfKey, $tf) && $tf[$tfKey] !== null) {
+            $value = (float)$tf[$tfKey];
+            $tfParts[] = $tfLabel . ' ' . ($value >= 0 ? '+' : '') . number_format($value, 2, '.', '');
+        } else {
+            $tfParts[] = $tfLabel . ' -';
+        }
+    }
+    $probability = is_array($signal['empirical_win_probability'] ?? null) ? $signal['empirical_win_probability'] : [];
+    $family = is_array($signal['live_family_evidence'] ?? null) ? $signal['live_family_evidence'] : [];
+    $familyText = 'UNAVAILABLE';
+    if ($family !== []) {
+        $familyText = (isset($family['score']) ? number_format((float)$family['score'], 2, '.', '') : '-')
+            . ' | agreement ' . number_format((float)($family['agreement_ratio'] ?? 0.0) * 100.0, 0, '.', '') . '%'
+            . ' | aligned ' . (int)($family['aligned_families'] ?? 0) . '/9'
+            . ' | conflicts ' . (int)($family['conflicting_families'] ?? 0);
+    }
+    $probabilityText = 'NOT CALIBRATED';
+    if (isset($probability['estimated_probability']) && is_numeric($probability['estimated_probability'])) {
+        $probabilityText = number_format((float)$probability['estimated_probability'] * 100.0, 1, '.', '')
+            . '% • n=' . (int)($probability['sample_size'] ?? 0);
+    }
+    $research = is_array($signal['research_calibration'] ?? null) ? $signal['research_calibration'] : [];
+    $researchText = 'NO MATCHING LIVE-TIMEFRAME CALIBRATION';
+    $featureText = 'NONE';
+    if (($research['status'] ?? '') === 'AVAILABLE_INFORMATIONAL' || isset($research['strategy_id'])) {
+        $researchText = (string)($research['strategy_id'] ?? '-')
+            . ' @ ' . (string)($research['timeframe'] ?? '-')
+            . ' | robust ' . number_format((float)($research['robust_score'] ?? 0.0), 2, '.', '');
+        $weights = is_array($research['feature_weights'] ?? null) ? $research['feature_weights'] : [];
+        arsort($weights, SORT_NUMERIC);
+        $top = [];
+        foreach (array_slice($weights, 0, 5, true) as $feature => $weight) {
+            $top[] = $feature . ' ' . number_format((float)$weight * 100.0, 1, '.', '') . '%';
+        }
+        if ($top !== []) {
+            $featureText = implode(' | ', $top);
+        }
+    }
+    $body = implode("\n", [
+        $symbol,
+        'STATUS: ACTIVE • ' . $minutesLeft . ' min left',
+        'Order: ' . $orderText,
+        'Entry zone: ' . $plan['entry_min'] . ' - ' . $plan['entry_max'],
+        'Stop: ' . $plan['initial_stop'],
+        'Management checkpoint (no partial TP): ' . $plan['target1'],
+        'Final take profit: ' . $plan['target2'],
+        $sizingText,
+        'Setup grade: ' . $setupGrade . ' (quality gate passed)',
+        'Setup quality: ' . ($qualityScore === null ? '-' : $qualityScore . '/100'),
+        'Empirical win probability: ' . $probabilityText,
+        'Research strategy: ' . $researchText,
+        'Top validated features: ' . $featureText,
+        'MTF: ' . implode(' | ', $tfParts),
+        'Evidence families: ' . $familyText,
+        'Signal score: ' . number_format((float)($signal['composite_score'] ?? 0.0), 2, '.', ''),
+        'Single-TP mode: place only the final take-profit; STC uses the checkpoint for protection logic.',
+        'Reconfirm the live price before approval.',
+        'Manual approval + manual order entry only.',
+    ]);
+
+    return [
+        'ok' => true,
+        'skipped' => false,
+        'dispatch' => stc_dispatch_notification($pdo, $config, [
+            'event_key' => 'plan:' . (string)$plan['plan_id'],
+            'event_type' => 'NEW_LOCKED_PLAN',
+            'competition_id' => $competitionId,
+            'symbol' => $symbol,
+            'position_id' => null,
+            'severity' => 'high',
+            'title' => $title,
+            'body' => $body,
+        ]),
+    ];
+}
+
+function stc_state_hash(PDO $pdo, string $stateKey): ?string {
+    $stmt = $pdo->prepare('SELECT state_hash FROM stc_notification_state WHERE state_key = ?');
+    $stmt->execute([$stateKey]);
+    $value = $stmt->fetchColumn();
+    return $value === false ? null : (string)$value;
+}
+
+function stc_set_state_hash(PDO $pdo, string $stateKey, string $hash): void {
+    $stmt = $pdo->prepare(
+        'INSERT INTO stc_notification_state (state_key, state_hash) VALUES (?, ?) '
+        . 'ON DUPLICATE KEY UPDATE state_hash = VALUES(state_hash), updated_at_utc = CURRENT_TIMESTAMP'
+    );
+    $stmt->execute([$stateKey, $hash]);
+}
+
+function stc_notify_portfolio(PDO $pdo, array $config): array {
+    $notifications = [];
+    $stmt = $pdo->query("SELECT * FROM stc_positions WHERE status = 'OPEN' ORDER BY id ASC");
+    while (($position = $stmt->fetch()) !== false) {
+        $history = stc_recent_signal_states(
+            $pdo,
+            (string)$position['competition_id'],
+            (string)$position['symbol'],
+            3
+        );
+        $advice = stc_supervise_position($position, $history);
+        if (($advice['action'] ?? 'HOLD') === 'HOLD') {
+            continue;
+        }
+        $stateKey = 'position:' . (string)$position['position_id'] . ':management';
+        $fingerprint = hash('sha256', json_encode([
+            'action' => $advice['action'],
+            'suggested_stop' => $advice['suggested_stop'] === null ? null : round((float)$advice['suggested_stop'], 8),
+            'partial' => $advice['suggested_partial_fraction'],
+            'reasons' => $advice['reasons'],
+        ], JSON_UNESCAPED_SLASHES));
+        if (stc_state_hash($pdo, $stateKey) === $fingerprint) {
+            continue;
+        }
+
+        $title = 'STC POSITION • ' . (string)$advice['action'] . ' • ' . (string)$position['symbol'];
+        $bodyLines = [
+            'Competition: ' . (string)$position['competition_id'],
+            'Position: ' . (string)$position['side'] . ' x ' . (string)$position['quantity'],
+            'R multiple: ' . ($advice['r_multiple'] === null ? '-' : number_format((float)$advice['r_multiple'], 2, '.', '')),
+            'Unrealized P/L: ' . ($advice['unrealized_pnl_usd'] === null ? '-' : '$' . number_format((float)$advice['unrealized_pnl_usd'], 2, '.', '')),
+        ];
+        if ($advice['suggested_stop'] !== null) {
+            $bodyLines[] = 'Suggested stop: ' . (string)$advice['suggested_stop'];
+        }
+        if ($advice['suggested_partial_fraction'] !== null) {
+            $bodyLines[] = 'Suggested partial: ' . number_format((float)$advice['suggested_partial_fraction'] * 100, 0) . '%';
+        }
+        $bodyLines[] = 'Reason: ' . implode(', ', $advice['reasons']);
+        $bodyLines[] = 'Take action manually in the competition platform, then record it in STC.';
+
+        $dispatch = stc_dispatch_notification($pdo, $config, [
+            'event_key' => 'position:' . (string)$position['position_id'] . ':' . $fingerprint,
+            'event_type' => 'POSITION_MANAGEMENT',
+            'competition_id' => (string)$position['competition_id'],
+            'symbol' => (string)$position['symbol'],
+            'position_id' => (string)$position['position_id'],
+            'severity' => ($advice['action'] === 'EXIT_NOW' ? 'critical' : 'high'),
+            'title' => $title,
+            'body' => implode("\n", $bodyLines),
+        ]);
+        $notifications[] = $dispatch;
+        if ($dispatch['delivered_any']) {
+            stc_set_state_hash($pdo, $stateKey, $fingerprint);
+        }
+    }
+    return ['ok' => true, 'notifications' => $notifications];
+}
+ . number_format((float)$sizing['risk_amount_usd'], 2, '.', '')
+                . ' (' . number_format($riskPct, 3, '.', '') . '%)';
+        } catch (Throwable $e) {
             $sizingText = 'Sizing blocked: ' . $e->getMessage();
         }
     }
