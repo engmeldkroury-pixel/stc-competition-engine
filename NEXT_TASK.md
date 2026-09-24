@@ -58,3 +58,16 @@ Extract only reproducible logic:
 - claims that need independent verification.
 
 Do not copy live calls into STC. Convert useful concepts into research candidates, then require causal/OOS/forward validation before any weight.
+
+
+## ACTIVE NEXT WORK UNIT — GENERAL LAB AUTOMATION
+Build the runtime bridge so every symbol added to General Lab invokes the same research PROCESS automatically:
+asset classification -> data quality -> native matrix -> community matrix -> OOS/forward -> redundancy-aware ensemble -> compact report.
+The symbol must inherit process only, never weights.
+The bridge must fail clearly when exact historical data is unavailable instead of substituting another provider silently.
+
+## EXTERNAL SOURCE BLOCKER
+The two Facebook trader links are registered but not yet readable:
+- direct fetch -> login_required;
+- browser automation -> not started because TinyFish wallet balance is negative.
+Do not fabricate content. Resume when browser access is funded or when screenshots/video/text are supplied.
