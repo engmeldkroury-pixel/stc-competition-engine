@@ -376,7 +376,8 @@ function stc_notify_signal_event(PDO $pdo, array $config, string $eventId): arra
         'Signal score: ' . number_format((float)($signal['composite_score'] ?? 0.0), 2, '.', ''),
         'Single-TP mode: place only the final take-profit; STC uses the checkpoint for protection logic.',
         'IMPORTANT: MAX STC QUANTITY is the risk-controlled size. Never use profile max, trade value, margin, leverage, or % balance as quantity.',
-        'This notification is NOT an execution approval. Reconfirm live price and obtain the fresh STC approval ticket before manual entry.',
+        'Reconfirm the live price before approval.',
+        'This notification is NOT an execution approval. Obtain the fresh STC approval ticket before manual entry.',
         'Manual approval + manual order entry only.',
     ]);
 
