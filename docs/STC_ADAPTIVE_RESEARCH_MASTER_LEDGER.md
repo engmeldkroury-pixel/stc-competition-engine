@@ -808,3 +808,38 @@ Status: IN_PROGRESS / BLOCKS WU-110 ACCEPTANCE.
   5. sync the exact-data research branch again;
   6. rerun 26-symbol exact-provider benchmark and verify Lorentzian is present in artifacts.
 - Live boundary unchanged.
+
+
+### WU-110A — official-port benchmark inclusion repair
+Status: VERIFIED / MERGED.
+- PR #129 merged as 34db5cf32d8802b22d442858bc76c3420158ec8e.
+- CI: 384 passed, 1 warning.
+- Regression test proves official Lorentzian enters the per-symbol benchmark matrix.
+- native_proxy_only components remain excluded from independent research weight.
+- Workflow 35967884019 remains superseded for Lorentzian evidence and must not be cited as a Lorentzian run.
+
+### WU-111 — VuManChu Cipher B causal source audit and adapter
+Status: VERIFIED / MERGED.
+- PR #132 merged as faa2744258d863e6c3e0e3bbecaea6729c200883.
+- CI: 386 passed, 1 warning.
+- Public source audit confirmed:
+  - explicit WaveTrend oversold cross-up / overbought cross-down buy/sell dot semantics;
+  - regular divergence is a centered five-bar fractal only knowable two bars after the pivot;
+  - visual offset=-2 must not become an execution timestamp;
+  - Sommi/HTF paths using lookahead_on are future-dependent and excluded.
+- STC independent causal adapter:
+  - base dot signals at confirmed bar close;
+  - divergence emitted only at pivot+2 confirmation as weaker evidence;
+  - TRAIN-only parameter selection;
+  - prefix invariance + dedicated timing test.
+- Durable audit: docs/VUMANCHU_CAUSAL_AUDIT_20260924.md.
+- Component id: vumanchu_cipher_b.
+- Family: composite_momentum.
+- live_authority=false.
+
+### WU-112 — native exact frozen confirmation clean replacement
+Status: IN PROGRESS.
+- Original PR #116 closed as superseded due stale-base/concurrency churn.
+- Clean replacement PR #133 created from current main.
+- Scope remains exact 85/15 final-unseen confirmation for native STC strategies.
+- live_authority=false.
