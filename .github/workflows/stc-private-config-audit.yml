@@ -14,85 +14,52 @@ jobs:
     env:
       STC_WORKER_TOKEN: ${{ secrets.STC_WORKER_TOKEN }}
     steps:
-      - name: Read sanitized latest EURUSD persisted result
+      - name: Retry current EURUSD plan notification safely
         shell: bash
         run: |
           python - <<'PY'
           import json
           import os
-          import urllib.parse
           import urllib.request
 
           token = os.environ.get("STC_WORKER_TOKEN", "")
           if not token:
               raise SystemExit("STC_WORKER_TOKEN missing")
-          url = "https://stc.feama.site/inbox.php?" + urllib.parse.urlencode({
-              "status": "ingested",
-              "limit": 100,
-          })
+
+          event_id = "capital-africa-sep-2026|CAPITALCOM:EURUSD|15|1790245800000"
+          body = json.dumps({"action": "signal", "event_id": event_id}).encode()
           req = urllib.request.Request(
-              url,
+              "https://stc.feama.site/notification.php",
+              data=body,
+              method="POST",
               headers={
                   "Authorization": f"Bearer {token}",
                   "Accept": "application/json",
+                  "Content-Type": "application/json",
                   "User-Agent": "STC-Private-Config-Audit/1.0",
               },
           )
           with urllib.request.urlopen(req, timeout=15) as response:
               data = json.load(response)
 
-          candidates = []
-          for item in data.get("events") or []:
-              payload = item.get("payload") or {}
-              if (
-                  payload.get("competition_id") == "capital-africa-sep-2026"
-                  and payload.get("symbol") == "CAPITALCOM:EURUSD"
-              ):
-                  candidates.append(item)
-          selected = max(
-              candidates,
-              key=lambda item: str((item.get("payload") or {}).get("time") or ""),
-              default=None,
-          )
+          dispatch = data.get("dispatch") or {}
+          channels = dispatch.get("channels") or {}
+          sanitized_channels = {}
+          for name, item in channels.items():
+              if isinstance(item, dict):
+                  sanitized_channels[name] = {
+                      "attempted": item.get("attempted"),
+                      "ok": item.get("ok"),
+                      "status": item.get("status"),
+                      "http_code": item.get("http_code"),
+                  }
 
-          if selected is None:
-              print(json.dumps({"found": False}))
-              raise SystemExit(0)
-
-          result = selected.get("result") or {}
-          decision = result.get("decision") or {}
-          signal = decision.get("signal") or {}
-          plan = decision.get("locked_trade_plan")
-          envelope = decision.get("approval_envelope") or {}
           print(json.dumps({
-              "found": True,
-              "event_id": selected.get("event_id"),
-              "status": selected.get("status"),
-              "source_time": (selected.get("payload") or {}).get("time"),
-              "signal": {
-                  "recommendation": signal.get("recommendation"),
-                  "setup_grade": signal.get("setup_grade"),
-                  "setup_quality_score": signal.get("setup_quality_score"),
-                  "quality_gate_passed": signal.get("quality_gate_passed"),
-                  "quality_gate_failures": signal.get("quality_gate_failures") or [],
-                  "composite_score": signal.get("composite_score"),
-              },
-              "approval_envelope": {
-                  "reference_price": envelope.get("reference_price"),
-                  "entry_min": envelope.get("entry_min"),
-                  "entry_max": envelope.get("entry_max"),
-                  "valid_until": envelope.get("valid_until"),
-              },
-              "locked_trade_plan": None if not isinstance(plan, dict) else {
-                  "direction": plan.get("direction"),
-                  "entry_min": plan.get("entry_min"),
-                  "entry_max": plan.get("entry_max"),
-                  "entry_mid": plan.get("entry_mid"),
-                  "initial_stop": plan.get("initial_stop"),
-                  "target1": plan.get("target1"),
-                  "target2": plan.get("target2"),
-                  "valid_until": plan.get("valid_until"),
-                  "levels_locked": plan.get("levels_locked"),
-              },
+              "event_id": event_id,
+              "ok": data.get("ok"),
+              "skipped": data.get("skipped"),
+              "reason": data.get("reason"),
+              "delivered_any": dispatch.get("delivered_any"),
+              "channels": sanitized_channels,
           }, sort_keys=True))
           PY
