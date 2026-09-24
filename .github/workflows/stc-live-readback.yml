@@ -87,7 +87,7 @@ jobs:
           print("STC_LIVE_ACTIVE_OPPORTUNITIES=" + json.dumps(active, sort_keys=True))
           print("STC_LIVE_RUNTIME_CONTROL=" + json.dumps(data.get("runtime_control") or {}, sort_keys=True))
           positions = []
-          for p in data.get("positions") or []:
+          for p in ((data.get("portfolio") or {}).get("positions") or []):
               positions.append({
                   "position_id": p.get("position_id"),
                   "competition_id": p.get("competition_id"),
