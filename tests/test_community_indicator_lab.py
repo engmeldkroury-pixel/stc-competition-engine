@@ -47,7 +47,7 @@ def _bars(count: int = 700) -> list[Bar]:
 def test_community_catalog_separates_research_popularity_from_live_weighting():
     summary = catalog_summary()
     assert summary["total"] >= 20
-    assert summary["implemented_or_proxy"] >= 13
+    assert summary["implemented_or_proxy"] >= 20
     assert "never become trading weights" in summary["rule"]
 
     ids = {x.indicator_id for x in eligible_indicators("rates", "15", implemented_only=True)}
@@ -60,6 +60,8 @@ def test_community_catalog_separates_research_popularity_from_live_weighting():
 @pytest.mark.parametrize(
     "indicator_id",
     (
+        "lorentzian_classification",
+        "lorentzian_classification",
         "ut_bot_alerts",
         "squeeze_momentum_lazybear",
         "wavetrend_crosses",
@@ -74,6 +76,10 @@ def test_community_catalog_separates_research_popularity_from_live_weighting():
         "ssl_hybrid",
         "waddah_attar_explosion",
         "qqe_ssl_wae_composite",
+        "halftrend_everget",
+        "trendilo",
+        "nadaraya_watson_endpoint_nonrepaint",
+        "rsi_kernel_optimized_flux",
     ),
 )
 def test_community_indicator_adapters_are_causal(indicator_id: str):
@@ -87,6 +93,31 @@ def test_community_indicator_adapters_are_causal(indicator_id: str):
     }
     assert all(-1.0 <= value <= 1.0 for value in full.values())
 
+
+
+def test_lorentzian_adapter_maps_official_port_buy_sell_stream_exactly():
+    from lorentzian_classification import LorentzianClassification, Settings
+
+    bars = _bars(900)
+    records = [
+        {
+            "time": bar.timestamp.isoformat(),
+            "open": bar.open,
+            "high": bar.high,
+            "low": bar.low,
+            "close": bar.close,
+        }
+        for bar in bars
+    ]
+    official = LorentzianClassification(records, settings=Settings())
+    expected = {}
+    for i, row in enumerate(official.results):
+        if row.buy and not row.sell:
+            expected[i] = 1.0
+        elif row.sell and not row.buy:
+            expected[i] = -1.0
+
+    assert indicator_signal_series("lorentzian_classification", bars) == expected
 
 def test_symbol_benchmark_runs_each_implemented_indicator_independently():
     trials = benchmark_symbol_indicators(
@@ -111,6 +142,10 @@ def test_symbol_benchmark_runs_each_implemented_indicator_independently():
         "ssl_hybrid",
         "waddah_attar_explosion",
         "qqe_ssl_wae_composite",
+        "halftrend_everget",
+        "trendilo",
+        "nadaraya_watson_endpoint_nonrepaint",
+        "rsi_kernel_optimized_flux",
     } <= ids
     assert all(trial.symbol == "CBOT:ZN1!" for trial in trials)
     assert all(trial.timeframe == "15" for trial in trials)
@@ -174,3 +209,22 @@ def test_general_lab_gets_same_matrix_engine_for_arbitrary_symbols():
     assert summary["symbols"] >= 28
     assert summary["by_scope"]["general-lab"] > 0
     assert "does not inherit weights from a different asset" in summary["general_lab_rule"]
+
+
+def test_historical_shadow_component_ids_remain_benchmarkable():
+    ids = {x.indicator_id for x in eligible_indicators("crypto", "5", implemented_only=True)}
+    assert "nadaraya_watson_endpoint_nonrepaint" in ids
+    assert "halftrend_everget" in ids
+    assert "nadaraya_watson_envelope_luxalgo" not in ids
+
+
+def test_trendilo_parameter_contract_matches_existing_shadow_registry():
+    from app.community_indicator_benchmark import indicator_parameter_grid
+
+    grid = indicator_parameter_grid("trendilo")
+    assert any(
+        row.get("smoothing") == 1
+        and row.get("lookback") == 50
+        and row.get("band_multiplier") == 1.25
+        for row in grid
+    )

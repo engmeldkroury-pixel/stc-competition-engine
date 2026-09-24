@@ -3,3 +3,4 @@ pydantic>=2.10,<3
 uvicorn>=0.34,<1
 pytest>=8,<9
 httpx>=0.28,<1
+lorentzian-classification @ git+https://github.com/artificial-intelligence-edge/lorentzian-classification.git@27776bd51cbd3e07b6383cfa468d4d33f4b50297#subdirectory=ports/python

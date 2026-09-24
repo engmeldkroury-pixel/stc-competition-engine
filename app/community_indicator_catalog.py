@@ -32,10 +32,10 @@ INDICATORS: tuple[CommunityIndicatorSpec, ...] = (
         open_source=True,
         editor_pick=True,
         popularity_uses=1_229_919,
-        implementation_status="pending_exact_port",
+        implementation_status="implemented_official_port",
         notes=(
-            "Candidate is high priority because it publishes a backtest stream and explicit ANN/Lorentzian logic.",
-            "Do not approximate the classifier in production; exact causal semantics must be verified first.",
+            "STC uses the official AI Edge MIT-licensed Python port pinned to an exact upstream commit.",
+            "Classifier/features/ANN/filters/kernel semantics remain upstream parity-tested; STC maps confirmed Buy/Sell events only.",
         ),
         review_urls=(
             "https://www.tradingview.com/script/Pu38F2pB-Backtest-Adapter/",
@@ -183,8 +183,11 @@ INDICATORS: tuple[CommunityIndicatorSpec, ...] = (
         preferred_timeframes=("5", "15", "30", "60", "120", "240", "1D"),
         open_source=True,
         popularity_uses=415_742,
-        implementation_status="pending_exact_port",
-        notes=("High-priority trend candidate; exact swing/ATR transition semantics must be preserved.",),
+        implementation_status="implemented_conceptual",
+        notes=(
+            "Independent causal implementation of the published HalfTrend swing/SMA state-transition methodology.",
+            "Only confirmed trend flips are benchmarked; ATR channel visuals do not create extra entries.",
+        ),
     ),
     CommunityIndicatorSpec(
         indicator_id="ssl_hybrid",
@@ -244,22 +247,40 @@ INDICATORS: tuple[CommunityIndicatorSpec, ...] = (
         preferred_timeframes=("5", "15", "30", "60", "120", "240", "1D"),
         open_source=True,
         popularity_uses=55_235,
-        implementation_status="pending_exact_port",
-        notes=("ALMA-smoothed percentage-change trend state with RMS band; exact defaults still require source verification.",),
+        implementation_status="implemented_conceptual",
+        notes=(
+            "Causal conceptual adapter uses percentage change, ALMA smoothing and an RMS neutral band.",
+            "Bounded parameters are selected on TRAIN only; this is not a copy of third-party source code.",
+        ),
     ),
     CommunityIndicatorSpec(
-        indicator_id="nadaraya_watson_envelope_luxalgo",
-        display_name="Nadaraya-Watson Envelope [LuxAlgo]",
-        author="LuxAlgo",
+        indicator_id="nadaraya_watson_endpoint_nonrepaint",
+        display_name="Endpoint Nadaraya-Watson Envelope — non-repainting",
+        author="STC independent implementation inspired by LuxAlgo public endpoint methodology",
         source_url="https://www.tradingview.com/script/Iko0E2kL-Nadaraya-Watson-Envelope-LuxAlgo/",
-        signal_family="kernel_regression",
+        signal_family="kernel_reversal",
         suitable_asset_classes=("forex", "crypto", "indices", "metals", "energy", "rates"),
         preferred_timeframes=("5", "15", "30", "60", "120", "240", "1D"),
         open_source=True,
-        implementation_status="pending_non_repaint_port",
+        implementation_status="implemented_conceptual",
         notes=(
-            "The script supports both repainting and non-repainting modes.",
-            "STC may benchmark only the explicitly non-repainting mode.",
+            "Canonical STC component id retained because frozen/shadow records already reference it.",
+            "Endpoint-only one-sided kernel smoothing; the repainting TradingView mode is explicitly excluded.",
+        ),
+    ),
+    CommunityIndicatorSpec(
+        indicator_id="nadaraya_watson_envelope_luxalgo",
+        display_name="Nadaraya-Watson Envelope [LuxAlgo] — compatibility alias",
+        author="LuxAlgo",
+        source_url="https://www.tradingview.com/script/Iko0E2kL-Nadaraya-Watson-Envelope-LuxAlgo/",
+        signal_family="kernel_reversal",
+        suitable_asset_classes=("forex", "crypto", "indices", "metals", "energy", "rates"),
+        preferred_timeframes=("5", "15", "30", "60", "120", "240", "1D"),
+        open_source=True,
+        implementation_status="superseded_alias",
+        notes=(
+            "Compatibility/discovery alias only; not separately benchmarked to avoid double counting.",
+            "Canonical benchmark id is nadaraya_watson_endpoint_nonrepaint.",
         ),
     ),
     CommunityIndicatorSpec(
@@ -386,10 +407,10 @@ INDICATORS: tuple[CommunityIndicatorSpec, ...] = (
         preferred_timeframes=("5", "15", "30", "60", "120", "240", "1D"),
         open_source=True,
         popularity_uses=226_304,
-        implementation_status="pending_confirmation_delay_audit",
+        implementation_status="implemented_conceptual",
         notes=(
-            "Uses RSI plus KDE around pivot distributions.",
-            "Pivot labels depend on bars after the pivot; STC must shift evidence to the actual confirmation bar to avoid lookahead.",
+            "Uses RSI plus KDE-like density around previously confirmed pivot distributions.",
+            "STC adds pivot samples only on the actual confirmation bar after the required right-hand bars have closed, preventing lookahead.",
         ),
         review_urls=("https://www.reddit.com/r/TradingView/comments/1lqg6ra/best_tradingview_indicators_3_years_experience/",),
     ),
@@ -529,7 +550,7 @@ def eligible_indicators(
     *,
     implemented_only: bool = True,
 ) -> tuple[CommunityIndicatorSpec, ...]:
-    allowed = {"implemented_conceptual", "native_proxy_only"}
+    allowed = {"implemented_conceptual", "implemented_official_port", "native_proxy_only"}
     return tuple(
         spec
         for spec in INDICATORS
@@ -544,7 +565,7 @@ def catalog_summary() -> dict:
         "total": len(INDICATORS),
         "implemented_or_proxy": sum(
             1 for spec in INDICATORS
-            if spec.implementation_status in {"implemented_conceptual", "native_proxy_only"}
+            if spec.implementation_status in {"implemented_conceptual", "implemented_official_port", "native_proxy_only"}
         ),
         "pending_exact_port": sum(1 for spec in INDICATORS if spec.implementation_status == "pending_exact_port"),
         "discovery_only": sum(1 for spec in INDICATORS if spec.implementation_status == "discovery_only"),

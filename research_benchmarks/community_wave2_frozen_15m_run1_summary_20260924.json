@@ -1,0 +1,106 @@
+{
+  "schema": "stc-wave2-frozen-15m-v1",
+  "run_id": 35926880568,
+  "status": "SUCCESS",
+  "source": "TradingView exact-provider 5000-bar datasets captured in research/native-community-15m-20260923",
+  "method": "85% development with internal TRAIN/TEST/FORWARD; final 15% untouched frozen confirmation",
+  "symbol_count": 26,
+  "symbols_with_any_frozen_pass": 6,
+  "symbols_with_wave2_frozen_pass": 2,
+  "component_pass_counts": {
+    "alphatrend": 1,
+    "range_filter_guikroth": 2,
+    "ssl_hybrid": 1,
+    "supertrend_kivanc": 1,
+    "trendilo": 2,
+    "waddah_attar_explosion": 1
+  },
+  "wave2": {
+    "tested": [
+      "trendilo",
+      "halftrend_everget",
+      "nadaraya_watson_endpoint_nonrepaint"
+    ],
+    "survivors": [
+      {
+        "symbol": "CAPITALCOM:BTCUSD",
+        "indicator_id": "trendilo",
+        "selected_parameters": {
+          "alma_offset": 0.85,
+          "alma_sigma": 6,
+          "band_multiplier": 1.25,
+          "lookback": 50,
+          "smoothing": 1
+        },
+        "development_robust_score": 19.422,
+        "development_test": {
+          "trades": 21,
+          "expectancy_r": 0.08433846576120035,
+          "profit_factor": 1.1419156875789407,
+          "win_rate": 0.42857142857142855,
+          "max_drawdown_r": 4.68689811436394
+        },
+        "development_forward": {
+          "trades": 27,
+          "expectancy_r": 0.09550955323142342,
+          "profit_factor": 1.1879719462392104,
+          "win_rate": 0.4074074074074074,
+          "max_drawdown_r": 3.4689869186727673
+        },
+        "frozen": {
+          "trades": 22,
+          "expectancy_r": 0.19528442761425752,
+          "profit_factor": 1.3866232310590296,
+          "win_rate": 0.45454545454545453,
+          "max_drawdown_r": 7.2849079509026495
+        }
+      },
+      {
+        "symbol": "CME_MINI:MJY1!",
+        "indicator_id": "trendilo",
+        "selected_parameters": {
+          "alma_offset": 0.85,
+          "alma_sigma": 6,
+          "band_multiplier": 1.25,
+          "lookback": 50,
+          "smoothing": 1
+        },
+        "development_robust_score": 15.3988,
+        "development_test": {
+          "trades": 26,
+          "expectancy_r": 0.12086736389402869,
+          "profit_factor": 1.2009304003353374,
+          "win_rate": 0.38461538461538464,
+          "max_drawdown_r": 4.160000000000023
+        },
+        "development_forward": {
+          "trades": 19,
+          "expectancy_r": 0.06209964528060579,
+          "profit_factor": 1.1031375227562523,
+          "win_rate": 0.42105263157894735,
+          "max_drawdown_r": 7.134344256005734
+        },
+        "frozen": {
+          "trades": 22,
+          "expectancy_r": 0.1508503781936634,
+          "profit_factor": 1.2713051298003084,
+          "win_rate": 0.4090909090909091,
+          "max_drawdown_r": 5.199999999999797
+        }
+      }
+    ],
+    "no_frozen_survivor": [
+      "halftrend_everget",
+      "nadaraya_watson_endpoint_nonrepaint"
+    ]
+  },
+  "unchanged_existing_frozen_survivors": [
+    "CAPITALCOM:USDZAR|15|supertrend_kivanc",
+    "CAPITALCOM:XAUUSD|15|range_filter_guikroth",
+    "CBOT:ZB1!|15|range_filter_guikroth",
+    "CME_MINI:MJY1!|15|alphatrend",
+    "CME_MINI:MJY1!|15|waddah_attar_explosion",
+    "NYMEX:MCL1!|15|ssl_hybrid"
+  ],
+  "live_authority": false
+}

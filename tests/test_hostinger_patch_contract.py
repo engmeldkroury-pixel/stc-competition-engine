@@ -9,7 +9,7 @@ PATCH = ROOT / "hostinger_patch"
 
 
 def test_hostinger_patch_files_present():
-    for name in ("cloud_control.php", "runtime_control.php", "approval.php", "operator_snapshot.php", "operator.php", "portfolio_control.php", "position.php", "account_state.php", "notification_control.php", "notification.php", "macro_control.php", "migrations/001_cloud_approval.sql", "migrations/002_portfolio_supervisor.sql", "migrations/003_notifications.sql"):
+    for name in ("cloud_control.php", "runtime_control.php", "approval.php", "operator_snapshot.php", "operator.php", "portfolio_control.php", "position.php", "account_state.php", "notification_control.php", "notification.php", "macro_control.php", "general_lab.php", "migrations/001_cloud_approval.sql", "migrations/002_portfolio_supervisor.sql", "migrations/003_notifications.sql", "migrations/004_general_lab_queue.sql"):
         assert (PATCH / name).exists()
 
 
@@ -280,6 +280,7 @@ def test_hostinger_php_patch_files_are_syntax_valid_when_php_is_available():
         "notification_control.php",
         "notification.php",
         "macro_control.php",
+        "general_lab.php",
     ]
     for name in names:
         result = subprocess.run(
@@ -531,3 +532,31 @@ def test_owner_console_exposes_verified_competition_rules_and_sources():
         assert label in ui
     assert "rulesHtml(competitionId)" in ui
 
+
+
+def test_general_lab_queue_is_additive_research_only_and_audited():
+    sql = (PATCH / "migrations" / "004_general_lab_queue.sql").read_text(encoding="utf-8")
+    endpoint = (PATCH / "general_lab.php").read_text(encoding="utf-8")
+    ui = (PATCH / "operator.php").read_text(encoding="utf-8")
+
+    assert "CREATE TABLE IF NOT EXISTS stc_general_lab_requests" in sql
+    assert "CREATE TABLE IF NOT EXISTS stc_general_lab_request_events" in sql
+    assert "DROP TABLE" not in sql.upper()
+    assert "DELETE FROM" not in sql.upper()
+
+    assert "stc_require_operator_auth($config)" in endpoint
+    assert "WAITING_FOR_SYMBOL_RESOLUTION" in endpoint
+    assert "WAITING_FOR_EXACT_HISTORY" in endpoint
+    assert "exact_provider_history_required_no_silent_substitution" in endpoint
+    assert "'execution' => 'research_only'" in endpoint
+    assert "'live_authority' => false" in endpoint
+    for forbidden in ("place_order", "submit_order", "broker_order", "strategy.entry"):
+        assert forbidden not in endpoint
+
+    assert "Save + queue research" in ui
+    assert "General Lab research queue" in ui
+    assert "queueGeneralLabResearch()" in ui
+    assert "refreshGeneralLabResearch()" in ui
+    assert "general_lab.php" in ui
+    assert "Exact-provider history is mandatory" in ui
+    assert "Weights are symbol/timeframe-specific" in ui

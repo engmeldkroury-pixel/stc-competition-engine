@@ -420,3 +420,373 @@ Status: IN VERIFICATION.
 - PR #113 supersedes #110 on current main.
 - Target registry: 10 SHADOW component-symbol-timeframe records.
 - MULTITF_CONFIRMED remains zero because none of the original 15m components passed the same component on another timeframe.
+
+
+## Owner continuity checkpoint — 2026-09-24 00:50 EEST
+
+Controlling owner instruction:
+- Continue the STC adaptive-strategy program from the last verified state without waiting for repeated chat prompts.
+- Preserve all new strategy, indicator, weighting, research-layer, General Lab, validation, and promotion decisions in durable project history before advancing work.
+- A future/new chat must be able to continue from repository state alone.
+
+The complete target architecture is therefore fixed as:
+1. Native STC strategy matrix per symbol/timeframe.
+2. Community/composite indicator discovery catalog, expanded continuously with practical/high-use candidates.
+3. Causal/repaint audit before an indicator becomes benchmarkable.
+4. Bounded parameter search on TRAIN only.
+5. OOS TEST + FORWARD validation.
+6. Exact final frozen holdout; insufficient history fails closed.
+7. Symbol/timeframe-specific ensemble weights.
+8. Redundancy/family normalization so correlated indicators cannot create fake consensus.
+9. Shadow registry and multi-timeframe confirmation ladder.
+10. Live outcomes accumulated as evidence, with recalibration only on frozen batches/windows.
+11. General Lab must automatically inherit the entire PROCESS for every newly added symbol; it never inherits weights from another symbol.
+12. Popularity/followers/reviews are discovery priority and qualitative audit evidence only, never direct trading weights.
+13. Human manual execution remains mandatory; research never grants broker execution authority.
+14. No live A+ / risk / competition rule change without a separate explicit promotion decision.
+
+Current executable community pool in main is 14 components:
+- UT Bot Alerts
+- Squeeze Momentum
+- WaveTrend Crosses
+- Hull Suite
+- SuperTrend
+- Chandelier Exit
+- Schaff Trend Cycle
+- Range Filter Buy/Sell
+- AlphaTrend
+- Optimized Trend Tracker
+- QQE MOD
+- SSL Hybrid
+- Waddah Attar Explosion
+- QQE + SSL + WAE composite
+
+Current durable research evidence:
+- 26-symbol 15m native-vs-community run completed.
+- Exact 85/15 final unseen confirmation completed.
+- 10 research-only SHADOW records now exist across 15m/5m/30m/1h.
+- No same-component multi-timeframe confirmation yet for the original 15m survivors.
+- community_indicator_live_authority remains false.
+
+General Lab current runtime boundary:
+- Main already exposes protected research-only endpoints for plan/evaluate/shadow-candidates.
+- Evaluation requires exact-provider OHLCV series; the hosted STC server cannot itself call the ChatGPT TradingView MCP by ticker.
+- Therefore the UI can automate plan/queue/status, but full automatic historical evaluation requires an authorized exact-provider data worker/connector or supplied exact series.
+- This limitation must be shown as a data-source blocker, never bypassed with silent provider substitution.
+
+Next implementation order:
+A. finish General Lab owner-console/runtime bridge;
+B. add durable research-request/queue status so adding a Lab symbol creates a research job request automatically;
+C. keep evaluation fail-closed until exact-provider series arrives;
+D. continue indicator expansion/audit, prioritizing Lorentzian Classification and other practical high-use composites;
+E. extend frozen multi-timeframe scans only where the evidence floor is met;
+F. keep all candidates SHADOW until promotion rules are independently satisfied.
+
+
+## Work-unit register update — 2026-09-24 01:05 EEST
+
+### WU-114 — General Lab durable runtime bridge
+Status: VERIFIED / MERGED.
+- PR #117 merged as 9469dccfafa1a3b66eaddd8d9e7ff072c5cdb3fa.
+- CI: 373 passed, 1 warning.
+- Added additive migration hostinger_patch/migrations/004_general_lab_queue.sql.
+- Added authenticated hostinger_patch/general_lab.php using existing owner/worker bearer roles.
+- General Lab request states:
+  - WAITING_FOR_SYMBOL_RESOLUTION;
+  - WAITING_FOR_EXACT_HISTORY;
+  - RUNNING;
+  - EVALUATED;
+  - FAILED;
+  - CANCELLED.
+- Owner Console General Lab now queues durable research requests, displays queue/running/evaluated state, and keeps research isolated from both competition accounts.
+- Added app/general_lab_request.py and scripts/run_general_lab_request.py so an authorized exact-data worker can submit exact-provider series to the existing STC research engine and create a completion payload.
+- Completed General Lab results remain:
+  - execution=research_only;
+  - live_authority=false;
+  - promotion_required=true.
+- Existing SHADOW context is included when a symbol is evaluated.
+- No new secret was introduced.
+- No broker execution, A+ threshold, risk rule, competition rule, or live research authority changed.
+- Deployment still required on Hostinger:
+  1. run migration 004 once;
+  2. upload general_lab.php;
+  3. replace operator.php.
+- Data-source boundary remains: Hostinger cannot itself call ChatGPT TradingView MCP; exact-provider history requires an authorized data worker/connector. No provider substitution.
+
+
+### WU-115 — Wave-two causal community adapters
+Status: VERIFIED / MERGED.
+- PR #118 merged as 485f6d03479846e9060d82fe6906d6a3de6501b0.
+- CI: 378 passed, 1 warning.
+- Added research-only causal adapters:
+  - Trendilo: percentage change -> ALMA -> RMS state transition.
+  - HalfTrend: documented swing-extreme/SMA transition state; confirmed flips only.
+  - Endpoint Nadaraya-Watson non-repainting: one-sided Gaussian endpoint estimate + causal MAD envelope.
+- Added TRAIN-only bounded parameter grids and prefix-invariance causality tests.
+- Added docs/COMMUNITY_WAVE2_AUDIT_20260924.md.
+- Original LuxAlgo Nadaraya-Watson repainting output remains excluded.
+- Lorentzian Classification remains pending exact semantic audit rather than being approximated.
+- VuManChu remains pending confirmation-delay/divergence audit.
+- Community implemented pool increases from 14 to 17 research components.
+- live_authority remains false.
+
+
+## Work-unit register update — 2026-09-24 05:21 EEST
+
+### WU-116 — wave-two expanded 17-component frozen 15m confirmation
+Status: VERIFIED / COMPLETED / ARCHIVED.
+- Workflow run 35926880568: SUCCESS.
+- 26/26 competition symbols evaluated on 5,000 exact-provider TradingView 15m bars each.
+- Exact frozen method retained:
+  - first 4,250 bars development;
+  - last 750 bars untouched final holdout.
+- New wave-two frozen survivors:
+  1. CAPITALCOM:BTCUSD / 15m / Trendilo.
+  2. CME_MINI:MJY1! / 15m / Trendilo.
+- BTCUSD Trendilo:
+  - dev TEST 21 trades, 0.0843R expectancy, PF 1.142;
+  - dev FORWARD 27 trades, 0.0955R expectancy, PF 1.188;
+  - frozen 22 trades, 0.1953R expectancy, PF 1.387, max DD 7.285R.
+- MJY Trendilo:
+  - dev TEST 26 trades, 0.1209R expectancy, PF 1.201;
+  - dev FORWARD 19 trades, 0.0621R expectancy, PF 1.103;
+  - frozen 22 trades, 0.1509R expectancy, PF 1.271, max DD 5.20R.
+- HalfTrend: no 15m frozen survivor.
+- endpoint Nadaraya-Watson non-repaint: no 15m frozen survivor.
+- Durable evidence:
+  - research_benchmarks/community_wave2_frozen_15m_run1_summary_20260924.json
+  - docs/COMMUNITY_WAVE2_FROZEN_15M_RUN1_20260924.md
+
+### WU-117 — durable 32-candidate community/composite inventory
+Status: VERIFIED / MERGED.
+- Main commit c45947f328aef83426ac54382535218f1efde707.
+- Durable matrix:
+  - docs/COMMUNITY_INDICATOR_CANDIDATE_MATRIX_20260924.md
+- Catalog inventory: 32 candidate/component families.
+- Implemented causal research pool: 17.
+- Native-overlap/context-only candidates remain non-independent until overlap audit.
+- Pending causal/exact-audit candidates include Lorentzian Classification, VuManChu Cipher B, RSI Kernel Optimized, VWAP Stdev Bands, ML Supertrend variants, AI-SuperTrend KNN, Tri-State Supertrend, Koncorde Plus and %R Trend Exhaustion.
+
+### WU-118 — wave-two SHADOW registry promotion
+Status: VERIFIED / MERGED.
+- Main commit 3112d3c3d82e96dc4f99312ab3f7a942980d5980.
+- Added BTCUSD/15m/Trendilo and MJY1!/15m/Trendilo to research/community_shadow_registry.json.
+- Shadow registry total: 12 research-only records.
+- live_authority=false remains enforced.
+- No owner/live promotion occurred.
+
+### Controlling next research order
+1. Run exact-provider multi-timeframe frozen scan for the two Trendilo survivors:
+   - CAPITALCOM:BTCUSD;
+   - CME_MINI:MJY1!.
+2. Seek same-component Trendilo confirmation on 5m/30m/1h/2h/4h/1D where exact history meets evidence floor.
+3. Update SHADOW registry only if new independent frozen evidence is produced; same-component support is required before MULTITF_CONFIRMED.
+4. Continue exact Lorentzian Classification semantic audit rather than approximating it.
+5. Continue VuManChu divergence confirmation-delay audit.
+6. Preserve General Lab rule: every new symbol inherits the full process automatically, never another symbol's weights.
+7. Do not change live A+ gates/risk/competition rules without separate owner promotion.
+
+
+## Work-unit register update — 2026-09-24
+
+### WU-119 — Trendilo multi-timeframe frozen confirmation
+Status: VERIFIED / COMPLETED / PENDING MERGE.
+- Workflow run 35947248551: SUCCESS.
+- Symbols: CAPITALCOM:BTCUSD and CME_MINI:MJY1!.
+- Timeframes tested: 5m, 30m, 1h, derived 2h, 4h, 1D where exact-provider history met the frozen evidence floor.
+- Same-component result:
+  - MJY Trendilo passed 15m + 5m + 30m and is now MULTITF_CONFIRMED.
+  - BTCUSD Trendilo had no supporting timeframe pass and remains SHADOW.
+- New independent frozen candidates:
+  - BTCUSD 5m / endpoint Nadaraya-Watson non-repaint;
+  - BTCUSD 1D / Hull Suite.
+- Existing MJY 5m Squeeze Momentum passed again.
+- Registry after update:
+  - 16 total records;
+  - 3 MULTITF_CONFIRMED records, all MJY Trendilo at 15m/5m/30m;
+  - all records live_authority=false.
+- Promotion ladder is unchanged. MULTITF_CONFIRMED is still research-only and requires sufficient positive shadow observations before ELIGIBLE_FOR_OWNER_PROMOTION.
+
+### Controlling next research actions
+1. Begin formal shadow observation accumulation for MULTITF_CONFIRMED MJY Trendilo without changing live authority.
+2. Continue Lorentzian Classification exact semantic/parity audit using the official open-source Pine/Python reference.
+3. Continue VuManChu divergence confirmation-delay audit.
+4. Preserve General Lab automatic full-process routing for every newly added symbol.
+5. Expand practical open-source candidates only after causal/repaint review.
+
+
+## New owner instruction — external trader/composite-indicator intelligence layer
+Date: 2026-09-24
+
+The owner supplied two Facebook trader/source links for review:
+- https://www.facebook.com/share/18ntSnCtXa/
+- https://www.facebook.com/share/p/1beB4M9ykK/
+
+The purpose is not to copy recommendations blindly. STC must inspect these sources for:
+- composite indicators used by the traders;
+- explicit buy/sell or entry/exit logic;
+- market-regime commentary;
+- risk/stop/target conventions;
+- timeframe/asset specialization;
+- recurring qualitative concepts that can be translated into measurable features;
+- evidence of repainting, hindsight-only presentation, selective screenshots, or unverifiable performance claims.
+
+Any useful concept enters a separate research queue first. It must be:
+DISCOVERED -> SOURCE_AUDITED -> RULE_EXTRACTED -> CAUSALIZED -> BACKTESTED -> OOS_PASSED -> FORWARD_PASSED -> SHADOW_WEIGHT -> FROZEN_CONFIRMATION -> EXPLICIT_PROMOTION.
+
+Social-source claims, reviews, follower counts, screenshots, recommendations and trader reputation never become trading weights directly.
+
+If a trader's composite logic overlaps with existing STC/community families, STC must measure information overlap before adding weight to avoid double counting.
+
+## Completion requirement for the current adaptive-strategy program
+The program is not considered complete after adding indicators to a catalog. Completion requires:
+1. durable project-state/ledger documentation;
+2. full 26-symbol community benchmark;
+3. native-vs-community same-window benchmark;
+4. symbol/timeframe-specific research weights;
+5. correlation/diversity penalty for overlapping evidence;
+6. exact/repaint-safe ports of the highest-priority pending composite indicators;
+7. additional timeframe expansion where history is sufficient;
+8. General Lab automatic research bridge for newly added symbols;
+9. external trader/composite source audit pipeline;
+10. frozen-window recalibration from accumulated live outcomes;
+11. explicit promotion control that keeps live A+ behavior unchanged until validated.
+
+
+### WU-105 — verified native-vs-community 15m benchmark promoted
+Status: VERIFIED / MERGED.
+- Workflow run 35916027610: SUCCESS.
+- PR #122 merged as b37cee34362dba4a27c23994f8bd147d7523f3fe.
+- CI on clean promotion branch: 369 passed, 1 warning.
+- Scope: 26 competition symbols x 5,000 exact-provider TradingView 15m bars.
+- The promoted code includes 14 causal community benchmark components used in the successful workflow:
+  - UT Bot Alerts
+  - Squeeze Momentum
+  - WaveTrend
+  - Hull Suite
+  - SuperTrend
+  - Chandelier Exit
+  - Schaff Trend Cycle
+  - Range Filter
+  - AlphaTrend
+  - Optimized Trend Tracker
+  - QQE MOD
+  - SSL Hybrid
+  - Waddah Attar Explosion
+  - QQE + SSL + WAE composite
+- Native STC 15m outcome under the current robustness gates: 0 validated symbols across the tested native families.
+- Community ensemble research profiles: 10/26 symbols.
+- Cross-symbol community validation counts:
+  - SSL Hybrid 4/26
+  - Range Filter 4/26
+  - QQE MOD 4/26
+  - Schaff Trend Cycle 4/26
+  - Waddah Attar Explosion 3/26
+  - UT Bot 3/26
+  - Chandelier Exit 2/26
+  - AlphaTrend 2/26
+  - WaveTrend 1/26
+  - SuperTrend 1/26
+  - Squeeze Momentum 1/26
+  - Hull Suite 0/26
+  - QQE+SSL+WAE composite 0/26
+  - Optimized Trend Tracker 0/26
+- Redundancy-aware family normalization is now implemented so multiple correlated variants cannot gain unlimited ensemble weight simply by being numerous.
+- Result evidence is preserved in:
+  - research_benchmarks/native_community_15m_summary_20260923.json
+  - docs/NATIVE_COMMUNITY_15M_BENCHMARK_20260923.md
+- Live authority remains unchanged: research-only, no live A+ threshold/risk/execution change.
+
+### Facebook trader-source audit blocker
+Status: BLOCKED_EXTERNAL_ACCESS.
+- Direct public fetch of both owner-provided Facebook share URLs returned login_required.
+- Read-only browser automation was attempted with a browser profile, but TinyFish did not start because its wallet balance is negative.
+- No content from those Facebook posts has been inferred or fabricated.
+- The URLs remain registered in the research ledger for audit once browser access is available or the owner supplies screenshots/video/text from the posts.
+
+
+### WU-106 — wave 3 causal adapter expansion
+Status: VERIFIED / MERGED.
+- PR #123 merged as 078f2552928b0167cd37c0eacf05bb193db0fe51.
+- CI: 378 passed, 1 warning.
+- Added three source-audited causal research adapters:
+  - Trendilo conceptual adapter: percentage-change -> ALMA smoothing -> RMS neutral band.
+  - Nadaraya-Watson Envelope: endpoint-only non-repainting kernel envelope; repainting mode is excluded.
+  - RSI Kernel Optimized family: pivot RSI samples enter the model only after the right-hand pivot-confirmation bars have closed, then causal density comparison is used.
+- Added bounded TRAIN-only parameter grids for all three.
+- Expanded causality contract tests across the implemented community set.
+- Research-only boundary remains intact; no live A+ weight, risk rule, approval gate, or execution behavior changed.
+
+
+### WU-107 — frozen research contract reconciliation
+Status: VERIFIED / MERGED.
+- PR #124 merged as 6df403846a1d386816a1bf0ebe29db79fc27cd60.
+- CI: 381 passed, 1 warning.
+- A continuity regression was found and repaired before accepting new benchmark evidence:
+  - HalfTrend had reverted from implemented to pending after a later clean promotion.
+  - the canonical frozen Nadaraya component id used by the shadow registry had been replaced by a newer alias;
+  - Trendilo parameter names/semantics had drifted from the contract that produced existing frozen/shadow records.
+- Repairs:
+  - restored HalfTrend causal adapter + TRAIN-only grid;
+  - restored frozen-compatible Trendilo semantics and parameter schema;
+  - restored canonical id nadaraya_watson_endpoint_nonrepaint;
+  - retained nadaraya_watson_envelope_luxalgo only as a superseded compatibility/discovery alias, not a second benchmark component;
+  - preserved wave-3 RSI Kernel causal adapter.
+- Added tests that fail if historical shadow component ids or frozen Trendilo parameter contracts drift again.
+- Reconciled 26-symbol benchmark was re-triggered from exact staged data after the repair; pre-reconciliation benchmark output is superseded and must not be used for promotion.
+
+
+### WU-108 — official Lorentzian Classification integration
+Status: VERIFIED / MERGED.
+- PR #125 merged as 445cf9e7a0f92567dac49a8a16e01e40d378d298.
+- CI: 384 passed, 1 warning.
+- STC now uses the official AI Edge Python port of Machine Learning: Lorentzian Classification rather than an approximate reimplementation.
+- Upstream repository: artificial-intelligence-edge/lorentzian-classification.
+- Upstream commit is pinned exactly at 27776bd51cbd3e07b6383cfa468d4d33f4b50297.
+- Upstream license: MIT.
+- The official port states it is parity-tested against Pine/TradingView fixtures and includes feature engineering, Lorentzian ANN, filters, kernel logic, prediction/direction, Buy/Sell, exits and Backtest Stream semantics.
+- STC maps only official confirmed Buy/Sell booleans into the generic community research signal layer.
+- A bounded TRAIN-only settings grid is allowed; TEST/FORWARD remain frozen.
+- Direct contract test verifies STC's adapter output equals the official-port Buy/Sell output.
+- Third-party attribution is documented in docs/THIRD_PARTY_LORENTZIAN.md.
+- Research-only authority; no live A+ gate/risk/execution change.
+
+
+### WU-109 — reconciled wave-3 exact-provider 15m benchmark
+Status: VERIFIED / ARCHIVED / MERGED.
+- Workflow run: 35964596933 — SUCCESS.
+- Evidence PR: #126 — merged as 598f14b0a8d4c907fe88ffdb391ea433d5638c31.
+- CI on evidence PR: 384 passed, 1 warning.
+- Scope: 26 competition symbols, 5,000 exact TradingView 15m bars each, 18 community components, same-window native matrix.
+- Native 15m: 0/26 validated under current gates.
+- Community profile-ready coverage: 13/26 versus 10/26 in prior verified 14-component run.
+- Incremental symbols covered: BTCUSD, EURUSD, NAS100.
+- New/reconciled component validated counts:
+  - HalfTrend 2/26;
+  - Trendilo 2/26;
+  - endpoint Nadaraya-Watson non-repaint 1/26;
+  - delayed RSI Kernel Optimized 1/26.
+- Durable artifacts:
+  - research_benchmarks/native_community_wave3_reconciled_15m_summary_20260924.json
+  - docs/NATIVE_COMMUNITY_WAVE3_RECONCILED_15M_20260924.md
+- This work unit excludes Lorentzian because its workflow began before PR #125 merged.
+
+### WU-110 — official Lorentzian exact-provider 15m benchmark
+Status: IN PROGRESS.
+- Research branch: research/native-community-15m-20260923.
+- PR #127 merged current main into the research branch so the branch contains PR #125 official Lorentzian integration while retaining staged exact-provider datasets outside main.
+- Trigger commit: e95ce289bbcca93ab13c6035772eb986c6674bde.
+- Workflow run: 35967884019.
+- Required outputs:
+  1. Lorentzian validated symbol count;
+  2. TRAIN-selected official settings per survivor;
+  3. TEST/FORWARD metrics;
+  4. incremental profile-ready coverage versus WU-109;
+  5. redundancy/family overlap;
+  6. untouched frozen holdout only for Lorentzian survivors.
+- No live authority may be granted from this run alone.
+
+### Repository hygiene decision — 2026-09-24
+- PR #121 closed as superseded by merged PR #125 official Lorentzian integration.
+- PR #115 closed as superseded by PRs #123/#124 canonical wave-3 implementation/reconciliation.
+- PR #116 native frozen confirmation remains open because the apples-to-apples final-holdout objective is still relevant and is not yet superseded by an accepted main-branch artifact.

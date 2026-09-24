@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from math import sqrt
+from math import exp, sqrt
 from statistics import fmean
 
 from .models import Bar
@@ -57,6 +57,47 @@ def _hma_full(values: list[float], period: int) -> list[float | None]:
         den = root * (root + 1) / 2.0
         out[i] = sum(v * w for v, w in zip(clean, weights)) / den
     return out
+
+
+def _alma_full(
+    values: list[float],
+    period: int,
+    *,
+    offset: float = 0.85,
+    sigma: float = 6.0,
+) -> list[float | None]:
+    out: list[float | None] = [None] * len(values)
+    if period <= 0:
+        return out
+    m = offset * (period - 1)
+    s = period / max(sigma, 1e-9)
+    weights = [exp(-((i - m) ** 2) / (2.0 * s * s)) for i in range(period)]
+    den = sum(weights)
+    if den <= 1e-12:
+        return out
+    for i in range(period - 1, len(values)):
+        window = values[i - period + 1 : i + 1]
+        out[i] = sum(v * w for v, w in zip(window, weights)) / den
+    return out
+
+
+def _endpoint_nadaraya_watson(
+    values: list[float],
+    i: int,
+    *,
+    lookback: int,
+    bandwidth: float,
+) -> float | None:
+    start = i - lookback + 1
+    if lookback <= 1 or start < 0:
+        return None
+    h = max(0.25, float(bandwidth))
+    weights = [exp(-0.5 * (lag / h) ** 2) for lag in range(lookback)]
+    den = sum(weights)
+    if den <= 1e-12:
+        return None
+    # lag 0 is the current confirmed bar; larger lags are progressively older.
+    return sum(values[i - lag] * weights[lag] for lag in range(lookback)) / den
 
 
 def _atr_full(bars: list[Bar], period: int = 14) -> list[float | None]:
@@ -952,6 +993,307 @@ def qqe_ssl_wae_composite_signals(
     return out
 
 
+def halftrend_signals(
+    bars: list[Bar],
+    *,
+    amplitude: int = 2,
+) -> dict[int, float]:
+    """Confirmed HalfTrend swing/SMA state transitions.
+
+    The ATR/channel portion of HalfTrend is visual/risk context in the public
+    indicator; STC benchmarks only the causal trend flip state.
+    """
+    if amplitude < 1 or len(bars) < max(3, amplitude):
+        return {}
+
+    trend = 0
+    next_trend = 0
+    max_low_price = bars[0].low
+    min_high_price = bars[0].high
+    out: dict[int, float] = {}
+
+    for i in range(len(bars)):
+        start_i = max(0, i - amplitude + 1)
+        window = bars[start_i : i + 1]
+        if len(window) < amplitude:
+            continue
+
+        high_price = max(bar.high for bar in window)
+        low_price = min(bar.low for bar in window)
+        high_ma = fmean(bar.high for bar in window)
+        low_ma = fmean(bar.low for bar in window)
+        prev_low = bars[i - 1].low if i > 0 else bars[i].low
+        prev_high = bars[i - 1].high if i > 0 else bars[i].high
+        previous_trend = trend
+
+        if next_trend == 1:
+            max_low_price = max(low_price, max_low_price)
+            if high_ma < max_low_price and bars[i].close < prev_low:
+                trend = 1
+                next_trend = 0
+                min_high_price = high_price
+        else:
+            min_high_price = min(high_price, min_high_price)
+            if low_ma > min_high_price and bars[i].close > prev_high:
+                trend = 0
+                next_trend = 1
+                max_low_price = low_price
+
+        if trend != previous_trend:
+            out[i] = 1.0 if trend == 0 else -1.0
+
+    return out
+
+
+def trendilo_signals(
+    bars: list[Bar],
+    *,
+    smoothing: int = 1,
+    lookback: int = 50,
+    alma_offset: float = 0.85,
+    alma_sigma: float = 6.0,
+    band_multiplier: float = 1.0,
+    band_length: int | None = None,
+) -> dict[int, float]:
+    """Confirmed Trendilo state transitions with no future-bar inputs.
+
+    This preserves the parameter/semantic contract used by the frozen Trendilo
+    research records already stored in the STC shadow registry.
+    """
+    if smoothing < 1 or lookback < 2:
+        return {}
+    closes = [bar.close for bar in bars]
+    pch = [0.0] * len(bars)
+    for i in range(smoothing, len(bars)):
+        current = closes[i]
+        if abs(current) <= 1e-15:
+            continue
+        pch[i] = (current - closes[i - smoothing]) / current * 100.0
+
+    avpch = _alma_full(pch, lookback, offset=alma_offset, sigma=alma_sigma)
+    rms_length = int(band_length or lookback)
+    state: list[int] = [0] * len(bars)
+    out: dict[int, float] = {}
+    for i in range(len(bars)):
+        if avpch[i] is None or i - rms_length + 1 < 0:
+            continue
+        window_values = avpch[i - rms_length + 1 : i + 1]
+        if any(value is None for value in window_values):
+            continue
+        rms = band_multiplier * sqrt(
+            sum(float(value) ** 2 for value in window_values if value is not None) / rms_length
+        )
+        value = float(avpch[i])
+        current_state = 1 if value > rms else -1 if value < -rms else 0
+        state[i] = current_state
+        prev_state = state[i - 1] if i > 0 else 0
+        if current_state in (-1, 1) and current_state != prev_state:
+            out[i] = float(current_state)
+    return out
+
+
+def nadaraya_watson_endpoint_signals(
+    bars: list[Bar],
+    *,
+    window: int = 500,
+    bandwidth: float = 8.0,
+    multiplier: float = 3.0,
+    deviation_length: int | None = None,
+) -> dict[int, float]:
+    """Canonical endpoint-only non-repainting Nadaraya-Watson adapter.
+
+    The component id and parameter schema intentionally match the frozen
+    research/shadow records already stored by STC.
+    """
+    dev_len = max(10, int(deviation_length or min(window, 499)))
+    return nadaraya_watson_nonrepaint_signals(
+        bars,
+        lookback=window,
+        bandwidth=bandwidth,
+        deviation_length=dev_len,
+        envelope_multiplier=multiplier,
+    )
+
+
+def nadaraya_watson_nonrepaint_signals(
+    bars: list[Bar],
+    *,
+    lookback: int = 50,
+    bandwidth: float = 8.0,
+    deviation_length: int = 50,
+    envelope_multiplier: float = 2.5,
+) -> dict[int, float]:
+    """Endpoint-only non-repainting Nadaraya-Watson envelope adapter.
+
+    Only past and current confirmed bars are used. The signal is contrarian:
+    crossing below the lower envelope emits LONG; crossing above the upper
+    envelope emits SHORT.
+    """
+    closes = [bar.close for bar in bars]
+    estimate: list[float | None] = [None] * len(bars)
+    abs_error: list[float | None] = [None] * len(bars)
+    upper: list[float | None] = [None] * len(bars)
+    lower: list[float | None] = [None] * len(bars)
+    out: dict[int, float] = {}
+
+    for i in range(len(bars)):
+        est = _endpoint_nadaraya_watson(
+            closes,
+            i,
+            lookback=lookback,
+            bandwidth=bandwidth,
+        )
+        if est is None:
+            continue
+        estimate[i] = est
+        abs_error[i] = abs(closes[i] - est)
+        start_i = i - deviation_length + 1
+        if start_i < 0:
+            continue
+        errors = [x for x in abs_error[start_i : i + 1] if x is not None]
+        if len(errors) < deviation_length:
+            continue
+        width = fmean(float(x) for x in errors) * envelope_multiplier
+        upper[i] = est + width
+        lower[i] = est - width
+        if i == 0 or upper[i - 1] is None or lower[i - 1] is None:
+            continue
+        if closes[i - 1] >= float(lower[i - 1]) and closes[i] < float(lower[i]):
+            out[i] = 1.0
+        elif closes[i - 1] <= float(upper[i - 1]) and closes[i] > float(upper[i]):
+            out[i] = -1.0
+    return out
+
+
+def rsi_kernel_pivot_signals(
+    bars: list[Bar],
+    *,
+    rsi_period: int = 14,
+    pivot_length: int = 12,
+    bandwidth: float = 4.0,
+    min_samples: int = 12,
+    dominance_ratio: float = 1.30,
+) -> dict[int, float]:
+    """Causal RSI/KDE pivot-family adapter.
+
+    Pivot RSI samples enter the training pool only when the required right-hand
+    bars have already closed. Current-bar KDE similarity is therefore computed
+    from previously confirmed pivot samples only; no future bars leak into the
+    live decision.
+    """
+    closes = [bar.close for bar in bars]
+    rsi = _rsi_full(closes, rsi_period)
+    low_samples: list[float] = []
+    high_samples: list[float] = []
+    out: dict[int, float] = {}
+    state = 0
+    h = max(0.25, float(bandwidth))
+
+    def density(value: float, samples: list[float]) -> float:
+        if not samples:
+            return 0.0
+        return fmean(exp(-0.5 * ((value - sample) / h) ** 2) for sample in samples)
+
+    for i in range(len(bars)):
+        pivot_i = i - pivot_length
+        if pivot_i >= pivot_length and rsi[pivot_i] is not None:
+            lo_start = pivot_i - pivot_length
+            hi_end = i
+            pivot_low = bars[pivot_i].low
+            pivot_high = bars[pivot_i].high
+            is_low = all(pivot_low <= bars[j].low for j in range(lo_start, hi_end + 1) if j != pivot_i)
+            is_high = all(pivot_high >= bars[j].high for j in range(lo_start, hi_end + 1) if j != pivot_i)
+            if is_low:
+                low_samples.append(float(rsi[pivot_i]))
+            if is_high:
+                high_samples.append(float(rsi[pivot_i]))
+            # Bound memory so the model adapts without using an ever-growing pool.
+            if len(low_samples) > 300:
+                low_samples = low_samples[-300:]
+            if len(high_samples) > 300:
+                high_samples = high_samples[-300:]
+
+        if rsi[i] is None or len(low_samples) < min_samples or len(high_samples) < min_samples:
+            continue
+        value = float(rsi[i])
+        low_d = density(value, low_samples)
+        high_d = density(value, high_samples)
+        bullish = low_d > high_d * dominance_ratio
+        bearish = high_d > low_d * dominance_ratio
+        current = 1 if bullish else -1 if bearish else 0
+        if current != 0 and current != state:
+            out[i] = float(current)
+        if current != 0:
+            state = current
+    return out
+
+
+def lorentzian_classification_signals(
+    bars: list[Bar],
+    *,
+    source: str = "close",
+    neighbors_count: int = 8,
+    max_bars_back: int = 2000,
+    feature_count: int = 5,
+    include_full_history: bool = False,
+    use_volatility_filter: bool = True,
+    use_regime_filter: bool = True,
+    regime_threshold: float = -0.1,
+    use_adx_filter: bool = False,
+    adx_threshold: int = 20,
+    use_kernel_filter: bool = True,
+    use_kernel_smoothing: bool = False,
+    kernel_h: int = 8,
+    kernel_r: float = 8.0,
+    kernel_x: int = 25,
+    kernel_lag: int = 2,
+) -> dict[int, float]:
+    """Exact official AI Edge Lorentzian Classification entry stream.
+
+    STC delegates the classifier/filter/kernel business logic to the official
+    parity-tested MIT-licensed Python port pinned in requirements.txt. STC only
+    maps confirmed Buy/Sell booleans into its {-1,+1} research signal format.
+    """
+    from lorentzian_classification import LorentzianClassification, Settings
+
+    records = [
+        {
+            "time": bar.timestamp.isoformat(),
+            "open": bar.open,
+            "high": bar.high,
+            "low": bar.low,
+            "close": bar.close,
+        }
+        for bar in bars
+    ]
+    settings = Settings(
+        source=source,
+        neighbors_count=neighbors_count,
+        max_bars_back=max_bars_back,
+        feature_count=feature_count,
+        include_full_history=include_full_history,
+        use_volatility_filter=use_volatility_filter,
+        use_regime_filter=use_regime_filter,
+        regime_threshold=regime_threshold,
+        use_adx_filter=use_adx_filter,
+        adx_threshold=adx_threshold,
+        use_kernel_filter=use_kernel_filter,
+        use_kernel_smoothing=use_kernel_smoothing,
+        kernel_h=kernel_h,
+        kernel_r=kernel_r,
+        kernel_x=kernel_x,
+        kernel_lag=kernel_lag,
+    )
+    model = LorentzianClassification(records, settings=settings)
+    out: dict[int, float] = {}
+    for i, row in enumerate(model.results):
+        if row.buy and not row.sell:
+            out[i] = 1.0
+        elif row.sell and not row.buy:
+            out[i] = -1.0
+    return out
+
+
 def indicator_signal_series(
     indicator_id: str,
     bars: list[Bar],
@@ -959,6 +1301,8 @@ def indicator_signal_series(
     parameters: dict | None = None,
 ) -> dict[int, float]:
     params = dict(parameters or {})
+    if indicator_id == "lorentzian_classification":
+        return lorentzian_classification_signals(bars, **params)
     if indicator_id == "ut_bot_alerts":
         return ut_bot_signals(bars, **params)
     if indicator_id == "squeeze_momentum_lazybear":
@@ -987,4 +1331,14 @@ def indicator_signal_series(
         return waddah_attar_explosion_signals(bars, **params)
     if indicator_id == "qqe_ssl_wae_composite":
         return qqe_ssl_wae_composite_signals(bars, **params)
+    if indicator_id == "halftrend_everget":
+        return halftrend_signals(bars, **params)
+    if indicator_id == "trendilo":
+        return trendilo_signals(bars, **params)
+    if indicator_id == "nadaraya_watson_endpoint_nonrepaint":
+        return nadaraya_watson_endpoint_signals(bars, **params)
+    if indicator_id == "nadaraya_watson_envelope_luxalgo":
+        return nadaraya_watson_nonrepaint_signals(bars, **params)
+    if indicator_id == "rsi_kernel_optimized_flux":
+        return rsi_kernel_pivot_signals(bars, **params)
     raise KeyError(f"Community indicator is not implemented for causal benchmarking: {indicator_id}")

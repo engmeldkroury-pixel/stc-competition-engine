@@ -1,41 +1,55 @@
 # NEXT TASK
 
-Updated: 2026-09-24 00:25 EEST
+Updated: 2026-09-24 10:10 EEST
 
 ## CONTROLLING PROJECT
 STC.
 
-## VERIFIED COMPLETED
-- 26-symbol 15m native-vs-community benchmark archived.
-- Exact final 85/15 frozen confirmation archived.
-- Shadow registry foundation merged.
-- Multi-timeframe frozen scan of the five 15m survivor symbols completed.
-- Reusable multi-timeframe frozen research runner merged.
-- community_indicator_live_authority=false.
+## READ FIRST
+- docs/STC_ADAPTIVE_RESEARCH_MASTER_LEDGER.md
+- PROJECT_STATE.md
+- docs/COMMUNITY_INDICATOR_CANDIDATE_MATRIX_20260924.md
+- research/community_shadow_registry.json
+- docs/NATIVE_COMMUNITY_WAVE3_RECONCILED_15M_20260924.md
 
-## IMPORTANT RESULT
-No original 15m component has same-component multi-timeframe confirmation yet.
-New independent frozen candidates exist on:
-- XAUUSD 5m SuperTrend.
-- MJY 5m Squeeze Momentum.
-- MCL 30m UT Bot.
-- MCL 1h Hull Suite.
+## VERIFIED COMPLETE
+- Reconciled wave-3 26-symbol / 5,000-bar 15m benchmark archived through PR #126.
+- Community profile-ready coverage increased from 10/26 to 13/26.
+- Official Lorentzian port merged through PR #125 with upstream parity contract.
+- General Lab durable queue/runtime-plan layer exists.
+- MJY Trendilo remains MULTITF_CONFIRMED research-only.
+- All research/shadow records remain live_authority=false.
 
-## ACTIVE
-- PR #113: expand durable SHADOW registry to 10 records.
-- PR #112: expose protected General Lab research/shadow endpoints through the Vercel-compatible serverless API.
+## ACTIVE WORK UNIT — WU-110 LORENTZIAN EXACT-DATA BENCHMARK
+Workflow:
+- run 35967884019
+- trigger commit e95ce289bbcca93ab13c6035772eb986c6674bde
+- branch research/native-community-15m-20260923
 
-## NEXT WORK
-1. merge #113 and #112 after CI;
-2. finish General Lab owner-console/runtime bridge without exposing trigger secrets;
-3. record the exact current blocker: hosted STC cannot fetch TradingView MCP history by ticker alone; exact-provider series must be supplied by an authorized data worker/connector;
-4. continue catalog expansion and causal/repaint audits, prioritizing Lorentzian Classification and other high-use composite indicators;
-5. run broader multi-timeframe research only where exact-provider history meets the frozen evidence floor;
-6. keep all new candidates in SHADOW until independent evidence and owner promotion criteria are met.
+Use the same 26 symbols and exact 5,000-bar TradingView 15m windows.
 
-## NON-NEGOTIABLE
-- no automatic trade execution;
-- no live authority from research registry;
+On completion:
+1. archive combined benchmark summary on a clean main-based evidence branch;
+2. report Lorentzian validated symbols and TRAIN-selected official settings;
+3. compare TEST/FORWARD metrics against existing components;
+4. measure incremental symbol coverage vs 13/26 wave-3 baseline;
+5. inspect family/redundancy overlap;
+6. run exact 85/15 frozen holdout only for Lorentzian survivors;
+7. add survivors to SHADOW only after frozen pass.
+
+## THEN
+1. Finish/refresh PR #116 native frozen confirmation for an apples-to-apples native final-holdout comparison.
+2. Continue VuManChu Cipher B causal/pivot-delay audit.
+3. Continue expanding high-value practical open-source candidates only after repaint/causality audit.
+4. Extend benchmark/frozen evidence to 5m/30m/1h/2h/4h/1D where exact history is sufficient.
+5. Finish General Lab automatic exact-data worker bridge:
+   symbol -> asset classification -> exact history -> native matrix -> community matrix -> OOS/FORWARD -> redundancy-aware ensemble -> compact report.
+6. Add frozen-window recalibration from accumulated live outcomes; never reweight after one trade.
+
+## LIVE BOUNDARY
+- human approval/manual execution only;
+- no automatic broker execution;
+- no live A+/risk/competition rule change from research alone;
+- reviews/popularity are discovery metadata only;
 - no cross-symbol weight inheritance;
-- no review/popularity-based trading weights;
-- no silent gate weakening or provider substitution.
+- no repainting/future-dependent component may enter live evidence.

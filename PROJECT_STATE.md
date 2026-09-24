@@ -1891,3 +1891,183 @@ Owner intervention required now: YES — only for historical-data access, not fo
 - PR #110 was superseded by PR #113 after main advanced; the final #110 CI was green but no merge was performed.
 - PR #113 carries the 10-record SHADOW registry update on current main; CI pending.
 - Live authority remains false and no competition A+ gate/risk/execution rule changed.
+
+
+## Owner continuity + General Lab next-stage checkpoint — 2026-09-24 00:50 EEST
+- Owner explicitly required all adaptive-strategy/indicator/weighting/General-Lab decisions to be durable in repository history before more work, so future chats can continue without reconstruction.
+- Controlling durable ledger: docs/STC_ADAPTIVE_RESEARCH_MASTER_LEDGER.md.
+- Main already contains:
+  - 14 implemented community research adapters;
+  - redundancy-aware family normalization;
+  - exact frozen holdout rules;
+  - 10-record research-only shadow registry;
+  - protected serverless General Lab plan/evaluate/shadow endpoints;
+  - live_authority=false throughout research paths.
+- PR #112 and #113 are closed/unmerged as PR objects, but their intended functional outcomes are already present on current main through later/superseding repository changes:
+  - protected General Lab research endpoints exist in api/index.py;
+  - research/community_shadow_registry.json contains 10 records;
+  - tests assert 10 records and protected serverless research behavior.
+- Remaining General Lab gap is not research logic; it is runtime data orchestration/UI:
+  - operator.php currently stores General Lab symbols locally only;
+  - hosted STC cannot fetch TradingView MCP history directly;
+  - exact-provider historical series must come from an authorized worker/connector;
+  - no alternate provider substitution is allowed.
+- Next work: add General Lab UI status/plan + durable request queue, then continue high-value indicator causal audits and frozen multi-timeframe research.
+
+
+## General Lab durable queue merged — 2026-09-24 01:05 EEST
+- PR #117 merged as 9469dccfafa1a3b66eaddd8d9e7ff072c5cdb3fa.
+- CI: 373 passed, 1 warning.
+- General Lab now has a durable research request model and Owner Console queue/status UI.
+- New Hostinger production artifacts:
+  - hostinger_patch/general_lab.php;
+  - hostinger_patch/migrations/004_general_lab_queue.sql;
+  - updated hostinger_patch/operator.php.
+- Exact-provider worker helper:
+  - app/general_lab_request.py;
+  - scripts/run_general_lab_request.py.
+- The hosted queue fails closed while exact TradingView history is unavailable and never substitutes another provider.
+- Full automated ticker-to-history evaluation still needs an authorized exact-provider data worker/connector.
+- Research results remain research-only with live_authority=false.
+
+
+## Wave-two community adapters merged — 2026-09-24
+- PR #118 merged as 485f6d03479846e9060d82fe6906d6a3de6501b0.
+- CI: 378 passed, 1 warning.
+- New causal research components:
+  - Trendilo;
+  - HalfTrend;
+  - Endpoint Nadaraya-Watson non-repainting.
+- Total implemented community/composite research pool is now 17.
+- No live weight, A+ gate, risk rule, competition rule, or broker execution path changed.
+- Next evidence step is exact-provider 26-symbol 15m frozen confirmation for the expanded pool.
+
+
+## Wave-two frozen confirmation + durable candidate matrix checkpoint — 2026-09-24 05:21 EEST
+- Owner instruction repeated: before more work, persist all agreed adaptive-strategy, indicator, weighting, research-layer and General Lab rules in repository history so any new chat can continue from files alone.
+- Durable controlling research ledger remains docs/STC_ADAPTIVE_RESEARCH_MASTER_LEDGER.md.
+- Main now contains docs/COMMUNITY_INDICATOR_CANDIDATE_MATRIX_20260924.md with a 32-candidate/component inventory.
+- Implemented causal/community-composite research pool is 17 components:
+  - UT Bot;
+  - Squeeze Momentum;
+  - WaveTrend;
+  - Hull Suite;
+  - SuperTrend;
+  - Chandelier Exit;
+  - Schaff Trend Cycle;
+  - Range Filter;
+  - AlphaTrend;
+  - Optimized Trend Tracker;
+  - QQE MOD;
+  - SSL Hybrid;
+  - Waddah Attar Explosion;
+  - QQE+SSL+WAE composite;
+  - Trendilo;
+  - HalfTrend;
+  - endpoint Nadaraya-Watson non-repainting.
+- WU-116 wave-two 26-symbol 15m exact frozen run completed successfully:
+  - workflow run 35926880568;
+  - 26/26 symbols;
+  - 5,000 exact-provider TradingView 15m bars per symbol;
+  - 4,250 development + 750 untouched final holdout;
+  - new wave-two frozen survivors: CAPITALCOM:BTCUSD/Trendilo and CME_MINI:MJY1!/Trendilo;
+  - HalfTrend and endpoint Nadaraya-Watson had no new 15m frozen survivor in this run.
+- Both Trendilo survivors were added to the research-only SHADOW registry.
+- Shadow registry now has 12 records total and still enforces live_authority=false.
+- Existing promotion ladder remains:
+  FROZEN_PASS -> SHADOW -> MULTITF_CONFIRMED -> ELIGIBLE_FOR_OWNER_PROMOTION.
+- No component is currently MULTITF_CONFIRMED solely by the new Trendilo result.
+- Next evidence step: exact-provider multi-timeframe frozen confirmation for BTCUSD/Trendilo and MJY1!/Trendilo, then continue Lorentzian and VuManChu causal audits.
+
+
+## Trendilo multi-timeframe frozen confirmation completed — 2026-09-24
+- Workflow run 35947248551 completed successfully for CAPITALCOM:BTCUSD and CME_MINI:MJY1!.
+- Same exact-provider / frozen methodology was retained.
+- CME_MINI:MJY1! Trendilo independently passed 5m and 30m in addition to its existing 15m frozen pass.
+- MJY Trendilo therefore advances to MULTITF_CONFIRMED on 15m/5m/30m research records.
+- CAPITALCOM:BTCUSD Trendilo did not pass another tested timeframe and remains SHADOW.
+- New independent BTCUSD frozen candidates:
+  - 5m endpoint Nadaraya-Watson non-repainting;
+  - 1D Hull Suite.
+- MJY 5m Squeeze Momentum passed again and remains SHADOW.
+- Research shadow registry increases to 16 records.
+- live_authority=false for every record; no live A+/risk/competition/execution change.
+- Durable evidence:
+  - research_benchmarks/trendilo_multitf_frozen_run1_20260924.json
+  - docs/TRENDILO_MULTITF_FROZEN_RUN1_20260924.md
+
+
+## External trader/composite source research added — 2026-09-24
+- Owner supplied two Facebook trader/source links for audit.
+- New research objective: extract composite-indicator logic, market-regime concepts, entry/exit structure, risk conventions and potentially useful measurable features.
+- Social recommendations and reputation are discovery evidence only; they cannot directly alter live weights.
+- Any extracted concept must pass source audit, causal rule extraction, backtest, OOS/forward validation and frozen confirmation before promotion.
+- Information-overlap testing is mandatory before combining trader-derived features with existing STC/community families.
+
+
+## Native/community 15m benchmark promoted — 2026-09-24
+- Workflow 35916027610 completed successfully across all 26 competition symbols using 5,000 exact TradingView 15m bars each.
+- PR #122 merged as b37cee34362dba4a27c23994f8bd147d7523f3fe after 369 automated tests passed.
+- Native STC strategy matrix produced 0 validated 15m strategies under current gates in this exact run.
+- Community components produced research-ready profiles on 10/26 symbols.
+- The strongest cross-symbol validation counts were SSL Hybrid, Range Filter, QQE MOD and Schaff Trend Cycle at 4/26 each.
+- Family redundancy normalization is active in the research ensemble.
+- No live A+ weights or execution behavior changed.
+- Facebook trader-source audit is registered but blocked by Facebook login plus unavailable TinyFish browser funds; no claims from those links were assumed.
+
+
+## Community research wave 3 merged — 2026-09-24
+- PR #123 merged as 078f2552928b0167cd37c0eacf05bb193db0fe51 after 378 tests passed.
+- New implemented conceptual adapters:
+  - Trendilo;
+  - Nadaraya-Watson Envelope in endpoint-only non-repainting mode;
+  - RSI Kernel Optimized with explicit delayed pivot confirmation to avoid lookahead.
+- All new parameters are tuned on TRAIN only and frozen for TEST/FORWARD.
+- Next evidence task: rerun the exact-provider 26-symbol 15m benchmark with the expanded adapter set, compare incremental information against the prior 14-component benchmark, and retain zero weight for failed components.
+
+
+## Frozen component identity reconciliation — 2026-09-24
+- PR #124 merged as 6df403846a1d386816a1bf0ebe29db79fc27cd60 after 381 tests passed.
+- Detected and fixed a cross-PR regression before using new research results:
+  - HalfTrend restored to implemented;
+  - Trendilo restored to the exact parameter/semantic contract used by existing frozen records;
+  - canonical Nadaraya id restored to nadaraya_watson_endpoint_nonrepaint so the BTCUSD 5m SHADOW record remains executable/reproducible;
+  - newer Nadaraya alias is non-benchmarkable to prevent duplicate weight.
+- Any wave-3 benchmark started before this reconciliation is superseded.
+- Reconciled exact-data benchmark trigger commit: 8edb3edef2c26e6348e989d5b95632f50b803327.
+
+
+## Official Lorentzian Classification integrated — 2026-09-24
+- PR #125 merged as 445cf9e7a0f92567dac49a8a16e01e40d378d298 after 384 tests passed.
+- Instead of approximating Lorentzian logic, STC pins the official AI Edge MIT-licensed Python port at upstream commit 27776bd51cbd3e07b6383cfa468d4d33f4b50297.
+- STC benchmark adapter consumes official confirmed Buy/Sell events; official classifier/features/ANN/filters/kernel semantics stay upstream parity-tested.
+- TRAIN-only settings variants are allowed; TEST/FORWARD remain untouched.
+- Next exact-data step after the reconciled wave-3 run: rerun the 26-symbol matrix with Lorentzian included and compare incremental validated coverage.
+
+
+## Reconciled wave-3 benchmark archived + Lorentzian exact-data run started — 2026-09-24 10:10 EEST
+- Workflow run 35964596933 completed successfully after PR #124 identity reconciliation.
+- PR #126 merged as 598f14b0a8d4c907fe88ffdb391ea433d5638c31 after CI: 384 passed, 1 warning.
+- Durable reconciled wave-3 evidence:
+  - research_benchmarks/native_community_wave3_reconciled_15m_summary_20260924.json
+  - docs/NATIVE_COMMUNITY_WAVE3_RECONCILED_15M_20260924.md
+- Scope: 26 symbols x 5,000 exact-provider TradingView 15m bars; 18 community components; native matrix on the same windows.
+- Result:
+  - native STC validated 15m strategies: 0/26;
+  - community research-profile-ready symbols: 13/26, up from 10/26 in the prior 14-component benchmark;
+  - incremental coverage: CAPITALCOM:BTCUSD, CAPITALCOM:EURUSD, CAPITALCOM:NAS100.
+- New/reconciled component OOS+forward evidence:
+  - HalfTrend 2/26: NAS100, ZB1!;
+  - Trendilo 2/26: EURUSD, MJY1!;
+  - endpoint Nadaraya-Watson non-repaint 1/26: USDZAR;
+  - delayed RSI Kernel Optimized 1/26: BTCUSD.
+- PR #127 merged main into research/native-community-15m-20260923 without merging staged raw research data into main.
+- The research branch now includes merged PR #125 official Lorentzian integration.
+- New exact-data benchmark run 35967884019 started from commit e95ce289bbcca93ab13c6035772eb986c6674bde:
+  - same 26 symbols;
+  - same staged 5,000-bar 15m exact-provider windows;
+  - Lorentzian enabled alongside the reconciled community pool.
+- Superseded PRs closed:
+  - #121 superseded by merged official Lorentzian PR #125;
+  - #115 superseded by merged/reconciled wave-3 PRs #123/#124.
+- Live authority remains unchanged: research-only; no A+ gate/risk/competition/execution change.
