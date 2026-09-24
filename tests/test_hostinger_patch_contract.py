@@ -609,3 +609,20 @@ def test_locked_plan_recovery_does_not_allow_opposite_or_directionless_new_entry
     assert "$latestApprovalCompatible" in snapshot
     assert "&& $latestApprovalCompatible" in snapshot
     assert "PRESERVE_FOR_RECOVERY" in snapshot
+
+
+def test_position_recovery_resolves_blank_competition_and_bare_capital_symbol():
+    control = (PATCH / "portfolio_control.php").read_text(encoding="utf-8")
+    position = (PATCH / "position.php").read_text(encoding="utf-8")
+
+    assert "function stc_resolve_position_target" in control
+    assert "'EURUSD' => 'CAPITALCOM:EURUSD'" in control
+    assert "count($matches) === 1 ? $matches[0] : null" in control
+    assert position.count("stc_resolve_position_target($competitionId, $symbol)") >= 2
+    assert "'detail' => 'Select a configured competition and use a supported TradingView/provider symbol.'" in position
+
+
+def test_position_recovery_keeps_amp_resolution_fail_closed():
+    control = (PATCH / "portfolio_control.php").read_text(encoding="utf-8")
+    assert "if ($cid === 'amp-futures-sep-2026')" in control
+    assert "stc_max_open_position($cid, $raw) !== null ? $raw : null" in control
