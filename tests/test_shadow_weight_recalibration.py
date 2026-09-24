@@ -62,7 +62,7 @@ def test_positive_sealed_batch_can_raise_weight_but_step_is_capped():
         max_relative_step=0.20,
     )
     assert row.candidate_weight > 0.20
-    assert row.candidate_weight <= pytest.approx(0.24, abs=1e-12)
+    assert row.candidate_weight <= 0.24 + 1e-12
     assert row.live_authority is False
 
 
