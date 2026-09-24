@@ -1,6 +1,6 @@
 # STC HANDOFF
 
-HANDOFF_STATUS: ACTIVE_BLOCKED_ON_OWNER_HOSTINGER_UPLOAD  
+HANDOFF_STATUS: ACTIVE_LIVE_HOTFIX_VERIFIED  
 FROM_EXECUTOR: CODEX-0  
 TO_EXECUTOR_OR_REVIEWER: Next STC chat / Mohamed  
 TASK_OR_BATCH_ID: STC-20260924-CAPITAL-LIVE-HOTFIX  
@@ -17,19 +17,19 @@ CURRENT_MAIN_AFTER_ACCEPTED_SOURCE_WORK: includes PR #145, #146, #148, #149 and 
 - Research-only community shadow plumbing is merged.
 - Six-symbol Python parity reference run completed.
 
-## Current external blocker
-Mohamed must replace six PHP files on the existing Hostinger STC `public_html` deployment:
-`approval.php`, `cloud_control.php`, `notification_control.php`, `operator.php`, `operator_snapshot.php`, `portfolio_control.php`.
+## Hostinger hotfix verification
+- Owner upload completed.
+- Post-upload Live Readback succeeded.
+- One-time expired EURUSD COMPETITION_OPPORTUNITY probe returned `expired_plan`, not `quality_gate_not_passed`.
+- The PR #145 A_PLUS-only mismatch is therefore closed in production.
+- Telegram is configured and prior deliveries show HTTP 200.
 
-No SQL and no config change are required.
-
-## After upload
-1. Update `ops/LIVE_READBACK_TRIGGER`.
-2. Read `STC Live Readback` logs.
-3. Require a fresh Capital COMPETITION_OPPORTUNITY to show deployed `quality_gate_passed=true`.
-4. Confirm a locked plan is exposed while valid.
-5. Confirm Telegram NEW_LOCKED_PLAN delivery.
-6. Only then show Mohamed the manual competition order ticket.
+## Next live gate
+1. Observe the next fresh natural Capital COMPETITION_OPPORTUNITY.
+2. Require deployed `quality_gate_passed=true`.
+3. Confirm a locked plan is exposed while valid.
+4. Confirm Telegram NEW_LOCKED_PLAN delivery.
+5. Only then show Mohamed the manual competition order ticket.
 
 ## Parallel research continuation
 Implement Pine streams against `research_benchmarks/community_pine_parity_manifest_20260924.json`.
