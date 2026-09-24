@@ -2103,3 +2103,14 @@ Owner intervention required now: YES — only for historical-data access, not fo
 - PR #116 was closed as superseded by clean current-main replacement PR #133 for native frozen confirmation; PR #133 CI is pending.
 - Workflow 35967884019 remains superseded for Lorentzian evidence because it began before PR #129 corrected benchmark dispatch.
 - Live authority unchanged.
+
+
+## Corrected Lorentzian + VuManChu exact-data rerun triggered — 2026-09-24 10:27 EEST
+- PR #134 merged current main into research/native-community-15m-20260923 while keeping staged raw exact-provider datasets off main.
+- Research branch sync merge: 403a3b87e5d5daf7fa122bfd937112adc10ce645.
+- Corrected trigger commit: 2ed98f6b110cfbcb4f7a02c8af542109dd7362ab.
+- Workflow run: 35969652488.
+- This is the first authoritative 26-symbol 15m run intended to include both:
+  - official Lorentzian via corrected implemented_official_port dispatch;
+  - causal VuManChu Cipher B adapter.
+- Prior run 35967884019 completed successfully but remains superseded for Lorentzian evidence because it used the pre-fix dispatcher.
