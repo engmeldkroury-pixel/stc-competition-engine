@@ -1,7 +1,7 @@
 import pytest
 
 from app.models import FactorScores, SignalEvaluationRequest, TradingViewWebhook
-from app.signals import evaluate, liquidity_quality_from_tradingview, volatility_quality_from_tradingview
+from app.signals import competition_opportunity_assessment, evaluate, liquidity_quality_from_tradingview, volatility_quality_from_tradingview
 
 
 def test_strong_positive_signal_requires_human_approval():
@@ -103,3 +103,47 @@ def test_news_and_macro_are_context_not_primary_direction_drivers():
     assert r.recommendation == "SHORT"
     assert r.composite_score < 0
 
+
+
+def test_competition_opportunity_gate_accepts_majority_intraday_alignment():
+    passed, failures = competition_opportunity_assessment(
+        recommendation="LONG",
+        composite_score=0.52,
+        short_term_technical=0.75,
+        historical_regime=0.10,
+        blended_technical=0.62,
+        volatility_quality=0.20,
+        liquidity_quality=0.30,
+        confirmation_score=0.55,
+        trend_2h_score=0.60,
+        trend_4h_score=0.10,
+        family_evidence_score=0.45,
+        family_agreement_ratio=0.67,
+        family_aligned_count=6,
+        family_conflict_count=2,
+    )
+    assert passed is True
+    assert failures == []
+
+
+def test_competition_opportunity_gate_blocks_weak_or_conflicted_setup():
+    passed, failures = competition_opportunity_assessment(
+        recommendation="LONG",
+        composite_score=0.36,
+        short_term_technical=0.40,
+        historical_regime=-0.40,
+        blended_technical=0.30,
+        volatility_quality=-0.20,
+        liquidity_quality=0.10,
+        confirmation_score=0.20,
+        trend_2h_score=-0.30,
+        trend_4h_score=0.10,
+        family_evidence_score=0.10,
+        family_agreement_ratio=0.44,
+        family_aligned_count=3,
+        family_conflict_count=5,
+    )
+    assert passed is False
+    assert "intraday_majority_alignment" in failures
+    assert "short_term_strength" in failures
+    assert "historical_not_strongly_opposed" in failures
