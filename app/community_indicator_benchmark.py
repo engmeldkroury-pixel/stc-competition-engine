@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from math import inf
 from typing import Iterable
 
-from .community_indicator_catalog import eligible_indicators
+from .community_indicator_catalog import benchmarkable_indicators
 from .community_indicator_signals import atr_by_index, indicator_signal_series
 from .models import Bar
 from .strategy_lab import STRATEGIES, StrategyTrial, robust_trial_score
@@ -439,10 +439,7 @@ def benchmark_symbol_indicators(
     bars: list[Bar],
 ) -> tuple[CommunityIndicatorTrial, ...]:
     trials: list[CommunityIndicatorTrial] = []
-    benchmarkable_statuses = {"implemented_conceptual", "implemented_official_port"}
-    for spec in eligible_indicators(asset_class, timeframe, implemented_only=True):
-        if spec.implementation_status not in benchmarkable_statuses:
-            continue
+    for spec in benchmarkable_indicators(asset_class, timeframe):
         trials.append(
             benchmark_indicator(
                 indicator_id=spec.indicator_id,
