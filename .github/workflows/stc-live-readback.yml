@@ -59,6 +59,32 @@ jobs:
               })
           cards.sort(key=lambda row: row.get("symbol") or "")
           print("STC_LIVE_CAPITAL_SIGNAL_READBACK=" + json.dumps(cards, sort_keys=True))
+
+          active = []
+          for card in data.get("cards") or []:
+              if card.get("competition_id") != "capital-africa-sep-2026":
+                  continue
+              if card.get("opportunity_active") is not True:
+                  continue
+              active.append({
+                  "event_id": card.get("event_id"),
+                  "signal_id": card.get("signal_id"),
+                  "symbol": card.get("symbol"),
+                  "source_time": card.get("source_time"),
+                  "current_price_from_confirmed_bar": card.get("current_price"),
+                  "recommendation": card.get("recommendation"),
+                  "setup_grade": card.get("setup_grade"),
+                  "setup_quality_score": card.get("setup_quality_score"),
+                  "expires_in_seconds": card.get("expires_in_seconds"),
+                  "envelope": card.get("envelope"),
+                  "locked_trade_plan": card.get("locked_trade_plan"),
+                  "position_sizing": card.get("position_sizing"),
+                  "order_instruction": card.get("order_instruction"),
+                  "macro_context": card.get("macro_context"),
+                  "manual_execution_ready": card.get("manual_execution_ready"),
+                  "approval": card.get("approval"),
+              })
+          print("STC_LIVE_ACTIVE_OPPORTUNITIES=" + json.dumps(active, sort_keys=True))
           print("STC_LIVE_RUNTIME_CONTROL=" + json.dumps(data.get("runtime_control") or {}, sort_keys=True))
           print(
               "STC_LIVE_COMPETITION_PROGRESS="
