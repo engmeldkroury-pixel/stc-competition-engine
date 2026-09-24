@@ -843,3 +843,12 @@ Status: IN PROGRESS.
 - Clean replacement PR #133 created from current main.
 - Scope remains exact 85/15 final-unseen confirmation for native STC strategies.
 - live_authority=false.
+
+
+### WU-113 — corrected Lorentzian + VuManChu 26-symbol exact-data rerun
+Status: IN PROGRESS.
+- Research branch sync PR #134 merged.
+- Trigger commit: 2ed98f6b110cfbcb4f7a02c8af542109dd7362ab.
+- Workflow run: 35969652488.
+- Acceptance requires artifact-level proof that community_trials contains both lorentzian_classification and vumanchu_cipher_b on compatible symbols before interpreting performance.
+- Baseline for incremental comparison: 13/26 profile-ready symbols from WU-109.
