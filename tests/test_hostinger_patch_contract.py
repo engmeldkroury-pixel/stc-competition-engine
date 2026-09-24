@@ -606,3 +606,4 @@ def test_locked_plan_recovery_does_not_allow_opposite_or_directionless_new_entry
     assert "$latestDirection === $lockedDirection" in cloud
     assert "$latestApprovalCompatible" in snapshot
     assert "&& $latestApprovalCompatible" in snapshot
+    assert "PRESERVE_FOR_RECOVERY" in snapshot
