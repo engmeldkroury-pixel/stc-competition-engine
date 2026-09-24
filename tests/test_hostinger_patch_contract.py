@@ -575,3 +575,34 @@ def test_competition_opportunity_grade_is_centralized_end_to_end():
     assert "competition_mode" in cloud
     for text in (snapshot, approval, notify, control):
         assert "stc_signal_quality_gate_eligible($signal)" in text
+
+
+def test_valid_locked_plan_survives_newer_same_direction_monitor_bar():
+    cloud = (PATCH / "cloud_control.php").read_text(encoding="utf-8")
+    snapshot = (PATCH / "operator_snapshot.php").read_text(encoding="utf-8")
+    approval = (PATCH / "approval.php").read_text(encoding="utf-8")
+
+    assert "function stc_signal_direction_context" in cloud
+    assert "function stc_locked_plan_latest_signal_compatibility" in cloud
+    assert "function stc_latest_signal_context" in cloud
+
+    # Snapshot prefers the newest still-valid locked plan over a newer
+    # monitor-only row and exposes the newer context separately.
+    assert "$preferredRowIdByTarget" in snapshot
+    assert "Preserve the newest still-valid locked plan" in snapshot
+    assert "'latest_signal_context' => $latestSignalContext" in snapshot
+    assert "'approval_compatible_with_locked_plan' => $latestApprovalCompatible" in snapshot
+
+    # Approval no longer invalidates a plan merely because another bar exists.
+    assert "stc_locked_plan_latest_signal_compatibility(" in approval
+    assert "newer_signal_not_aligned" in approval
+    assert "$reasons[] = 'newer_signal_exists';" not in approval
+
+
+def test_locked_plan_recovery_does_not_allow_opposite_or_directionless_new_entry():
+    cloud = (PATCH / "cloud_control.php").read_text(encoding="utf-8")
+    snapshot = (PATCH / "operator_snapshot.php").read_text(encoding="utf-8")
+
+    assert "$latestDirection === $lockedDirection" in cloud
+    assert "$latestApprovalCompatible" in snapshot
+    assert "&& $latestApprovalCompatible" in snapshot
