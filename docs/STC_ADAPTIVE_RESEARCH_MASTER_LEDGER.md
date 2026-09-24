@@ -734,3 +734,19 @@ Status: VERIFIED / MERGED.
   - preserved wave-3 RSI Kernel causal adapter.
 - Added tests that fail if historical shadow component ids or frozen Trendilo parameter contracts drift again.
 - Reconciled 26-symbol benchmark was re-triggered from exact staged data after the repair; pre-reconciliation benchmark output is superseded and must not be used for promotion.
+
+
+### WU-108 — official Lorentzian Classification integration
+Status: VERIFIED / MERGED.
+- PR #125 merged as 445cf9e7a0f92567dac49a8a16e01e40d378d298.
+- CI: 384 passed, 1 warning.
+- STC now uses the official AI Edge Python port of Machine Learning: Lorentzian Classification rather than an approximate reimplementation.
+- Upstream repository: artificial-intelligence-edge/lorentzian-classification.
+- Upstream commit is pinned exactly at 27776bd51cbd3e07b6383cfa468d4d33f4b50297.
+- Upstream license: MIT.
+- The official port states it is parity-tested against Pine/TradingView fixtures and includes feature engineering, Lorentzian ANN, filters, kernel logic, prediction/direction, Buy/Sell, exits and Backtest Stream semantics.
+- STC maps only official confirmed Buy/Sell booleans into the generic community research signal layer.
+- A bounded TRAIN-only settings grid is allowed; TEST/FORWARD remain frozen.
+- Direct contract test verifies STC's adapter output equals the official-port Buy/Sell output.
+- Third-party attribution is documented in docs/THIRD_PARTY_LORENTZIAN.md.
+- Research-only authority; no live A+ gate/risk/execution change.
