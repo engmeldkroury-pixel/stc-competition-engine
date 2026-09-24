@@ -86,6 +86,22 @@ jobs:
               })
           print("STC_LIVE_ACTIVE_OPPORTUNITIES=" + json.dumps(active, sort_keys=True))
           print("STC_LIVE_RUNTIME_CONTROL=" + json.dumps(data.get("runtime_control") or {}, sort_keys=True))
+          positions = []
+          for p in data.get("positions") or []:
+              positions.append({
+                  "position_id": p.get("position_id"),
+                  "competition_id": p.get("competition_id"),
+                  "symbol": p.get("symbol"),
+                  "side": p.get("side"),
+                  "quantity": p.get("quantity"),
+                  "entry_price": p.get("entry_price"),
+                  "current_stop": p.get("current_stop"),
+                  "target1": p.get("target1"),
+                  "target2": p.get("target2"),
+                  "opened_at_utc": p.get("opened_at_utc"),
+                  "status": p.get("status"),
+              })
+          print("STC_LIVE_OPEN_POSITIONS=" + json.dumps(positions, sort_keys=True))
           print(
               "STC_LIVE_COMPETITION_PROGRESS="
               + json.dumps(
