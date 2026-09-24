@@ -32,14 +32,15 @@ jobs:
             notification_control.php \
             operator.php \
             operator_snapshot.php \
-            portfolio_control.php
+            portfolio_control.php \
+            position.php
           do
             cp "hostinger_patch/${file}" "out/stc-hostinger-hotfix-145/${file}"
           done
           cat > out/stc-hostinger-hotfix-145/UPLOAD_README.txt <<'EOF'
           STC Hostinger hotfix after PR #145
           =================================
-          Upload these six PHP files to the existing STC public_html directory.
+          Upload these seven PHP files to the existing STC public_html directory.
           Replace the files with the same names.
 
           Files:
@@ -49,6 +50,7 @@ jobs:
           - operator.php
           - operator_snapshot.php
           - portfolio_control.php
+          - position.php
 
           Do NOT upload config.php and do not change credentials.
           No SQL migration is required for this hotfix.
