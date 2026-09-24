@@ -2459,3 +2459,51 @@ Owner intervention required now: YES — only for historical-data access, not fo
   - artifact id: 10811854877;
   - inner ZIP SHA-256: `560ecbd32ecc82280ee385cedca179930904999c992e55b3d66bba33e9c585b7`.
 - Required next external action: upload/replace the six PHP files from the new combined bundle before relying on preserved-plan UI in production.
+
+
+## EURUSD existing-position recovery completed — 2026-09-24 14:40 UTC
+- Owner screenshots proved the TradingView Paper Trading position is genuinely open:
+  - competition: Capital.com Africa;
+  - symbol: CAPITALCOM:EURUSD;
+  - side: SHORT;
+  - filled quantity: 137552 units;
+  - average fill: 1.13677;
+  - current stop: 1.13930;
+  - final TP: 1.12740.
+- The owner attempted STC Record Trade and received `invalid_position_target`.
+- Root cause was twofold:
+  1. opening Record Trade directly could leave hidden `competition_id` blank;
+  2. the form allowed bare `EURUSD`, while the server allowlist uses `CAPITALCOM:EURUSD`.
+- Pre-recovery Live Readback proved STC had no open positions and no entries.
+- One-time idempotent server-side recovery run `36013822127` created exactly one STC position and then verified exactly one matching open EURUSD position.
+- Recovered STC position:
+  - position_id: `pos-d105686e5a029f0ef9d23cfbd44b48c0f0f826f1`;
+  - competition_id: `capital-africa-sep-2026`;
+  - symbol: `CAPITALCOM:EURUSD`;
+  - side: SHORT;
+  - quantity: 137552;
+  - entry: 1.13677;
+  - current stop: 1.13930;
+  - management checkpoint retained from the original locked plan: 1.130818315;
+  - final TP: 1.12740;
+  - opened_at_utc: 2026-09-24 13:51:00.
+- One-time recovery workflow was deleted immediately after success.
+- Final Live Readback run `36014399954` verified:
+  - exactly one open EURUSD position;
+  - Capital open_positions=1;
+  - total_entries=1;
+  - qualifying trading days=1/3;
+  - realized P/L in STC ledger remains 0 until a close is recorded.
+- PR #157 merged as `d6054845d45c6cc185eb276559e2c36fd3e53e63`.
+  - Record Trade now uses a strict competition selector;
+  - bare Capital symbols such as EURUSD are normalized client-side to CAPITALCOM:EURUSD;
+  - server-side `stc_resolve_position_target()` independently resolves the target and may infer a missing competition only when the symbol maps uniquely to exactly one configured competition;
+  - AMP symbol resolution remains fail-closed;
+  - OPEN and IMPORT_CLOSED both use target resolution;
+  - critical CI: 166 passed, 1 warning.
+- Final Hostinger hotfix packaging was expanded to seven PHP files because PR #157 also changes `position.php`.
+- Final seven-file Hostinger bundle:
+  - workflow run: `36014161196`;
+  - artifact id: `10813792030`;
+  - user ZIP SHA-256: `151724858788f83869bc49df42627594f0dcb487328c65abf5b8b34ebf858427`.
+- Production ledger recovery is complete. UI/server target-resolution deployment is still pending owner upload of the final seven-file bundle.
