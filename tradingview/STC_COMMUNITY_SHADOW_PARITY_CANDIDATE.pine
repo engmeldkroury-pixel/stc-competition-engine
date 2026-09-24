@@ -1,0 +1,165 @@
+//@version=6
+indicator("STC Community Shadow Parity Candidate v0.1", overlay=false, max_bars_back=5000)
+
+// Research/diagnostic only.
+// This script has NO live-trading authority and emits NO webhook/order action.
+// It exists to compare Pine event streams against the frozen Python parity fixtures.
+
+profile = input.string(
+    "CAPITALCOM:EURUSD",
+    "Frozen profile",
+    options=[
+        "CAPITALCOM:EURUSD",
+        "CAPITALCOM:ETHUSD",
+        "CAPITALCOM:DOGEUSD",
+        "CAPITALCOM:NAS100"
+    ]
+)
+
+trendiloSignal() =>
+    smoothing = 1
+    lookback = 50
+    almaOffset = 0.85
+    almaSigma = 6.0
+    bandMultiplier = 1.0
+    pch = math.abs(close) > 1e-15 ? (close - close[smoothing]) / close * 100.0 : 0.0
+    avpch = ta.alma(pch, lookback, almaOffset, almaSigma)
+    rms = bandMultiplier * math.sqrt(ta.sma(avpch * avpch, lookback))
+    currentState = not na(avpch) and not na(rms) ? (avpch > rms ? 1 : avpch < -rms ? -1 : 0) : 0
+    previousState = nz(currentState[1], 0)
+    event = currentState != 0 and currentState != previousState ? currentState : 0
+    [currentState, event]
+
+sslHybridSignal() =>
+    baselineLength = 60
+    sslLength = 15
+    baseline = ta.ema(close, baselineLength)
+    highMa = ta.ema(high, sslLength)
+    lowMa = ta.ema(low, sslLength)
+    int state = 0
+    state := not na(baseline) and not na(highMa) and not na(lowMa) ?
+         (close > highMa and close > baseline ? 1 :
+          close < lowMa and close < baseline ? -1 :
+          nz(state[1], 0)) :
+         nz(state[1], 0)
+    event = state != 0 and state != nz(state[1], 0) ? state : 0
+    [state, event]
+
+rangeFilterSignal() =>
+    samplingPeriod = 100
+    rangeMultiplier = 3.0
+    change = math.abs(close - close[1])
+    first = ta.ema(change, samplingPeriod)
+    second = ta.ema(first, samplingPeriod * 2 - 1)
+    float filt = na
+    previousFilter = filt[1]
+    if not na(second)
+        smoothRange = second * rangeMultiplier
+        if na(previousFilter)
+            filt := close
+        else if close > previousFilter
+            filt := math.max(previousFilter, close - smoothRange)
+        else if close < previousFilter
+            filt := math.min(previousFilter, close + smoothRange)
+        else
+            filt := previousFilter
+    int direction = 0
+    previousDirection = nz(direction[1], 0)
+    if not na(filt) and not na(previousFilter)
+        rising = filt > previousFilter
+        falling = filt < previousFilter
+        direction := close > filt and rising ? 1 : close < filt and falling ? -1 : previousDirection
+    else
+        direction := previousDirection
+    event = direction != 0 and direction != previousDirection ? direction : 0
+    [direction, event]
+
+schaffSignal() =>
+    cycleLength = 12
+    fastLength = 26
+    slowLength = 50
+    alpha = 0.5
+    fast = ta.ema(close, fastLength)
+    slow = ta.ema(close, slowLength)
+    macdLine = fast - slow
+
+    lowM = ta.lowest(macdLine, cycleLength)
+    highM = ta.highest(macdLine, cycleLength)
+    rawK1 = not na(lowM) and not na(highM) ? (highM == lowM ? 0.0 : 100.0 * (macdLine - lowM) / (highM - lowM)) : na
+
+    float d1 = na
+    previousD1 = nz(d1[1], rawK1)
+    d1 := not na(rawK1) ? previousD1 + alpha * (rawK1 - previousD1) : na
+
+    lowD1 = ta.lowest(d1, cycleLength)
+    highD1 = ta.highest(d1, cycleLength)
+    rawK2 = not na(lowD1) and not na(highD1) ? (highD1 == lowD1 ? 0.0 : 100.0 * (d1 - lowD1) / (highD1 - lowD1)) : na
+
+    float stc = na
+    previousStc = nz(stc[1], rawK2)
+    stc := not na(rawK2) ? previousStc + alpha * (rawK2 - previousStc) : na
+
+    now = stc
+    previous = stc[1]
+    older = stc[2]
+    event = 0.0
+    if not na(now) and not na(previous) and not na(older)
+        event := older >= previous and previous < now and previous <= 25.0 ? 1.0 :
+             older <= previous and previous > now and previous >= 75.0 ? -1.0 :
+             previous <= 50.0 and now > 50.0 ? 0.65 :
+             previous >= 50.0 and now < 50.0 ? -0.65 : 0.0
+    [stc, event]
+
+halfTrendSignal() =>
+    amplitude = 5
+    highPrice = ta.highest(high, amplitude)
+    lowPrice = ta.lowest(low, amplitude)
+    highMa = ta.sma(high, amplitude)
+    lowMa = ta.sma(low, amplitude)
+
+    var int trend = 0
+    var int nextTrend = 0
+    var float maxLowPrice = low
+    var float minHighPrice = high
+
+    previousTrend = trend
+    if bar_index >= amplitude - 1
+        if nextTrend == 1
+            maxLowPrice := math.max(lowPrice, maxLowPrice)
+            if highMa < maxLowPrice and close < low[1]
+                trend := 1
+                nextTrend := 0
+                minHighPrice := highPrice
+        else
+            minHighPrice := math.min(highPrice, minHighPrice)
+            if lowMa > minHighPrice and close > high[1]
+                trend := 0
+                nextTrend := 1
+                maxLowPrice := lowPrice
+
+    event = trend != previousTrend ? (trend == 0 ? 1.0 : -1.0) : 0.0
+    state = trend == 0 ? 1.0 : -1.0
+    [state, event]
+
+[trendiloState, trendiloEvent] = trendiloSignal()
+[sslState, sslEvent] = sslHybridSignal()
+[rangeState, rangeEvent] = rangeFilterSignal()
+[schaffState, schaffEvent] = schaffSignal()
+[halfTrendState, halfTrendEvent] = halfTrendSignal()
+
+selectedEvent =
+    profile == "CAPITALCOM:EURUSD" ? trendiloEvent :
+    profile == "CAPITALCOM:ETHUSD" ? sslEvent :
+    profile == "CAPITALCOM:DOGEUSD" ? (rangeEvent != 0 ? rangeEvent : schaffEvent) :
+    profile == "CAPITALCOM:NAS100" ? halfTrendEvent :
+    0.0
+
+plot(selectedEvent, "Selected event", style=plot.style_columns)
+plot(profile == "CAPITALCOM:EURUSD" ? trendiloEvent : na, "Trendilo event", display=display.data_window)
+plot(profile == "CAPITALCOM:ETHUSD" ? sslEvent : na, "SSL Hybrid event", display=display.data_window)
+plot(profile == "CAPITALCOM:DOGEUSD" ? rangeEvent : na, "Range Filter event", display=display.data_window)
+plot(profile == "CAPITALCOM:DOGEUSD" ? schaffEvent : na, "Schaff event", display=display.data_window)
+plot(profile == "CAPITALCOM:NAS100" ? halfTrendEvent : na, "HalfTrend event", display=display.data_window)
+
+plotshape(selectedEvent > 0, title="Shadow LONG event", style=shape.triangleup, location=location.bottom, size=size.tiny, text="S+")
+plotshape(selectedEvent < 0, title="Shadow SHORT event", style=shape.triangledown, location=location.top, size=size.tiny, text="S-")
