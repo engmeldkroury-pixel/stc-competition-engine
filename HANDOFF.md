@@ -77,3 +77,12 @@ Do not promote community weights before exact parity evidence.
 - Verified open position: SHORT 137552 @ 1.13677, stop 1.13930, management checkpoint 1.130818315, final TP 1.12740.
 - Live Readback run 36014399954 confirms open_positions=1 and total_entries=1.
 - The invalid_position_target defect is fixed in PR #157, but the final seven-file Hostinger bundle still requires owner upload before the UI/server fix is live.
+
+
+## XAGUSD recovery incident
+- Record Trade failed with `manual_position_open_time_outside_competition_window`.
+- PR #158 merged; final 7-file Hostinger bundle SHA-256:
+  `9153f76fb6bb861400f5d07cac7fe54e5e653bba56907a275769f34505493ae6`.
+- Live Hostinger was still on the older Record Trade UI at last verification.
+- Do NOT duplicate the XAGUSD trade.
+- Before STC ledger recovery, verify whether the actual platform trade is still OPEN or already CLOSED.
