@@ -126,8 +126,7 @@ try {
         $recommendation = (string)($signal['recommendation'] ?? 'WAIT');
         $hasOpenPosition = (float)($openQty[$seenKey] ?? 0.0) > 0.0;
         $macroContext = stc_macro_risk_context($config, $symbol, $now, $macroCalendar);
-        $qualityGatePassed = ($signal['quality_gate_passed'] ?? false) === true
-            && ($signal['setup_grade'] ?? '') === 'A_PLUS';
+        $qualityGatePassed = stc_signal_quality_gate_eligible($signal);
         $lockedPlan = $decision['locked_trade_plan'] ?? null;
         $planValid = $qualityGatePassed
             && is_array($lockedPlan)
