@@ -790,3 +790,21 @@ Status: IN PROGRESS.
 - PR #121 closed as superseded by merged PR #125 official Lorentzian integration.
 - PR #115 closed as superseded by PRs #123/#124 canonical wave-3 implementation/reconciliation.
 - PR #116 native frozen confirmation remains open because the apples-to-apples final-holdout objective is still relevant and is not yet superseded by an accepted main-branch artifact.
+
+
+### WU-110A — official-port benchmark inclusion repair
+Status: IN_PROGRESS / BLOCKS WU-110 ACCEPTANCE.
+- Defect found before accepting any Lorentzian exact-data result:
+  - official ports were eligible in the catalog but excluded by a downstream implementation-status filter.
+- Affected evidence:
+  - workflow 35967884019 must not be cited as Lorentzian benchmark evidence.
+- Repair PR:
+  - #129 Include official community ports in benchmark matrix.
+- Acceptance criteria:
+  1. CI green;
+  2. regression test proves lorentzian_classification appears in benchmark_symbol_indicators();
+  3. native_proxy_only components remain excluded from independent benchmark participation;
+  4. merge PR #129;
+  5. sync the exact-data research branch again;
+  6. rerun 26-symbol exact-provider benchmark and verify Lorentzian is present in artifacts.
+- Live boundary unchanged.
