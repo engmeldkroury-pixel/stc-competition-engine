@@ -70,10 +70,72 @@ try {
     );
     $stmt->execute(['capital-africa-sep-2026', 'amp-futures-sep-2026']);
 
+    $signalRows = $stmt->fetchAll();
+    $latestContextByTarget = [];
+    $preferredRowIdByTarget = [];
+
+    foreach ($signalRows as $candidateRow) {
+        $candidatePayload = json_decode((string)$candidateRow['payload_json'], true);
+        $candidateResult = json_decode((string)$candidateRow['result_json'], true);
+        $candidateDecision = is_array($candidateResult) ? ($candidateResult['decision'] ?? null) : null;
+        $candidateSignal = is_array($candidateDecision) ? ($candidateDecision['signal'] ?? null) : null;
+        $candidateEnvelope = is_array($candidateDecision) ? ($candidateDecision['approval_envelope'] ?? null) : null;
+        $candidatePlan = is_array($candidateDecision) ? ($candidateDecision['locked_trade_plan'] ?? null) : null;
+        if (!is_array($candidatePayload) || !is_array($candidateResult) || !is_array($candidateDecision)
+            || !is_array($candidateSignal) || !is_array($candidateEnvelope)) {
+            continue;
+        }
+        $candidateCompetitionId = (string)($candidatePayload['competition_id'] ?? '');
+        $candidateSymbol = (string)($candidatePayload['symbol'] ?? '');
+        $candidateSignalId = (string)($candidateSignal['signal_id'] ?? '');
+        if ($candidateCompetitionId === '' || $candidateSymbol === '' || $candidateSignalId === '') {
+            continue;
+        }
+        if (!stc_validate_signal_receipt(
+            $candidateRow,
+            $candidatePayload,
+            $candidateResult,
+            $candidateSignalId
+        )) {
+            continue;
+        }
+        $candidateKey = $candidateCompetitionId . '|' . $candidateSymbol;
+        if (!isset($latestContextByTarget[$candidateKey])) {
+            $latestContextByTarget[$candidateKey] = [
+                'id' => (int)$candidateRow['id'],
+                'event_id' => (string)$candidateRow['event_id'],
+                'payload' => $candidatePayload,
+                'signal' => $candidateSignal,
+            ];
+        }
+        if (isset($preferredRowIdByTarget[$candidateKey])) {
+            continue;
+        }
+        $candidateValidUntil = stc_parse_utc((string)($candidateEnvelope['valid_until'] ?? ''));
+        $candidatePlanValid = stc_signal_quality_gate_eligible($candidateSignal)
+            && is_array($candidatePlan)
+            && ($candidatePlan['levels_locked'] ?? false) === true
+            && ($candidatePlan['execution'] ?? '') === 'manual_only'
+            && $candidateValidUntil !== null
+            && $now < $candidateValidUntil;
+        if ($candidatePlanValid) {
+            // Preserve the newest still-valid locked plan even when a newer
+            // monitor-only bar arrives. This prevents an already presented
+            // execution ticket from disappearing before expiry/reconciliation.
+            $preferredRowIdByTarget[$candidateKey] = (int)$candidateRow['id'];
+        }
+    }
+
+    foreach ($latestContextByTarget as $targetKey => $latestContext) {
+        if (!isset($preferredRowIdByTarget[$targetKey])) {
+            $preferredRowIdByTarget[$targetKey] = (int)$latestContext['id'];
+        }
+    }
+
     $cards = [];
     $seen = [];
 
-    while (($row = $stmt->fetch()) !== false) {
+    foreach ($signalRows as $row) {
         $payload = json_decode((string)$row['payload_json'], true);
         $result = json_decode((string)$row['result_json'], true);
         if (!is_array($payload) || !is_array($result)) {
@@ -97,7 +159,41 @@ try {
         if (!stc_validate_signal_receipt($row, $payload, $result, $signalId)) {
             continue;
         }
+        if ((int)$row['id'] !== (int)($preferredRowIdByTarget[$seenKey] ?? -1)) {
+            continue;
+        }
         $seen[$seenKey] = true;
+
+        $latestRawContext = $latestContextByTarget[$seenKey] ?? null;
+        $latestSignalContext = null;
+        $latestApprovalCompatible = true;
+        if (is_array($latestRawContext)) {
+            $latestSignal = is_array($latestRawContext['signal'] ?? null)
+                ? $latestRawContext['signal']
+                : [];
+            $compatibility = stc_locked_plan_latest_signal_compatibility($signal, $latestSignal);
+            $sameEvent = (string)($latestRawContext['event_id'] ?? '') === (string)$row['event_id'];
+            $latestApprovalCompatible = $sameEvent || (($compatibility['compatible'] ?? false) === true);
+            $latestPayload = is_array($latestRawContext['payload'] ?? null)
+                ? $latestRawContext['payload']
+                : [];
+            $latestSignalContext = [
+                'event_id' => (string)($latestRawContext['event_id'] ?? ''),
+                'source_time' => (string)($latestPayload['time'] ?? ''),
+                'recommendation' => (string)($latestSignal['recommendation'] ?? 'WAIT'),
+                'pre_gate_recommendation' => (string)($latestSignal['pre_gate_recommendation'] ?? ($latestSignal['recommendation'] ?? 'WAIT')),
+                'setup_grade' => (string)($latestSignal['setup_grade'] ?? 'MONITOR_ONLY'),
+                'setup_quality_score' => isset($latestSignal['setup_quality_score'])
+                    ? (int)$latestSignal['setup_quality_score']
+                    : null,
+                'quality_gate_failures' => is_array($latestSignal['quality_gate_failures'] ?? null)
+                    ? $latestSignal['quality_gate_failures']
+                    : [],
+                'same_event' => $sameEvent,
+                'approval_compatible_with_locked_plan' => $latestApprovalCompatible,
+                'compatibility' => $compatibility,
+            ];
+        }
 
         $approvalStmt = $pdo->prepare(
             'SELECT approval_id, decision, quote_evidence_id, runtime_control_version, '
@@ -138,6 +234,7 @@ try {
             && in_array($recommendation, ['LONG', 'SHORT'], true)
             && !$hasOpenPosition
             && $planValid
+            && $latestApprovalCompatible
             && $approvalFresh
             && $validUntil !== null
             && $now < $validUntil;
@@ -185,23 +282,27 @@ try {
             } elseif ($hasOpenPosition) {
                 $pendingPlanAction = 'MANAGE_EXISTING_POSITION';
             } elseif (in_array($recommendation, ['LONG', 'SHORT'], true)) {
-                $opportunityActive = true;
-                try {
-                    $orderInstruction = stc_entry_order_instruction(
-                        $recommendation,
-                        (float)($payload['close'] ?? 0.0),
-                        (float)$lockedPlan['entry_min'],
-                        (float)$lockedPlan['entry_max']
-                    );
-                } catch (Throwable $e) {
-                    $orderInstruction = [
-                        'order_type' => 'UNKNOWN',
-                        'side' => null,
-                        'status' => 'instruction_unavailable',
-                        'trigger_price' => null,
-                        'limit_price' => null,
-                        'explanation' => 'Order instruction could not be derived safely.',
-                    ];
+                if ($latestApprovalCompatible) {
+                    $opportunityActive = true;
+                    try {
+                        $orderInstruction = stc_entry_order_instruction(
+                            $recommendation,
+                            (float)($payload['close'] ?? 0.0),
+                            (float)$lockedPlan['entry_min'],
+                            (float)$lockedPlan['entry_max']
+                        );
+                    } catch (Throwable $e) {
+                        $orderInstruction = [
+                            'order_type' => 'UNKNOWN',
+                            'side' => null,
+                            'status' => 'instruction_unavailable',
+                            'trigger_price' => null,
+                            'limit_price' => null,
+                            'explanation' => 'Order instruction could not be derived safely.',
+                        ];
+                    }
+                } else {
+                    $pendingPlanAction = 'PRESERVE_FOR_RECOVERY';
                 }
             }
         }
@@ -243,6 +344,7 @@ try {
             'pre_gate_recommendation' => (string)($signal['pre_gate_recommendation'] ?? ($signal['recommendation'] ?? 'WAIT')),
             'quality_gate_failures' => is_array($signal['quality_gate_failures'] ?? null) ? $signal['quality_gate_failures'] : [],
             'reasons' => is_array($signal['reasons'] ?? null) ? $signal['reasons'] : [],
+            'latest_signal_context' => $latestSignalContext,
             'envelope' => $envelope,
             'locked_trade_plan' => $planValid ? $lockedPlan : null,
             'position_sizing' => $sizing,

@@ -80,6 +80,7 @@ try {
     $reasons = [];
     $evidenceId = null;
     $macroContext = null;
+    $latestSignalContext = null;
 
     if ($requested === 'approve') {
         if ($control['safe_mode']) {
@@ -99,9 +100,18 @@ try {
         if ($validUntil === null || $now >= $validUntil) {
             $reasons[] = 'signal_expired';
         }
-        $latestEventId = stc_latest_signal_event_id($pdo, $competitionId, $symbol);
-        if ($latestEventId === null || $latestEventId !== (string)$signalRow['event_id']) {
-            $reasons[] = 'newer_signal_exists';
+        $latestSignalContext = stc_latest_signal_context($pdo, $competitionId, $symbol);
+        if ($latestSignalContext === null) {
+            $reasons[] = 'latest_signal_unavailable';
+        } elseif ((string)$latestSignalContext['event_id'] !== (string)$signalRow['event_id']) {
+            $compatibility = stc_locked_plan_latest_signal_compatibility(
+                $signal,
+                (array)$latestSignalContext['signal']
+            );
+            $latestSignalContext['compatibility_with_locked_plan'] = $compatibility;
+            if (($compatibility['compatible'] ?? false) !== true) {
+                $reasons[] = 'newer_signal_not_aligned';
+            }
         }
 
         $macroContext = stc_macro_risk_context($config, $symbol, $now);
@@ -174,6 +184,7 @@ try {
         'quote_evidence_id' => $evidenceId,
         'runtime_control_version' => $control['version'],
         'macro_context' => $macroContext,
+        'latest_signal_context' => $latestSignalContext,
         'execution' => 'manual_only',
     ], $status === 'blocked' ? 409 : 200);
 } catch (Throwable $e) {

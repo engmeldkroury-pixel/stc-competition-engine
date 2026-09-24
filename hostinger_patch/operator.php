@@ -113,6 +113,7 @@ input{width:100%}button{cursor:pointer}.primary{background:#1d4ed8}.danger{backg
   <div class="bar record-page">
     <h2>Record an already-executed position</h2>
     <div class="small">Use this only after the trade is ALREADY OPEN in the competition platform. STC will record and monitor it; no order will be sent.</div>
+    <div class="record-guide"><b>If you already filled the trade and the signal card disappeared after a refresh, DO NOT enter the trade again.</b> Record the existing position here using the actual platform fill details.</div>
     <div class="record-guide"><b>One form only.</b> Fill everything here at once. Auto-refresh will not erase these fields while this page is open.</div>
     <input id="pos-origin" type="hidden"><input id="pos-competition" type="hidden"><input id="pos-card-index" type="hidden">
     <div class="formgrid" style="margin-top:14px">
@@ -282,10 +283,15 @@ function formatCountdown(seconds){
  if(m>=60){const h=Math.floor(m/60);return h+'h '+(m%60)+'m';}
  return m+'m '+String(s).padStart(2,'0')+'s';
 }
-function isOpportunityActive(c){
+function isLockedPlanVisible(c){
  if(!c||c.has_open_position||!c.locked_trade_plan||!(c.recommendation==='LONG'||c.recommendation==='SHORT'))return false;
  const left=secondsUntil(c.locked_trade_plan.valid_until);
  return left!==null && left>0;
+}
+function isOpportunityActive(c){
+ if(!isLockedPlanVisible(c))return false;
+ if(c.latest_signal_context&&c.latest_signal_context.approval_compatible_with_locked_plan===false)return false;
+ return c.opportunity_active!==false;
 }
 function deriveOrderInstruction(c,price){
  const p=c&&c.locked_trade_plan;
@@ -455,6 +461,25 @@ function convictionHtml(c){
    +familyHtml+'</div>';
 }
 
+function latestLockedPlanContextHtml(c){
+ const x=c&&c.latest_signal_context;
+ if(!x||x.same_event)return '';
+ const compatible=x.approval_compatible_with_locked_plan!==false;
+ const failures=Array.isArray(x.quality_gate_failures)&&x.quality_gate_failures.length
+   ?x.quality_gate_failures.map(esc).join(', ')
+   :'none';
+ const cls=compatible?'ok':'wait';
+ const headline=compatible
+   ?'LOCKED PLAN PRESERVED • latest bar remains same-direction'
+   :'LOCKED PLAN PRESERVED FOR RECOVERY • latest bar no longer aligned for a new approval';
+ return '<div class="record-guide '+cls+'" style="margin-top:10px"><b>'+headline+'</b>'
+   +'<div class="small" style="margin-top:4px">Latest context: '
+   +esc(x.pre_gate_recommendation||x.recommendation||'WAIT')
+   +' • quality '+esc(x.setup_quality_score==null?'-':x.setup_quality_score+'/100')
+   +' • '+esc(x.setup_grade||'MONITOR_ONLY')
+   +' • failures: '+failures+'</div></div>';
+}
+
 function cardHtml(c,i){
  const active=isOpportunityActive(c);
  const cls=c.recommendation==='LONG'?'long':c.recommendation==='SHORT'?'short':'wait';
@@ -463,15 +488,18 @@ function cardHtml(c,i){
  const sizingAllowed=!c.position_sizing || (c.position_sizing.allowed_by_position_limit!==false && c.position_sizing.allowed_by_risk_policy!==false);
  const macroAllowed=!(c.macro_context&&c.macro_context.block_new_approval);
  const controlOpen=!!(snapshot&&snapshot.runtime_control&&!snapshot.runtime_control.safe_mode&&!snapshot.runtime_control.kill_switch);
- const canApprove=active&&(c.recommendation==='LONG'||c.recommendation==='SHORT')&&!!c.locked_trade_plan&&sizingAllowed&&macroAllowed&&controlOpen;
+ const latestCompatible=!c.latest_signal_context||c.latest_signal_context.same_event||c.latest_signal_context.approval_compatible_with_locked_plan!==false;
+ const canApprove=active&&(c.recommendation==='LONG'||c.recommendation==='SHORT')&&!!c.locked_trade_plan&&sizingAllowed&&macroAllowed&&controlOpen&&latestCompatible;
  const competitionLabel=c.competition_id==='amp-futures-sep-2026'?'AMP Futures':'Capital.com Africa';
+ const recoveryOnly=isLockedPlanVisible(c)&&!active;
  const statusBadge=c.recommendation==='WAIT'
    ?'<span class="badge blocked">WAIT</span>'
-   :(active?'<span class="badge active">ACTIVE NOW</span>':'<span class="badge expired">EXPIRED</span>');
+   :(active?'<span class="badge active">ACTIVE NOW</span>':recoveryOnly?'<span class="badge blocked">RECOVERY ONLY</span>':'<span class="badge expired">EXPIRED</span>');
  let blockReason='';
  if(c.has_open_position)blockReason='An executed position is already tracked for this symbol. New signals are used to manage that position, not to create a replacement trade.';
  else if(c.quality_gate_passed===false&&c.pre_gate_recommendation&&c.pre_gate_recommendation!=='WAIT')blockReason='MONITOR ONLY: this directional candidate failed its required quality gate and cannot be approved or notified as a trade.';
  else if(!active&&c.recommendation!=='WAIT')blockReason='Expired opportunities are removed automatically from opportunity lists.';
+ else if(active&&!latestCompatible)blockReason='The locked plan is still shown so an already-filled trade can be recorded, but the newest confirmed bar is no longer aligned. Do not create a new entry from this plan.';
  else if(!controlOpen)blockReason='SAFE MODE / KILL SWITCH is ON. Enable manual approval mode before approving.';
  else if(!sizingAllowed)blockReason='New entry blocked by sizing / risk capacity.';
  else if(!macroAllowed)blockReason='New entry blocked by macro-risk gate.';
@@ -496,6 +524,7 @@ function cardHtml(c,i){
      +'<div class="ticket-cell"><div class="ticket-label">FINAL TAKE PROFIT</div><div class="ticket-value">'+planPriceText(c,p.target2,'target')+'</div><div class="ticket-note">One final TP only. Do not place a separate TP1 order.</div></div>'
      +'<div class="ticket-cell"><div class="ticket-label">RISK</div><div class="ticket-value">'+(c.position_sizing?'$'+num(c.position_sizing.risk_amount_usd,2):'-')+(riskPct!==null?' • '+num(riskPct,3)+'%':'')+'</div></div>'
      +'</div>'
+     +latestLockedPlanContextHtml(c)
      +'<div class="ticket-input"><label class="small"><b>LIVE PRICE BEFORE APPROVAL</b> — copy the current TradingView price here</label>'
      +'<input id="price-'+i+'" type="text" autocomplete="off" value="'+esc(draft)+'" placeholder="Current TradingView price — decimal or exchange quote" oninput="updateOrderHint('+i+');savePriceDraft('+i+')">'
      +'<div id="order-hint-'+i+'" class="ticket-note">Enter the live price. STC will tell you MARKET / LIMIT / STOP-LIMIT before approval.</div></div>';
@@ -549,7 +578,7 @@ function competitionOf(c){
 }
 function renderCards(target,cards){
  const all=snapshot&&snapshot.cards?snapshot.cards:[];
- const visible=(cards||[]).filter(c=>c.recommendation==='WAIT'||isOpportunityActive(c));
+ const visible=(cards||[]).filter(c=>c.recommendation==='WAIT'||isLockedPlanVisible(c));
  $(target).innerHTML=visible.map(c=>cardHtml(c,all.indexOf(c))).join('')||'<div class="card">No current signals or active opportunities.</div>';
  for(const card of visible){
    const i=all.indexOf(card);
@@ -996,6 +1025,8 @@ function approvalReasonText(reason){
  const labels={
    price_outside_envelope:'Current price is outside the locked entry zone.',
    newer_signal_exists:'A newer confirmed signal already exists; refresh and use the newest plan.',
+   newer_signal_not_aligned:'The newest confirmed bar is no longer aligned with this locked plan. Do not create a new entry; if the trade is already open, record the existing position instead.',
+   latest_signal_unavailable:'The latest signal context could not be verified, so approval fails closed.',
    signal_expired:'The locked plan has expired.',
    evidence_stale:'The price confirmation became stale; enter the current price again.',
    safe_mode_active:'Safe Mode is active.',
