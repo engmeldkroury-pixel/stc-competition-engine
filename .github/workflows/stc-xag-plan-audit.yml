@@ -31,7 +31,7 @@ jobs:
           import json, re
           data=json.load(open("/tmp/notifications.json",encoding="utf-8"))
           rows=[]
-          target_symbols={"CAPITALCOM:XAGUSD","CAPITALCOM:BTCUSD","CAPITALCOM:ETHUSD","CAPITALCOM:SPX500","CAPITALCOM:EURUSD"}
+          target_symbols={"CAPITALCOM:XAGUSD","CAPITALCOM:BTCUSD","CAPITALCOM:ETHUSD","CAPITALCOM:SPX500","CAPITALCOM:EURUSD","CAPITALCOM:NAS100"}
           for e in data.get("events") or []:
               if e.get("event_type")!="NEW_LOCKED_PLAN" or e.get("symbol") not in target_symbols:
                   continue
