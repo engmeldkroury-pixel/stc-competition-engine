@@ -2278,3 +2278,94 @@ Owner intervention required now: YES — only for historical-data access, not fo
   - XAUUSD reference 4251.90; entry envelope 4247.6247..4256.1753; stop 4266.4360; checkpoint 4230.0960; final target 4215.5600.
 - These levels are historical replay evidence from the 09:30 UTC confirmed bar only. They are not live-persisted owner approvals and must not be treated as fresh orders after the plan validity window or outside the locked entry envelope.
 - Runtime blocker remains: private GitHub Actions allowance exhausted; live processing/Telegram path has not yet consumed these fresh events under the merged code.
+
+
+## Live competition runtime + community shadow checkpoint — 2026-09-24 11:30 UTC
+
+### Accepted source state
+- PR #145 merged as `9b3746d2be8e448d76f9f0ce76d7425d9fcc0d12`.
+  - Centralized Hostinger quality eligibility through `stc_signal_quality_gate_eligible()`.
+  - Capital `COMPETITION_OPPORTUNITY` is eligible only for `capital-africa-sep-2026` with `competition_mode=true`.
+  - Approval, snapshot, notification and position paths use the same source contract.
+  - PR CI completed successfully.
+- PR #146 merged as `9fbff8954f0fc2967c815ad762c43bf81af808f3`.
+  - Corrected community evidence is complete over 26 symbols.
+  - Community profile-ready: 13/26 overall, 6/10 Capital.
+  - Lorentzian: 3/26 validated.
+  - VuManChu: 0/26.
+  - QQE+SSL+WAE composite: 0/26.
+- PR #149 merged as `a9f7e6bbbad1355f43cd4d27f64a77bc53c4e1c4`.
+  - Adds permanent read-only `STC Live Readback` workflow.
+- PR #150 merged as `47292a65c9961e31bfc7dd9088cf11c1ee28d3d9`.
+  - Adds reproducible Hostinger six-file hotfix bundle workflow.
+- PR #148 merged as `a19bbc8e5fe8fbd410c28b98b487fbf006f404d7`.
+  - Adds research-only `community_component_signals` payload plumbing.
+  - Adds symbol/timeframe-specific frozen community weights and selected parameters.
+  - Adds `community_component_shadow` to analyzed signals.
+  - Shadow is explicitly `live_authority=false` and is not consumed by quality gate, risk, sizing, approval or execution.
+  - Critical verification: 155 passed, 1 warning.
+
+### Live production proof and current blocker
+- TradingView Capital feed remains active; the latest checked ten-symbol cycle delivered webhook HTTP 200.
+- GitHub process run `35991923114` processed 25 queued events: claimed=25, ingested=25, rejected=0, failed=0.
+- Production readback run `35992932406` proved the Python/main competition gate is live:
+  - `CAPITALCOM:EURUSD`: SHORT, `setup_grade=COMPETITION_OPPORTUNITY`, setup quality 80/100, no gate failures.
+- The deployed Hostinger PHP is still older than PR #145:
+  - the same EURUSD card is reported by deployed PHP with `quality_gate_passed_live_php=false`;
+  - deployed PHP suppresses the locked plan/opportunity because it still applies the older A_PLUS-only eligibility logic.
+- Runtime controls at readback:
+  - `safe_mode=false`;
+  - `kill_switch=false`.
+- Capital competition ledger at readback:
+  - open positions: 0;
+  - closed positions: 0;
+  - qualifying trading days: 0/3;
+  - realized P/L: USD 0;
+  - total entries: 0.
+- Therefore the immediate production blocker is **Hostinger PHP deployment mismatch**, not absence of a qualifying strategy signal.
+
+### Hostinger hotfix package
+- Bundle workflow run: `35993270128`.
+- GitHub artifact id: `10805096749`.
+- User-deliverable ZIP: `STC_HOSTINGER_HOTFIX_145.zip`.
+- ZIP SHA-256: `a4b3acddc468a9f95c3813dd3a18b201b31e12517ebb788445202fdbd1b3a93a`.
+- Replace only these six deployed PHP files:
+  - `approval.php`;
+  - `cloud_control.php`;
+  - `notification_control.php`;
+  - `operator.php`;
+  - `operator_snapshot.php`;
+  - `portfolio_control.php`.
+- No SQL migration is required for this hotfix.
+- Do not upload or alter `config.php` or any credentials.
+
+### Pine parity reference
+- Research workflow run: `35992849854`.
+- Research trigger/head: `dc40a5d530609156d17b64e5c2fc637c52f21f19`.
+- Combined parity artifact: `10804853153`.
+- Artifact digest: `sha256:e0357abc68949b88d5554e636cb376f70c004bac7fb8e4da213cb1a33c67cce7`.
+- Six 5,000-bar exact-provider 15m fixtures completed successfully.
+- Event counts:
+  - BTCUSD RSI Kernel Optimized: 252;
+  - DOGEUSD Range Filter: 149; Schaff Trend Cycle: 609;
+  - ETHUSD SSL Hybrid: 210;
+  - EURUSD Trendilo: 225;
+  - NAS100 HalfTrend: 133;
+  - USDZAR Lorentzian: 47; Nadaraya-Watson endpoint: 76; AlphaTrend: 363; Supertrend: 142; UT Bot: 383.
+- These event streams are the required Python reference for future Pine bar-by-bar parity before any community weight receives live authority.
+
+### Competition pressure snapshot
+- Official TradingView leaderboard checked during this checkpoint:
+  - participants: 4,188;
+  - rank 1 realized profit: +38.08%;
+  - rank 60 realized profit: +11.16%.
+- Ranking is based on realized P/L.
+- STC must not promise to reproduce leaderboard returns; the immediate goal is to stop runtime suppression of valid qualified opportunities while preserving manual owner execution.
+
+### Immediate continuation rule
+1. Owner uploads/replaces the six Hostinger hotfix files.
+2. Trigger/read `STC Live Readback` immediately afterward.
+3. Acceptance condition: a fresh Capital `COMPETITION_OPPORTUNITY` must show `quality_gate_passed=true`, expose its locked plan while valid, and be eligible for the notification path.
+4. Confirm Telegram delivery for the same fresh plan.
+5. Human approval/manual order entry remains mandatory.
+6. In parallel, continue Pine community-component implementation against the frozen parity fixtures; do not promote shadow weights until parity is proven.
