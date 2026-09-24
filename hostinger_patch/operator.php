@@ -115,9 +115,9 @@ input{width:100%}button{cursor:pointer}.primary{background:#1d4ed8}.danger{backg
     <div class="small">Use this only after the trade is ALREADY OPEN in the competition platform. STC will record and monitor it; no order will be sent.</div>
     <div class="record-guide"><b>If you already filled the trade and the signal card disappeared after a refresh, DO NOT enter the trade again.</b> Record the existing position here using the actual platform fill details.</div>
     <div class="record-guide"><b>One form only.</b> Fill everything here at once. Auto-refresh will not erase these fields while this page is open.</div>
-    <input id="pos-origin" type="hidden"><input id="pos-competition" type="hidden"><input id="pos-card-index" type="hidden">
+    <input id="pos-origin" type="hidden"><input id="pos-card-index" type="hidden">
     <div class="formgrid" style="margin-top:14px">
-      <div><label class="small">Competition — selected automatically</label><input id="pos-competition-label" type="text" readonly aria-readonly="true" title="Selected automatically from the competition section or signal card"><div class="fieldnote">Read-only on purpose. Do not type the competition name; STC binds the trade to the selected competition automatically.</div></div>
+      <div><label class="small">Competition</label><select id="pos-competition" onchange="normalizePositionTargetInputs()"><option value="">Select competition</option><option value="capital-africa-sep-2026">Capital.com Africa</option><option value="amp-futures-sep-2026">AMP Futures</option></select><div class="fieldnote">Choose from the allowed competitions. Free-text competition names are not accepted.</div></div>
       <div><label class="small">Symbol</label><input id="pos-symbol" type="text" autocomplete="off" placeholder="Example: CBOT:ZN1!" oninput="updatePositionPricePreviews()"></div>
       <div><label class="small">Side</label><select id="pos-side"><option>LONG</option><option>SHORT</option></select></div>
       <div><label class="small">Quantity actually filled</label><input id="pos-qty" type="number" min="0" step="any"><div id="pos-qty-note" class="fieldnote"></div></div>
@@ -901,15 +901,33 @@ function recordExistingPositionFromCard(cardIndex){
  if(!c)return;
  return openExistingPositionForm(c.competition_id,cardIndex);
 }
+function normalizePositionSymbolForCompetition(competitionId,symbol){
+ const raw=String(symbol||'').trim().toUpperCase();
+ if(!raw)return '';
+ if(competitionId==='capital-africa-sep-2026'&&!raw.includes(':')){
+   const allowed=new Set(['BTCUSD','ETHUSD','DOGEUSD','EURUSD','AUDUSD','USDZAR','XAUUSD','XAGUSD','SPX500','NAS100']);
+   if(allowed.has(raw))return 'CAPITALCOM:'+raw;
+ }
+ return raw;
+}
+function normalizePositionTargetInputs(){
+ const competitionId=$('pos-competition').value;
+ const symbolInput=$('pos-symbol');
+ if(symbolInput){
+   symbolInput.value=normalizePositionSymbolForCompetition(competitionId,symbolInput.value);
+ }
+ updatePositionPricePreviews();
+}
+
 function openExistingPositionForm(competitionId,cardIndex=null){
  recordReturnTab=activeTab;
  const c=cardIndex!==null&&snapshot&&snapshot.cards?snapshot.cards[cardIndex]:null;
  const p=c&&c.locked_trade_plan?c.locked_trade_plan:null;
  $('pos-origin').value='manual_external';
  $('pos-competition').value=competitionId;
- $('pos-competition-label').value=competitionId==='amp-futures-sep-2026'?'AMP Futures':'Capital.com Africa';
  $('pos-card-index').value=cardIndex===null?'':String(cardIndex);
  $('pos-symbol').value=c?c.symbol:'';
+ $('pos-symbol').value=normalizePositionSymbolForCompetition(competitionId,$('pos-symbol').value);
  $('pos-side').value=p&&p.direction?p.direction:'LONG';
  $('pos-qty').value=c&&c.position_sizing&&c.position_sizing.proposed_quantity?c.position_sizing.proposed_quantity:'';
  $('pos-entry').value=c&&Number.isFinite(Number(c.current_price))?formatPlatformInput(c.symbol,c.current_price):'';
@@ -936,9 +954,8 @@ function recordFilledPosition(i){
  recordReturnTab=activeTab;
  $('pos-origin').value='stc_plan';
  $('pos-competition').value=c.competition_id;
- $('pos-competition-label').value=c.competition_id==='amp-futures-sep-2026'?'AMP Futures':'Capital.com Africa';
  $('pos-card-index').value=String(i);
- $('pos-symbol').value=c.symbol;
+ $('pos-symbol').value=normalizePositionSymbolForCompetition(c.competition_id,c.symbol);
  $('pos-side').value=p.direction;
  $('pos-qty').value=c.position_sizing&&c.position_sizing.proposed_quantity?c.position_sizing.proposed_quantity:'';
  $('pos-entry').value=Number.isFinite(Number(c.current_price))?formatPlatformInput(c.symbol,c.current_price):formatPlatformInput(c.symbol,p.entry_mid);
@@ -955,12 +972,14 @@ async function submitPositionModal(){
  const competitionId=$('pos-competition').value;
  const origin=$('pos-origin').value||'manual_external';
  const cardIndex=$('pos-card-index').value===''?null:Number($('pos-card-index').value);
- const symbol=$('pos-symbol').value.trim();
+ const symbol=normalizePositionSymbolForCompetition(competitionId,$('pos-symbol').value);
+ $('pos-symbol').value=symbol;
  const side=$('pos-side').value.trim().toUpperCase();
  const qty=Number($('pos-qty').value);
  const entry=parsePlatformPrice(symbol,$('pos-entry').value);
  const stop=parsePlatformPrice(symbol,$('pos-stop').value);
  const finalTp=parsePlatformPrice(symbol,$('pos-tp').value);
+ if(!(competitionId==='capital-africa-sep-2026'||competitionId==='amp-futures-sep-2026')){setPositionModalMessage('Select the competition first.');return;}
  if(!symbol){setPositionModalMessage('Symbol is required.');return;}
  if(!(side==='LONG'||side==='SHORT')){setPositionModalMessage('Side must be LONG or SHORT.');return;}
  if(!Number.isFinite(qty)||qty<=0){setPositionModalMessage('Enter the quantity actually filled.');return;}
@@ -988,7 +1007,13 @@ async function submitPositionModal(){
    await refresh();
    setTimeout(()=>closePositionModal(),900);
  }catch(e){
-   setPositionModalMessage('Position record failed: '+e.message);
+   const raw=String(e&&e.message?e.message:e);
+   const friendly=raw.includes('invalid_position_target')
+     ?'Position target is not valid. Select the competition and use the supported symbol (for example CAPITALCOM:EURUSD).'
+     :raw.includes('symbol_not_allowed')
+       ?'That symbol is not enabled for the selected competition.'
+       :raw;
+   setPositionModalMessage('Position record failed: '+friendly);
  }finally{
    $('position-submit').disabled=false;
  }
