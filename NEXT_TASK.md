@@ -86,3 +86,10 @@ Record:
 - whether any new component survives OOS+forward;
 - redundancy/family overlap.
 Failed components remain zero-weight.
+
+
+## RECONCILIATION CONTROL
+Use only benchmark results generated after PR #124 / commit 6df403846a1d386816a1bf0ebe29db79fc27cd60.
+Any wave-3 result produced before the canonical HalfTrend/Trendilo/Nadaraya contract reconciliation is superseded.
+Current exact-data trigger commit on research/native-community-15m-20260923:
+- 8edb3edef2c26e6348e989d5b95632f50b803327
