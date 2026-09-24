@@ -36,11 +36,6 @@ jobs:
           curl -fsS --retry 2 --max-time 20 \
             -H "Authorization: Bearer ${STC_OWNER_TOKEN}" \
             "https://stc.feama.site/notification.php" > /tmp/stc_notifications.json
-          curl -fsS --retry 2 --max-time 20 \
-            -H "Authorization: Bearer ${STC_OWNER_TOKEN}" \
-            -H "Content-Type: application/json" \
-            -d '{"action":"signal","event_id":"capital-africa-sep-2026|CAPITALCOM:EURUSD|15|1790247600000"}' \
-            "https://stc.feama.site/notification.php" > /tmp/stc_expired_probe.json
           python - <<'PY'
           import json
 
@@ -78,7 +73,6 @@ jobs:
           events = notifications.get("events") or []
           deliveries = notifications.get("deliveries") or []
           print("STC_LIVE_NOTIFICATION_CONFIG=" + json.dumps(config, sort_keys=True))
-          print("STC_EXPIRED_ELIGIBILITY_PROBE=" + json.dumps(json.load(open("/tmp/stc_expired_probe.json", encoding="utf-8")), sort_keys=True))
           print(
               "STC_LIVE_NOTIFICATION_RECENT="
               + json.dumps(
