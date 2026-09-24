@@ -60,3 +60,13 @@ def test_record_trade_competition_is_selected_from_allowed_values_and_capital_sy
     assert "return 'CAPITALCOM:'+raw" in source
     assert "Select the competition first." in source
     assert "Position target is not valid. Select the competition and use the supported symbol" in source
+
+
+def test_record_trade_blank_open_time_uses_server_time() -> None:
+    source = _source()
+    assert "Leave blank to use the STC server time automatically." in source
+    assert "const openedAt=openedText?new Date(openedText):null;" in source
+    assert "const openedUtc=openedAt?openedAt.toISOString():null;" in source
+    assert "opened_at_utc:openedUtc" in source
+    assert "manual_position_open_time_outside_competition_window" in source
+    assert "opened_at_out_of_range" in source
