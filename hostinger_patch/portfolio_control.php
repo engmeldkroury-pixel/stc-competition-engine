@@ -380,6 +380,64 @@ function stc_max_open_position(string $competitionId, string $symbol): ?float {
     return null;
 }
 
+function stc_resolve_position_target(string $competitionId, string $symbol): ?array {
+    $competitionId = trim($competitionId);
+    $symbol = strtoupper(trim($symbol));
+    if ($symbol === '') {
+        return null;
+    }
+
+    $capitalAliases = [
+        'BTCUSD' => 'CAPITALCOM:BTCUSD',
+        'ETHUSD' => 'CAPITALCOM:ETHUSD',
+        'DOGEUSD' => 'CAPITALCOM:DOGEUSD',
+        'EURUSD' => 'CAPITALCOM:EURUSD',
+        'AUDUSD' => 'CAPITALCOM:AUDUSD',
+        'USDZAR' => 'CAPITALCOM:USDZAR',
+        'XAUUSD' => 'CAPITALCOM:XAUUSD',
+        'XAGUSD' => 'CAPITALCOM:XAGUSD',
+        'SPX500' => 'CAPITALCOM:SPX500',
+        'NAS100' => 'CAPITALCOM:NAS100',
+    ];
+
+    $resolveForCompetition = static function (string $cid, string $raw) use ($capitalAliases): ?string {
+        if ($cid === 'capital-africa-sep-2026') {
+            $candidate = str_starts_with($raw, 'CAPITALCOM:')
+                ? $raw
+                : ($capitalAliases[$raw] ?? null);
+            return $candidate !== null && stc_max_open_position($cid, $candidate) !== null
+                ? $candidate
+                : null;
+        }
+        if ($cid === 'amp-futures-sep-2026') {
+            return stc_max_open_position($cid, $raw) !== null ? $raw : null;
+        }
+        return null;
+    };
+
+    if ($competitionId !== '') {
+        $resolved = $resolveForCompetition($competitionId, $symbol);
+        return $resolved === null ? null : [
+            'competition_id' => $competitionId,
+            'symbol' => $resolved,
+        ];
+    }
+
+    // Recovery convenience only: infer a missing competition when the symbol
+    // resolves uniquely to exactly one configured competition.
+    $matches = [];
+    foreach (['capital-africa-sep-2026', 'amp-futures-sep-2026'] as $candidateCompetition) {
+        $resolved = $resolveForCompetition($candidateCompetition, $symbol);
+        if ($resolved !== null) {
+            $matches[] = [
+                'competition_id' => $candidateCompetition,
+                'symbol' => $resolved,
+            ];
+        }
+    }
+    return count($matches) === 1 ? $matches[0] : null;
+}
+
 function stc_competition_rule_summary(string $competitionId): array {
     if ($competitionId === 'capital-africa-sep-2026') {
         return [
