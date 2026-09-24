@@ -2043,3 +2043,63 @@ Owner intervention required now: YES — only for historical-data access, not fo
 - STC benchmark adapter consumes official confirmed Buy/Sell events; official classifier/features/ANN/filters/kernel semantics stay upstream parity-tested.
 - TRAIN-only settings variants are allowed; TEST/FORWARD remain untouched.
 - Next exact-data step after the reconciled wave-3 run: rerun the 26-symbol matrix with Lorentzian included and compare incremental validated coverage.
+
+
+## Reconciled wave-3 benchmark archived + Lorentzian exact-data run started — 2026-09-24 10:10 EEST
+- Workflow run 35964596933 completed successfully after PR #124 identity reconciliation.
+- PR #126 merged as 598f14b0a8d4c907fe88ffdb391ea433d5638c31 after CI: 384 passed, 1 warning.
+- Durable reconciled wave-3 evidence:
+  - research_benchmarks/native_community_wave3_reconciled_15m_summary_20260924.json
+  - docs/NATIVE_COMMUNITY_WAVE3_RECONCILED_15M_20260924.md
+- Scope: 26 symbols x 5,000 exact-provider TradingView 15m bars; 18 community components; native matrix on the same windows.
+- Result:
+  - native STC validated 15m strategies: 0/26;
+  - community research-profile-ready symbols: 13/26, up from 10/26 in the prior 14-component benchmark;
+  - incremental coverage: CAPITALCOM:BTCUSD, CAPITALCOM:EURUSD, CAPITALCOM:NAS100.
+- New/reconciled component OOS+forward evidence:
+  - HalfTrend 2/26: NAS100, ZB1!;
+  - Trendilo 2/26: EURUSD, MJY1!;
+  - endpoint Nadaraya-Watson non-repaint 1/26: USDZAR;
+  - delayed RSI Kernel Optimized 1/26: BTCUSD.
+- PR #127 merged main into research/native-community-15m-20260923 without merging staged raw research data into main.
+- The research branch now includes merged PR #125 official Lorentzian integration.
+- New exact-data benchmark run 35967884019 started from commit e95ce289bbcca93ab13c6035772eb986c6674bde:
+  - same 26 symbols;
+  - same staged 5,000-bar 15m exact-provider windows;
+  - Lorentzian enabled alongside the reconciled community pool.
+- Superseded PRs closed:
+  - #121 superseded by merged official Lorentzian PR #125;
+  - #115 superseded by merged/reconciled wave-3 PRs #123/#124.
+- Live authority remains unchanged: research-only; no A+ gate/risk/competition/execution change.
+
+
+## Lorentzian benchmark integration defect found before acceptance — 2026-09-24 10:15 EEST
+- During WU-110 execution, an integration defect was found in the benchmark dispatcher:
+  - community_indicator_catalog.eligible_indicators() correctly considers implemented_official_port benchmarkable;
+  - community_indicator_benchmark.benchmark_symbol_indicators() still filtered to implementation_status == implemented_conceptual only.
+- Consequence: the official Lorentzian adapter from PR #125 could pass parity/causality tests but be silently omitted from the 26-symbol benchmark matrix.
+- Therefore workflow 35967884019 is superseded for Lorentzian evidence even if it completes successfully. Its non-Lorentzian outputs are not needed because the accepted reconciled baseline is already archived.
+- PR #129 opened to:
+  - admit implemented_official_port alongside implemented_conceptual in benchmark_symbol_indicators();
+  - continue excluding native_proxy_only from independent benchmark weight;
+  - add a regression test that Lorentzian is included and SMC native proxy is excluded;
+  - remove a duplicated Lorentzian causality-test parameter.
+- No live behavior was affected; this defect existed only in research matrix inclusion.
+
+
+## Official-port benchmark fix + VuManChu causal adapter merged — 2026-09-24 10:25 EEST
+- PR #129 merged as 34db5cf32d8802b22d442858bc76c3420158ec8e after CI: 384 passed, 1 warning.
+  - Repairs community benchmark dispatch so implementation_status=implemented_official_port participates alongside implemented_conceptual.
+  - native_proxy_only remains excluded from independent benchmark participation.
+  - Adds regression coverage proving official Lorentzian enters benchmark_symbol_indicators().
+- PR #132 merged as faa2744258d863e6c3e0e3bbecaea6729c200883 after CI: 386 passed, 1 warning.
+  - Adds source-audited causal VuManChu Cipher B research adapter.
+  - Preserves explicit WaveTrend oversold cross-up / overbought cross-down dot semantics.
+  - Regular WaveTrend divergence is emitted only on the true confirmation bar (pivot + 2), never visually backdated.
+  - Excludes Sommi/higher-timeframe paths using lookahead_on from STC causal signals.
+  - Adds TRAIN-only bounded parameter grid, prefix-invariance test, and dedicated divergence-timing test.
+  - Source audit: docs/VUMANCHU_CAUSAL_AUDIT_20260924.md.
+- Benchmarkable community pool is now 20 independent implemented components including the official Lorentzian port and causal VuManChu adapter.
+- PR #116 was closed as superseded by clean current-main replacement PR #133 for native frozen confirmation; PR #133 CI is pending.
+- Workflow 35967884019 remains superseded for Lorentzian evidence because it began before PR #129 corrected benchmark dispatch.
+- Live authority unchanged.

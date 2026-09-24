@@ -750,3 +750,96 @@ Status: VERIFIED / MERGED.
 - Direct contract test verifies STC's adapter output equals the official-port Buy/Sell output.
 - Third-party attribution is documented in docs/THIRD_PARTY_LORENTZIAN.md.
 - Research-only authority; no live A+ gate/risk/execution change.
+
+
+### WU-109 — reconciled wave-3 exact-provider 15m benchmark
+Status: VERIFIED / ARCHIVED / MERGED.
+- Workflow run: 35964596933 — SUCCESS.
+- Evidence PR: #126 — merged as 598f14b0a8d4c907fe88ffdb391ea433d5638c31.
+- CI on evidence PR: 384 passed, 1 warning.
+- Scope: 26 competition symbols, 5,000 exact TradingView 15m bars each, 18 community components, same-window native matrix.
+- Native 15m: 0/26 validated under current gates.
+- Community profile-ready coverage: 13/26 versus 10/26 in prior verified 14-component run.
+- Incremental symbols covered: BTCUSD, EURUSD, NAS100.
+- New/reconciled component validated counts:
+  - HalfTrend 2/26;
+  - Trendilo 2/26;
+  - endpoint Nadaraya-Watson non-repaint 1/26;
+  - delayed RSI Kernel Optimized 1/26.
+- Durable artifacts:
+  - research_benchmarks/native_community_wave3_reconciled_15m_summary_20260924.json
+  - docs/NATIVE_COMMUNITY_WAVE3_RECONCILED_15M_20260924.md
+- This work unit excludes Lorentzian because its workflow began before PR #125 merged.
+
+### WU-110 — official Lorentzian exact-provider 15m benchmark
+Status: IN PROGRESS.
+- Research branch: research/native-community-15m-20260923.
+- PR #127 merged current main into the research branch so the branch contains PR #125 official Lorentzian integration while retaining staged exact-provider datasets outside main.
+- Trigger commit: e95ce289bbcca93ab13c6035772eb986c6674bde.
+- Workflow run: 35967884019.
+- Required outputs:
+  1. Lorentzian validated symbol count;
+  2. TRAIN-selected official settings per survivor;
+  3. TEST/FORWARD metrics;
+  4. incremental profile-ready coverage versus WU-109;
+  5. redundancy/family overlap;
+  6. untouched frozen holdout only for Lorentzian survivors.
+- No live authority may be granted from this run alone.
+
+### Repository hygiene decision — 2026-09-24
+- PR #121 closed as superseded by merged PR #125 official Lorentzian integration.
+- PR #115 closed as superseded by PRs #123/#124 canonical wave-3 implementation/reconciliation.
+- PR #116 native frozen confirmation remains open because the apples-to-apples final-holdout objective is still relevant and is not yet superseded by an accepted main-branch artifact.
+
+
+### WU-110A — official-port benchmark inclusion repair
+Status: IN_PROGRESS / BLOCKS WU-110 ACCEPTANCE.
+- Defect found before accepting any Lorentzian exact-data result:
+  - official ports were eligible in the catalog but excluded by a downstream implementation-status filter.
+- Affected evidence:
+  - workflow 35967884019 must not be cited as Lorentzian benchmark evidence.
+- Repair PR:
+  - #129 Include official community ports in benchmark matrix.
+- Acceptance criteria:
+  1. CI green;
+  2. regression test proves lorentzian_classification appears in benchmark_symbol_indicators();
+  3. native_proxy_only components remain excluded from independent benchmark participation;
+  4. merge PR #129;
+  5. sync the exact-data research branch again;
+  6. rerun 26-symbol exact-provider benchmark and verify Lorentzian is present in artifacts.
+- Live boundary unchanged.
+
+
+### WU-110A — official-port benchmark inclusion repair
+Status: VERIFIED / MERGED.
+- PR #129 merged as 34db5cf32d8802b22d442858bc76c3420158ec8e.
+- CI: 384 passed, 1 warning.
+- Regression test proves official Lorentzian enters the per-symbol benchmark matrix.
+- native_proxy_only components remain excluded from independent research weight.
+- Workflow 35967884019 remains superseded for Lorentzian evidence and must not be cited as a Lorentzian run.
+
+### WU-111 — VuManChu Cipher B causal source audit and adapter
+Status: VERIFIED / MERGED.
+- PR #132 merged as faa2744258d863e6c3e0e3bbecaea6729c200883.
+- CI: 386 passed, 1 warning.
+- Public source audit confirmed:
+  - explicit WaveTrend oversold cross-up / overbought cross-down buy/sell dot semantics;
+  - regular divergence is a centered five-bar fractal only knowable two bars after the pivot;
+  - visual offset=-2 must not become an execution timestamp;
+  - Sommi/HTF paths using lookahead_on are future-dependent and excluded.
+- STC independent causal adapter:
+  - base dot signals at confirmed bar close;
+  - divergence emitted only at pivot+2 confirmation as weaker evidence;
+  - TRAIN-only parameter selection;
+  - prefix invariance + dedicated timing test.
+- Durable audit: docs/VUMANCHU_CAUSAL_AUDIT_20260924.md.
+- Component id: vumanchu_cipher_b.
+- Family: composite_momentum.
+- live_authority=false.
+
+### WU-112 — native exact frozen confirmation clean replacement
+Status: IN PROGRESS.
+- Original PR #116 closed as superseded due stale-base/concurrency churn.
+- Clean replacement PR #133 created from current main.
+- Scope remains exact 85/15 final-unseen confirmation for native STC strategies.
+- live_authority=false.

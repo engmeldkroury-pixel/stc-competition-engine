@@ -61,7 +61,6 @@ def test_community_catalog_separates_research_popularity_from_live_weighting():
     "indicator_id",
     (
         "lorentzian_classification",
-        "lorentzian_classification",
         "ut_bot_alerts",
         "squeeze_momentum_lazybear",
         "wavetrend_crosses",
@@ -80,6 +79,7 @@ def test_community_catalog_separates_research_popularity_from_live_weighting():
         "trendilo",
         "nadaraya_watson_endpoint_nonrepaint",
         "rsi_kernel_optimized_flux",
+        "vumanchu_cipher_b",
     ),
 )
 def test_community_indicator_adapters_are_causal(indicator_id: str):
@@ -128,6 +128,7 @@ def test_symbol_benchmark_runs_each_implemented_indicator_independently():
     )
     ids = {trial.indicator_id for trial in trials}
     assert {
+        "lorentzian_classification",
         "ut_bot_alerts",
         "squeeze_momentum_lazybear",
         "wavetrend_crosses",
@@ -146,6 +147,7 @@ def test_symbol_benchmark_runs_each_implemented_indicator_independently():
         "trendilo",
         "nadaraya_watson_endpoint_nonrepaint",
         "rsi_kernel_optimized_flux",
+        "vumanchu_cipher_b",
     } <= ids
     assert all(trial.symbol == "CBOT:ZN1!" for trial in trials)
     assert all(trial.timeframe == "15" for trial in trials)
@@ -228,3 +230,50 @@ def test_trendilo_parameter_contract_matches_existing_shadow_registry():
         and row.get("band_multiplier") == 1.25
         for row in grid
     )
+
+
+def test_benchmark_matrix_includes_official_ports_but_not_native_proxy_only():
+    trials = benchmark_symbol_indicators(
+        symbol="CBOT:ZN1!",
+        asset_class="rates",
+        timeframe="15",
+        bars=_bars(900),
+    )
+    ids = {trial.indicator_id for trial in trials}
+    assert "lorentzian_classification" in ids
+    assert "smart_money_concepts_luxalgo" not in ids
+
+
+def test_vumanchu_divergence_is_emitted_on_confirmation_bar_not_backdated():
+    from app.community_indicator_signals import _vumanchu_confirmed_divergence_events
+
+    bars = _bars(12)
+    oscillator = [
+        10.0, 30.0, 70.0, 40.0, 20.0,
+        15.0, 35.0, 60.0, 30.0, 10.0,
+        5.0, 0.0,
+    ]
+    bars[2] = Bar(
+        timestamp=bars[2].timestamp,
+        open=bars[2].open,
+        high=101.0,
+        low=bars[2].low,
+        close=bars[2].close,
+        volume=bars[2].volume,
+    )
+    bars[7] = Bar(
+        timestamp=bars[7].timestamp,
+        open=bars[7].open,
+        high=103.0,
+        low=bars[7].low,
+        close=bars[7].close,
+        volume=bars[7].volume,
+    )
+    events = _vumanchu_confirmed_divergence_events(
+        bars,
+        oscillator,
+        bearish_min=45.0,
+        bullish_max=-65.0,
+    )
+    assert 7 not in events
+    assert events[9] < 0

@@ -1,6 +1,14 @@
 # NEXT TASK
 
-Updated: 2026-09-24
+Updated: 2026-09-24 10:25 EEST
+
+## IMMEDIATE SEQUENCE
+1. Sync current main (including PR #129 and PR #132) into research/native-community-15m-20260923.
+2. Retrigger the 26-symbol / 5,000-bar exact-provider 15m matrix.
+3. Verify artifacts contain both lorentzian_classification and vumanchu_cipher_b for compatible symbols.
+4. Compare incremental validated coverage against the accepted 13/26 reconciled wave-3 baseline.
+5. Run exact 85/15 frozen holdout only for new Lorentzian/VuManChu survivors.
+6. If PR #133 CI is green, merge native frozen confirmation and schedule apples-to-apples native final-holdout evidence.
 
 ## CONTROLLING PROJECT
 STC.
@@ -9,95 +17,47 @@ STC.
 - docs/STC_ADAPTIVE_RESEARCH_MASTER_LEDGER.md
 - PROJECT_STATE.md
 - docs/COMMUNITY_INDICATOR_CANDIDATE_MATRIX_20260924.md
-- docs/TRENDILO_MULTITF_FROZEN_RUN1_20260924.md
 - research/community_shadow_registry.json
+- docs/NATIVE_COMMUNITY_WAVE3_RECONCILED_15M_20260924.md
 
 ## VERIFIED COMPLETE
-- 32-candidate durable community/composite inventory.
-- 17 implemented causal/composite research components.
-- Wave-two 26-symbol 15m frozen run.
-- Trendilo multi-timeframe frozen run 35947248551.
-- MJY Trendilo is MULTITF_CONFIRMED across 15m/5m/30m.
-- BTCUSD Trendilo remains SHADOW.
-- Registry target after WU-119: 16 records; live_authority=false.
+- Reconciled wave-3 26-symbol / 5,000-bar 15m benchmark archived through PR #126.
+- Community profile-ready coverage increased from 10/26 to 13/26.
+- Official Lorentzian port merged through PR #125 with upstream parity contract.
+- General Lab durable queue/runtime-plan layer exists.
+- MJY Trendilo remains MULTITF_CONFIRMED research-only.
+- All research/shadow records remain live_authority=false.
 
-## COMPLETED RESEARCH WORK UNIT — LORENTZIAN
-- PR #125 merged.
-- Official AI Edge parity-tested Python port pinned to exact upstream commit.
-- STC maps official confirmed Buy/Sell stream only.
-- Adapter parity contract test passed in CI.
-- live_authority=false.
-- Next: exact-provider 26-symbol benchmark/frozen evidence before any shadow participation.
+## ACTIVE WORK UNIT — WU-110 LORENTZIAN EXACT-DATA BENCHMARK
+Workflow:
+- run 35967884019
+- trigger commit e95ce289bbcca93ab13c6035772eb986c6674bde
+- branch research/native-community-15m-20260923
 
-## PARALLEL FOLLOW-UP
-- Audit VuManChu Cipher B pivot/divergence confirmation delay.
-- Accumulate MJY Trendilo shadow observations; no weight/live promotion until the registry threshold is satisfied.
-- General Lab continues to inherit the full research PROCESS for every new symbol, never another symbol's weights.
+Use the same 26 symbols and exact 5,000-bar TradingView 15m windows.
+
+On completion:
+1. archive combined benchmark summary on a clean main-based evidence branch;
+2. report Lorentzian validated symbols and TRAIN-selected official settings;
+3. compare TEST/FORWARD metrics against existing components;
+4. measure incremental symbol coverage vs 13/26 wave-3 baseline;
+5. inspect family/redundancy overlap;
+6. run exact 85/15 frozen holdout only for Lorentzian survivors;
+7. add survivors to SHADOW only after frozen pass.
+
+## THEN
+1. Finish/refresh PR #116 native frozen confirmation for an apples-to-apples native final-holdout comparison.
+2. Continue VuManChu Cipher B causal/pivot-delay audit.
+3. Continue expanding high-value practical open-source candidates only after repaint/causality audit.
+4. Extend benchmark/frozen evidence to 5m/30m/1h/2h/4h/1D where exact history is sufficient.
+5. Finish General Lab automatic exact-data worker bridge:
+   symbol -> asset classification -> exact history -> native matrix -> community matrix -> OOS/FORWARD -> redundancy-aware ensemble -> compact report.
+6. Add frozen-window recalibration from accumulated live outcomes; never reweight after one trade.
 
 ## LIVE BOUNDARY
 - human approval/manual execution only;
 - no automatic broker execution;
-- no A+/risk/competition-rule change from research alone;
-- reviews/popularity remain discovery metadata only.
-
-
-## FACEBOOK / EXTERNAL TRADER SOURCE AUDIT
-Audit the owner-supplied sources:
-- https://www.facebook.com/share/18ntSnCtXa/
-- https://www.facebook.com/share/p/1beB4M9ykK/
-
-Extract only reproducible logic:
-- indicator names/components;
-- buy/sell trigger rules;
-- exit/stop/target logic;
-- market-regime commentary;
-- asset/timeframe specialization;
-- claims that need independent verification.
-
-Do not copy live calls into STC. Convert useful concepts into research candidates, then require causal/OOS/forward validation before any weight.
-
-
-## ACTIVE NEXT WORK UNIT — GENERAL LAB AUTOMATION
-Build the runtime bridge so every symbol added to General Lab invokes the same research PROCESS automatically:
-asset classification -> data quality -> native matrix -> community matrix -> OOS/forward -> redundancy-aware ensemble -> compact report.
-The symbol must inherit process only, never weights.
-The bridge must fail clearly when exact historical data is unavailable instead of substituting another provider silently.
-
-## EXTERNAL SOURCE BLOCKER
-The two Facebook trader links are registered but not yet readable:
-- direct fetch -> login_required;
-- browser automation -> not started because TinyFish wallet balance is negative.
-Do not fabricate content. Resume when browser access is funded or when screenshots/video/text are supplied.
-
-
-## ACTIVE EVIDENCE TASK — WAVE 3 REBENCHMARK
-Rerun the same 26-symbol / 5,000-bar exact-provider 15m benchmark with the expanded implemented community set including:
-- Trendilo;
-- endpoint-only non-repainting Nadaraya-Watson;
-- causally delayed RSI Kernel Optimized.
-Compare against the prior verified workflow 35916027610.
-Record:
-- validated symbols per component;
-- incremental symbols covered;
-- robust scores;
-- whether any new component survives OOS+forward;
-- redundancy/family overlap.
-Failed components remain zero-weight.
-
-
-## RECONCILIATION CONTROL
-Use only benchmark results generated after PR #124 / commit 6df403846a1d386816a1bf0ebe29db79fc27cd60.
-Any wave-3 result produced before the canonical HalfTrend/Trendilo/Nadaraya contract reconciliation is superseded.
-Current exact-data trigger commit on research/native-community-15m-20260923:
-- 8edb3edef2c26e6348e989d5b95632f50b803327
-
-
-## LORENTZIAN EXACT-DATA FOLLOW-UP
-After the reconciled wave-3 benchmark completes, sync PR #125 to the exact-data research branch and run the same 26-symbol / 5,000-bar 15m matrix with Lorentzian enabled.
-Record:
-- validated symbols;
-- TRAIN-selected official settings;
-- TEST/FORWARD metrics;
-- incremental coverage versus existing community pool;
-- family redundancy;
-- final frozen holdout only for survivors.
+- no live A+/risk/competition rule change from research alone;
+- reviews/popularity are discovery metadata only;
+- no cross-symbol weight inheritance;
+- no repainting/future-dependent component may enter live evidence.
