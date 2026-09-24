@@ -14,3 +14,4 @@ T-STC-RECORD-COMPETITION-READONLY,PASS,"Record Trade competition identity remain
 T-STC-POSITION-TARGET-FIX,PASS,"Competition selector and canonical position target resolution","PR #157 critical CI: 166 passed 1 warning"
 T-STC-EURUSD-RECOVERY,PASS,"Existing EURUSD position recorded exactly once in STC ledger","Recovery run 36013822127 created one position; Live Readback 36014399954 confirms exactly one open position and total_entries=1"
 T-STC-RECORD-TIME-FALLBACK,PASS,"Record Trade blank open-time server fallback and clock-skew guard","PR #158 critical CI: 168 passed 1 warning"
+T-STC-B159,PASS,"Competition trade inventory and P/L operator-console contract","PR #159 CI run 36023363966 completed success before merge ae51f8010ab1f7ba93fadc3661066397cc167268"
