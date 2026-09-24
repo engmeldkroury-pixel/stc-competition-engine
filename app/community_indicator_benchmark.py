@@ -314,6 +314,21 @@ def indicator_parameter_grid(indicator_id: str) -> tuple[dict, ...]:
             {"qqe_rsi_period": 6, "qqe_smoothing": 5, "qqe_fast_factor": 3.0, "qqe_slow_factor": 1.61, "qqe_threshold": 3.0, "ssl_baseline_length": 60, "ssl_length": 15, "wae_fast_length": 20, "wae_slow_length": 40, "wae_sensitivity": 150.0},
             {"qqe_rsi_period": 6, "qqe_smoothing": 5, "qqe_fast_factor": 2.5, "qqe_slow_factor": 1.61, "qqe_threshold": 2.0, "ssl_baseline_length": 50, "ssl_length": 10, "wae_fast_length": 12, "wae_slow_length": 26, "wae_sensitivity": 100.0},
         ),
+        "trendilo": (
+            {"change_period": 1, "alma_length": 10, "alma_offset": 0.85, "alma_sigma": 6.0, "rms_length": 20, "band_multiplier": 1.0},
+            {"change_period": 1, "alma_length": 20, "alma_offset": 0.85, "alma_sigma": 6.0, "rms_length": 30, "band_multiplier": 1.0},
+            {"change_period": 3, "alma_length": 10, "alma_offset": 0.85, "alma_sigma": 6.0, "rms_length": 20, "band_multiplier": 1.25},
+        ),
+        "nadaraya_watson_envelope_luxalgo": (
+            {"lookback": 30, "bandwidth": 6.0, "deviation_length": 30, "envelope_multiplier": 2.0},
+            {"lookback": 50, "bandwidth": 8.0, "deviation_length": 50, "envelope_multiplier": 2.5},
+            {"lookback": 80, "bandwidth": 12.0, "deviation_length": 50, "envelope_multiplier": 2.0},
+        ),
+        "rsi_kernel_optimized_flux": (
+            {"rsi_period": 14, "pivot_length": 8, "bandwidth": 4.0, "min_samples": 10, "dominance_ratio": 1.25},
+            {"rsi_period": 14, "pivot_length": 12, "bandwidth": 4.0, "min_samples": 12, "dominance_ratio": 1.30},
+            {"rsi_period": 21, "pivot_length": 12, "bandwidth": 6.0, "min_samples": 12, "dominance_ratio": 1.35},
+        ),
     }
     return grids.get(indicator_id, ({},))
 
