@@ -6,7 +6,7 @@ Updated: 2026-09-24 11:30 UTC
 STC.
 
 ## URGENT PRODUCTION PRIORITY
-Deploy the six-file Hostinger PR #145 hotfix. Live Python processing is already producing Capital `COMPETITION_OPPORTUNITY` signals, but the deployed PHP still applies the older A_PLUS-only eligibility rule and suppresses those opportunities.
+The six-file Hostinger PR #145 hotfix is deployed and verified. The current priority is the next naturally generated fresh Capital `COMPETITION_OPPORTUNITY`: confirm deployed quality eligibility, locked-plan visibility and Telegram delivery, then present the still-valid manual order ticket to Mohamed.
 
 ## VERIFIED LIVE EVIDENCE
 - Main includes PR #145 competition quality eligibility fix.
@@ -21,26 +21,21 @@ Deploy the six-file Hostinger PR #145 hotfix. Live Python processing is already 
 - Competition progress: 0 entries, 0 qualifying days, USD 0 realized P/L.
 - Official leaderboard checkpoint: 4,188 participants; rank 60 +11.16% realized; rank 1 +38.08%.
 
-## OWNER ACTION REQUIRED — ONLY CURRENT EXTERNAL BLOCKER
-Upload `STC_HOSTINGER_HOTFIX_145.zip` contents to the existing STC `public_html` directory and replace the six same-name files:
-1. approval.php
-2. cloud_control.php
-3. notification_control.php
-4. operator.php
-5. operator_snapshot.php
-6. portfolio_control.php
+## HOSTINGER HOTFIX STATUS
+DEPLOYED AND VERIFIED.
 
-Do not upload config.php. No SQL migration is required.
+Evidence:
+- post-upload readback run: `36005321334`;
+- expired historical EURUSD eligibility probe: `expired_plan`, proving the deployed PHP reached expiry after accepting the competition grade;
+- Telegram configured: true;
+- historical Telegram deliveries: HTTP 200.
 
-Bundle SHA-256:
-`a4b3acddc468a9f95c3813dd3a18b201b31e12517ebb788445202fdbd1b3a93a`
-
-## IMMEDIATE AUTOMATED ACTION AFTER OWNER UPLOAD
-1. Update `ops/LIVE_READBACK_TRIGGER`.
-2. Verify a fresh Capital `COMPETITION_OPPORTUNITY` is accepted by deployed PHP.
+## IMMEDIATE AUTOMATED ACTION
+1. Continue reading each fresh Capital cycle.
+2. On the next natural `COMPETITION_OPPORTUNITY`, verify deployed `quality_gate_passed=true`.
 3. Verify locked plan is visible while active.
-4. Verify Telegram notification is sent/not skipped.
-5. If the opportunity remains fresh, present the manual order ticket to Mohamed for final human execution only.
+4. Verify Telegram `NEW_LOCKED_PLAN` delivery is sent.
+5. If the plan is still valid, present the manual order ticket to Mohamed for final human execution only.
 
 ## COMMUNITY INDICATOR TRACK — CONTINUE IN PARALLEL
 - Corrected research complete: 13/26 profile-ready, 6/10 Capital.
