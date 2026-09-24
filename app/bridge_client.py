@@ -40,7 +40,11 @@ class BridgeClient:
 
     @property
     def headers(self) -> dict[str, str]:
-        return {"Authorization": f"Bearer {self.token}", "Accept": "application/json"}
+        return {
+            "Authorization": f"Bearer {self.token}",
+            "Accept": "application/json",
+            "User-Agent": "STC-Competition-Worker/1.0",
+        }
 
     def _client(self) -> httpx.Client:
         return httpx.Client(timeout=self.timeout_seconds, transport=self.transport)
