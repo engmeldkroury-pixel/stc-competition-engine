@@ -1941,3 +1941,40 @@ Owner intervention required now: YES — only for historical-data access, not fo
 - Total implemented community/composite research pool is now 17.
 - No live weight, A+ gate, risk rule, competition rule, or broker execution path changed.
 - Next evidence step is exact-provider 26-symbol 15m frozen confirmation for the expanded pool.
+
+
+## Wave-two frozen confirmation + durable candidate matrix checkpoint — 2026-09-24 05:21 EEST
+- Owner instruction repeated: before more work, persist all agreed adaptive-strategy, indicator, weighting, research-layer and General Lab rules in repository history so any new chat can continue from files alone.
+- Durable controlling research ledger remains docs/STC_ADAPTIVE_RESEARCH_MASTER_LEDGER.md.
+- Main now contains docs/COMMUNITY_INDICATOR_CANDIDATE_MATRIX_20260924.md with a 32-candidate/component inventory.
+- Implemented causal/community-composite research pool is 17 components:
+  - UT Bot;
+  - Squeeze Momentum;
+  - WaveTrend;
+  - Hull Suite;
+  - SuperTrend;
+  - Chandelier Exit;
+  - Schaff Trend Cycle;
+  - Range Filter;
+  - AlphaTrend;
+  - Optimized Trend Tracker;
+  - QQE MOD;
+  - SSL Hybrid;
+  - Waddah Attar Explosion;
+  - QQE+SSL+WAE composite;
+  - Trendilo;
+  - HalfTrend;
+  - endpoint Nadaraya-Watson non-repainting.
+- WU-116 wave-two 26-symbol 15m exact frozen run completed successfully:
+  - workflow run 35926880568;
+  - 26/26 symbols;
+  - 5,000 exact-provider TradingView 15m bars per symbol;
+  - 4,250 development + 750 untouched final holdout;
+  - new wave-two frozen survivors: CAPITALCOM:BTCUSD/Trendilo and CME_MINI:MJY1!/Trendilo;
+  - HalfTrend and endpoint Nadaraya-Watson had no new 15m frozen survivor in this run.
+- Both Trendilo survivors were added to the research-only SHADOW registry.
+- Shadow registry now has 12 records total and still enforces live_authority=false.
+- Existing promotion ladder remains:
+  FROZEN_PASS -> SHADOW -> MULTITF_CONFIRMED -> ELIGIBLE_FOR_OWNER_PROMOTION.
+- No component is currently MULTITF_CONFIRMED solely by the new Trendilo result.
+- Next evidence step: exact-provider multi-timeframe frozen confirmation for BTCUSD/Trendilo and MJY1!/Trendilo, then continue Lorentzian and VuManChu causal audits.
