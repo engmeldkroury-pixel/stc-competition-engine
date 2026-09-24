@@ -2085,3 +2085,21 @@ Owner intervention required now: YES — only for historical-data access, not fo
   - add a regression test that Lorentzian is included and SMC native proxy is excluded;
   - remove a duplicated Lorentzian causality-test parameter.
 - No live behavior was affected; this defect existed only in research matrix inclusion.
+
+
+## Official-port benchmark fix + VuManChu causal adapter merged — 2026-09-24 10:25 EEST
+- PR #129 merged as 34db5cf32d8802b22d442858bc76c3420158ec8e after CI: 384 passed, 1 warning.
+  - Repairs community benchmark dispatch so implementation_status=implemented_official_port participates alongside implemented_conceptual.
+  - native_proxy_only remains excluded from independent benchmark participation.
+  - Adds regression coverage proving official Lorentzian enters benchmark_symbol_indicators().
+- PR #132 merged as faa2744258d863e6c3e0e3bbecaea6729c200883 after CI: 386 passed, 1 warning.
+  - Adds source-audited causal VuManChu Cipher B research adapter.
+  - Preserves explicit WaveTrend oversold cross-up / overbought cross-down dot semantics.
+  - Regular WaveTrend divergence is emitted only on the true confirmation bar (pivot + 2), never visually backdated.
+  - Excludes Sommi/higher-timeframe paths using lookahead_on from STC causal signals.
+  - Adds TRAIN-only bounded parameter grid, prefix-invariance test, and dedicated divergence-timing test.
+  - Source audit: docs/VUMANCHU_CAUSAL_AUDIT_20260924.md.
+- Benchmarkable community pool is now 20 independent implemented components including the official Lorentzian port and causal VuManChu adapter.
+- PR #116 was closed as superseded by clean current-main replacement PR #133 for native frozen confirmation; PR #133 CI is pending.
+- Workflow 35967884019 remains superseded for Lorentzian evidence because it began before PR #129 corrected benchmark dispatch.
+- Live authority unchanged.
