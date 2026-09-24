@@ -6,3 +6,5 @@ T-STC-LIVE-PROCESS,PASS,"Production bridge processing","Run 35991923114 claimed 
 T-STC-PARITY,PASS,"Python community parity fixture generation","Run 35992849854: 6/6 fixture jobs + combine success"
 T-STC-HOTFIX-BUNDLE,PASS,"Six-file Hostinger bundle generation","Run 35993270128 success; local ZIP SHA-256 a4b3acddc468a9f95c3813dd3a18b201b31e12517ebb788445202fdbd1b3a93a"
 T-STC-PINE-01-CRITICAL,PASS,"Static research-only Pine candidate contract","PR #152 critical CI success; TradingView compile NOT_RUN"
+T-STC-HOTFIX-LIVE,PASS,"Deployed Hostinger Capital competition eligibility","Expired historical EURUSD COMPETITION_OPPORTUNITY returned expired_plan after upload; old code would return quality_gate_not_passed"
+T-STC-NOTIFY-READBACK,PASS,"Production notification configuration/readback","Telegram configured true; prior deliveries HTTP 200; sanitized readback workflow success"
