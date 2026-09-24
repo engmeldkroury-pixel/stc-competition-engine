@@ -921,3 +921,16 @@ Status: CODE PROPOSED / COMPLETED_UNVERIFIED / CI INFRASTRUCTURE BLOCKED.
   - negative expectancy or PF<1 cannot increase weight;
   - output remains `live_authority=false`.
 - Both PR CI jobs failed before steps began because of the external Actions blocker. They are not accepted/merged on that basis yet.
+
+
+### WU-115 — benchmark eligibility clean replacement
+Status: COMPLETED_UNVERIFIED / EXTERNAL CI BLOCKED.
+- Clean current-main replacement PR #138 opened for stale PR #135.
+- Centralizes benchmarkable community implementation status selection.
+- Normal benchmark and final community frozen confirmation use the same selector.
+- Official-port components such as Lorentzian are eligible in both paths.
+- native_proxy_only components remain excluded from independent community weights.
+- PR is mergeable.
+- GitHub Actions run 35974456534 has steps=null, so no CI step executed.
+- This must not be labeled test failure; independent code review is continuing.
+- Live authority remains false.
