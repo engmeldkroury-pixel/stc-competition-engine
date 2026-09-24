@@ -267,3 +267,192 @@ def test_research_runner_still_rejects_duplicate_timestamps_even_with_enough_oth
         assert "Research data quality failed" in str(exc)
     else:
         raise AssertionError("Expected duplicate-timestamp integrity failure")
+
+
+def test_shadow_batch_parser_rejects_unsealed_windows():
+    payload = {
+        "shadow_batch": {
+            "batch_id": "open-window",
+            "sealed": False,
+            "observations": [],
+        }
+    }
+    try:
+        rr._shadow_batch_from_payload(payload)
+    except ValueError as exc:
+        assert "sealed" in str(exc)
+    else:
+        raise AssertionError("Expected unsealed shadow batch to fail closed")
+
+
+def test_shadow_batch_parser_requires_exact_typed_observations():
+    payload = {
+        "shadow_batch": {
+            "batch_id": "sealed-1",
+            "sealed": True,
+            "observations": [
+                {
+                    "observation_id": "obs-1",
+                    "symbol": "CBOT:ZN1!",
+                    "timeframe": "15",
+                    "component_id": "schaff_trend_cycle",
+                    "result_r": 0.25,
+                    "directional_hit": "yes",
+                }
+            ],
+        }
+    }
+    try:
+        rr._shadow_batch_from_payload(payload)
+    except ValueError as exc:
+        assert "directional_hit" in str(exc)
+    else:
+        raise AssertionError("Expected non-boolean directional_hit to fail closed")
+
+
+def test_research_runner_recalibrates_ensemble_from_sealed_batch_only():
+    from app.community_indicator_benchmark import (
+        EnsembleComponentWeight,
+        SymbolEnsembleProfile,
+    )
+
+    profile = SymbolEnsembleProfile(
+        symbol="CBOT:ZN1!",
+        timeframe="15",
+        components=(
+            EnsembleComponentWeight(
+                component_id="schaff_trend_cycle",
+                source_type="community_indicator",
+                family="momentum_cycle",
+                symbol="CBOT:ZN1!",
+                timeframe="15",
+                raw_score=30.0,
+                normalized_weight=0.5,
+                test_trades=40,
+                forward_trades=20,
+                note="fixture",
+            ),
+            EnsembleComponentWeight(
+                component_id="range_filter_guikroth",
+                source_type="community_indicator",
+                family="adaptive_range_trend",
+                symbol="CBOT:ZN1!",
+                timeframe="15",
+                raw_score=30.0,
+                normalized_weight=0.5,
+                test_trades=40,
+                forward_trades=20,
+                note="fixture",
+            ),
+        ),
+        community_weight_share=1.0,
+        core_weight_share=0.0,
+        status="RESEARCH_PROFILE_READY",
+        notes=("fixture",),
+    )
+    observations = []
+    for i in range(40):
+        observations.append({
+            "observation_id": f"good-{i}",
+            "symbol": "CBOT:ZN1!",
+            "timeframe": "15",
+            "component_id": "schaff_trend_cycle",
+            "result_r": 0.30,
+            "directional_hit": True,
+        })
+        observations.append({
+            "observation_id": f"bad-{i}",
+            "symbol": "CBOT:ZN1!",
+            "timeframe": "15",
+            "component_id": "range_filter_guikroth",
+            "result_r": -0.15,
+            "directional_hit": False,
+        })
+    batch = rr._shadow_batch_from_payload({
+        "shadow_batch": {
+            "batch_id": "sealed-40",
+            "sealed": True,
+            "observations": observations,
+        }
+    })
+    result = rr._recalibrate_ensemble_profiles(
+        symbol="CBOT:ZN1!",
+        profiles={"15": profile},
+        batch=batch,
+    )
+    recalibrated = result["15"]
+    assert recalibrated.live_authority is False
+    assert recalibrated.status == "RESEARCH_PROFILE_RECALIBRATED"
+    assert abs(sum(recalibrated.normalized_candidate_weights.values()) - 1.0) < 1e-12
+    assert (
+        recalibrated.normalized_candidate_weights["schaff_trend_cycle"]
+        > recalibrated.normalized_candidate_weights["range_filter_guikroth"]
+    )
+
+
+def test_research_runner_small_shadow_batch_keeps_prior_profile_weights():
+    from app.community_indicator_benchmark import (
+        EnsembleComponentWeight,
+        SymbolEnsembleProfile,
+    )
+
+    profile = SymbolEnsembleProfile(
+        symbol="CBOT:ZN1!",
+        timeframe="15",
+        components=(
+            EnsembleComponentWeight(
+                component_id="schaff_trend_cycle",
+                source_type="community_indicator",
+                family="momentum_cycle",
+                symbol="CBOT:ZN1!",
+                timeframe="15",
+                raw_score=30.0,
+                normalized_weight=0.7,
+                test_trades=40,
+                forward_trades=20,
+                note="fixture",
+            ),
+            EnsembleComponentWeight(
+                component_id="range_filter_guikroth",
+                source_type="community_indicator",
+                family="adaptive_range_trend",
+                symbol="CBOT:ZN1!",
+                timeframe="15",
+                raw_score=20.0,
+                normalized_weight=0.3,
+                test_trades=40,
+                forward_trades=20,
+                note="fixture",
+            ),
+        ),
+        community_weight_share=1.0,
+        core_weight_share=0.0,
+        status="RESEARCH_PROFILE_READY",
+        notes=("fixture",),
+    )
+    batch = rr._shadow_batch_from_payload({
+        "shadow_batch": {
+            "batch_id": "small-sealed",
+            "sealed": True,
+            "observations": [
+                {
+                    "observation_id": f"small-{i}",
+                    "symbol": "CBOT:ZN1!",
+                    "timeframe": "15",
+                    "component_id": "schaff_trend_cycle",
+                    "result_r": 1.0,
+                    "directional_hit": True,
+                }
+                for i in range(10)
+            ],
+        }
+    })
+    result = rr._recalibrate_ensemble_profiles(
+        symbol="CBOT:ZN1!",
+        profiles={"15": profile},
+        batch=batch,
+    )["15"]
+    assert result.live_authority is False
+    assert result.status == "RESEARCH_PROFILE_UNCHANGED"
+    assert abs(result.normalized_candidate_weights["schaff_trend_cycle"] - 0.7) < 1e-12
+    assert abs(result.normalized_candidate_weights["range_filter_guikroth"] - 0.3) < 1e-12
