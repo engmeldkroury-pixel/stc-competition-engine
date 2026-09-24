@@ -1,0 +1,169 @@
+{
+  "schema": "stc-community-corrected-full26-v1",
+  "created_utc": "2026-09-24T10:38:00Z",
+  "controlling_project": "STC",
+  "evidence": {
+    "corrected_partial_run": 35969652488,
+    "retry_run": 35987607069,
+    "retry_combined_artifact_id": 10803236399,
+    "retry_combined_artifact_sha256": "dd7462c6cf70ad05c150f9acae5b981fa64f05133e4cbed017ba26bc05119798",
+    "exact_provider_bars_per_symbol": 5000,
+    "timeframe": "15",
+    "symbol_count": 26,
+    "community_trial_count": 20
+  },
+  "full26": {
+    "native_validated_15m": "0/26",
+    "community_profile_ready": "13/26",
+    "lorentzian_classification": {
+      "validated": "3/26",
+      "symbols": [
+        {
+          "symbol": "CAPITALCOM:USDZAR",
+          "robust_score": 44.3006
+        },
+        {
+          "symbol": "CBOT:ZB1!",
+          "robust_score": 23.2508
+        },
+        {
+          "symbol": "NYMEX:MCL1!",
+          "robust_score": 15.8644
+        }
+      ]
+    },
+    "vumanchu_cipher_b": {
+      "validated": "0/26"
+    },
+    "qqe_ssl_wae_composite": {
+      "validated": "0/26"
+    }
+  },
+  "capital_15m": {
+    "profile_ready": "6/10",
+    "symbols": {
+      "CAPITALCOM:BTCUSD": [
+        {
+          "component_id": "rsi_kernel_optimized_flux",
+          "family": "kernel_reversal",
+          "normalized_weight": 1,
+          "raw_score": 28.6002,
+          "test_trades": 41,
+          "forward_trades": 29
+        }
+      ],
+      "CAPITALCOM:DOGEUSD": [
+        {
+          "component_id": "range_filter_guikroth",
+          "family": "adaptive_range_trend",
+          "normalized_weight": 0.6006253304227808,
+          "raw_score": 23.2279,
+          "test_trades": 24,
+          "forward_trades": 35
+        },
+        {
+          "component_id": "schaff_trend_cycle",
+          "family": "momentum_cycle",
+          "normalized_weight": 0.3993746695772193,
+          "raw_score": 13.4807,
+          "test_trades": 66,
+          "forward_trades": 72
+        }
+      ],
+      "CAPITALCOM:ETHUSD": [
+        {
+          "component_id": "ssl_hybrid",
+          "family": "composite_trend",
+          "normalized_weight": 1,
+          "raw_score": 39.1016,
+          "test_trades": 42,
+          "forward_trades": 27
+        }
+      ],
+      "CAPITALCOM:EURUSD": [
+        {
+          "component_id": "trendilo",
+          "family": "adaptive_momentum",
+          "normalized_weight": 1,
+          "raw_score": 21.9819,
+          "test_trades": 33,
+          "forward_trades": 35
+        }
+      ],
+      "CAPITALCOM:NAS100": [
+        {
+          "component_id": "halftrend_everget",
+          "family": "atr_trend",
+          "normalized_weight": 1,
+          "raw_score": 32.7868,
+          "test_trades": 29,
+          "forward_trades": 21
+        }
+      ],
+      "CAPITALCOM:USDZAR": [
+        {
+          "component_id": "lorentzian_classification",
+          "family": "machine_learning",
+          "normalized_weight": 0.2879042371321771,
+          "raw_score": 44.3006,
+          "test_trades": 28,
+          "forward_trades": 19
+        },
+        {
+          "component_id": "nadaraya_watson_endpoint_nonrepaint",
+          "family": "kernel_reversal",
+          "normalized_weight": 0.2341137461419382,
+          "raw_score": 33.6239,
+          "test_trades": 23,
+          "forward_trades": 21
+        },
+        {
+          "component_id": "alphatrend",
+          "family": "composite_trend",
+          "normalized_weight": 0.1788421855683715,
+          "raw_score": 23.4804,
+          "test_trades": 46,
+          "forward_trades": 45
+        },
+        {
+          "component_id": "supertrend_kivanc",
+          "family": "atr_trend",
+          "normalized_weight": 0.1771992492416492,
+          "raw_score": 27.6163,
+          "test_trades": 27,
+          "forward_trades": 28
+        },
+        {
+          "component_id": "ut_bot_alerts",
+          "family": "atr_trend",
+          "normalized_weight": 0.12194058191586397,
+          "raw_score": 19.0043,
+          "test_trades": 65,
+          "forward_trades": 67
+        }
+      ],
+      "CAPITALCOM:AUDUSD": [],
+      "CAPITALCOM:SPX500": [],
+      "CAPITALCOM:XAGUSD": [],
+      "CAPITALCOM:XAUUSD": []
+    }
+  },
+  "live_integration_status": {
+    "calibration_registry_records": 0,
+    "pine_payload_exact_component_signals": false,
+    "current_live_family_weights": {
+      "trend": 0.15,
+      "market_structure": 0.16,
+      "smc_liquidity": 0.15,
+      "momentum": 0.11,
+      "volume": 0.1,
+      "volatility": 0.1,
+      "vwap": 0.08,
+      "price_action": 0.08,
+      "microstructure": 0.07
+    },
+    "conclusion": "Research component weights are not yet live authority. Exact component state must be carried into the live payload before symbol-specific research weights can be applied honestly."
+  },
+  "live_authority": false,
+  "promotion_effect": "NONE"
+}
