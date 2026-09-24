@@ -2156,3 +2156,17 @@ Owner intervention required now: YES — only for historical-data access, not fo
 - PR #136 remains superseded; clean replacement PR #137 already merged as c1254278f0159012dcabade8cf5bdcb0deca7cfc and provides sealed frozen-batch shadow weight recalibration.
 - Current main already contains redundancy-aware family normalization in build_symbol_ensemble_profile(); no duplicate implementation was added.
 - Live A+, risk, sizing, competition and manual-execution rules remain unchanged.
+
+
+## Benchmark eligibility selector accepted/merged — 2026-09-24 11:27 EEST
+- Clean replacement PR #138 merged as cd458d2eb20cebcb4bbc34fa822edfcd5cda0233.
+- Stale PR #135 closed as superseded.
+- Independent unified-diff review confirmed the change is limited to:
+  - central BENCHMARKABLE_IMPLEMENTATION_STATUSES;
+  - benchmarkable_indicators();
+  - normal benchmark selector use;
+  - community frozen-confirmation selector use;
+  - regression tests for official Lorentzian inclusion and native SMC proxy exclusion.
+- GitHub Actions run 35974456534 remained pre-start blocked (steps=null), so CI is explicitly recorded as NOT RUN, not passed.
+- Acceptance basis: mergeable clean diff + independent source review + research-only boundary.
+- Live A+, risk, sizing, competition and manual execution behavior unchanged.
