@@ -177,6 +177,33 @@ def test_one_r_profit_recommends_protection_not_rotation():
     assert advice.suggested_stop > 7800
 
 
+def test_peak_r_retrace_exits_to_protect_competition_score():
+    advice = supervise_position(
+        pos(target1=7890, target2=7920),
+        market(
+            current_price=7831,
+            peak_r_multiple=2.90,
+        ),
+    )
+    assert advice.action == "EXIT_NOW"
+    assert advice.urgency == "high"
+    assert "profit_retrace_breached_dynamic_floor" in advice.reasons
+
+
+def test_peak_r_progressive_lock_raises_stop_without_forcing_exit():
+    advice = supervise_position(
+        pos(target1=7890, target2=7920),
+        market(
+            current_price=7850,
+            peak_r_multiple=2.80,
+        ),
+    )
+    # 2.80R peak -> dynamic floor 2.05R -> 7800 + 2.05 * 20 = 7841.
+    assert advice.action == "PROTECT"
+    assert advice.suggested_stop == pytest.approx(7841.0)
+    assert "progressive_profit_lock_from_closed_bar_high_water" in advice.reasons
+
+
 def test_rotation_requires_degraded_thesis_and_material_score_advantage():
     p = pos()
     degraded = supervise_position(
