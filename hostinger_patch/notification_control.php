@@ -235,8 +235,35 @@ function stc_notify_signal_event(PDO $pdo, array $config, string $eventId): arra
 
     $competitionId = (string)$payload['competition_id'];
     $symbol = (string)$payload['symbol'];
+
+    $openStmt = $pdo->prepare(
+        "SELECT COALESCE(SUM(quantity), 0) FROM stc_positions "
+        . "WHERE status = 'OPEN' AND competition_id = ? AND symbol = ?"
+    );
+    $openStmt->execute([$competitionId, $symbol]);
+    if ((float)$openStmt->fetchColumn() > 1e-12) {
+        return ['ok' => true, 'skipped' => true, 'reason' => 'existing_open_position'];
+    }
+
+    $decisionTimeframeMinutes = 15;
+    $rawTimeframe = trim((string)($plan['decision_timeframe'] ?? '15'));
+    if (preg_match('/^\d+$/', $rawTimeframe) === 1) {
+        $decisionTimeframeMinutes = max(1, (int)$rawTimeframe);
+    }
+    $cooldown = stc_recent_same_direction_loss_cooldown(
+        $pdo,
+        $competitionId,
+        $symbol,
+        $direction,
+        $now,
+        $decisionTimeframeMinutes
+    );
+    if (($cooldown['active'] ?? false) === true) {
+        return ['ok' => true, 'skipped' => true, 'reason' => 'same_direction_loss_cooldown'];
+    }
+
     $account = stc_account_state_for($pdo, $competitionId);
-    $sizingText = 'Quantity: update account state / sizing before manual entry.';
+    $sizingText = 'MAX STC QUANTITY: update account state / sizing before manual entry.';
     if (is_array($account)) {
         $openStmt = $pdo->prepare(
             "SELECT COALESCE(SUM(quantity), 0) FROM stc_positions "
@@ -257,10 +284,10 @@ function stc_notify_signal_event(PDO $pdo, array $config, string $eventId): arra
             $riskPct = ((float)$account['equity_usd']) > 0
                 ? ((float)$sizing['risk_amount_usd'] / (float)$account['equity_usd']) * 100.0
                 : 0.0;
-            $sizingText = 'Quantity: ' . rtrim(rtrim(number_format((float)$sizing['proposed_quantity'], 6, '.', ''), '0'), '.')
-                . ' | Risk: $' . number_format((float)$sizing['risk_amount_usd'], 2, '.', '')
-                . ' (' . number_format($riskPct, 3, '.', '') . '%)'
-                . ' | Official max: ' . rtrim(rtrim(number_format((float)$sizing['max_position'], 6, '.', ''), '0'), '.');
+            $sizingText = 'MAX STC QUANTITY: ' . rtrim(rtrim(number_format((float)$sizing['proposed_quantity'], 6, '.', ''), '0'), '.')
+                . ' | DO NOT EXCEED; smaller is allowed'
+                . ' | Risk budget USD ' . number_format((float)$sizing['risk_amount_usd'], 2, '.', '')
+                . ' (' . number_format($riskPct, 3, '.', '') . '%)';
         } catch (Throwable $e) {
             $sizingText = 'Sizing blocked: ' . $e->getMessage();
         }
@@ -350,7 +377,9 @@ function stc_notify_signal_event(PDO $pdo, array $config, string $eventId): arra
         'Evidence families: ' . $familyText,
         'Signal score: ' . number_format((float)($signal['composite_score'] ?? 0.0), 2, '.', ''),
         'Single-TP mode: place only the final take-profit; STC uses the checkpoint for protection logic.',
+        'IMPORTANT: MAX STC QUANTITY is the risk-controlled size. Never use profile max, trade value, margin, leverage, or % balance as quantity.',
         'Reconfirm the live price before approval.',
+        'This notification is NOT an execution approval. Obtain the fresh STC approval ticket before manual entry.',
         'Manual approval + manual order entry only.',
     ]);
 
