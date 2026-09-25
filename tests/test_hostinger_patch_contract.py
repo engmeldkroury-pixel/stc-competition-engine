@@ -684,3 +684,15 @@ def test_execution_guardrails_remain_manual_only_and_do_not_add_broker_execution
     assert "manual_only" in combined
     for forbidden in ("place_order", "submit_order", "broker_order", "strategy.entry"):
         assert forbidden not in combined
+
+
+def test_manual_external_ledger_void_is_audited_and_does_not_create_fake_pnl():
+    position = (PATCH / "position.php").read_text(encoding="utf-8")
+    assert "if ($action === 'VOID')" in position
+    assert "void_confirmation_required" in position
+    assert "void_restricted_to_manual_external" in position
+    assert "status = 'VOID'" in position
+    assert "realized_pnl_usd = 0" in position
+    assert "'VOID'" in position
+    assert "No broker action" in position
+    assert "No realized P/L" in position
