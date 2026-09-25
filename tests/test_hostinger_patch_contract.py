@@ -314,7 +314,10 @@ def test_owner_console_hides_expired_opportunities_and_formats_readable_local_ti
     assert "ACTIVE NOW" in ui
     assert "Expired opportunities are removed automatically" in ui
     assert "const actionable=cards.filter(c=>isOpportunityActive(c));" in ui
-    assert "c.recommendation==='WAIT'||isLockedPlanVisible(c)" in ui
+    assert "function shouldShowSignalCard(c)" in ui
+    assert "if(c.recommendation==='WAIT')return true;" in ui
+    assert "if(c.has_open_position)return true;" in ui
+    assert "return isLockedPlanVisible(c);" in ui
     assert "function isLockedPlanVisible(c)" in ui
     assert "RECOVERY ONLY" in ui
     assert "updateLiveCountdowns()" in ui
@@ -696,3 +699,15 @@ def test_manual_external_ledger_void_is_audited_and_does_not_create_fake_pnl():
     assert "'VOID'" in position
     assert "No broker action" in position
     assert "No realized P/L" in position
+
+
+def test_console_keeps_telegram_events_visible_and_shows_open_position_signal_context():
+    ui = (PATCH / "operator.php").read_text(encoding="utf-8")
+    assert "Recent Telegram / server events" in ui
+    assert "server-notify-events" in ui
+    assert "function notificationEventHtml" in ui
+    assert "renderNotificationEvents(notificationStatus.events||[])" in ui
+    assert "function shouldShowSignalCard" in ui
+    assert "if(c.has_open_position)return true;" in ui
+    assert "POSITION CONTEXT — NO NEW ENTRY" in ui
+    assert "Telegram/server signal received, but STC already tracks an open position for this symbol." in ui
