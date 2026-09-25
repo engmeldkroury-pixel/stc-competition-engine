@@ -711,3 +711,15 @@ def test_console_keeps_telegram_events_visible_and_shows_open_position_signal_co
     assert "if(c.has_open_position)return true;" in ui
     assert "POSITION CONTEXT — NO NEW ENTRY" in ui
     assert "Telegram/server signal received, but STC already tracks an open position for this symbol." in ui
+
+
+def test_snapshot_exposes_research_only_competition_gate_opportunity_audit():
+    snapshot = (PATCH / "operator_snapshot.php").read_text(encoding="utf-8")
+    assert "'competition_gate_audit' => $gateAudit" in snapshot
+    assert "'strict_a_plus_proxy' => 0" in snapshot
+    assert "'balanced_competition_proxy' => 0" in snapshot
+    assert "'authority' => 'research_audit_only'" in snapshot
+    assert "'gte_78' => 0" in snapshot
+    assert "'gte_84' => 0" in snapshot
+    assert "'gte_90' => 0" in snapshot
+    assert "They do not create or approve trades." in snapshot
