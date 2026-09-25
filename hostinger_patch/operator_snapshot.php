@@ -529,6 +529,131 @@ try {
         $closedPositions[] = stc_position_public($closedRow);
     }
 
+    $gateAudit = [
+        'scope' => 'recent_signal_created_rows_from_operator_snapshot_query',
+        'rows_examined' => count($signalRows),
+        'capital_rows' => 0,
+        'capital_directional_rows' => 0,
+        'historical_live_passed' => 0,
+        'quality_bins' => [
+            'gte_78' => 0,
+            'gte_84' => 0,
+            'gte_90' => 0,
+        ],
+        'strict_a_plus_proxy' => 0,
+        'balanced_competition_proxy' => 0,
+        'per_symbol' => [],
+        'authority' => 'research_audit_only',
+        'note' => 'Proxy counts compare recent stored signal context. They do not create or approve trades.',
+    ];
+
+    foreach ($signalRows as $auditRow) {
+        $auditPayload = json_decode((string)$auditRow['payload_json'], true);
+        $auditResult = json_decode((string)$auditRow['result_json'], true);
+        $auditDecision = is_array($auditResult) ? ($auditResult['decision'] ?? null) : null;
+        $auditSignal = is_array($auditDecision) ? ($auditDecision['signal'] ?? null) : null;
+        if (!is_array($auditPayload) || !is_array($auditSignal)) {
+            continue;
+        }
+        if (($auditPayload['competition_id'] ?? '') !== 'capital-africa-sep-2026') {
+            continue;
+        }
+
+        $gateAudit['capital_rows']++;
+        $direction = (string)($auditSignal['pre_gate_recommendation']
+            ?? $auditSignal['recommendation']
+            ?? 'WAIT');
+        if (!in_array($direction, ['LONG', 'SHORT'], true)) {
+            continue;
+        }
+        $gateAudit['capital_directional_rows']++;
+        $sign = $direction === 'LONG' ? 1.0 : -1.0;
+        $quality = isset($auditSignal['setup_quality_score'])
+            ? (int)$auditSignal['setup_quality_score']
+            : 0;
+        if ($quality >= 78) {
+            $gateAudit['quality_bins']['gte_78']++;
+        }
+        if ($quality >= 84) {
+            $gateAudit['quality_bins']['gte_84']++;
+        }
+        if ($quality >= 90) {
+            $gateAudit['quality_bins']['gte_90']++;
+        }
+        if (($auditSignal['quality_gate_passed'] ?? false) === true) {
+            $gateAudit['historical_live_passed']++;
+        }
+
+        $tf = is_array($auditSignal['timeframe_confirmation'] ?? null)
+            ? $auditSignal['timeframe_confirmation']
+            : [];
+        $family = is_array($auditSignal['live_family_evidence'] ?? null)
+            ? $auditSignal['live_family_evidence']
+            : [];
+
+        $aligned = static function ($value, float $sign): ?float {
+            return is_numeric($value) ? $sign * (float)$value : null;
+        };
+        $entry = $aligned($tf['entry_score'] ?? null, $sign);
+        $h1 = $aligned($tf['1h_score'] ?? null, $sign);
+        $h2 = $aligned($tf['2h_score'] ?? null, $sign);
+        $h4 = $aligned($tf['4h_score'] ?? null, $sign);
+        $d1 = $aligned($tf['1d_score'] ?? null, $sign);
+        $m1 = $aligned($tf['1m_score'] ?? null, $sign);
+        $familyScore = $aligned($family['score'] ?? null, $sign);
+        $familyAgreement = is_numeric($family['agreement_ratio'] ?? null)
+            ? (float)$family['agreement_ratio']
+            : null;
+        $familyAligned = is_numeric($family['aligned_families'] ?? null)
+            ? (int)$family['aligned_families']
+            : null;
+        $familyConflicts = is_numeric($family['conflicting_families'] ?? null)
+            ? (int)$family['conflicting_families']
+            : null;
+
+        $strictProxy = $quality >= 90
+            && $entry !== null && $entry >= 0.75
+            && $h1 !== null && $h1 >= 0.70
+            && $h2 !== null && $h2 >= 0.65
+            && $h4 !== null && $h4 >= 0.65
+            && $d1 !== null && $d1 >= 0.55
+            && $m1 !== null && $m1 >= 0.55
+            && $familyScore !== null && $familyScore >= 0.45
+            && $familyAgreement !== null && $familyAgreement >= 0.65
+            && $familyAligned !== null && $familyAligned >= 5
+            && $familyConflicts !== null && $familyConflicts <= 2;
+
+        $balancedProxy = $quality >= 84
+            && $entry !== null && $entry >= 0.65
+            && $h1 !== null && $h1 >= 0.60
+            && $h2 !== null && $h2 >= 0.50
+            && $h4 !== null && $h4 >= 0.50
+            && $d1 !== null && $d1 >= 0.00
+            && $m1 !== null && $m1 >= 0.00
+            && $familyScore !== null && $familyScore >= 0.35
+            && $familyAgreement !== null && $familyAgreement >= 0.65
+            && $familyAligned !== null && $familyAligned >= 5
+            && $familyConflicts !== null && $familyConflicts <= 1;
+
+        $symbol = (string)($auditPayload['symbol'] ?? 'UNKNOWN');
+        if (!isset($gateAudit['per_symbol'][$symbol])) {
+            $gateAudit['per_symbol'][$symbol] = [
+                'directional_rows' => 0,
+                'strict_a_plus_proxy' => 0,
+                'balanced_competition_proxy' => 0,
+            ];
+        }
+        $gateAudit['per_symbol'][$symbol]['directional_rows']++;
+        if ($strictProxy) {
+            $gateAudit['strict_a_plus_proxy']++;
+            $gateAudit['per_symbol'][$symbol]['strict_a_plus_proxy']++;
+        }
+        if ($balancedProxy) {
+            $gateAudit['balanced_competition_proxy']++;
+            $gateAudit['per_symbol'][$symbol]['balanced_competition_proxy']++;
+        }
+    }
+
     stc_json([
         'ok' => true,
         'scope' => 'owner_console_dual_competition_portfolio_snapshot',
@@ -552,6 +677,7 @@ try {
             'amp-futures-sep-2026' => stc_competition_progress($pdo, 'amp-futures-sep-2026'),
         ],
         'cards' => $cards,
+        'competition_gate_audit' => $gateAudit,
         'portfolio' => [
             'positions' => $positions,
             'closed_positions_recent' => $closedPositions,

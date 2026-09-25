@@ -116,3 +116,21 @@ Required evidence-driven sequence:
 - do not add to an already-open symbol;
 - do not increase risk to recover losses;
 - setup quality is not a win probability.
+
+## 2026-09-25 — Current next task update
+
+Owner objective:
+- future competitions are judged by results, not by indicator complexity;
+- avoid both extremes: weak high-frequency entries and an over-tight gate that produces no progress.
+
+Current actions:
+1. PR #166 merged: Telegram/server notification history and owner-console signal context parity restored in main.
+2. PR #167 moved to DRAFT: 90/100 strict-only Capital gating is not final until opportunity starvation is measured.
+3. PR #168 adds a research-only audit over the recent stored Capital signal rows. It compares quality counts >=78, >=84 and >=90, plus strict-A+ and balanced-competition MTF/family proxies.
+4. After PR #168 passes CI and is deployed, run Live Readback and use the measured supply to choose the competition gate. No guess-based threshold change.
+5. Facebook links remain unreadable through public fetch because Facebook blocks the current fetchers. Opera Browser Connector is the preferred authenticated-browser path once connected; screenshots remain a zero-cost fallback.
+
+Competition design principle:
+- maximize validated opportunity flow, not raw trade count;
+- quality gate + opportunity supply + smaller risk on secondary-tier setups;
+- no automatic execution; human approval remains mandatory.

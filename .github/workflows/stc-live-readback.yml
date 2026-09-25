@@ -86,6 +86,7 @@ jobs:
               })
           print("STC_LIVE_ACTIVE_OPPORTUNITIES=" + json.dumps(active, sort_keys=True))
           print("STC_LIVE_RUNTIME_CONTROL=" + json.dumps(data.get("runtime_control") or {}, sort_keys=True))
+          print("STC_LIVE_COMPETITION_GATE_AUDIT=" + json.dumps(data.get("competition_gate_audit") or {}, sort_keys=True))
           positions = []
           for p in ((data.get("portfolio") or {}).get("positions") or []):
               positions.append({

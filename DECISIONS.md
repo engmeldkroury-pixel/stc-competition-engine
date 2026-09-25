@@ -30,3 +30,13 @@
 - Future manual fills should use the STC proposed quantity exactly or a smaller valid quantity when the platform requires it; larger discretionary sizing is outside the STC risk ticket.
 - Do not promote community/shadow indicators merely because the current live strategy experienced drawdown; promotion still requires parity and evidence.
 - Before changing live weights or symbol rules, backfill the visible closed trades and attribute each one to its actual STC source evidence where possible.
+
+## 2026-09-25 — Competition objective and gate-supply policy
+- The controlling objective is competition performance: maximize the chance of positive leaderboard progress while keeping drawdown and execution errors controlled.
+- Do not optimize for indicator count, model complexity, or theoretical elegance.
+- Do not use a permanently loose 78/100 gate merely to create activity.
+- Do not use a permanently strict 90/100-only gate without measuring whether it starves the competition of viable opportunities.
+- PR #167 is held as a draft safety reference, not a final competition policy.
+- Before changing the live gate, compare recent production signal supply under strict A+ and a balanced competition proxy using the same stored signal context.
+- Any future relaxed tier must preserve higher-timeframe non-opposition, family breadth, conflict limits, reduced risk, and manual approval.
+- Telegram/server notifications and owner-console visibility must represent the same actionable event stream; PR #166 is the controlling parity fix.
