@@ -150,3 +150,64 @@ A later STC plan at 18:30:24 UTC proposed only 19.636645 units with final target
 3. The second SPX500 entry demonstrates a separate anti-churn/oversizing failure: it was opened ~20 minutes after the stop and at ~2x the nearest STC sizing ticket.
 4. PR #161 directly addresses both execution failure modes by persisting an approval-time MAX STC QUANTITY, rejecting oversized STC-plan fill records, blocking duplicate open-symbol entries, and applying a same-symbol/same-direction loss cooldown.
 5. Indicator weights and the competition quality floor should not be changed from these few trades alone. The next research priority is trade-level attribution and stop/entry sensitivity using no-lookahead evidence.
+
+## Follow-up incident — 2026-09-25 NAS100 profit giveback and stale ledger
+
+Owner screenshots on 2026-09-25 show the competition account at approximately:
+- account balance: USD 96,605.69;
+- realized P/L: USD -3,394.31;
+- one actual open position only;
+- actual open position: CAPITALCOM:NAS100 LONG 7.7, average fill 30,416.1, active TP 30,758.6, active SL 30,319.1.
+
+The current actual position is composed from at least two visible filled NAS100 entry orders:
+- 3.7 @ approximately 30,407.5;
+- 4.0 @ approximately 30,424.0.
+
+The account order history also shows additional stopped/closed losses after the prior reconciliation, including:
+- EURUSD short stopped at 1.13930;
+- SPX500 39.2 aggregate long stopped around 7,690.7;
+- a later SPX500 20 long entered around 7,730.2 and stopped around 7,704.6;
+- BTCUSD 0.5 long entered around 85,026.25 and stopped around 84,800.
+
+### NAS100 missed profit protection
+
+TradingView 15-minute market history for the actual NAS100 position shows:
+- actual average entry: 30,416.1;
+- initial active stop: 30,319.1;
+- initial risk distance: 97.0 index points;
+- maximum observed intrabar high after entry: 30,714.6 at 2026-09-25 11:30 UTC;
+- maximum closed-bar close after entry: 30,696.7 at 2026-09-25 11:15 UTC;
+- closed-bar peak R: approximately +2.89R;
+- intrabar peak R: approximately +3.08R;
+- gross peak open P/L on 7.7 units: approximately USD +2,298 before commission.
+
+This confirms the owner's report that the trade exceeded USD +2,000 unrealized profit.
+
+By 2026-09-25 around 15:30 UTC, NAS100 had retraced to roughly 30,569, around +1.58R on the actual position. The original stop was still 30,319.1, so the platform had already surrendered more than 1R of open profit while still leaving the trade capable of turning into a full initial-risk loss.
+
+### Root cause
+
+This is not only an entry-quality problem. The profit-management layer is inadequate for the competition objective.
+
+Two separate failures were confirmed:
+1. The live STC ledger is stale and does not match the platform. Live readback still shows four STC OPEN positions (EURUSD, XAGUSD, NAS100, SPX500), while the platform screenshot shows only one actual open NAS100 position.
+2. STC tracks NAS100 as only 3.797603 units entered at 30,444.7, not the actual 7.7 units at 30,416.1. Therefore its portfolio supervisor cannot calculate or communicate the real account's risk/profit correctly.
+
+The existing production supervisor also used only current R and a weak fixed profit lock:
+- +1.0R to +1.5R -> lock +0.25R;
+- >= +1.5R -> lock only +0.50R.
+
+That rule is too permissive after a 2.5R-3R excursion for a realized-P/L competition.
+
+### Corrective design
+
+The new branch `stc-profit-lock-highwater-20260925` changes the supervisor to use a closed-bar high-water mark from stored signal history and a progressive profit floor:
+- peak 1.0R-1.5R -> floor +0.25R;
+- peak 1.5R-2.0R -> floor +0.75R;
+- peak 2.0R-2.5R -> floor +1.25R;
+- peak 2.5R-3.0R -> floor at least +1.50R and approximately peak minus 0.75R;
+- peak >=3.0R -> floor at least +1.75R and approximately peak minus 0.60R.
+
+If current R falls below the already-earned dynamic floor, the supervisor recommends EXIT_NOW instead of allowing the position to drift back toward the original stop.
+
+Execution remains manual.
