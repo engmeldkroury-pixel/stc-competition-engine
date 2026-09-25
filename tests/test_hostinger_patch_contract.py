@@ -723,3 +723,17 @@ def test_snapshot_exposes_research_only_competition_gate_opportunity_audit():
     assert "'gte_84' => 0" in snapshot
     assert "'gte_90' => 0" in snapshot
     assert "They do not create or approve trades." in snapshot
+
+
+def test_php_portfolio_supervisor_tracks_closed_bar_high_water_profit_lock():
+    control = (PATCH / "portfolio_control.php").read_text(encoding="utf-8")
+    notify = (PATCH / "notification_control.php").read_text(encoding="utf-8")
+    assert "min($limit, 192)" in control
+    assert "$peakR = $r;" in control
+    assert "$lockedR = max(1.50, $peakR - 0.75);" in control
+    assert "$lockedR = max(1.75, $peakR - 0.60);" in control
+    assert "profit_retrace_breached_dynamic_floor" in control
+    assert "progressive_profit_lock_from_closed_bar_high_water" in control
+    assert "Peak closed-bar R:" in notify
+    assert "Locked R floor:" in notify
+    assert "192" in notify
