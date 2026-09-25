@@ -189,7 +189,7 @@ function stc_validate_stc_plan_position(PDO $pdo, array $body): array {
 }
 
 function stc_recent_signal_states(PDO $pdo, string $competitionId, string $symbol, int $limit = 3): array {
-    $limit = max(1, min($limit, 5));
+    $limit = max(1, min($limit, 192));
     $stmt = $pdo->prepare(
         'SELECT payload_json, result_json FROM stc_webhook_events '
         . "WHERE status = 'ingested' "
@@ -248,6 +248,39 @@ function stc_supervise_position(array $position, array $history): array {
     $sign = $side === 'LONG' ? 1.0 : -1.0;
     $pnlPrice = ($price - $entry) * $sign;
     $r = $pnlPrice / $riskPrice;
+
+    // Track the best closed-bar R observed since the position was opened.
+    // This allows competition management to protect a meaningful fraction of
+    // large unrealized gains even after the market starts retracing.
+    $peakR = $r;
+    $openedTs = strtotime((string)($position['opened_at_utc'] ?? '') . ' UTC');
+    foreach ($history as $item) {
+        $itemTs = strtotime((string)($item['time'] ?? ''));
+        if ($openedTs !== false && $itemTs !== false && $itemTs < $openedTs) {
+            continue;
+        }
+        $histPrice = (float)($item['close'] ?? 0);
+        if ($histPrice <= 0) {
+            continue;
+        }
+        $histR = (($histPrice - $entry) * $sign) / $riskPrice;
+        if ($histR > $peakR) {
+            $peakR = $histR;
+        }
+    }
+
+    $lockedR = null;
+    if ($peakR >= 3.0) {
+        $lockedR = max(1.75, $peakR - 0.60);
+    } elseif ($peakR >= 2.5) {
+        $lockedR = max(1.50, $peakR - 0.75);
+    } elseif ($peakR >= 2.0) {
+        $lockedR = 1.25;
+    } elseif ($peakR >= 1.5) {
+        $lockedR = 0.75;
+    } elseif ($peakR >= 1.0) {
+        $lockedR = 0.25;
+    }
     try {
         $value = stc_price_value_usd((string)$position['competition_id'], (string)$position['symbol'], $entry);
         $unrealized = $pnlPrice * $quantity * $value;
@@ -317,6 +350,45 @@ function stc_supervise_position(array $position, array $history): array {
         ];
     }
 
+    if ($lockedR !== null) {
+        if ($r < $lockedR) {
+            return [
+                'action' => 'EXIT_NOW',
+                'urgency' => 'high',
+                'r_multiple' => $r,
+                'peak_r_multiple' => $peakR,
+                'locked_r_floor' => $lockedR,
+                'unrealized_pnl_usd' => $unrealized,
+                'thesis_degraded' => false,
+                'suggested_stop' => null,
+                'suggested_partial_fraction' => null,
+                'reasons' => [
+                    'profit_retrace_breached_dynamic_floor',
+                    'protect_realized_competition_score',
+                ],
+            ];
+        }
+
+        $suggested = $side === 'LONG'
+            ? max($currentStop, $entry + $riskPrice * $lockedR)
+            : min($currentStop, $entry - $riskPrice * $lockedR);
+        return [
+            'action' => 'PROTECT',
+            'urgency' => $peakR >= 2.0 ? 'high' : 'normal',
+            'r_multiple' => $r,
+            'peak_r_multiple' => $peakR,
+            'locked_r_floor' => $lockedR,
+            'unrealized_pnl_usd' => $unrealized,
+            'thesis_degraded' => false,
+            'suggested_stop' => $suggested,
+            'suggested_partial_fraction' => null,
+            'reasons' => [
+                'progressive_profit_lock_from_closed_bar_high_water',
+                'never_loosen_protective_stop',
+            ],
+        ];
+    }
+
     if ($target1Hit) {
         $protective = $side === 'LONG' ? max($currentStop, $entry) : min($currentStop, $entry);
         return [
@@ -328,23 +400,6 @@ function stc_supervise_position(array $position, array $history): array {
             'suggested_stop' => $protective,
             'suggested_partial_fraction' => null,
             'reasons' => ['management_checkpoint_reached', 'single_take_profit_mode_keep_full_quantity_and_protect'],
-        ];
-    }
-
-    if ($r >= 1.0) {
-        $lockR = $r < 1.5 ? 0.25 : 0.50;
-        $suggested = $side === 'LONG'
-            ? max($currentStop, $entry + $riskPrice * $lockR)
-            : min($currentStop, $entry - $riskPrice * $lockR);
-        return [
-            'action' => 'PROTECT',
-            'urgency' => 'normal',
-            'r_multiple' => $r,
-            'unrealized_pnl_usd' => $unrealized,
-            'thesis_degraded' => false,
-            'suggested_stop' => $suggested,
-            'suggested_partial_fraction' => null,
-            'reasons' => ['position_at_least_one_r_in_profit', 'tighten_protection_without_forced_rotation'],
         ];
     }
 
