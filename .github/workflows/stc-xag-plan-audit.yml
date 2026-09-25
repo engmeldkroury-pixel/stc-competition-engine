@@ -98,6 +98,8 @@ jobs:
                   "pending_plan_action":c.get("pending_plan_action"),
                   "entry_blocked_reason":c.get("entry_blocked_reason"),
                   "order_instruction":c.get("order_instruction"),
+                  "community_component_shadow":c.get("community_component_shadow"),
+                  "research_calibration":c.get("research_calibration"),
               })
           print("STC_LIVE_OPERATOR_CARDS="+json.dumps(cards,sort_keys=True))
           print("STC_LIVE_RUNTIME="+json.dumps(snap.get("runtime_control"),sort_keys=True))
