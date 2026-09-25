@@ -108,6 +108,9 @@ input{width:100%}button{cursor:pointer}.primary{background:#1d4ed8}.danger{backg
     <button id="test-server-notify" style="margin-top:10px">Send notification test</button>
     <div id="server-notify-note" class="small" style="margin-top:8px">Server notification status not loaded yet.</div>
     <div class="small" style="margin-top:10px">Raw 15-minute feed bars do not generate user notifications. Server notifications are reserved for new locked plans and non-HOLD position-management changes.</div>
+    <div class="sectiontitle" style="margin-top:16px">Recent Telegram / server events</div>
+    <div class="small">This audit mirrors what the server sent. If a Telegram message is delivered, it remains visible here even when the related symbol already has an open position and is therefore not a new-entry opportunity.</div>
+    <div id="server-notify-events" class="grid" style="margin-top:10px"></div>
   </div>
 </div>
 
@@ -535,9 +538,16 @@ function cardHtml(c,i){
  const draft=livePriceDrafts[c.signal_id]||'';
  const ticketClass=active?'ticket actionable':'ticket blockedticket';
 
- let ticket='<div class="'+ticketClass+'"><div class="ticket-title">EXECUTION TICKET</div>'
-   +'<div class="ticket-action '+cls+'">'+esc(c.recommendation==='LONG'?'BUY / LONG':c.recommendation==='SHORT'?'SELL / SHORT':'DO NOT ENTER')+' • '+esc(c.symbol)+'</div>';
- if(p){
+ let ticket='';
+ if(c.has_open_position){
+   ticket='<div class="ticket blockedticket"><div class="ticket-title">POSITION CONTEXT — NO NEW ENTRY</div>'
+     +'<div class="ticket-action '+cls+'">'+esc(c.recommendation)+' SIGNAL • '+esc(c.symbol)+'</div>'
+     +'<div class="ticket-note">Telegram/server signal received, but STC already tracks an open position for this symbol. Use the Portfolio Supervisor; do not add a new trade from this signal.</div></div>';
+ }else{
+   ticket='<div class="'+ticketClass+'"><div class="ticket-title">EXECUTION TICKET</div>'
+     +'<div class="ticket-action '+cls+'">'+esc(c.recommendation==='LONG'?'BUY / LONG':c.recommendation==='SHORT'?'SELL / SHORT':'DO NOT ENTER')+' • '+esc(c.symbol)+'</div>';
+ }
+ if(!c.has_open_position&&p){
    ticket+='<div class="ticket-grid">'
      +'<div class="ticket-cell"><div class="ticket-label">ORDER TO PLACE</div><div class="ticket-value" id="ticket-order-'+i+'">'+esc(actionText)+'</div></div>'
      +'<div class="ticket-cell"><div class="ticket-label">QUANTITY</div><div class="ticket-value">'+esc(s.qty)+' '+esc(s.unit)+'</div><div class="ticket-note">'+esc(s.mode)+'</div></div>'
@@ -557,10 +567,10 @@ function cardHtml(c,i){
      +'<div class="buttonrow"><button onclick="recordExistingPositionFromCard('+i+')">Already filled on platform? Record position</button>'
      +(active&&a.decision==='approved'?'<button class="primary" onclick="recordFilledPosition('+i+')">After manual fill: record open position</button>':'')
      +'</div>';
- } else {
+ } else if(!c.has_open_position) {
    ticket+='<div class="ticket-note">No locked executable plan. Do not place a trade from this card.</div>';
  }
- ticket+='</div>';
+ if(!c.has_open_position)ticket+='</div>';
 
  const advanced='<details class="advanced"><summary>Advanced details / why STC selected this setup</summary><div class="advanced-body">'
    +'<div class="statusline">'+statusBadge+'<span class="pill">'+esc(competitionLabel)+'</span><span class="pill">'+esc(c.setup_grade||'MONITOR_ONLY')+'</span></div>'
@@ -598,9 +608,16 @@ function maybeNotify(cards){
 function competitionOf(c){
  return c.competition_id==='amp-futures-sep-2026'?'amp':c.competition_id==='capital-africa-sep-2026'?'capital':'other';
 }
+function shouldShowSignalCard(c){
+ if(!c)return false;
+ if(c.recommendation==='WAIT')return true;
+ if(!(c.recommendation==='LONG'||c.recommendation==='SHORT'))return false;
+ if(c.has_open_position)return true;
+ return isLockedPlanVisible(c);
+}
 function renderCards(target,cards){
  const all=snapshot&&snapshot.cards?snapshot.cards:[];
- const visible=(cards||[]).filter(c=>c.recommendation==='WAIT'||isLockedPlanVisible(c));
+ const visible=(cards||[]).filter(shouldShowSignalCard);
  $(target).innerHTML=visible.map(c=>cardHtml(c,all.indexOf(c))).join('')||'<div class="card">No current signals or active opportunities.</div>';
  for(const card of visible){
    const i=all.indexOf(card);
@@ -815,6 +832,22 @@ function render(){
  maybeNotifyManagement(positions);
 }
 
+function notificationEventHtml(e){
+ const cls=e.event_type==='NEW_LOCKED_PLAN'?'active':e.event_type==='POSITION_MANAGEMENT'?'blocked':'';
+ return '<div class="card">'
+   +'<div class="statusline"><span class="badge '+cls+'">'+esc(e.event_type||'EVENT')+'</span>'
+   +(e.symbol?'<span class="pill">'+esc(e.symbol)+'</span>':'')+'</div>'
+   +'<div class="row"><span>Sent</span><span class="value">'+formatLocalTime(e.created_at_utc)+'</span></div>'
+   +'<div class="row"><span>Title</span><span class="value">'+esc(e.title||'-')+'</span></div>'
+   +'<details class="advanced"><summary>Message body</summary><div class="advanced-body small" style="white-space:pre-wrap">'+esc(e.body_text||'')+'</div></details>'
+   +'</div>';
+}
+function renderNotificationEvents(events){
+ const recent=(events||[]).slice(0,20);
+ if($('server-notify-events'))$('server-notify-events').innerHTML=recent.map(notificationEventHtml).join('')
+   ||'<div class="card">No server notification events recorded yet.</div>';
+}
+
 async function refreshNotificationStatus(){
  if(!$('token').value.trim())return;
  try{
@@ -823,7 +856,8 @@ async function refreshNotificationStatus(){
    if($('telegram-notify-status'))$('telegram-notify-status').textContent=cfg.telegram_configured?'Configured':'Not configured';
    if($('email-notify-status'))$('email-notify-status').textContent=cfg.email_configured?'Configured':'Not configured';
    if($('server-notify-count'))$('server-notify-count').textContent=(notificationStatus.events||[]).length;
-   if($('server-notify-note'))$('server-notify-note').textContent='Actionable server notification audit loaded.';
+   renderNotificationEvents(notificationStatus.events||[]);
+   if($('server-notify-note'))$('server-notify-note').textContent='Server notification audit loaded. Recent Telegram/server events are shown below.';
  }catch(e){
    if($('server-notify-note'))$('server-notify-note').textContent='Server notification endpoint not available yet: '+e.message;
  }
