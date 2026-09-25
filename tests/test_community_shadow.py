@@ -128,7 +128,7 @@ def test_shadow_component_score_cannot_change_live_trade_decision():
     assert base_signal["composite_score"] == shadow_signal["composite_score"]
     assert shadow_signal["community_component_shadow"]["weighted_score"] == 1.0
     assert shadow_signal["community_component_shadow"]["live_authority"] is False
-    assert with_shadow["decision"]["locked_trade_plan"]["direction"] == baseline["decision"]["locked_trade_plan"]["direction"]
+    assert with_shadow["decision"]["locked_trade_plan"] == baseline["decision"]["locked_trade_plan"]
 
 
 def test_invalid_shadow_signal_value_is_stored_as_context_only():

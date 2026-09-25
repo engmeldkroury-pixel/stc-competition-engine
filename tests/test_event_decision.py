@@ -140,7 +140,7 @@ def _strong_history():
     }
 
 
-def test_capital_competition_gate_allows_directional_opportunity_plan():
+def test_capital_competition_requires_strict_a_plus_plan():
     payload = {
         "event_id": "evt-a-plus",
         "event": "bar_close",
@@ -167,11 +167,11 @@ def test_capital_competition_gate_allows_directional_opportunity_plan():
     signal = result["decision"]["signal"]
     assert signal["recommendation"] == "LONG"
     assert signal["quality_gate_passed"] is True
-    assert signal["setup_grade"] == "COMPETITION_OPPORTUNITY"
+    assert signal["setup_grade"] == "A_PLUS"
     assert signal["competition_mode"] is True
-    assert signal["quality_floor"] == 78
+    assert signal["quality_floor"] == 90
     assert result["decision"]["locked_trade_plan"] is not None
-    assert "competition_opportunity_gate=PASSED" in signal["reasons"]
+    assert "high_conviction_gate=PASSED" in signal["reasons"]
 
 
 def test_borderline_direction_is_downgraded_to_wait_and_has_no_plan():
@@ -407,3 +407,80 @@ def test_mismatched_calibration_timeframe_is_informational_not_live_weighting(mo
     assert evidence["entry_timeframe"] == "15"
     assert evidence["strategy_id"] is None
     assert signal["research_calibration"]["status"] == "AVAILABLE_INFORMATIONAL"
+
+
+def test_loss_review_spx500_shape_is_blocked_by_strict_a_plus_gate():
+    from app.signals import high_conviction_assessment
+
+    passed, failures = high_conviction_assessment(
+        recommendation="LONG",
+        composite_score=0.58,
+        short_term_technical=0.65,
+        historical_regime=1.00,
+        blended_technical=0.75,
+        volatility_quality=0.50,
+        liquidity_quality=0.50,
+        confirmation_score=0.70,
+        trend_2h_score=0.15,
+        trend_4h_score=0.45,
+        trend_1m_score=1.00,
+        family_evidence_score=0.50,
+        family_agreement_ratio=1.00,
+        family_aligned_count=7,
+        family_conflict_count=0,
+    )
+    assert passed is False
+    assert "short_term_strength" in failures
+    assert "trend_2h_alignment" in failures
+    assert "trend_4h_alignment" in failures
+
+
+def test_loss_review_xagusd_shape_is_blocked_by_strict_a_plus_gate():
+    from app.signals import high_conviction_assessment
+
+    passed, failures = high_conviction_assessment(
+        recommendation="SHORT",
+        composite_score=-0.54,
+        short_term_technical=-0.75,
+        historical_regime=-0.60,
+        blended_technical=-0.75,
+        volatility_quality=-0.50,
+        liquidity_quality=-0.50,
+        confirmation_score=-0.85,
+        trend_2h_score=-1.00,
+        trend_4h_score=-0.60,
+        trend_1m_score=0.60,
+        family_evidence_score=-0.61,
+        family_agreement_ratio=1.00,
+        family_aligned_count=6,
+        family_conflict_count=0,
+    )
+    assert passed is False
+    assert "trend_4h_alignment" in failures
+    assert "trend_1m_alignment" in failures
+
+
+def test_loss_review_eurusd_shape_is_blocked_by_strict_a_plus_gate():
+    from app.signals import high_conviction_assessment
+
+    passed, failures = high_conviction_assessment(
+        recommendation="SHORT",
+        composite_score=-0.58,
+        short_term_technical=-0.75,
+        historical_regime=-1.00,
+        blended_technical=-0.75,
+        volatility_quality=-0.50,
+        liquidity_quality=-0.50,
+        confirmation_score=-0.60,
+        trend_2h_score=-0.55,
+        trend_4h_score=-0.85,
+        trend_1m_score=0.60,
+        family_evidence_score=-0.64,
+        family_agreement_ratio=1.00,
+        family_aligned_count=6,
+        family_conflict_count=0,
+    )
+    assert passed is False
+    assert "confirmation_alignment_1h" in failures
+    assert "trend_2h_alignment" in failures
+    assert "trend_1m_alignment" in failures

@@ -30,3 +30,11 @@
 - Future manual fills should use the STC proposed quantity exactly or a smaller valid quantity when the platform requires it; larger discretionary sizing is outside the STC risk ticket.
 - Do not promote community/shadow indicators merely because the current live strategy experienced drawdown; promotion still requires parity and evidence.
 - Before changing live weights or symbol rules, backfill the visible closed trades and attribute each one to its actual STC source evidence where possible.
+
+## 2026-09-25 — Capital acceleration gate withdrawn after loss review
+- The 2026-09-24 Capital-specific 78/100 acceleration decision is superseded.
+- Capital must use the strict A+ high-conviction gate and a 90/100 quality floor before a new locked trade plan is eligible.
+- Higher-timeframe confirmation is again hard-gated; 1M direction is not ignored for Capital.
+- Forensic reason: the observed SPX500, XAGUSD and EURUSD plan shapes passed the relaxed gate but would have failed the already-existing strict A+ gate.
+- This correction is a safety/quality change, not proof of profitability. It intentionally accepts fewer opportunities until symbol-specific component evidence is live-parity verified.
+- Community/component research remains shadow-only; no component is promoted merely because the relaxed gate lost money.

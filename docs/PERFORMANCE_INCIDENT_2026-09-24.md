@@ -150,3 +150,17 @@ A later STC plan at 18:30:24 UTC proposed only 19.636645 units with final target
 3. The second SPX500 entry demonstrates a separate anti-churn/oversizing failure: it was opened ~20 minutes after the stop and at ~2x the nearest STC sizing ticket.
 4. PR #161 directly addresses both execution failure modes by persisting an approval-time MAX STC QUANTITY, rejecting oversized STC-plan fill records, blocking duplicate open-symbol entries, and applying a same-symbol/same-direction loss cooldown.
 5. Indicator weights and the competition quality floor should not be changed from these few trades alone. The next research priority is trade-level attribution and stop/entry sensitivity using no-lookahead evidence.
+
+## Strategy-gate root cause confirmed — 2026-09-25
+
+The post-incident code review identified a material live-policy difference between the two competition lanes. Capital.com Africa was intentionally routed through a relaxed `competition_opportunity_assessment` with a 78/100 quality floor, while the other lane used the stricter `high_conviction_assessment` / A+ gate with a 90/100 floor.
+
+The losing/at-risk Capital plan shapes demonstrate why this mattered:
+
+- SPX500 17:15 UTC LONG: 15m +0.65, 1H +0.70, 2H +0.15, 4H +0.45, 1D +1.00, 1M +1.00. It passed the relaxed Capital gate, but fails strict A+ on short-term strength and both 2H/4H alignment.
+- XAGUSD 15:15 UTC SHORT: 15m -0.75, 1H -0.85, 2H -1.00, 4H -0.60, 1D -0.60, 1M +0.60. It passed the relaxed Capital gate, but fails strict A+ because 4H is below the strict magnitude requirement and the monthly regime is opposite the short thesis.
+- EURUSD 13:30 UTC SHORT: 15m -0.75, 1H -0.60, 2H -0.55, 4H -0.85, 1D -1.00, 1M +0.60. It passes the relaxed competition logic but fails strict A+ on 1H/2H confirmation and opposed monthly direction.
+
+This does not prove that every blocked trade would have lost or that the strict gate will be profitable. It proves that the relaxed Capital gate admitted materially weaker multi-timeframe structures than the system's own existing high-conviction standard.
+
+Control decision: withdraw the relaxed Capital gate, restore strict A+ gating for Capital, and require regression tests showing the three observed plan shapes fail closed.
