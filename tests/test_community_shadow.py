@@ -138,3 +138,66 @@ def test_invalid_shadow_signal_value_is_stored_as_context_only():
     assert result["status"] == "ingested_context"
     assert result["decision"]["action"] == "store_context_only"
     assert result["decision"]["reason"] == "insufficient_signal_payload"
+
+
+def test_amp_mng_shadow_uses_validated_range_filter_profile():
+    shadow = build_community_component_shadow(
+        "NYMEX:MNG1!",
+        "15m",
+        {"range_filter_guikroth": -1.0},
+    )
+    assert shadow["status"] == "COMPLETE_SHADOW_EVIDENCE"
+    assert shadow["weighted_score"] == -1.0
+    assert shadow["normalized_weights"] == {"range_filter_guikroth": 1.0}
+    assert shadow["selected_parameters"]["range_filter_guikroth"] == {
+        "sampling_period": 100,
+        "range_multiplier": 2.0,
+    }
+    assert shadow["live_authority"] is False
+    assert shadow["used_in_quality_gate"] is False
+
+
+def test_amp_mcl_shadow_requires_full_validated_ensemble():
+    shadow = build_community_component_shadow(
+        "NYMEX:MCL1!",
+        "15",
+        {
+            "ssl_hybrid": 1.0,
+            "qqe_mod": 1.0,
+        },
+    )
+    assert shadow["status"] == "INCOMPLETE_SHADOW_EVIDENCE"
+    assert shadow["weighted_score"] is None
+    assert "chandelier_exit_everget" in shadow["missing_components"]
+    assert "range_filter_guikroth" in shadow["missing_components"]
+    assert "ut_bot_alerts" in shadow["missing_components"]
+    assert "schaff_trend_cycle" in shadow["missing_components"]
+    assert "squeeze_momentum_lazybear" in shadow["missing_components"]
+
+
+def test_amp_mgc_complete_shadow_weight_is_normalized():
+    shadow = build_community_component_shadow(
+        "COMEX_MINI:MGC1!",
+        "15",
+        {
+            "qqe_mod": 1.0,
+            "ssl_hybrid": 1.0,
+        },
+    )
+    assert shadow["status"] == "COMPLETE_SHADOW_EVIDENCE"
+    assert abs(shadow["weighted_score"] - 1.0) < 1e-12
+    assert abs(sum(shadow["normalized_weights"].values()) - 1.0) < 1e-12
+    assert shadow["selected_parameters"]["qqe_mod"]["rsi_period"] == 8
+    assert shadow["selected_parameters"]["ssl_hybrid"]["baseline_length"] == 60
+
+
+def test_amp_unvalidated_core_symbol_does_not_invent_shadow_profile():
+    shadow = build_community_component_shadow(
+        "CME_MINI:MES1!",
+        "15",
+        {"ssl_hybrid": 1.0},
+    )
+    assert shadow["status"] == "NO_VALIDATED_COMMUNITY_PROFILE"
+    assert shadow["normalized_weights"] == {}
+    assert shadow["weighted_score"] is None
+    assert shadow["unexpected_components_ignored"] == ["ssl_hybrid"]
