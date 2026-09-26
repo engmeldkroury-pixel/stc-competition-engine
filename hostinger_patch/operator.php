@@ -643,7 +643,9 @@ function rulesHtml(competitionId){
   +'<div class="row"><span>Scoring</span><span class="value">'+scoring+'</span></div>'
   +'<div class="row"><span>Leverage</span><span class="value">'+esc(leverage||'-')+'</span></div>'
   +'<div class="row"><span>Commission</span><span class="value">'+num(Number(r.commission_rate||0)*100,3)+'%</span></div>'
-  +'<div class="row"><span>STC production feed</span><span class="value">'+esc(r.production_feed_symbols)+' symbols monitored</span></div>'
+  +'<div class="row"><span>STC production feed</span><span class="value">'+esc(r.production_feed_symbols)+' symbols currently configured</span></div>'
+  +(r.verified_feed_symbols_after_24x7_crypto_alert?'<div class="row"><span>Verified coverage after 24x7 crypto alert</span><span class="value">'+esc(r.verified_feed_symbols_after_24x7_crypto_alert)+' unique symbols</span></div>':'')
+  +(r.official_allowed_symbols?'<div class="row"><span>Official competition universe</span><span class="value">'+esc(r.official_allowed_symbols)+' allowed symbols</span></div>':'')
   +'<div class="small"><a href="'+esc(r.official_rules_url||'#')+'" target="_blank" rel="noopener">Open official competition rules</a></div>'
   +'</div>';
 }
