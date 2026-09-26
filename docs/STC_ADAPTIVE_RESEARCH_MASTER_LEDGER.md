@@ -1042,3 +1042,19 @@ Status: COMPLETED / INDEPENDENT REVIEW OPTIONAL.
 6. Reconcile STC positions against the actual competition platform before trusting portfolio-management actions.
 7. Continue symbol-specific Pine/Python parity and sealed shadow evidence; no live promotion from research evidence alone.
 
+### WU-120 — strategy correctness and starvation observability
+Status: IMPLEMENTED / CRITICAL CI VERIFIED / FULL CI TRACKED SEPARATELY.
+- Policy centralization commit: `81415fbcafd64e3202fbf7150a1c21e1bfe807c0`.
+  - active competition ids and 84/90 floors are centralized;
+  - live event decision and advisory competition pace now consume one contract.
+- Gate-failure attribution commit: `d0089bb99d9da9938f711e1d744ea9d9c1351aef`.
+  - read-only Hostinger audit counts persisted gate failure reasons by competition and symbol;
+  - it has no live decision authority.
+- Missing-evidence direction fix: `760796b58f0d763ea54b9fc452a8cd8aba119a49`.
+  - a raw missing sentinel could become positive evidence after SHORT sign multiplication;
+  - missing optional evidence is now direction-symmetric and fail-closed;
+  - regression coverage added.
+- Critical CI on corrected code: 191 passed, 1 warning.
+- Full-suite result remains separate evidence.
+- Live deployment still waits on owner correction of `HOSTINGER_SSH_PRIVATE_KEY`; failed SSH runs did not replace production files.
+

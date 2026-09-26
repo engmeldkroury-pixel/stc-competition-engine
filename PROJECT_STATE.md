@@ -2620,3 +2620,12 @@ Current next action:
 6. reconcile STC open positions to platform truth before trusting portfolio management;
 7. continue exact Pine/Python parity and sealed shadow research without automatic live promotion.
 
+## Strategy correctness continuation — 2026-09-26 19:03 UTC
+- Policy centralization commit: `81415fbcafd64e3202fbf7150a1c21e1bfe807c0`.
+- Gate-failure attribution commit: `d0089bb99d9da9938f711e1d744ea9d9c1351aef`.
+- Missing-evidence SHORT asymmetry fix: `760796b58f0d763ea54b9fc452a8cd8aba119a49`.
+- Critical CI on the corrected code: 191 passed, 1 warning.
+- Full-suite validation remains a separate evidence item and must not be inferred from critical CI.
+- Independent-review prompt: `docs/EXTERNAL_AI_REVIEW_PROMPT_2026-09-26.md`.
+- Production deployment remains fail-closed on correction of `HOSTINGER_SSH_PRIVATE_KEY`; failed SSH runs changed no Hostinger production files.
+

@@ -315,3 +315,45 @@ Ask an independent AI reviewer to focus on:
 - Do not promote research/shadow evidence directly into live authority.
 - Platform account evidence overrides stale STC ledger state until reconciliation.
 - Failed/not-run tests remain recorded as failed/not-run, never silently treated as passed.
+
+## 11. Post-review corrections implemented on 2026-09-26
+
+Three additional strategy/correctness improvements were implemented after the first review draft.
+
+### 11.1 Competition policy centralized
+Commit: `81415fbcafd64e3202fbf7150a1c21e1bfe807c0`
+- active competition ids and the 84/90 quality-floor policy now live in `app/competition_profiles.py`;
+- `app/event_decision.py` consumes those shared constants;
+- `app/competition_strategy.py` now reports `COMPETITION_OPPORTUNITY_84` for Capital + AMP instead of stale `A_PLUS_ONLY` semantics;
+- advisory scan language was changed from `KEEP_A_PLUS` to `KEEP_QUALITY`;
+- no live threshold was loosened.
+
+### 11.2 Gate-failure attribution added
+Commit: `d0089bb99d9da9938f711e1d744ea9d9c1351aef`
+- `operator_snapshot.php` now exposes research-only gate-failure counts by competition and by symbol;
+- it reads already-persisted `quality_gate_failures`;
+- it does not change signal, risk or approval decisions;
+- this is the primary evidence path for diagnosing opportunity concentration instead of guessing.
+
+### 11.3 Missing-evidence SHORT asymmetry fixed
+Commit: `760796b58f0d763ea54b9fc452a8cd8aba119a49`
+
+A real direction-asymmetry bug was found in `setup_quality_score()`:
+- optional missing evidence used a raw sentinel of `-1.0`;
+- that sentinel was multiplied by the trade-direction sign;
+- for SHORT, `-1 x -1 = +1`;
+- therefore missing optional evidence could incorrectly contribute maximum positive normalized setup quality.
+
+The practical risk was highest when one of 2h/4h was missing because the competition majority-intraday gate can still pass when two of the three intraday timeframes align.
+
+Correction:
+- missing optional evidence is now a penalty after direction normalization;
+- LONG and SHORT missing-data behavior is symmetric;
+- a regression test proves mirrored LONG/SHORT missing evidence receives the same score and scores lower than aligned present evidence.
+
+Validation:
+- competition-critical CI on the corrected code passed 191 tests with 1 warning;
+- full-suite evidence is tracked separately and is not inferred from the critical suite.
+
+This is fail-closed: it can remove incorrectly inflated SHORT quality but does not relax entry criteria.
+
