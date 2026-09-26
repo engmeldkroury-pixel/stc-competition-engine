@@ -174,6 +174,40 @@ def test_capital_competition_gate_allows_directional_opportunity_plan():
     assert "competition_opportunity_gate=PASSED" in signal["reasons"]
 
 
+def test_amp_competition_gate_allows_strong_directional_opportunity_plan():
+    payload = {
+        "event_id": "evt-amp-opportunity",
+        "event": "bar_close",
+        "competition_id": "amp-futures-sep-2026",
+        "symbol": "NYMEX:MCL1!",
+        "timeframe": "15",
+        "time": "2026-09-21T18:00:00Z",
+        "open": 3600,
+        "high": 3615,
+        "low": 3605,
+        "close": 3610,
+        "volume": 1800,
+        "ema20": 3605,
+        "ema50": 3590,
+        "rsi14": 60,
+        "atr14": 10,
+        "macd": 5,
+        "macd_signal": 2,
+        "volume_ratio": 1.8,
+        **_strong_confirmation(),
+        **_strong_history(),
+    }
+    result = decide_bridge_event("evt-amp-opportunity", payload)
+    signal = result["decision"]["signal"]
+    assert signal["recommendation"] == "LONG"
+    assert signal["quality_gate_passed"] is True
+    assert signal["setup_grade"] == "COMPETITION_OPPORTUNITY"
+    assert signal["competition_mode"] is True
+    assert signal["quality_floor"] == 78
+    assert result["decision"]["locked_trade_plan"] is not None
+    assert "competition_opportunity_gate=PASSED" in signal["reasons"]
+
+
 def test_borderline_direction_is_downgraded_to_wait_and_has_no_plan():
     payload = {
         "event_id": "evt-borderline",
@@ -201,7 +235,9 @@ def test_borderline_direction_is_downgraded_to_wait_and_has_no_plan():
     assert signal["quality_gate_passed"] is False
     assert signal["setup_grade"] == "MONITOR_ONLY"
     assert result["decision"]["locked_trade_plan"] is None
-    assert "high_conviction_gate=BLOCKED" in signal["reasons"]
+    assert signal["competition_mode"] is True
+    assert signal["quality_floor"] == 78
+    assert "competition_opportunity_gate=BLOCKED" in signal["reasons"]
 
 def test_directional_candidate_without_1h_confirmation_fails_closed_to_wait():
     payload = {
