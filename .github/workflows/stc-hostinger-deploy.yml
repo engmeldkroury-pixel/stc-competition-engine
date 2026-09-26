@@ -1,0 +1,118 @@
+name: STC Hostinger Deploy
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "ops/HOSTINGER_DEPLOY_TRIGGER"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: stc-hostinger-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate approved PHP files
+        shell: bash
+        run: |
+          set -euo pipefail
+          files=(approval.php cloud_control.php notification_control.php operator.php operator_snapshot.php portfolio_control.php position.php)
+          for f in "${files[@]}"; do
+            test -f "hostinger_patch/$f"
+            php -l "hostinger_patch/$f"
+          done
+
+      - name: Build release archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p out/release
+          files=(approval.php cloud_control.php notification_control.php operator.php operator_snapshot.php portfolio_control.php position.php)
+          for f in "${files[@]}"; do cp "hostinger_patch/$f" "out/release/$f"; done
+          (cd out/release && sha256sum *.php > manifest.sha256)
+          tar -C out/release -czf out/stc-release.tar.gz .
+
+      - name: Configure SSH
+        shell: bash
+        env:
+          SSH_KEY: ${{ secrets.HOSTINGER_SSH_PRIVATE_KEY }}
+          SSH_HOST: ${{ secrets.HOSTINGER_SSH_HOST }}
+        run: |
+          set -euo pipefail
+          test -n "$SSH_KEY"
+          test -n "$SSH_HOST"
+          mkdir -p "$HOME/.ssh"
+          printf '%s\n' "$SSH_KEY" > "$HOME/.ssh/id_ed25519"
+          chmod 600 "$HOME/.ssh/id_ed25519"
+          ssh-keyscan -p 65002 "$SSH_HOST" >> "$HOME/.ssh/known_hosts"
+          chmod 600 "$HOME/.ssh/known_hosts"
+
+      - name: Upload staged release
+        shell: bash
+        env:
+          SSH_HOST: ${{ secrets.HOSTINGER_SSH_HOST }}
+          SSH_USER: ${{ secrets.HOSTINGER_SSH_USER }}
+        run: |
+          set -euo pipefail
+          test -n "$SSH_USER"
+          scp -P 65002 out/stc-release.tar.gz "$SSH_USER@$SSH_HOST:stc-release-${GITHUB_RUN_ID}.tar.gz"
+
+      - name: Backup, deploy and verify
+        shell: bash
+        env:
+          SSH_HOST: ${{ secrets.HOSTINGER_SSH_HOST }}
+          SSH_USER: ${{ secrets.HOSTINGER_SSH_USER }}
+          TARGET: ${{ secrets.HOSTINGER_STC_PUBLIC_HTML }}
+        run: |
+          set -euo pipefail
+          test -n "$TARGET"
+          case "$TARGET" in
+            /home/*/domains/stc.feama.site/public_html) ;;
+            *) echo "Unexpected target path"; exit 1 ;;
+          esac
+
+          ssh -p 65002 "$SSH_USER@$SSH_HOST" bash -s -- "$TARGET" "$GITHUB_RUN_ID" <<'REMOTE'
+          set -euo pipefail
+          target="$1"
+          run_id="$2"
+          archive="$HOME/stc-release-$run_id.tar.gz"
+          stage="$HOME/stc-stage-$run_id"
+          backup="$HOME/stc-backup-$run_id"
+          files=(approval.php cloud_control.php notification_control.php operator.php operator_snapshot.php portfolio_control.php position.php)
+
+          mkdir -p "$stage" "$backup"
+          tar -xzf "$archive" -C "$stage"
+
+          for f in "${files[@]}"; do
+            test -f "$stage/$f"
+            if [ -f "$target/$f" ]; then cp -p "$target/$f" "$backup/$f"; fi
+          done
+
+          restore() {
+            for f in "${files[@]}"; do
+              if [ -f "$backup/$f" ]; then cp -p "$backup/$f" "$target/$f"; fi
+            done
+          }
+
+          trap 'restore' ERR
+
+          for f in "${files[@]}"; do cp "$stage/$f" "$target/$f"; done
+          cd "$target"
+          sha256sum -c "$stage/manifest.sha256"
+
+          trap - ERR
+          rm -rf "$stage" "$archive"
+          echo "STC deploy verified. Backup retained at $backup"
+          REMOTE
+
+      - name: Deployment summary
+        run: echo "Seven-file STC Hostinger deployment completed and checksum verified."
