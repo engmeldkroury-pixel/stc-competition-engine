@@ -28,6 +28,8 @@ type FeedBar
     float familySmcLiquidity
     float familyPriceAction
     float familyMicrostructure
+    float frozenSupertrend
+    float frozenRangeFilter
 
 type ConfirmBar
     int t
@@ -62,6 +64,50 @@ type HistoryBar
 
 clampScore(float x) =>
     math.max(-1.0, math.min(1.0, x))
+
+frozenSupertrendEvent() =>
+    atrPeriod = 14
+    multiplier = 3.0
+    a = ta.atr(atrPeriod)
+    basicUpper = hl2 + multiplier * a
+    basicLower = hl2 - multiplier * a
+    var float finalUpper = na
+    var float finalLower = na
+    var int trend = 1
+    prevUpper = finalUpper[1]
+    prevLower = finalLower[1]
+    prevTrend = nz(trend[1], 1)
+    finalUpper := na(prevUpper) ? basicUpper : (basicUpper < prevUpper or close[1] > prevUpper ? basicUpper : prevUpper)
+    finalLower := na(prevLower) ? basicLower : (basicLower > prevLower or close[1] < prevLower ? basicLower : prevLower)
+    trend := prevTrend < 0 and close > finalUpper ? 1 : prevTrend > 0 and close < finalLower ? -1 : prevTrend
+    trend != prevTrend ? float(trend) : 0.0
+
+frozenRangeFilterEvent(float rangeMultiplier) =>
+    samplingPeriod = 100
+    change = math.abs(close - close[1])
+    first = ta.ema(change, samplingPeriod)
+    second = ta.ema(first, samplingPeriod * 2 - 1)
+    var float filt = na
+    previousFilter = filt[1]
+    if not na(second)
+        smoothRange = second * rangeMultiplier
+        if na(previousFilter)
+            filt := close
+        else if close > previousFilter
+            filt := math.max(previousFilter, close - smoothRange)
+        else if close < previousFilter
+            filt := math.min(previousFilter, close + smoothRange)
+        else
+            filt := previousFilter
+    var int direction = 0
+    previousDirection = nz(direction[1], 0)
+    if not na(filt) and not na(previousFilter)
+        rising = filt > previousFilter
+        falling = filt < previousFilter
+        direction := close > filt and rising ? 1 : close < filt and falling ? -1 : previousDirection
+    else
+        direction := previousDirection
+    direction != 0 and direction != previousDirection ? float(direction) : 0.0
 
 makeFeedBar() =>
     [macdLine, signalLine, _] = ta.macd(close, 12, 26, 9)
@@ -103,7 +149,9 @@ makeFeedBar() =>
     familyPriceAction = clampScore(engulf * 0.55 + clampScore(clv) * 0.45)
     efficiency = math.abs(body) / barRange
     familyMicrostructure = clampScore(barDir * (efficiency * 0.60 + participation * 0.40))
-    FeedBar.new(time, open, high, low, close, volume, e20, e50, r, a, macdLine, signalLine, vr, familyTrend, familyMomentum, familyVolatility, familyVolume, familyVwap, familyMarketStructure, familySmcLiquidity, familyPriceAction, familyMicrostructure)
+    frozenSupertrend = frozenSupertrendEvent()
+    frozenRangeFilter = frozenRangeFilterEvent(2.0)
+    FeedBar.new(time, open, high, low, close, volume, e20, e50, r, a, macdLine, signalLine, vr, familyTrend, familyMomentum, familyVolatility, familyVolume, familyVwap, familyMarketStructure, familySmcLiquidity, familyPriceAction, familyMicrostructure, frozenSupertrend, frozenRangeFilter)
 
 feedBar(string symbol) =>
     request.security(symbol, feedTf, makeFeedBar(), gaps=barmerge.gaps_off, lookahead=barmerge.lookahead_off, ignore_invalid_symbol=false)
@@ -164,6 +212,9 @@ historyBar(string symbol) =>
 
 buildMessage(string symbol, FeedBar d, ConfirmBar q, TrendBar t2, TrendBar t4, HistoryBar h, TrendBar m) =>
     eventId = competitionId + "|" + symbol + "|" + feedTf + "|" + str.tostring(d.t)
+    communityJson =
+        symbol == "CAPITALCOM:USDZAR" ? ',"community_component_signals":{"supertrend_kivanc":' + str.tostring(d.frozenSupertrend) + '}' :
+        symbol == "CAPITALCOM:XAUUSD" ? ',"community_component_signals":{"range_filter_guikroth":' + str.tostring(d.frozenRangeFilter) + '}' : ""
     msg = (
         '{"event_id":"' + eventId + '",' +
         '"event":"bar_close",' +
@@ -223,6 +274,7 @@ buildMessage(string symbol, FeedBar d, ConfirmBar q, TrendBar t2, TrendBar t4, H
         '"history_momentum_126":' + str.tostring(h.momentum126) + ',' +
         '"history_momentum_252":' + str.tostring(h.momentum252) + ',' +
         '"history_volatility_20":' + str.tostring(h.volatility20) +
+        communityJson +
         '}'
     )
     msg
