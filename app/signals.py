@@ -268,6 +268,18 @@ def competition_opportunity_assessment(
     return failed == [], failed
 
 
+def _aligned_quality_component(sign: float, value: float | None) -> float:
+    """Map a component into the active thesis direction.
+
+    Missing optional evidence must always be a penalty, never a directional
+    benefit. Applying the direction sign to a raw -1 sentinel would otherwise
+    turn missing data into +1 for SHORT setups.
+    """
+    if value is None:
+        return -1.0
+    return sign * float(value)
+
+
 def setup_quality_score(
     *,
     recommendation: str,
@@ -288,16 +300,16 @@ def setup_quality_score(
     sign = 1.0 if recommendation == "LONG" else -1.0
 
     components = [
-        (sign * short_term_technical, 0.14),
-        (sign * (confirmation_score if confirmation_score is not None else -1.0), 0.15),
-        (sign * (trend_2h_score if trend_2h_score is not None else -1.0), 0.12),
-        (sign * (trend_4h_score if trend_4h_score is not None else -1.0), 0.12),
-        (sign * (historical_regime if historical_regime is not None else -1.0), 0.12),
-        (sign * (trend_1m_score if trend_1m_score is not None else -1.0), 0.08),
-        (sign * blended_technical, 0.06),
-        (sign * volatility_quality, 0.03),
-        (sign * liquidity_quality, 0.03),
-        (sign * (family_evidence_score if family_evidence_score is not None else -1.0), 0.15),
+        (_aligned_quality_component(sign, short_term_technical), 0.14),
+        (_aligned_quality_component(sign, confirmation_score), 0.15),
+        (_aligned_quality_component(sign, trend_2h_score), 0.12),
+        (_aligned_quality_component(sign, trend_4h_score), 0.12),
+        (_aligned_quality_component(sign, historical_regime), 0.12),
+        (_aligned_quality_component(sign, trend_1m_score), 0.08),
+        (_aligned_quality_component(sign, blended_technical), 0.06),
+        (_aligned_quality_component(sign, volatility_quality), 0.03),
+        (_aligned_quality_component(sign, liquidity_quality), 0.03),
+        (_aligned_quality_component(sign, family_evidence_score), 0.15),
     ]
     raw = 0.0
     for value, weight in components:

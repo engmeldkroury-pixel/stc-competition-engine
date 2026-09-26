@@ -198,3 +198,49 @@ def test_incident_shapes_do_not_reach_balanced_84_quality_floor(
         family_evidence_score=family,
     )
     assert score < 84
+
+
+
+def test_missing_optional_quality_evidence_is_direction_symmetric_and_penalized():
+    long_missing = setup_quality_score(
+        recommendation="LONG",
+        short_term_technical=0.80,
+        confirmation_score=0.80,
+        trend_2h_score=None,
+        trend_4h_score=0.80,
+        historical_regime=0.80,
+        trend_1m_score=0.80,
+        blended_technical=0.80,
+        volatility_quality=0.50,
+        liquidity_quality=0.50,
+        family_evidence_score=0.80,
+    )
+    short_missing = setup_quality_score(
+        recommendation="SHORT",
+        short_term_technical=-0.80,
+        confirmation_score=-0.80,
+        trend_2h_score=None,
+        trend_4h_score=-0.80,
+        historical_regime=-0.80,
+        trend_1m_score=-0.80,
+        blended_technical=-0.80,
+        volatility_quality=-0.50,
+        liquidity_quality=-0.50,
+        family_evidence_score=-0.80,
+    )
+    short_present = setup_quality_score(
+        recommendation="SHORT",
+        short_term_technical=-0.80,
+        confirmation_score=-0.80,
+        trend_2h_score=-0.80,
+        trend_4h_score=-0.80,
+        historical_regime=-0.80,
+        trend_1m_score=-0.80,
+        blended_technical=-0.80,
+        volatility_quality=-0.50,
+        liquidity_quality=-0.50,
+        family_evidence_score=-0.80,
+    )
+
+    assert long_missing == short_missing
+    assert short_missing < short_present
