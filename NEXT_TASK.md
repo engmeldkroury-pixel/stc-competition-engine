@@ -175,3 +175,18 @@ Owner deployment action:
 3. after upload, run Live Readback;
 4. reconcile STC OPEN positions to the competition platform before trusting position-management alerts;
 5. verify Telegram/server notification parity and high-water management fields.
+
+## 2026-09-26 — Opportunity concentration correction
+
+Live audit confirms all 10 Capital symbols are being scanned, but NEW_LOCKED_PLAN events are concentrated in only four symbols:
+SPX500, NAS100, BTCUSD and ETHUSD.
+
+Immediate engineering objective:
+1. keep all 10 symbols in the production scan;
+2. expose symbol-coverage status so the owner can see SCANNED / WAIT / BLOCKED / ACTIVE for every symbol;
+3. carry exact symbol-specific validated community component states into the live shadow payload for profile-ready symbols;
+4. start with DOGEUSD (Range Filter + Schaff), EURUSD (Trendilo), ETHUSD (SSL Hybrid), NAS100 (HalfTrend), then BTCUSD and USDZAR;
+5. do not grant live authority merely to increase trade count;
+6. promote only non-redundant component evidence that passes live/Pine parity and forward shadow checks.
+
+Latest live evidence also shows no current ACTIVE opportunity; NAS100 latest directional setup was quality 84 but blocked by liquidity quality.
