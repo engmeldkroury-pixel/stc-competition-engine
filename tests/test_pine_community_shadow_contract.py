@@ -43,8 +43,8 @@ def test_community_pine_candidate_exposes_each_component_event_separately_for_pa
         assert label in source
 
 
-def test_community_pine_candidate_covers_frozen_amp_profiles():
-    source = Path("tradingview/STC_COMMUNITY_SHADOW_PARITY_CANDIDATE.pine").read_text(encoding="utf-8")
+def test_amp_pine_candidate_covers_frozen_amp_profiles():
+    source = Path("tradingview/STC_AMP_COMMUNITY_SHADOW_PARITY_CANDIDATE.pine").read_text(encoding="utf-8")
     for symbol in ("NYMEX:MCL1!", "CME_MINI:MJY1!", "CBOT:ZB1!"):
         assert symbol in source
 
