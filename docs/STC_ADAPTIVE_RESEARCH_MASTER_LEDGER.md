@@ -955,3 +955,90 @@ Status: ACCEPTED / MERGED WITH EXTERNAL CI BLOCKER DISCLOSED.
 - Output is separate from base ensemble and live_authority remains false.
 - GitHub Actions run 35976346795 did not execute steps; CI = NOT RUN.
 - Acceptance basis: bounded research-only diff, explicit fail-closed validation and independent diff review.
+
+### WU-117 — dual-competition live-policy checkpoint
+Status: VERIFIED IN MAIN / PRODUCTION DEPLOYMENT PENDING.
+- Current main treats both Capital.com Africa and AMP Futures as competition mode.
+- Shared competition opportunity setup-quality floor: 84/100.
+- Existing risk, manual approval and manual order-entry boundaries remain unchanged.
+- Hostinger eligibility logic in current main accepts COMPETITION_OPPORTUNITY symmetrically for Capital and AMP.
+- Permanent readback and dual-competition gate-supply audit are present in the release set.
+- Production evidence before the current deploy attempt still showed stale AMP runtime behavior at 90/100.
+- Historical stored signals must not be expected to mutate after deployment; only fresh post-deploy events can prove current 84 metadata end to end.
+
+### WU-118 — secure Hostinger SSH deployment channel
+Status: IMPLEMENTED / BLOCKED ON OWNER SECRET CORRECTION.
+- Workflow: `.github/workflows/stc-hostinger-deploy.yml`.
+- Initial workflow commit: `c758d267aa3cbe2dd9aaf24c2b9165426ba802b1`.
+- Deployment trigger commit: `c20dd6f0136c1cc2c07157cea63a2657b76d00df`.
+- Approved production file set is fixed at seven PHP files:
+  - approval.php;
+  - cloud_control.php;
+  - notification_control.php;
+  - operator.php;
+  - operator_snapshot.php;
+  - portfolio_control.php;
+  - position.php.
+- Workflow controls:
+  - PHP lint before upload;
+  - SHA-256 release manifest;
+  - dedicated SSH key from GitHub Secret;
+  - Hostinger SSH port 65002;
+  - target-path allowlist for stc.feama.site/public_html;
+  - pre-deploy backup;
+  - post-deploy checksum verification;
+  - no config.php;
+  - no SQL migration;
+  - no broker execution.
+- First run `36264035149`:
+  - PHP validation passed;
+  - SSH host-key setup passed;
+  - upload failed before production replacement because the configured key could not be parsed by libcrypto;
+  - deploy/replace step was skipped.
+- Workflow hardened in commit `8f26c50474084f30b4938dee693567eea3717a9b`:
+  - normalizes CRLF;
+  - verifies OpenSSH private-key header;
+  - parses the private key with ssh-keygen before any upload;
+  - emits only sanitized diagnostic messages.
+- Retry trigger commit: `0ab333077488e640af65e243a014b98bc63b0d98`.
+- Retry run `36264123000`:
+  - PHP validation passed;
+  - fail-closed key validation identified that HOSTINGER_SSH_PRIVATE_KEY is not the private OpenSSH key;
+  - upload/deploy steps were skipped;
+  - production Hostinger files remained unchanged.
+- Required owner correction:
+  - replace HOSTINGER_SSH_PRIVATE_KEY with the full contents of local file `stc_hostinger_deploy` (without `.pub`);
+  - preserve BEGIN/END OPENSSH PRIVATE KEY lines;
+  - do not paste the private key in chat.
+
+### WU-119 — full system/strategy review checkpoint
+Status: COMPLETED / INDEPENDENT REVIEW OPTIONAL.
+- Durable review created:
+  - `docs/STC_FULL_SYSTEM_REVIEW_2026-09-26.md`.
+- Review covers:
+  - architecture;
+  - deployment;
+  - historical production incidents;
+  - live strategy/gate structure;
+  - strategy research evidence;
+  - opportunity concentration;
+  - ledger mismatch;
+  - profit protection;
+  - security;
+  - development priorities;
+  - external-AI review questions.
+- Key new consistency finding:
+  - `app/event_decision.py` is controlling for the current live competition gate and uses 84 for Capital + AMP;
+  - `app/competition_strategy.py` still exposes advisory `A_PLUS_ONLY` pace semantics;
+  - record this as policy consistency debt, not as evidence that live main reverted to 90.
+- Do not change live weights solely to resolve naming. Centralize policy after production deployment/readback and account-ledger reconciliation.
+
+### Current next action — 2026-09-26
+1. Correct only the GitHub Secret HOSTINGER_SSH_PRIVATE_KEY with the actual private key file contents.
+2. Re-trigger the secure Hostinger deploy workflow.
+3. Require successful seven-file checksum verification.
+4. Run permanent Live Readback.
+5. Require structured dual-competition gate audit and fresh AMP evidence of competition_mode=true / quality_floor=84.
+6. Reconcile STC positions against the actual competition platform before trusting portfolio-management actions.
+7. Continue symbol-specific Pine/Python parity and sealed shadow evidence; no live promotion from research evidence alone.
+
