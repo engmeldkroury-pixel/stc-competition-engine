@@ -16,3 +16,6 @@ T-STC-EURUSD-RECOVERY,PASS,"Existing EURUSD position recorded exactly once in ST
 T-STC-RECORD-TIME-FALLBACK,PASS,"Record Trade blank open-time server fallback and clock-skew guard","PR #158 critical CI: 168 passed 1 warning"
 T-STC-B159,PASS,"Competition trade inventory and P/L operator-console contract","PR #159 CI run 36023363966 completed success before merge ae51f8010ab1f7ba93fadc3661066397cc167268"
 T-STC-B161,PASS,"Execution max-quantity ticket, oversized-fill rejection, duplicate-open block and same-direction post-loss cooldown","PR #161 CI run 36033893798 completed success before merge 99b9241485e702ac97e2d3ac653f62b6243ad5a4"
+T-STC-SSH-PHP-LINT,PASS,"Seven approved Hostinger PHP files syntax validation before deployment","Runs 36264035149 and 36264123000 passed PHP lint for all seven files before any upload"
+T-STC-SSH-DEPLOY-01,FAIL_SAFE,"First SSH-key Hostinger deployment attempt","Run 36264035149 stopped at Upload staged release: libcrypto could not parse the configured private key; no production file replacement step ran"
+T-STC-SSH-DEPLOY-02,FAIL_SAFE,"Hardened SSH-key secret validation","Run 36264123000 stopped in Configure and validate SSH key with explicit sanitized diagnosis that HOSTINGER_SSH_PRIVATE_KEY is not the private OpenSSH key; upload/deploy steps skipped"
