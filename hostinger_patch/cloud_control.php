@@ -49,7 +49,11 @@ function stc_signal_quality_gate_eligible(array $signal): bool {
         return true;
     }
     return $grade === 'COMPETITION_OPPORTUNITY'
-        && (string)($signal['competition_id'] ?? '') === 'capital-africa-sep-2026'
+        && in_array(
+            (string)($signal['competition_id'] ?? ''),
+            ['capital-africa-sep-2026', 'amp-futures-sep-2026'],
+            true
+        )
         && ($signal['competition_mode'] ?? false) === true;
 }
 
