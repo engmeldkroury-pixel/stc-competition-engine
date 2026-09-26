@@ -1,7 +1,7 @@
 import pytest
 
 from app.models import FactorScores, SignalEvaluationRequest, TradingViewWebhook
-from app.signals import competition_opportunity_assessment, evaluate, liquidity_quality_from_tradingview, volatility_quality_from_tradingview
+from app.signals import competition_opportunity_assessment, evaluate, liquidity_quality_from_tradingview, setup_quality_score, volatility_quality_from_tradingview
 
 
 def test_strong_positive_signal_requires_human_approval():
@@ -117,6 +117,7 @@ def test_competition_opportunity_gate_accepts_majority_intraday_alignment():
         confirmation_score=0.55,
         trend_2h_score=0.60,
         trend_4h_score=0.10,
+        trend_1m_score=0.20,
         family_evidence_score=0.45,
         family_agreement_ratio=0.67,
         family_aligned_count=6,
@@ -138,6 +139,7 @@ def test_competition_opportunity_gate_blocks_weak_or_conflicted_setup():
         confirmation_score=0.20,
         trend_2h_score=-0.30,
         trend_4h_score=0.10,
+        trend_1m_score=-0.60,
         family_evidence_score=0.10,
         family_agreement_ratio=0.44,
         family_aligned_count=3,
@@ -147,3 +149,52 @@ def test_competition_opportunity_gate_blocks_weak_or_conflicted_setup():
     assert "intraday_majority_alignment" in failures
     assert "short_term_strength" in failures
     assert "historical_not_strongly_opposed" in failures
+
+
+def test_competition_gate_blocks_strongly_opposed_monthly_regime():
+    passed, failures = competition_opportunity_assessment(
+        recommendation="SHORT",
+        composite_score=-0.58,
+        short_term_technical=-0.75,
+        historical_regime=-1.00,
+        blended_technical=-0.75,
+        volatility_quality=-0.50,
+        liquidity_quality=-0.50,
+        confirmation_score=-0.70,
+        trend_2h_score=-0.70,
+        trend_4h_score=-0.70,
+        trend_1m_score=0.60,
+        family_evidence_score=-0.64,
+        family_agreement_ratio=0.80,
+        family_aligned_count=6,
+        family_conflict_count=0,
+    )
+    assert passed is False
+    assert "trend_1m_not_strongly_opposed" in failures
+
+
+@pytest.mark.parametrize(
+    "direction,short_term,confirmation,t2,t4,hist,m1,blend,vol,liq,family",
+    [
+        ("LONG", 0.65, 0.70, 0.15, 0.45, 1.00, 1.00, 0.75, 0.50, 0.50, 0.50),
+        ("SHORT", -0.75, -0.85, -1.00, -0.60, -0.60, 0.60, -0.75, -0.50, -0.50, -0.61),
+        ("SHORT", -0.75, -0.60, -0.55, -0.85, -1.00, 0.60, -0.75, -0.50, -0.50, -0.64),
+    ],
+)
+def test_incident_shapes_do_not_reach_balanced_84_quality_floor(
+    direction, short_term, confirmation, t2, t4, hist, m1, blend, vol, liq, family
+):
+    score = setup_quality_score(
+        recommendation=direction,
+        short_term_technical=short_term,
+        confirmation_score=confirmation,
+        trend_2h_score=t2,
+        trend_4h_score=t4,
+        historical_regime=hist,
+        trend_1m_score=m1,
+        blended_technical=blend,
+        volatility_quality=vol,
+        liquidity_quality=liq,
+        family_evidence_score=family,
+    )
+    assert score < 84
