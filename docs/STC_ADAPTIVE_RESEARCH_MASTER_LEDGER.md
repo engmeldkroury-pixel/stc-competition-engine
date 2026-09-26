@@ -955,3 +955,19 @@ Status: ACCEPTED / MERGED WITH EXTERNAL CI BLOCKER DISCLOSED.
 - Output is separate from base ensemble and live_authority remains false.
 - GitHub Actions run 35976346795 did not execute steps; CI = NOT RUN.
 - Acceptance basis: bounded research-only diff, explicit fail-closed validation and independent diff review.
+
+
+### WU-117 — Facebook external indicator audit
+Status: SOURCE IDENTIFIED / EVIDENCE INCOMPLETE.
+- Owner-provided public Facebook links were successfully inspected read-only on 2026-09-26.
+- Muhammad Al Bermaui, CMT post: no executable strategy or indicator disclosed; retained only as an evidence-quality reminder against treating AI/backtest claims as proof.
+- Tamer Zaky post:
+  - chart: EGAL, 1h, EGX;
+  - visible TradingView indicator label: `All in one (Tamer Zaky)`;
+  - discrete buy/sell markers visible;
+  - public post markets the indicator as free;
+  - exact formula/settings/components/repaint behavior not yet recovered.
+- Durable audit: `docs/FACEBOOK_INDICATOR_AUDIT_20260926.md`.
+- Candidate status: external research candidate only.
+- live_authority=false; risk_authority=false; approval_authority=false.
+- Next dependency: exact script/access/settings and causal timing, then same-window frozen benchmark.
