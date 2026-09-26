@@ -2629,3 +2629,19 @@ Current next action:
 - Independent-review prompt: `docs/EXTERNAL_AI_REVIEW_PROMPT_2026-09-26.md`.
 - Production deployment remains fail-closed on correction of `HOSTINGER_SSH_PRIVATE_KEY`; failed SSH runs changed no Hostinger production files.
 
+## External AI review triage — 2026-09-27
+- Owner supplied multiple independent STC reviews.
+- Durable reconciliation note: `docs/EXTERNAL_AI_REVIEW_TRIAGE_2026-09-27.md`.
+- Confirmed/implemented during review:
+  - per-component LONG/SHORT missing-evidence symmetry regression;
+  - staged deploy package checksum validation before production touch;
+  - deployment rollback-order contract test;
+  - legacy A_PLUS_ONLY/KEEP_A_PLUS reintroduction guard.
+- Code commit: `634de19a3d0404826c4ecffeca2887f4f6af1159`.
+- Competition-critical CI for this patch: 198 passed, 1 warning.
+- Full CI for this exact patch remains separately tracked until completion.
+- Strongest unresolved P0 remains platform/STC ledger reconciliation before portfolio advice is trusted.
+- External hard-coded correlation 0.70/0.85 and -10 quality rules were not adopted without same-provider OOS evidence.
+- Current deterministic correlation-cluster risk caps remain active.
+- Current ATR volatility quality is already range/ATR normalized.
+- HalfTrend Python research adapter already has causal prefix-invariance coverage; live authority remains blocked on exact Pine parity + forward evidence.
