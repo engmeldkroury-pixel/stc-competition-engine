@@ -62,3 +62,30 @@ def test_community_pine_candidate_covers_frozen_amp_profiles():
     assert "rangeMultiplier = 3.0" in source
 
     assert "MCL SSL Hybrid event" in source
+
+
+def test_amp_mtf_feeds_emit_only_their_frozen_shadow_component_payloads():
+    feed_b = Path("tradingview/STC_AMP_MTF_FEED_B.pine").read_text(encoding="utf-8")
+    feed_c = Path("tradingview/STC_AMP_MTF_FEED_C.pine").read_text(encoding="utf-8")
+    feed_d = Path("tradingview/STC_AMP_MTF_FEED_D.pine").read_text(encoding="utf-8")
+
+    assert '"community_component_signals":{"ssl_hybrid":' in feed_b
+    assert 'symbol == "NYMEX:MCL1!"' in feed_b
+    assert "ta.ema(close, 100)" in feed_b
+    assert "ta.ema(high, 20)" in feed_b
+    assert "ta.ema(low, 20)" in feed_b
+
+    assert '"community_component_signals":{"trendilo":' in feed_c
+    assert 'symbol == "CME_MINI:MJY1!"' in feed_c
+    assert "ta.alma(trendiloPch, 50, 0.85, 6.0)" in feed_c
+    assert "trendiloRms = 1.25 *" in feed_c
+
+    assert '"community_component_signals":{"range_filter_guikroth":' in feed_d
+    assert 'symbol == "CBOT:ZB1!"' in feed_d
+    assert "ta.ema(rfChange, 100)" in feed_d
+    assert "rfSecond = ta.ema(rfFirst, 199)" in feed_d
+    assert "rfSmoothRange = rfSecond * 3.0" in feed_d
+
+    for source in (feed_b, feed_c, feed_d):
+        assert "communitySignal" in source
+        assert "strategy.entry" not in source
