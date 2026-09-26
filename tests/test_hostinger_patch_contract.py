@@ -580,6 +580,8 @@ def test_competition_opportunity_grade_is_centralized_end_to_end():
     assert "function stc_signal_quality_gate_eligible" in cloud
     assert "COMPETITION_OPPORTUNITY" in cloud
     assert "capital-africa-sep-2026" in cloud
+    assert "amp-futures-sep-2026" in cloud
+    assert "['capital-africa-sep-2026', 'amp-futures-sep-2026']" in cloud
     assert "competition_mode" in cloud
     for text in (snapshot, approval, notify, control):
         assert "stc_signal_quality_gate_eligible($signal)" in text
@@ -737,3 +739,12 @@ def test_php_portfolio_supervisor_tracks_closed_bar_high_water_profit_lock():
     assert "Peak closed-bar R:" in notify
     assert "Locked R floor:" in notify
     assert "192" in notify
+
+
+def test_competition_opportunity_eligibility_is_symmetric_for_capital_and_amp():
+    cloud = (PATCH / "cloud_control.php").read_text(encoding="utf-8")
+    assert "in_array(" in cloud
+    assert "['capital-africa-sep-2026', 'amp-futures-sep-2026']" in cloud
+    assert "($signal['competition_mode'] ?? false) === true" in cloud
+    # Prevent reintroducing the old Capital-only hard gate.
+    assert "($signal['competition_id'] ?? '') === 'capital-africa-sep-2026'" not in cloud
