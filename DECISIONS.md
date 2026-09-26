@@ -74,3 +74,18 @@
 - Seven AMP core symbols have validated exact-provider Wave-3 15m research profiles: MCL, MNG, MGC, MJY, MET, ZN and ZB.
 - PR #185 merged as 5173c1296a01573ff2bca94729eabf08a3b29b35 after full and critical CI success.
 - AMP component profiles remain research/shadow-only until exact causal Pine payload parity is demonstrated. No approximate Pine mapping may receive live authority.
+
+## 2026-09-26 — Secure Hostinger deployment channel
+- Manual ZIP/File Manager replacement is superseded as the preferred STC deployment path.
+- Production Hostinger updates should use the dedicated SSH-key GitHub Actions workflow `.github/workflows/stc-hostinger-deploy.yml`.
+- The workflow is restricted to the approved seven PHP files, validates PHP syntax, creates a pre-deploy backup, verifies SHA-256 parity after replacement, and never deploys `config.php` or SQL.
+- GitHub repository visibility does not expose secret values; only secret names appear in workflow source.
+- Password-based reusable deployment credentials are not the preferred automation mechanism.
+- Failed deployment attempts must be fail-closed before production replacement and recorded in the test/risk registers.
+
+## 2026-09-26 — Strategy policy consistency debt
+- Live event decision policy for Capital and AMP is the shared 84/100 COMPETITION_OPPORTUNITY gate.
+- `app/competition_strategy.py` still reports `A_PLUS_ONLY` in the advisory competition-pace object.
+- This advisory/live semantic mismatch is not evidence that the live gate is 90, but it is a policy-drift risk and must be reconciled before relying on the pace object for automation or UI decisions.
+- Do not change live weights or thresholds merely to fix naming; first centralize the policy contract and lock it with regression tests.
+
