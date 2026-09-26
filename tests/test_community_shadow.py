@@ -138,3 +138,85 @@ def test_invalid_shadow_signal_value_is_stored_as_context_only():
     assert result["status"] == "ingested_context"
     assert result["decision"]["action"] == "store_context_only"
     assert result["decision"]["reason"] == "insufficient_signal_payload"
+
+
+def test_amp_mng_shadow_uses_verified_range_filter_profile():
+    shadow = build_community_component_shadow(
+        "NYMEX:MNG1!",
+        "15",
+        {"range_filter_guikroth": -1.0},
+    )
+    assert shadow["status"] == "COMPLETE_SHADOW_EVIDENCE"
+    assert shadow["weighted_score"] == -1.0
+    assert shadow["normalized_weights"] == {"range_filter_guikroth": 1.0}
+    assert shadow["selected_parameters"]["range_filter_guikroth"] == {
+        "sampling_period": 100,
+        "range_multiplier": 2.0,
+    }
+    assert shadow["evidence_source"].startswith("github-actions:35916027610")
+    assert shadow["live_authority"] is False
+    assert shadow["used_in_quality_gate"] is False
+    assert shadow["used_in_risk"] is False
+    assert shadow["used_in_approval"] is False
+
+
+def test_amp_mgc_shadow_requires_both_qqe_and_ssl_before_scoring():
+    partial = build_community_component_shadow(
+        "COMEX_MINI:MGC1!",
+        "15",
+        {"qqe_mod": 1.0},
+    )
+    assert partial["status"] == "INCOMPLETE_SHADOW_EVIDENCE"
+    assert partial["weighted_score"] is None
+    assert partial["missing_components"] == ["ssl_hybrid"]
+
+    full = build_community_component_shadow(
+        "COMEX_MINI:MGC1!",
+        "15",
+        {"qqe_mod": 1.0, "ssl_hybrid": -1.0},
+    )
+    assert full["status"] == "COMPLETE_SHADOW_EVIDENCE"
+    expected = 0.5698649457861664 - 0.43013505421383363
+    assert full["weighted_score"] == expected
+
+
+def test_amp_zn_shadow_keeps_symbol_specific_weights_and_parameters():
+    shadow = build_community_component_shadow(
+        "CBOT:ZN1!",
+        "15",
+        {
+            "schaff_trend_cycle": 1.0,
+            "alphatrend": 1.0,
+            "qqe_mod": -1.0,
+        },
+    )
+    assert shadow["status"] == "COMPLETE_SHADOW_EVIDENCE"
+    assert shadow["normalized_weights"]["schaff_trend_cycle"] == 0.3704593624494359
+    assert shadow["selected_parameters"]["alphatrend"]["period"] == 20
+    assert shadow["selected_parameters"]["qqe_mod"]["rsi_period"] == 8
+    assert shadow["live_authority"] is False
+
+
+def test_amp_met_shadow_uses_verified_wae_and_ut_parameters():
+    shadow = build_community_component_shadow(
+        "CME:MET1!",
+        "15",
+        {"waddah_attar_explosion": 1.0, "ut_bot_alerts": 1.0},
+    )
+    assert shadow["status"] == "COMPLETE_SHADOW_EVIDENCE"
+    assert shadow["weighted_score"] == 1.0
+    assert shadow["selected_parameters"]["waddah_attar_explosion"]["fast_length"] == 12
+    assert shadow["selected_parameters"]["waddah_attar_explosion"]["dead_zone_mult"] == 3.0
+    assert shadow["selected_parameters"]["ut_bot_alerts"]["key_value"] == 2.0
+
+
+def test_amp_changed_profiles_fail_closed_until_weights_are_reconciled():
+    for symbol in ("CBOT:ZB1!", "CME_MINI:MJY1!", "NYMEX:MCL1!"):
+        shadow = build_community_component_shadow(
+            symbol,
+            "15",
+            {"range_filter_guikroth": 1.0},
+        )
+        assert shadow["status"] == "PROFILE_RECONCILIATION_PENDING"
+        assert shadow["weighted_score"] is None
+        assert shadow["live_authority"] is False
