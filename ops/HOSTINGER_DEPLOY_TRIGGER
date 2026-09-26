@@ -1,2 +1,2 @@
-2026-09-26T21:28:00+03:00
-Retry secure Hostinger deployment after private-key CRLF normalization and non-secret key-shape validation.
+2026-09-27T00:12:00+03:00
+Owner confirmed HOSTINGER_SSH_PRIVATE_KEY corrected. Trigger secure seven-file Hostinger deployment with staged checksum validation.
