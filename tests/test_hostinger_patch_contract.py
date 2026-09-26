@@ -737,3 +737,18 @@ def test_php_portfolio_supervisor_tracks_closed_bar_high_water_profit_lock():
     assert "Peak closed-bar R:" in notify
     assert "Locked R floor:" in notify
     assert "192" in notify
+
+
+def test_operator_exposes_dual_competition_signal_coverage():
+    snapshot = (PATCH / "operator_snapshot.php").read_text(encoding="utf-8")
+    ui = (PATCH / "operator.php").read_text(encoding="utf-8")
+    assert "$signalCoverage = [];" in snapshot
+    assert "'signal_coverage' => $signalCoverage" in snapshot
+    assert "'capital-africa-sep-2026', 'amp-futures-sep-2026'" in snapshot
+    assert "'expected_feed_symbols'" in snapshot
+    assert "'observed_symbols'" in snapshot
+    assert "'feed_complete_now'" in snapshot
+    assert "function signalCoverageHtml(competitionId)" in ui
+    assert "SIGNAL COVERAGE — LIVE" in ui
+    assert "Feed symbols arriving" in ui
+    assert "ACTIVE opportunities now" in ui
