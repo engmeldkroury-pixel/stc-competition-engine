@@ -190,6 +190,18 @@ def test_peak_r_retrace_exits_to_protect_competition_score():
     assert "profit_retrace_breached_dynamic_floor" in advice.reasons
 
 
+def test_two_r_peak_locks_at_least_one_point_two_five_r():
+    advice = supervise_position(
+        pos(target1=7890, target2=7920),
+        market(
+            current_price=7830,
+            peak_r_multiple=2.0,
+        ),
+    )
+    assert advice.action == "PROTECT"
+    assert advice.suggested_stop == pytest.approx(7825.0)
+
+
 def test_peak_r_progressive_lock_raises_stop_without_forcing_exit():
     advice = supervise_position(
         pos(target1=7890, target2=7920),
