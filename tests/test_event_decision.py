@@ -441,3 +441,94 @@ def test_mismatched_calibration_timeframe_is_informational_not_live_weighting(mo
     assert evidence["entry_timeframe"] == "15"
     assert evidence["strategy_id"] is None
     assert signal["research_calibration"]["status"] == "AVAILABLE_INFORMATIONAL"
+
+
+def test_competition_near_miss_is_watch_only_without_locked_plan(monkeypatch):
+    import app.event_decision as event_decision
+
+    monkeypatch.setattr(
+        event_decision,
+        "competition_opportunity_assessment",
+        lambda **kwargs: (True, []),
+    )
+    monkeypatch.setattr(
+        event_decision,
+        "setup_quality_score",
+        lambda **kwargs: 78,
+    )
+    payload = {
+        "event_id": "evt-amp-watch",
+        "event": "bar_close",
+        "competition_id": "amp-futures-sep-2026",
+        "symbol": "CBOT:ZN1!",
+        "timeframe": "15",
+        "time": "2026-09-21T18:00:00Z",
+        "open": 105.0,
+        "high": 105.4,
+        "low": 104.95,
+        "close": 105.35,
+        "volume": 2200,
+        "ema20": 105.20,
+        "ema50": 105.00,
+        "rsi14": 61,
+        "atr14": 0.25,
+        "macd": 0.08,
+        "macd_signal": 0.03,
+        "volume_ratio": 1.8,
+        **_strong_confirmation(),
+        **_strong_history(),
+    }
+    result = event_decision.decide_bridge_event("evt-amp-watch", payload)
+    signal = result["decision"]["signal"]
+    assert signal["recommendation"] == "WAIT"
+    assert signal["quality_gate_passed"] is False
+    assert signal["watch_candidate"] is True
+    assert signal["watch_direction"] == "LONG"
+    assert signal["setup_quality_score"] == 78
+    assert signal["quality_gate_failures"] == ["setup_quality_below_84"]
+    assert "PREPARE ONLY" in signal["watch_note"]
+    assert result["decision"]["locked_trade_plan"] is None
+
+
+def test_competition_weak_or_multi_failure_signal_is_not_watch(monkeypatch):
+    import app.event_decision as event_decision
+
+    monkeypatch.setattr(
+        event_decision,
+        "competition_opportunity_assessment",
+        lambda **kwargs: (False, ["intraday_majority_alignment", "family_breadth", "short_term_strength"]),
+    )
+    monkeypatch.setattr(
+        event_decision,
+        "setup_quality_score",
+        lambda **kwargs: 75,
+    )
+    payload = {
+        "event_id": "evt-amp-not-watch",
+        "event": "bar_close",
+        "competition_id": "amp-futures-sep-2026",
+        "symbol": "CBOT:ZN1!",
+        "timeframe": "15",
+        "time": "2026-09-21T18:00:00Z",
+        "open": 105.0,
+        "high": 105.4,
+        "low": 104.95,
+        "close": 105.35,
+        "volume": 2200,
+        "ema20": 105.20,
+        "ema50": 105.00,
+        "rsi14": 61,
+        "atr14": 0.25,
+        "macd": 0.08,
+        "macd_signal": 0.03,
+        "volume_ratio": 1.8,
+        **_strong_confirmation(),
+        **_strong_history(),
+    }
+    result = event_decision.decide_bridge_event("evt-amp-not-watch", payload)
+    signal = result["decision"]["signal"]
+    assert signal["recommendation"] == "WAIT"
+    assert signal["watch_candidate"] is False
+    assert signal["watch_direction"] is None
+    assert len(signal["quality_gate_failures"]) == 4
+    assert result["decision"]["locked_trade_plan"] is None
