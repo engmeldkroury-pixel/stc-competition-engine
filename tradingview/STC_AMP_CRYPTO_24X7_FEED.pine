@@ -1,0 +1,280 @@
+//@version=6
+indicator("STC AMP Crypto 24x7 Feed v1.0", overlay=true)
+
+// IMPORTANT: attach the TradingView alert for this script to a 24/7 CME crypto
+// host chart, recommended CME:MBT1! on 15m. Pine outer realtime execution follows
+// the host chart. A weekday-only host can starve Saturday/Sunday crypto updates.
+
+competitionId = input.string("amp-futures-sep-2026", "Competition ID", options=["amp-futures-sep-2026"], group="Production feed")
+feedTf = input.timeframe("15", "Production feed timeframe", options=["15"], group="Production feed")
+feedEnabled = input.bool(true, "Enable webhook feed", group="Production feed")
+
+type FeedBar
+    int t
+    float o
+    float h
+    float l
+    float c
+    float v
+    float ema20
+    float ema50
+    float rsi14
+    float atr14
+    float macd
+    float macdSignal
+    float volumeRatio
+    float familyTrend
+    float familyMomentum
+    float familyVolatility
+    float familyVolume
+    float familyVwap
+    float familyMarketStructure
+    float familySmcLiquidity
+    float familyPriceAction
+    float familyMicrostructure
+
+type ConfirmBar
+    int t
+    float c
+    float ema20
+    float ema50
+    float ema200
+    float rsi14
+    float atr14
+    float macd
+    float macdSignal
+    float volumeRatio
+
+type TrendBar
+    int t
+    float score
+
+type HistoryBar
+    int t
+    float c
+    float ema50
+    float ema200
+    float rsi14
+    float atr14
+    float high252
+    float low252
+    float momentum20
+    float momentum63
+    float momentum126
+    float momentum252
+    float volatility20
+
+clampScore(float x) =>
+    math.max(-1.0, math.min(1.0, x))
+
+makeFeedBar() =>
+    [macdLine, signalLine, _] = ta.macd(close, 12, 26, 9)
+    e20 = ta.ema(close, 20)
+    e50 = ta.ema(close, 50)
+    e200 = ta.ema(close, 200)
+    r = ta.rsi(close, 14)
+    a = ta.atr(14)
+    stoch = ta.stoch(close, high, low, 14)
+    volSma = ta.sma(volume, 20)
+    vr = not na(volume) and volSma > 0 ? volume / volSma : 1.0
+    safeAtr = math.max(a, syminfo.mintick)
+    trendDir = close > e20 and e20 > e50 ? 1.0 : close < e20 and e20 < e50 ? -1.0 : close >= e50 ? 0.30 : -0.30
+    familyTrend = clampScore(trendDir * 0.55 + (e50 >= e200 ? 0.25 : -0.25) + (macdLine >= signalLine ? 0.20 : -0.20))
+    macdNorm = clampScore((macdLine - signalLine) / math.max(safeAtr * 0.35, syminfo.mintick))
+    familyMomentum = clampScore(clampScore((r - 50.0) / 25.0) * 0.40 + clampScore((stoch - 50.0) / 40.0) * 0.25 + macdNorm * 0.35)
+    rangeAtr = (high - low) / safeAtr
+    volQuality = rangeAtr >= 0.40 and rangeAtr <= 1.80 ? 0.60 : rangeAtr >= 0.20 and rangeAtr <= 2.50 ? 0.20 : rangeAtr > 3.00 ? -0.80 : -0.20
+    familyVolatility = clampScore(trendDir * volQuality)
+    barDir = close > open ? 1.0 : close < open ? -1.0 : trendDir
+    participation = math.max(0.0, math.min(1.0, (vr - 0.70) / 1.00))
+    familyVolume = clampScore(barDir * participation)
+    vw = ta.vwap(hlc3)
+    familyVwap = na(vw) ? 0.0 : clampScore((close - vw) / safeAtr)
+    priorHi = ta.highest(high, 20)[1]
+    priorLo = ta.lowest(low, 20)[1]
+    bos = close > priorHi ? 1.0 : close < priorLo ? -1.0 : 0.0
+    familyMarketStructure = clampScore(bos * 0.65 + trendDir * 0.35)
+    sweep = high > priorHi and close < priorHi ? -1.0 : low < priorLo and close > priorLo ? 1.0 : 0.0
+    fvg = low > high[2] ? 1.0 : high < low[2] ? -1.0 : 0.0
+    body = close - open
+    displacement = math.abs(body) >= 1.20 * safeAtr ? barDir : 0.0
+    familySmcLiquidity = clampScore(sweep * 0.50 + fvg * 0.20 + displacement * 0.30)
+    bullEngulf = close > open and close[1] < open[1] and close >= open[1] and open <= close[1]
+    bearEngulf = close < open and close[1] > open[1] and open >= close[1] and close <= open[1]
+    engulf = bullEngulf ? 1.0 : bearEngulf ? -1.0 : 0.0
+    barRange = math.max(high - low, syminfo.mintick)
+    clv = ((close - low) - (high - close)) / barRange
+    familyPriceAction = clampScore(engulf * 0.55 + clampScore(clv) * 0.45)
+    efficiency = math.abs(body) / barRange
+    familyMicrostructure = clampScore(barDir * (efficiency * 0.60 + participation * 0.40))
+    FeedBar.new(time, open, high, low, close, volume, e20, e50, r, a, macdLine, signalLine, vr, familyTrend, familyMomentum, familyVolatility, familyVolume, familyVwap, familyMarketStructure, familySmcLiquidity, familyPriceAction, familyMicrostructure)
+
+feedBar(string symbol) =>
+    request.security(symbol, feedTf, makeFeedBar(), gaps=barmerge.gaps_off, lookahead=barmerge.lookahead_off, ignore_invalid_symbol=false)
+
+makeConfirmBar() =>
+    [macdLine, signalLine, _] = ta.macd(close, 12, 26, 9)
+    volSma = ta.sma(volume, 20)
+    ConfirmBar.new(time[1], close[1], ta.ema(close, 20)[1], ta.ema(close, 50)[1], ta.ema(close, 200)[1], ta.rsi(close, 14)[1], ta.atr(14)[1], macdLine[1], signalLine[1], not na(volume[1]) and volSma[1] > 0 ? volume[1] / volSma[1] : 1.0)
+
+confirmBar(string symbol) =>
+    request.security(symbol, "60", makeConfirmBar(), gaps=barmerge.gaps_off, lookahead=barmerge.lookahead_on, ignore_invalid_symbol=false)
+
+makeTrendBar() =>
+    [macdLine, signalLine, _] = ta.macd(close, 12, 26, 9)
+    e20 = ta.ema(close, 20)
+    e50 = ta.ema(close, 50)
+    e200 = ta.ema(close, 200)
+    r = ta.rsi(close, 14)
+    volSma = ta.sma(volume, 20)
+    vr = not na(volume[1]) and volSma[1] > 0 ? volume[1] / volSma[1] : 1.0
+    s = 0.0
+    s += close[1] > e20[1] and e20[1] > e50[1] ? 0.30 : close[1] < e20[1] and e20[1] < e50[1] ? -0.30 : 0.0
+    s += e50[1] >= e200[1] ? 0.20 : -0.20
+    s += macdLine[1] >= signalLine[1] ? 0.20 : -0.20
+    s += r[1] >= 52 and r[1] <= 72 ? 0.15 : r[1] <= 48 and r[1] >= 28 ? -0.15 : 0.0
+    s += vr >= 1.0 ? (close[1] >= open[1] ? 0.15 : -0.15) : 0.0
+    TrendBar.new(time[1], math.max(-1.0, math.min(1.0, s)))
+
+trendBar(string symbol, string tf) =>
+    request.security(symbol, tf, makeTrendBar(), gaps=barmerge.gaps_off, lookahead=barmerge.lookahead_on, ignore_invalid_symbol=false)
+
+makeMonthlyTrendBar() =>
+    [macdLine, signalLine, _] = ta.macd(close, 6, 13, 5)
+    e6 = ta.ema(close, 6)
+    e12 = ta.ema(close, 12)
+    e24 = ta.ema(close, 24)
+    r = ta.rsi(close, 14)
+    s = 0.0
+    s += close[1] > e6[1] and e6[1] > e12[1] ? 0.35 : close[1] < e6[1] and e6[1] < e12[1] ? -0.35 : 0.0
+    s += e12[1] >= e24[1] ? 0.25 : -0.25
+    s += macdLine[1] >= signalLine[1] ? 0.20 : -0.20
+    s += r[1] >= 52 ? 0.20 : r[1] <= 48 ? -0.20 : 0.0
+    TrendBar.new(time[1], math.max(-1.0, math.min(1.0, s)))
+
+monthlyBar(string symbol) =>
+    request.security(symbol, "1M", makeMonthlyTrendBar(), gaps=barmerge.gaps_off, lookahead=barmerge.lookahead_on, ignore_invalid_symbol=false)
+
+makeHistoryBar() =>
+    m20 = close[21] != 0 ? close[1] / close[21] - 1.0 : 0.0
+    m63 = close[64] != 0 ? close[1] / close[64] - 1.0 : 0.0
+    m126 = close[127] != 0 ? close[1] / close[127] - 1.0 : 0.0
+    m252 = close[253] != 0 ? close[1] / close[253] - 1.0 : 0.0
+    vol20 = close[1] != 0 ? ta.atr(20)[1] / close[1] : 0.0
+    HistoryBar.new(time[1], close[1], ta.ema(close, 50)[1], ta.ema(close, 200)[1], ta.rsi(close, 14)[1], ta.atr(14)[1], ta.highest(high, 252)[1], ta.lowest(low, 252)[1], m20, m63, m126, m252, vol20)
+
+historyBar(string symbol) =>
+    request.security(symbol, "1D", makeHistoryBar(), gaps=barmerge.gaps_off, lookahead=barmerge.lookahead_on, ignore_invalid_symbol=false)
+
+buildMessage(string symbol, FeedBar d, ConfirmBar q, TrendBar t2, TrendBar t4, HistoryBar h, TrendBar m) =>
+    eventId = competitionId + "|" + symbol + "|" + feedTf + "|" + str.tostring(d.t)
+    msg = (
+        '{"event_id":"' + eventId + '",' +
+        '"event":"bar_close",' +
+        '"competition_id":"' + competitionId + '",' +
+        '"symbol":"' + symbol + '",' +
+        '"timeframe":"' + feedTf + '",' +
+        '"time":"' + str.format_time(d.t, "yyyy-MM-dd\'T\'HH:mm:ss\'Z\'", "UTC") + '",' +
+        '"open":' + str.tostring(d.o) + ',' +
+        '"high":' + str.tostring(d.h) + ',' +
+        '"low":' + str.tostring(d.l) + ',' +
+        '"close":' + str.tostring(d.c) + ',' +
+        '"volume":' + str.tostring(d.v) + ',' +
+        '"ema20":' + str.tostring(d.ema20) + ',' +
+        '"ema50":' + str.tostring(d.ema50) + ',' +
+        '"rsi14":' + str.tostring(d.rsi14) + ',' +
+        '"atr14":' + str.tostring(d.atr14) + ',' +
+        '"macd":' + str.tostring(d.macd) + ',' +
+        '"macd_signal":' + str.tostring(d.macdSignal) + ',' +
+        '"volume_ratio":' + str.tostring(d.volumeRatio) + ',' +
+        '"family_trend":' + str.tostring(d.familyTrend) + ',' +
+        '"family_momentum":' + str.tostring(d.familyMomentum) + ',' +
+        '"family_volatility":' + str.tostring(d.familyVolatility) + ',' +
+        '"family_volume":' + str.tostring(d.familyVolume) + ',' +
+        '"family_vwap":' + str.tostring(d.familyVwap) + ',' +
+        '"family_market_structure":' + str.tostring(d.familyMarketStructure) + ',' +
+        '"family_smc_liquidity":' + str.tostring(d.familySmcLiquidity) + ',' +
+        '"family_price_action":' + str.tostring(d.familyPriceAction) + ',' +
+        '"family_microstructure":' + str.tostring(d.familyMicrostructure) + ',' +
+        '"confirm_timeframe":"60",' +
+        '"confirm_time":"' + str.format_time(q.t, "yyyy-MM-dd\'T\'HH:mm:ss\'Z\'", "UTC") + '",' +
+        '"confirm_close":' + str.tostring(q.c) + ',' +
+        '"confirm_ema20":' + str.tostring(q.ema20) + ',' +
+        '"confirm_ema50":' + str.tostring(q.ema50) + ',' +
+        '"confirm_ema200":' + str.tostring(q.ema200) + ',' +
+        '"confirm_rsi14":' + str.tostring(q.rsi14) + ',' +
+        '"confirm_atr14":' + str.tostring(q.atr14) + ',' +
+        '"confirm_macd":' + str.tostring(q.macd) + ',' +
+        '"confirm_macd_signal":' + str.tostring(q.macdSignal) + ',' +
+        '"confirm_volume_ratio":' + str.tostring(q.volumeRatio) + ',' +
+        '"trend_2h_time":"' + str.format_time(t2.t, "yyyy-MM-dd\'T\'HH:mm:ss\'Z\'", "UTC") + '",' +
+        '"trend_2h_score":' + str.tostring(t2.score) + ',' +
+        '"trend_4h_time":"' + str.format_time(t4.t, "yyyy-MM-dd\'T\'HH:mm:ss\'Z\'", "UTC") + '",' +
+        '"trend_4h_score":' + str.tostring(t4.score) + ',' +
+        '"trend_1m_time":"' + str.format_time(m.t, "yyyy-MM-dd\'T\'HH:mm:ss\'Z\'", "UTC") + '",' +
+        '"trend_1m_score":' + str.tostring(m.score) + ',' +
+        '"history_timeframe":"1D",' +
+        '"history_time":"' + str.format_time(h.t, "yyyy-MM-dd\'T\'HH:mm:ss\'Z\'", "UTC") + '",' +
+        '"history_close":' + str.tostring(h.c) + ',' +
+        '"history_ema50":' + str.tostring(h.ema50) + ',' +
+        '"history_ema200":' + str.tostring(h.ema200) + ',' +
+        '"history_rsi14":' + str.tostring(h.rsi14) + ',' +
+        '"history_atr14":' + str.tostring(h.atr14) + ',' +
+        '"history_high_252":' + str.tostring(h.high252) + ',' +
+        '"history_low_252":' + str.tostring(h.low252) + ',' +
+        '"history_momentum_20":' + str.tostring(h.momentum20) + ',' +
+        '"history_momentum_63":' + str.tostring(h.momentum63) + ',' +
+        '"history_momentum_126":' + str.tostring(h.momentum126) + ',' +
+        '"history_momentum_252":' + str.tostring(h.momentum252) + ',' +
+        '"history_volatility_20":' + str.tostring(h.volatility20) +
+        '}'
+    )
+    msg
+
+mbt = feedBar("CME:MBT1!")
+mbtC = confirmBar("CME:MBT1!")
+mbt2 = trendBar("CME:MBT1!", "120")
+mbt4 = trendBar("CME:MBT1!", "240")
+mbtH = historyBar("CME:MBT1!")
+mbtM = monthlyBar("CME:MBT1!")
+varip int lastMBT = na
+
+met = feedBar("CME:MET1!")
+metC = confirmBar("CME:MET1!")
+met2 = trendBar("CME:MET1!", "120")
+met4 = trendBar("CME:MET1!", "240")
+metH = historyBar("CME:MET1!")
+metM = monthlyBar("CME:MET1!")
+varip int lastMET = na
+
+msl = feedBar("CME:MSL1!")
+mslC = confirmBar("CME:MSL1!")
+msl2 = trendBar("CME:MSL1!", "120")
+msl4 = trendBar("CME:MSL1!", "240")
+mslH = historyBar("CME:MSL1!")
+mslM = monthlyBar("CME:MSL1!")
+varip int lastMSL = na
+
+mxp = feedBar("CME:MXP1!")
+mxpC = confirmBar("CME:MXP1!")
+mxp2 = trendBar("CME:MXP1!", "120")
+mxp4 = trendBar("CME:MXP1!", "240")
+mxpH = historyBar("CME:MXP1!")
+mxpM = monthlyBar("CME:MXP1!")
+varip int lastMXP = na
+
+if feedEnabled and barstate.isconfirmed and barstate.isrealtime
+    if not na(mbt.t) and not na(mbt.c) and not na(mbtC.t) and not na(mbt2.t) and not na(mbt4.t) and not na(mbtH.t) and not na(mbtM.t) and (na(lastMBT) or mbt.t != lastMBT)
+        lastMBT := mbt.t
+        alert(buildMessage("CME:MBT1!", mbt, mbtC, mbt2, mbt4, mbtH, mbtM), alert.freq_all)
+    if not na(met.t) and not na(met.c) and not na(metC.t) and not na(met2.t) and not na(met4.t) and not na(metH.t) and not na(metM.t) and (na(lastMET) or met.t != lastMET)
+        lastMET := met.t
+        alert(buildMessage("CME:MET1!", met, metC, met2, met4, metH, metM), alert.freq_all)
+    if not na(msl.t) and not na(msl.c) and not na(mslC.t) and not na(msl2.t) and not na(msl4.t) and not na(mslH.t) and not na(mslM.t) and (na(lastMSL) or msl.t != lastMSL)
+        lastMSL := msl.t
+        alert(buildMessage("CME:MSL1!", msl, mslC, msl2, msl4, mslH, mslM), alert.freq_all)
+    if not na(mxp.t) and not na(mxp.c) and not na(mxpC.t) and not na(mxp2.t) and not na(mxp4.t) and not na(mxpH.t) and not na(mxpM.t) and (na(lastMXP) or mxp.t != lastMXP)
+        lastMXP := mxp.t
+        alert(buildMessage("CME:MXP1!", mxp, mxpC, mxp2, mxp4, mxpH, mxpM), alert.freq_all)
+
+plot(na, title="STC AMP Crypto 24x7", display=display.none)
