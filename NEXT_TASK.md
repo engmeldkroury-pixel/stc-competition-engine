@@ -318,3 +318,30 @@ Research-only next queue:
 - Do not modify STC ledger rows until the comparison is complete.
 - Separately, wait for the next natural AMP event to confirm fresh post-deploy competition metadata.
 
+## 2026-09-27 — One remaining owner evidence step before ledger write
+Current platform truth is known for OPEN positions, but exact execution timestamps are missing.
+
+Owner should open Capital.com `Trade history` and send screenshots covering:
+- the opening execution(s) that make up the current NAS100 7.7 long position;
+- the opening execution(s) that make up the current SPX500 40 long position;
+- the closing trade(s) for EURUSD;
+- the closing trade(s) for XAGUSD;
+- any additional Capital trades since the prior reconciliation.
+
+Required visible fields where available:
+- symbol;
+- side;
+- quantity;
+- execution/fill price;
+- date/time;
+- realized P/L for closed trades.
+
+Do not change or close anything on the platform. This is evidence-only.
+
+After this evidence:
+1. VOID the four stale `manual_external` STC rows as ledger-only reconciliation;
+2. re-open only NAS100 and SPX500 in STC with exact platform quantity/entry/open time/SL/TP;
+3. import closed EURUSD/XAGUSD trades with actual close time/price/P&L if evidenced;
+4. rerun Live Readback and compare exact open ledger to platform;
+5. restore portfolio/high-water authority only after exact match.
+
