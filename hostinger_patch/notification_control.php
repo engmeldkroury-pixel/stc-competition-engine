@@ -199,6 +199,109 @@ function stc_account_state_for(PDO $pdo, string $competitionId): ?array {
     return $row === false ? null : $row;
 }
 
+function stc_notify_watch_candidate(PDO $pdo, array $config, array $payload, array $signal): array {
+    if (($signal['watch_candidate'] ?? false) !== true) {
+        return ['ok' => true, 'skipped' => true, 'reason' => 'not_watch_candidate'];
+    }
+    $direction = strtoupper(trim((string)($signal['watch_direction'] ?? 'WAIT')));
+    if (!in_array($direction, ['LONG', 'SHORT'], true)) {
+        return ['ok' => true, 'skipped' => true, 'reason' => 'watch_direction_invalid'];
+    }
+
+    $competitionId = (string)($payload['competition_id'] ?? '');
+    $symbol = (string)($payload['symbol'] ?? '');
+    if ($competitionId === '' || $symbol === '') {
+        return ['ok' => true, 'skipped' => true, 'reason' => 'watch_context_missing'];
+    }
+
+    $openStmt = $pdo->prepare(
+        "SELECT COALESCE(SUM(quantity), 0) FROM stc_positions "
+        . "WHERE status = 'OPEN' AND competition_id = ? AND symbol = ?"
+    );
+    $openStmt->execute([$competitionId, $symbol]);
+    if ((float)$openStmt->fetchColumn() > 1e-12) {
+        return ['ok' => true, 'skipped' => true, 'reason' => 'existing_open_position'];
+    }
+
+    $qualityScore = isset($signal['setup_quality_score']) ? (int)$signal['setup_quality_score'] : 0;
+    $qualityFloor = isset($signal['quality_floor']) ? (int)$signal['quality_floor'] : 84;
+    $bucket = max(70, min(95, intdiv(max(0, $qualityScore), 5) * 5));
+    $timeText = (string)($payload['time'] ?? '');
+    $day = preg_match('/^\d{4}-\d{2}-\d{2}/', $timeText) === 1
+        ? substr($timeText, 0, 10)
+        : gmdate('Y-m-d');
+
+    $tf = is_array($signal['timeframe_confirmation'] ?? null) ? $signal['timeframe_confirmation'] : [];
+    $tfParts = [];
+    foreach ([
+        ['15m', 'entry_score'],
+        ['1H', '1h_score'],
+        ['2H', '2h_score'],
+        ['4H', '4h_score'],
+        ['1D', '1d_score'],
+        ['1M', '1m_score'],
+    ] as $tfDef) {
+        [$tfLabel, $tfKey] = $tfDef;
+        if (array_key_exists($tfKey, $tf) && $tf[$tfKey] !== null) {
+            $value = (float)$tf[$tfKey];
+            $tfParts[] = $tfLabel . ' ' . ($value >= 0 ? '+' : '') . number_format($value, 2, '.', '');
+        } else {
+            $tfParts[] = $tfLabel . ' -';
+        }
+    }
+
+    $failures = is_array($signal['quality_gate_failures'] ?? null)
+        ? array_values(array_map('strval', $signal['quality_gate_failures']))
+        : [];
+    $family = is_array($signal['live_family_evidence'] ?? null) ? $signal['live_family_evidence'] : [];
+    $familyText = $family === []
+        ? 'UNAVAILABLE'
+        : (isset($family['score']) ? number_format((float)$family['score'], 2, '.', '') : '-')
+            . ' | agreement ' . number_format((float)($family['agreement_ratio'] ?? 0.0) * 100.0, 0, '.', '') . '%'
+            . ' | aligned ' . (int)($family['aligned_families'] ?? 0) . '/9'
+            . ' | conflicts ' . (int)($family['conflicting_families'] ?? 0);
+
+    $shadow = is_array($signal['community_component_shadow'] ?? null)
+        ? $signal['community_component_shadow']
+        : [];
+    $shadowText = $shadow === []
+        ? 'UNAVAILABLE'
+        : (string)($shadow['status'] ?? 'UNKNOWN')
+            . (($shadow['weighted_score'] ?? null) === null
+                ? ''
+                : ' | score ' . number_format((float)$shadow['weighted_score'], 2, '.', ''));
+
+    $label = $competitionId === 'amp-futures-sep-2026' ? 'AMP Futures' : 'Capital.com Africa';
+    $title = 'STC WATCH • ' . $label . ' • ' . $direction;
+    $body = implode("\n", [
+        $symbol,
+        'STATUS: WATCH / PREPARE ONLY',
+        'NO ENTRY • NO ORDER • NO SIZE • NO APPROVAL',
+        'Setup quality: ' . $qualityScore . '/100 | live floor ' . $qualityFloor . '/100',
+        'Blocking reasons: ' . ($failures === [] ? 'none recorded' : implode(', ', $failures)),
+        'MTF: ' . implode(' | ', $tfParts),
+        'Evidence families: ' . $familyText,
+        'Community shadow: ' . $shadowText,
+        'Wait for STC NEW PLAN before any manual order.',
+    ]);
+
+    return [
+        'ok' => true,
+        'skipped' => false,
+        'watch_only' => true,
+        'dispatch' => stc_dispatch_notification($pdo, $config, [
+            'event_key' => 'watch:' . $competitionId . ':' . $symbol . ':' . $direction . ':' . $bucket . ':' . $day,
+            'event_type' => 'SETUP_WATCH',
+            'competition_id' => $competitionId,
+            'symbol' => $symbol,
+            'position_id' => null,
+            'severity' => 'normal',
+            'title' => $title,
+            'body' => $body,
+        ]),
+    ];
+}
+
 function stc_notify_signal_event(PDO $pdo, array $config, string $eventId): array {
     $stmt = $pdo->prepare(
         'SELECT payload_json, result_json FROM stc_webhook_events '
@@ -214,7 +317,13 @@ function stc_notify_signal_event(PDO $pdo, array $config, string $eventId): arra
     $decision = is_array($result) ? ($result['decision'] ?? null) : null;
     $signal = is_array($decision) ? ($decision['signal'] ?? null) : null;
     $plan = is_array($decision) ? ($decision['locked_trade_plan'] ?? null) : null;
-    if (!is_array($payload) || !is_array($signal) || !is_array($plan)) {
+    if (!is_array($payload) || !is_array($signal)) {
+        return ['ok' => true, 'skipped' => true, 'reason' => 'no_signal_context'];
+    }
+    if (!is_array($plan)) {
+        if (($signal['watch_candidate'] ?? false) === true) {
+            return stc_notify_watch_candidate($pdo, $config, $payload, $signal);
+        }
         return ['ok' => true, 'skipped' => true, 'reason' => 'no_locked_plan'];
     }
     $direction = (string)($signal['recommendation'] ?? 'WAIT');
