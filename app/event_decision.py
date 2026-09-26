@@ -6,7 +6,12 @@ from pydantic import ValidationError
 
 from .approval import build_approval_envelope
 from .calibration_registry import calibration_to_public_dict, lookup_runtime_calibration
-from .competition_profiles import get_profile
+from .competition_profiles import (
+    COMPETITION_MODE_IDS,
+    COMPETITION_OPPORTUNITY_QUALITY_FLOOR,
+    STRICT_QUALITY_FLOOR,
+    get_profile,
+)
 from .community_shadow import build_community_component_shadow
 from .evidence_engine import aggregate_live_family_scores
 from .models import FactorScores, SignalEvaluationRequest, TradingViewWebhook
@@ -150,10 +155,7 @@ def decide_bridge_event(event_id: str, payload: dict) -> dict:
         ),
     )
     base_result = evaluate(req).model_copy(update={"signal_id": deterministic_signal_id(event_id)})
-    competition_mode = tv.competition_id in {
-        "capital-africa-sep-2026",
-        "amp-futures-sep-2026",
-    }
+    competition_mode = tv.competition_id in COMPETITION_MODE_IDS
     if competition_mode:
         gate_passed, gate_failures = competition_opportunity_assessment(
             recommendation=base_result.recommendation,
@@ -205,7 +207,7 @@ def decide_bridge_event(event_id: str, payload: dict) -> dict:
         family_evidence_score=None if family_evidence is None else family_evidence.score,
     )
 
-    quality_floor = 84 if competition_mode else 90
+    quality_floor = COMPETITION_OPPORTUNITY_QUALITY_FLOOR if competition_mode else STRICT_QUALITY_FLOOR
     final_gate_passed = gate_passed and quality_score >= quality_floor
     if gate_passed and quality_score < quality_floor:
         gate_failures = [*gate_failures, f"setup_quality_below_{quality_floor}"]

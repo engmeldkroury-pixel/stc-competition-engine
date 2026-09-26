@@ -25,7 +25,7 @@ def test_win_probability_is_calibrated_only_after_minimum_sample():
     assert r.confidence_low < r.estimated_win_probability < r.confidence_high
 
 
-def test_competition_pace_never_lowers_quality_floor_when_catching_up():
+def test_competition_pace_keeps_shared_competition_floor_when_catching_up():
     r = competition_pace(
         "amp-futures-sep-2026",
         now_utc=datetime(2026, 9, 25, 12, 0, tzinfo=UTC),
@@ -35,8 +35,8 @@ def test_competition_pace_never_lowers_quality_floor_when_catching_up():
         prize_cutoff_rank=20,
     )
     assert r.phase == "CATCH_UP"
-    assert r.scan_mode == "BROADEN_UNIVERSE_KEEP_A_PLUS"
-    assert r.quality_floor == "A_PLUS_ONLY"
+    assert r.scan_mode == "BROADEN_UNIVERSE_KEEP_QUALITY"
+    assert r.quality_floor == "COMPETITION_OPPORTUNITY_84"
     assert r.size_band == "NORMAL_TO_UPPER_ALLOWED"
 
 
@@ -51,4 +51,4 @@ def test_competition_pace_protects_late_prize_zone_score():
     )
     assert r.phase == "PROTECT_SCORE"
     assert r.size_band == "LOW"
-    assert r.quality_floor == "A_PLUS_ONLY"
+    assert r.quality_floor == "COMPETITION_OPPORTUNITY_84"

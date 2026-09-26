@@ -3,7 +3,12 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import datetime, timezone
 
-from .competition_profiles import get_profile
+from .competition_profiles import (
+    COMPETITION_MODE_IDS,
+    COMPETITION_OPPORTUNITY_QUALITY_FLOOR,
+    STRICT_QUALITY_FLOOR,
+    get_profile,
+)
 
 
 UTC = timezone.utc
@@ -57,8 +62,8 @@ def competition_pace(
     elif q_remaining > 0 and fraction <= 0.40:
         phase = "QUALIFICATION_URGENT"
         size_band = "LOW_TO_NORMAL"
-        scan_mode = "BROADEN_UNIVERSE_KEEP_A_PLUS"
-        note = "Qualification days are still missing; do not lower the A+ quality floor."
+        scan_mode = "BROADEN_UNIVERSE_KEEP_QUALITY"
+        note = "Qualification days are still missing; do not lower the active competition quality floor."
     elif in_prize_zone and fraction <= 0.25:
         phase = "PROTECT_SCORE"
         size_band = "LOW"
@@ -72,21 +77,27 @@ def competition_pace(
     ):
         phase = "CATCH_UP"
         size_band = "NORMAL_TO_UPPER_ALLOWED"
-        scan_mode = "BROADEN_UNIVERSE_KEEP_A_PLUS"
+        scan_mode = "BROADEN_UNIVERSE_KEEP_QUALITY"
         note = (
             "Behind the target zone late in the event: scan more symbols and sessions, "
-            "but keep the same A+ quality floor and all official/risk caps."
+            "but keep the same active competition quality floor and all official/risk caps."
         )
     elif realized_pnl > 0 and fraction <= 0.15:
         phase = "FINAL_WINDOW"
         size_band = "LOW_TO_NORMAL"
         scan_mode = "TOP_SETUPS_ONLY"
-        note = "Final window: prioritize score preservation and only exceptional A+ setups."
+        note = "Final window: prioritize score preservation and only exceptional qualified setups."
     else:
         phase = "BUILD_SCORE"
         size_band = "NORMAL"
         scan_mode = "NORMAL_UNIVERSE"
-        note = "Build realized score with A+ setups while preserving qualification and risk limits."
+        note = "Build realized score with qualified setups while preserving qualification and risk limits."
+
+    quality_floor = (
+        f"COMPETITION_OPPORTUNITY_{COMPETITION_OPPORTUNITY_QUALITY_FLOOR}"
+        if competition_id in COMPETITION_MODE_IDS
+        else f"A_PLUS_{STRICT_QUALITY_FLOOR}"
+    )
 
     return CompetitionPace(
         competition_id=competition_id,
@@ -100,6 +111,6 @@ def competition_pace(
         prize_cutoff_rank=prize_cutoff_rank,
         size_band=size_band,
         scan_mode=scan_mode,
-        quality_floor="A_PLUS_ONLY",
+        quality_floor=quality_floor,
         note=note,
     )

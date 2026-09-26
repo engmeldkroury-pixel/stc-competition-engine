@@ -196,6 +196,17 @@ PROFILES: dict[str, CompetitionProfile] = {
 }
 
 
+# One policy contract for the active short-horizon competition gate.
+# Keep these constants centralized so advisory pace logic and live event decisions
+# cannot silently drift between 84/90 semantics.
+COMPETITION_MODE_IDS = frozenset({
+    "amp-futures-sep-2026",
+    "capital-africa-sep-2026",
+})
+COMPETITION_OPPORTUNITY_QUALITY_FLOOR = 84
+STRICT_QUALITY_FLOOR = 90
+
+
 def get_profile(competition_id: str) -> CompetitionProfile:
     try:
         return PROFILES[competition_id]
