@@ -763,3 +763,15 @@ def test_amp_weekend_crypto_support_and_qualification_urgency_are_owner_visible(
     assert "MUST_TRADE_TODAY" in control
     assert "STC QUALIFICATION URGENT" in ui
     assert "maybeNotifyQualification()" in ui
+
+
+def test_amp_qualification_urgency_reaches_server_notifications_without_trade_authority():
+    notify = (PATCH / "notification_control.php").read_text(encoding="utf-8")
+    assert "function stc_notify_qualification_urgency" in notify
+    assert "QUALIFICATION_URGENT" in notify
+    assert "qualification:" in notify
+    assert "This is a qualification warning, not a trade recommendation." in notify
+    assert "Use only an independently valid setup and manual execution." in notify
+    assert "stc_notify_qualification_urgency(" in notify
+    for forbidden in ("place_order", "submit_order", "broker_order", "strategy.entry"):
+        assert forbidden not in notify
