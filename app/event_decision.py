@@ -156,8 +156,9 @@ def decide_bridge_event(event_id: str, payload: dict) -> dict:
         ),
     )
     base_result = evaluate(req).model_copy(update={"signal_id": deterministic_signal_id(event_id)})
-    candidate_recommendation, direction_source = competition_candidate_recommendation(
+    candidate_recommendation, direction_source, effective_competition_score = competition_candidate_recommendation(
         base_recommendation=base_result.recommendation,
+        base_composite_score=base_result.composite_score,
         frozen_component_score=frozen_component_support["weighted_score"],
         frozen_component_complete=bool(frozen_component_support["complete"]),
     )
@@ -168,7 +169,7 @@ def decide_bridge_event(event_id: str, payload: dict) -> dict:
     if competition_mode:
         gate_passed, gate_failures = competition_opportunity_assessment(
             recommendation=candidate_recommendation,
-            composite_score=base_result.composite_score,
+            composite_score=effective_competition_score,
             short_term_technical=short_term_technical,
             historical_regime=historical_regime,
             blended_technical=technical,
@@ -178,7 +179,6 @@ def decide_bridge_event(event_id: str, payload: dict) -> dict:
             trend_2h_score=tv.trend_2h_score,
             trend_4h_score=tv.trend_4h_score,
             trend_1m_score=tv.trend_1m_score,
-            frozen_component_score=frozen_component_support["weighted_score"],
             family_evidence_score=None if family_evidence is None else family_evidence.score,
             family_agreement_ratio=None if family_evidence is None else family_evidence.agreement_ratio,
             family_aligned_count=None if family_evidence is None else family_evidence.aligned_families,
@@ -273,6 +273,7 @@ def decide_bridge_event(event_id: str, payload: dict) -> dict:
     result_dict["pre_gate_recommendation"] = base_result.recommendation
     result_dict["competition_candidate_recommendation"] = candidate_recommendation
     result_dict["direction_source"] = direction_source
+    result_dict["effective_competition_score"] = effective_competition_score
     result_dict["quality_gate_failures"] = gate_failures
     result_dict["community_component_shadow"] = community_component_shadow
     result_dict["frozen_component_support"] = frozen_component_support
