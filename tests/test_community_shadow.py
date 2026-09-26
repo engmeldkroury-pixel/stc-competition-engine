@@ -1,4 +1,4 @@
-from app.community_shadow import build_community_component_shadow
+from app.community_shadow import build_community_component_shadow, build_frozen_competition_component_support
 from app.event_decision import decide_bridge_event
 
 
@@ -138,3 +138,49 @@ def test_invalid_shadow_signal_value_is_stored_as_context_only():
     assert result["status"] == "ingested_context"
     assert result["decision"]["action"] == "store_context_only"
     assert result["decision"]["reason"] == "insufficient_signal_payload"
+
+
+def test_frozen_amp_zb_support_uses_range_filter_only():
+    support = build_frozen_competition_component_support(
+        "CBOT:ZB1!",
+        "15",
+        {"range_filter_guikroth": -1.0},
+    )
+    assert support["complete"] is True
+    assert support["weighted_score"] == -1.0
+    assert support["normalized_weights"] == {"range_filter_guikroth": 1.0}
+    assert support["decision_support_eligible"] is True
+    assert support["live_authority"] is False
+
+
+def test_frozen_amp_mjy_requires_all_three_survivors_before_scoring():
+    support = build_frozen_competition_component_support(
+        "CME_MINI:MJY1!",
+        "15",
+        {"trendilo": 1.0},
+    )
+    assert support["complete"] is False
+    assert support["weighted_score"] is None
+    assert "alphatrend" in support["missing_components"]
+    assert "waddah_attar_explosion" in support["missing_components"]
+
+
+def test_frozen_capital_xau_support_uses_final_holdout_range_filter():
+    support = build_frozen_competition_component_support(
+        "CAPITALCOM:XAUUSD",
+        "15",
+        {"range_filter_guikroth": 1.0},
+    )
+    assert support["complete"] is True
+    assert support["selected_parameters"]["range_filter_guikroth"]["range_multiplier"] == 2.0
+
+
+def test_frozen_support_does_not_invent_profile_for_unvalidated_symbol():
+    support = build_frozen_competition_component_support(
+        "CAPITALCOM:SPX500",
+        "15",
+        {"trendilo": 1.0},
+    )
+    assert support["status"] == "NO_FROZEN_COMPETITION_PROFILE"
+    assert support["complete"] is False
+    assert support["decision_support_eligible"] is False
