@@ -74,3 +74,25 @@ Therefore the Tamer Zaky indicator should be tested as an independent candidate,
 - Risk authority: false.
 - Approval authority: false.
 - Next evidence dependency: exact script/access/settings and causal timing.
+
+
+## Follow-up access-post audit
+
+The public access link was inspected separately.
+
+Verified public access workflow:
+1. follow Tamer Zaky's Facebook account;
+2. comment with the user's TradingView username;
+3. the post says access will then be granted.
+
+Additional findings:
+- the indicator is also referred to as `المؤشر المدمج` ("integrated/combined indicator") and "the new indicator";
+- only buy/sell signals are explicitly claimed;
+- no public TradingView script page, Pine source, script id, inputs, defaults, component list, alert logic, stop/target logic or verified backtest was exposed;
+- the author says an explanation is coming, but no deterministic explanation was visible in the captured public material;
+- visible positive user comments are testimonials only and are not treated as performance evidence.
+
+Research consequence:
+- exact access to the TradingView indicator is the next useful evidence step;
+- once access is granted, capture the script title, Settings/Inputs, alert options and several historical signal timestamps;
+- compare those timestamps with STC exact-provider bars to detect repainting or delayed confirmation before any benchmark.
