@@ -25,7 +25,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          mkdir -p out/stc-hostinger-hotfix-169
+          mkdir -p out/stc-hostinger-dual-competition
           for file in \
             approval.php \
             cloud_control.php \
@@ -35,10 +35,10 @@ jobs:
             portfolio_control.php \
             position.php
           do
-            cp "hostinger_patch/${file}" "out/stc-hostinger-hotfix-169/${file}"
+            cp "hostinger_patch/${file}" "out/stc-hostinger-dual-competition/${file}"
           done
-          cat > out/stc-hostinger-hotfix-169/UPLOAD_README.txt <<'EOF'
-          STC Hostinger hotfix after PR #169
+          cat > out/stc-hostinger-dual-competition/UPLOAD_README.txt <<'EOF'
+          STC Hostinger dual-competition release
           =================================
           Upload these seven PHP files to the existing STC public_html directory.
           Replace the files with the same names.
@@ -59,7 +59,8 @@ jobs:
           - Telegram/server-to-console notification visibility parity;
           - approval-time MAX STC QUANTITY and duplicate/re-entry guardrails;
           - audited VOID support for mistaken manual_external ledger rows;
-          - research-only competition gate supply audit;
+          - research-only gate supply audit for both Capital and AMP Futures;
+          - shared Capital/AMP COMPETITION_OPPORTUNITY eligibility parity;
           - closed-bar high-water profit protection for open positions.
 
           After upload:
@@ -68,16 +69,18 @@ jobs:
              trusting portfolio-management alerts;
           3. verify Telegram/server events appear in the owner console;
           4. verify position-management messages expose current R, peak R and
-             locked R floor when profit protection is active.
+             locked R floor when profit protection is active;
+          5. verify the competition gate audit contains separate Capital and
+             AMP Futures buckets after this package is deployed.
           EOF
           (
             cd out
-            zip -qr stc-hostinger-hotfix-169.zip stc-hostinger-hotfix-169
+            zip -qr stc-hostinger-dual-competition.zip stc-hostinger-dual-competition
           )
-          sha256sum out/stc-hostinger-hotfix-169.zip
+          sha256sum out/stc-hostinger-dual-competition.zip
       - uses: actions/upload-artifact@v4
         with:
-          name: stc-hostinger-hotfix-169-${{ github.run_id }}
-          path: out/stc-hostinger-hotfix-169.zip
+          name: stc-hostinger-dual-competition-${{ github.run_id }}
+          path: out/stc-hostinger-dual-competition.zip
           if-no-files-found: error
           retention-days: 30
