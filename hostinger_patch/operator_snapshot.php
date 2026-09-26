@@ -542,6 +542,7 @@ try {
             'strict_a_plus_proxy' => 0,
             'balanced_competition_proxy' => 0,
             'current_84_structural_proxy' => 0,
+            'gate_failure_counts' => [],
             'per_symbol' => [],
         ];
     };
@@ -560,6 +561,7 @@ try {
         ],
         'strict_a_plus_proxy' => 0,
         'balanced_competition_proxy' => 0,
+        'gate_failure_counts' => [],
         'per_symbol' => [],
         'by_competition' => [
             'capital-africa-sep-2026' => $newAuditBucket(),
@@ -568,6 +570,7 @@ try {
         'authority' => 'research_audit_only',
         'note' => 'Proxy counts compare recent stored signal context. They do not create or approve trades.',
         'current_84_structural_proxy_note' => 'Approximates the shared 84 competition gate from stored MTF/family/composite fields; live volatility/liquidity/blended-technical factors are not replayed here.',
+        'gate_failure_counts_note' => 'Counts persisted live quality_gate_failures by competition and symbol so opportunity starvation can be diagnosed without changing the live gate.',
     ];
 
     foreach ($signalRows as $auditRow) {
@@ -698,9 +701,35 @@ try {
                 'strict_a_plus_proxy' => 0,
                 'balanced_competition_proxy' => 0,
                 'current_84_structural_proxy' => 0,
+                'gate_failure_counts' => [],
             ];
         }
         $bucket['per_symbol'][$symbol]['directional_rows']++;
+
+        $persistedFailures = is_array($auditSignal['quality_gate_failures'] ?? null)
+            ? $auditSignal['quality_gate_failures']
+            : [];
+        foreach ($persistedFailures as $failureValue) {
+            $failure = trim((string)$failureValue);
+            if ($failure === '') {
+                continue;
+            }
+            if (!isset($bucket['gate_failure_counts'][$failure])) {
+                $bucket['gate_failure_counts'][$failure] = 0;
+            }
+            $bucket['gate_failure_counts'][$failure]++;
+            if (!isset($bucket['per_symbol'][$symbol]['gate_failure_counts'][$failure])) {
+                $bucket['per_symbol'][$symbol]['gate_failure_counts'][$failure] = 0;
+            }
+            $bucket['per_symbol'][$symbol]['gate_failure_counts'][$failure]++;
+
+            if ($competitionId === 'capital-africa-sep-2026') {
+                if (!isset($gateAudit['gate_failure_counts'][$failure])) {
+                    $gateAudit['gate_failure_counts'][$failure] = 0;
+                }
+                $gateAudit['gate_failure_counts'][$failure]++;
+            }
+        }
         if ($strictProxy) {
             $bucket['strict_a_plus_proxy']++;
             $bucket['per_symbol'][$symbol]['strict_a_plus_proxy']++;
@@ -726,6 +755,7 @@ try {
                     'directional_rows' => 0,
                     'strict_a_plus_proxy' => 0,
                     'balanced_competition_proxy' => 0,
+                    'gate_failure_counts' => [],
                 ];
             }
             $gateAudit['per_symbol'][$symbol]['directional_rows']++;
@@ -734,6 +764,16 @@ try {
             }
             if ($balancedProxy) {
                 $gateAudit['per_symbol'][$symbol]['balanced_competition_proxy']++;
+            }
+            foreach ($persistedFailures as $failureValue) {
+                $failure = trim((string)$failureValue);
+                if ($failure === '') {
+                    continue;
+                }
+                if (!isset($gateAudit['per_symbol'][$symbol]['gate_failure_counts'][$failure])) {
+                    $gateAudit['per_symbol'][$symbol]['gate_failure_counts'][$failure] = 0;
+                }
+                $gateAudit['per_symbol'][$symbol]['gate_failure_counts'][$failure]++;
             }
         }
         unset($bucket);

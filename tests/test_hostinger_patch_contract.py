@@ -753,3 +753,13 @@ def test_competition_opportunity_eligibility_is_symmetric_for_capital_and_amp():
     assert "($signal['competition_mode'] ?? false) === true" in cloud
     # Prevent reintroducing the old Capital-only hard gate.
     assert "($signal['competition_id'] ?? '') === 'capital-africa-sep-2026'" not in cloud
+
+
+def test_gate_audit_exposes_failure_reason_counts_by_competition_and_symbol():
+    snapshot = (PATCH / "operator_snapshot.php").read_text(encoding="utf-8")
+    assert "'gate_failure_counts' => []" in snapshot
+    assert "quality_gate_failures" in snapshot
+    assert "$bucket['gate_failure_counts'][$failure]++" in snapshot
+    assert "$bucket['per_symbol'][$symbol]['gate_failure_counts'][$failure]++" in snapshot
+    assert "$gateAudit['per_symbol'][$symbol]['gate_failure_counts'][$failure]++" in snapshot
+    assert "opportunity starvation can be diagnosed without changing the live gate" in snapshot
