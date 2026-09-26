@@ -19,3 +19,6 @@ T-STC-B161,PASS,"Execution max-quantity ticket, oversized-fill rejection, duplic
 T-STC-SSH-PHP-LINT,PASS,"Seven approved Hostinger PHP files syntax validation before deployment","Runs 36264035149 and 36264123000 passed PHP lint for all seven files before any upload"
 T-STC-SSH-DEPLOY-01,FAIL_SAFE,"First SSH-key Hostinger deployment attempt","Run 36264035149 stopped at Upload staged release: libcrypto could not parse the configured private key; no production file replacement step ran"
 T-STC-SSH-DEPLOY-02,FAIL_SAFE,"Hardened SSH-key secret validation","Run 36264123000 stopped in Configure and validate SSH key with explicit sanitized diagnosis that HOSTINGER_SSH_PRIVATE_KEY is not the private OpenSSH key; upload/deploy steps skipped"
+T-STC-POLICY-CENTRALIZATION,PASS_CRITICAL,"Centralized active competition ids and 84/90 policy consistency","Included in corrected-code critical CI: 191 passed, 1 warning"
+T-STC-GATE-FAILURE-ATTRIBUTION,PASS_CRITICAL,"Operator snapshot exposes persisted quality_gate_failures by competition and symbol","Contract coverage included in corrected-code critical CI: 191 passed, 1 warning"
+T-STC-SHORT-MISSING-SYMMETRY,PASS_CRITICAL,"Missing optional setup-quality evidence is symmetric for LONG/SHORT and penalizes missing values","Regression in tests/test_signals.py; corrected-code critical CI: 191 passed, 1 warning"
