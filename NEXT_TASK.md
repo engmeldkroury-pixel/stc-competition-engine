@@ -156,3 +156,22 @@ Priority sequence:
 7. Re-run live readback and require exact agreement between platform and STC open-position count/quantity before trusting management alerts.
 
 The NAS100 incident confirms that competition management must protect MFE, not only original stop risk.
+
+## 2026-09-26 — Deployment-ready update
+
+Latest production-ready hotfix:
+- PR #169 merged successfully;
+- full CI: SUCCESS;
+- competition-critical CI: SUCCESS;
+- Hostinger bundle run: 36225098256 — SUCCESS;
+- artifact id: 10900587381;
+- package contains seven PHP files only;
+- no SQL migration;
+- no config.php or credential changes.
+
+Owner deployment action:
+1. upload/replace the seven PHP files in the existing STC public_html directory;
+2. do not upload config.php;
+3. after upload, run Live Readback;
+4. reconcile STC OPEN positions to the competition platform before trusting position-management alerts;
+5. verify Telegram/server notification parity and high-water management fields.
