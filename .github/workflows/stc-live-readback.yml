@@ -115,6 +115,23 @@ jobs:
           config = notifications.get("config") or {}
           events = notifications.get("events") or []
           deliveries = notifications.get("deliveries") or []
+          from collections import Counter, defaultdict
+          capital_events = [
+              e for e in events
+              if e.get("competition_id") == "capital-africa-sep-2026"
+          ]
+          symbol_event_counts = Counter(
+              (e.get("symbol") or "NONE", e.get("event_type") or "UNKNOWN")
+              for e in capital_events
+          )
+          by_symbol = defaultdict(lambda: {"total": 0, "NEW_LOCKED_PLAN": 0, "POSITION_MANAGEMENT": 0})
+          for e in capital_events:
+              sym = e.get("symbol") or "NONE"
+              typ = e.get("event_type") or "UNKNOWN"
+              by_symbol[sym]["total"] += 1
+              if typ in by_symbol[sym]:
+                  by_symbol[sym][typ] += 1
+          print("STC_LIVE_NOTIFICATION_SYMBOL_COUNTS=" + json.dumps(dict(sorted(by_symbol.items())), sort_keys=True))
           print("STC_LIVE_NOTIFICATION_CONFIG=" + json.dumps(config, sort_keys=True))
           print(
               "STC_LIVE_NOTIFICATION_RECENT="
