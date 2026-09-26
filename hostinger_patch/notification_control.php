@@ -189,6 +189,33 @@ function stc_dispatch_notification(PDO $pdo, array $config, array $event): array
     ];
 }
 
+function stc_notify_qualification_urgency(PDO $pdo, array $config, string $competitionId): ?array {
+    if ($competitionId !== 'amp-futures-sep-2026') {
+        return null;
+    }
+    $progress = stc_competition_progress($pdo, $competitionId);
+    if (($progress['qualification_urgency'] ?? '') !== 'MUST_TRADE_TODAY') {
+        return null;
+    }
+    $utcDate = gmdate('Y-m-d');
+    return stc_dispatch_notification($pdo, $config, [
+        'event_key' => 'qualification:' . $competitionId . ':' . $utcDate,
+        'event_type' => 'QUALIFICATION_URGENT',
+        'competition_id' => $competitionId,
+        'symbol' => null,
+        'position_id' => null,
+        'severity' => 'critical',
+        'title' => 'STC QUALIFICATION URGENT • AMP Futures',
+        'body' => implode("\n", [
+            'AMP Futures still needs ' . (int)($progress['qualifying_days_remaining'] ?? 0) . ' qualifying trading day(s).',
+            'UTC calendar dates remaining including today: ' . (int)($progress['utc_calendar_dates_remaining_including_today'] ?? 0) . '.',
+            'Today must contain a competition action that results in opening or closing a position to preserve minimum-day eligibility.',
+            'This is a qualification warning, not a trade recommendation.',
+            'Use only an independently valid setup and manual execution.',
+        ]),
+    ]);
+}
+
 function stc_account_state_for(PDO $pdo, string $competitionId): ?array {
     $stmt = $pdo->prepare(
         'SELECT competition_id, equity_usd, risk_fraction, source, version, updated_at_utc '
@@ -211,6 +238,13 @@ function stc_notify_signal_event(PDO $pdo, array $config, string $eventId): arra
     }
     $payload = json_decode((string)$row['payload_json'], true);
     $result = json_decode((string)$row['result_json'], true);
+    if (is_array($payload)) {
+        stc_notify_qualification_urgency(
+            $pdo,
+            $config,
+            (string)($payload['competition_id'] ?? '')
+        );
+    }
     $decision = is_array($result) ? ($result['decision'] ?? null) : null;
     $signal = is_array($decision) ? ($decision['signal'] ?? null) : null;
     $plan = is_array($decision) ? ($decision['locked_trade_plan'] ?? null) : null;
@@ -416,6 +450,10 @@ function stc_set_state_hash(PDO $pdo, string $stateKey, string $hash): void {
 
 function stc_notify_portfolio(PDO $pdo, array $config): array {
     $notifications = [];
+    $qualification = stc_notify_qualification_urgency($pdo, $config, 'amp-futures-sep-2026');
+    if (is_array($qualification)) {
+        $notifications[] = $qualification;
+    }
     $stmt = $pdo->query("SELECT * FROM stc_positions WHERE status = 'OPEN' ORDER BY id ASC");
     while (($position = $stmt->fetch()) !== false) {
         $history = stc_recent_signal_states(
