@@ -10,7 +10,7 @@ permissions:
 
 concurrency:
   group: stc-bridge-processor
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   process:
