@@ -345,3 +345,21 @@ After this evidence:
 4. rerun Live Readback and compare exact open ledger to platform;
 5. restore portfolio/high-water authority only after exact match.
 
+## 2026-09-27 — Reconciliation evidence nearly complete
+Durable evidence file:
+- `docs/LEDGER_RECONCILIATION_EVIDENCE_2026-09-27.md`.
+
+Important finding:
+- TradingView trade-history timestamps are consistent with Egypt local time UTC+03.
+- AMP conversion to UTC reproduces the platform's 3/5 trading-day count exactly.
+
+Only one screenshot is still required:
+- Capital.com Trade history scrolled further down from the partially visible BTCUSD row through the absolute bottom.
+
+Reason:
+- recover that BTCUSD entry time/price;
+- identify the remaining -54.39 USD realized-P/L difference;
+- prove no additional trades remain below.
+
+Do not reconcile/write the live STC ledger until this final history slice is captured.
+
