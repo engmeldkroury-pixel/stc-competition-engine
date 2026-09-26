@@ -1088,3 +1088,35 @@ Status: IMPLEMENTED / CRITICAL VERIFIED / FULL CI TRACKED SEPARATELY.
   - high-water vs volatility trailing forward A/B;
   - walk-forward threshold study plus Monte Carlo robustness.
 - Strongest unresolved P0: ledger/platform reconciliation before portfolio-management advice is trusted.
+
+### WU-123 — owner-accepted ledger reconciliation
+Status: VERIFIED / OWNER ACCEPTED.
+- Owner accepted leaving a Capital realized-P/L residual of -54.39 USD unattributed.
+- Reconciliation workflow: `.github/workflows/stc-ledger-reconcile.yml`.
+- Initial run `36274630447`:
+  - four stale manual_external rows VOIDed ledger-only;
+  - nine evidenced Capital closed trades imported;
+  - two AMP closed trades imported;
+  - current NAS100 and SPX500 positions recreated from platform truth;
+  - write phase succeeded;
+  - validation exposed a progress bug because VOID rows carried a current `closed_at_utc`.
+- Fix commit `4dfbb26a6c65ed80ef57e7e53e0f76a474f09c8e`:
+  - excludes status=VOID from position totals, opened-date days, closed-date days, partial-event days and action counts.
+- Critical CI: 199 passed, 1 warning.
+- Hostinger fix deploy `36274716351`: SUCCESS.
+- Idempotent reconciliation rerun `36274737170`: SUCCESS.
+- Final readback `36274764925`: SUCCESS.
+- Accepted Capital baseline:
+  - open NAS100 LONG 7.7 @ 30416.071, stop 30319.1, final TP 30758.6;
+  - open SPX500 LONG 40 @ 7737.25, stop 7716.0, final TP 7797.0;
+  - 9 closed trades;
+  - 4 qualifying UTC trading days;
+  - evidenced STC realized P/L -3370.87 USD;
+  - residual -54.39 USD remains explicitly unattributed.
+- AMP baseline:
+  - 0 open;
+  - 2 closed;
+  - +991.25 USD realized P/L;
+  - 3 qualifying UTC trading days.
+- No broker action was sent during any reconciliation step.
+
