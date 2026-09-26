@@ -81,13 +81,14 @@ Current stop/TP for these open rows must come from the current Positions view:
 | CAPITALCOM:ETHUSD | LONG | 2026-09-22 00:07 | 2772.35 | 2026-09-22 03:58 | 2753.74 | 9.02 | -172.80 |
 | CAPITALCOM:BTCUSD | LONG | 2026-09-22 01:28 | 86384.45 | 2026-09-22 03:55 | 85979.65 | 0.22 | -92.72 |
 
-### Partially visible row
-A further CAPITALCOM:BTCUSD LONG closed trade is partially visible:
+### Newly completed BTCUSD row
+The previously partial CAPITALCOM:BTCUSD LONG trade is now fully evidenced:
+- entry local time: 2026-09-22 00:09;
+- entry price: 86648.2;
 - exit local time: 2026-09-22 01:28;
 - exit price: 86358.7;
 - quantity: 0.23;
 - net P/L: -70.78.
-Its entry time and entry price are not visible in the supplied screenshot.
 
 ## Capital completeness check
 
