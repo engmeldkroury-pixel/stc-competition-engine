@@ -211,3 +211,18 @@ The new branch `stc-profit-lock-highwater-20260925` changes the supervisor to us
 If current R falls below the already-earned dynamic floor, the supervisor recommends EXIT_NOW instead of allowing the position to drift back toward the original stop.
 
 Execution remains manual.
+
+
+### Cross-check against the prior SPX500 39.2-unit stop-out
+
+The same high-water rule also addresses the prior SPX500 aggregate long:
+- actual average entry: 7,697.1;
+- actual active stop: 7,690.8;
+- initial risk distance: 6.3 points;
+- after the 18:05 UTC entry, the highest 15-minute close before the stop-out was 7,709.7 at 18:45 UTC;
+- that is exactly about +2.00R on the actual position;
+- price later fell through the original stop around the 20:15 UTC 15-minute bar.
+
+Under the proposed progressive high-water rule, a +2.00R closed-bar peak creates a +1.25R floor. For this position that corresponds to roughly 7,705.0, above the average entry. The old supervisor instead allowed the trade to retain its much lower original stop and eventually realize a loss.
+
+This second observed trade therefore supports the same defect classification as NAS100: material MFE was not converted into protected competition P/L.
