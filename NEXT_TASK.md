@@ -190,3 +190,27 @@ Immediate engineering objective:
 6. promote only non-redundant component evidence that passes live/Pine parity and forward shadow checks.
 
 Latest live evidence also shows no current ACTIVE opportunity; NAS100 latest directional setup was quality 84 but blocked by liquidity quality.
+
+## 2026-09-26 — Current deployment blocker and next verification
+
+Engineering work completed before owner intervention:
+1. Both competitions use competition-opportunity mode in current main.
+2. Shared competition quality floor is 84/100, with higher-timeframe non-opposition and existing risk/manual-approval controls.
+3. Hostinger notification eligibility accepts COMPETITION_OPPORTUNITY for both Capital and AMP.
+4. Closed-bar high-water profit protection remains included.
+5. Telegram/server-to-console parity remains included.
+6. Dual-competition supply diagnostics are included.
+7. AMP exact research profiles for MCL/MNG/MGC/MJY/MET/ZN/ZB are merged as shadow evidence only.
+
+Blocking production fact:
+- Hostinger is still running the older AMP high-conviction 90/100 runtime.
+- The next required owner action is upload/replace the seven PHP files from STC_DUAL_COMPETITION_HOTFIX_20260926.zip in the existing STC public_html directory.
+- Do not upload or change config.php. No SQL migration is required.
+
+Immediately after owner reports upload complete:
+1. run Live Readback;
+2. require AMP competition_mode=true and quality_floor=84;
+3. require notification eligibility parity for both competitions;
+4. verify high-water portfolio fields;
+5. reconcile stale Capital open-position ledger against the actual competition platform;
+6. continue exact Pine/Python parity work for symbol-specific community component signals before any live promotion.
