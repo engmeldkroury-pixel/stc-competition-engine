@@ -422,7 +422,7 @@ function stc_notify_portfolio(PDO $pdo, array $config): array {
             $pdo,
             (string)$position['competition_id'],
             (string)$position['symbol'],
-            3
+            192
         );
         $advice = stc_supervise_position($position, $history);
         if (($advice['action'] ?? 'HOLD') === 'HOLD') {
@@ -444,6 +444,8 @@ function stc_notify_portfolio(PDO $pdo, array $config): array {
             'Competition: ' . (string)$position['competition_id'],
             'Position: ' . (string)$position['side'] . ' x ' . (string)$position['quantity'],
             'R multiple: ' . ($advice['r_multiple'] === null ? '-' : number_format((float)$advice['r_multiple'], 2, '.', '')),
+            'Peak closed-bar R: ' . (!isset($advice['peak_r_multiple']) ? '-' : number_format((float)$advice['peak_r_multiple'], 2, '.', '')),
+            'Locked R floor: ' . (!isset($advice['locked_r_floor']) ? '-' : number_format((float)$advice['locked_r_floor'], 2, '.', '')),
             'Unrealized P/L: ' . ($advice['unrealized_pnl_usd'] === null ? '-' : '$' . number_format((float)$advice['unrealized_pnl_usd'], 2, '.', '')),
         ];
         if ($advice['suggested_stop'] !== null) {

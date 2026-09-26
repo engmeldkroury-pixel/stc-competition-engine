@@ -134,3 +134,25 @@ Competition design principle:
 - maximize validated opportunity flow, not raw trade count;
 - quality gate + opportunity supply + smaller risk on secondary-tier setups;
 - no automatic execution; human approval remains mandatory.
+
+## 2026-09-25 — NAS100 profit-protection correction
+
+New platform evidence supersedes the previous open-position state:
+- actual platform open positions: 1;
+- actual position: NAS100 LONG 7.7 @ 30,416.1;
+- active TP: 30,758.6;
+- active SL: 30,319.1;
+- realized P/L: approximately USD -3,394.31.
+
+Live STC readback is not authoritative for account state because it still reports four OPEN positions and tracks NAS100 with the wrong quantity/entry.
+
+Priority sequence:
+1. Do not use STC portfolio supervision as authoritative until the open-position ledger is reconciled to the platform.
+2. Deploy the already-merged VOID/reconciliation support and latest operator/notification parity files to Hostinger.
+3. Void stale EURUSD/XAGUSD/SPX500 manual_external OPEN records after confirming they are not open on the platform.
+4. Replace the incorrect NAS100 ledger row with the actual 7.7 @ 30,416.1 position and current platform stop/target.
+5. Complete and test PR for closed-bar high-water profit protection.
+6. Rebuild one Hostinger bundle after CI passes.
+7. Re-run live readback and require exact agreement between platform and STC open-position count/quantity before trusting management alerts.
+
+The NAS100 incident confirms that competition management must protect MFE, not only original stop risk.

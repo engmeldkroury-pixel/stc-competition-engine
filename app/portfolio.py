@@ -102,6 +102,10 @@ class MarketState:
     composite_score: float
     recent_recommendations: tuple[Recommendation, ...] = ()
     recent_scores: tuple[float, ...] = ()
+    # Optional best closed-bar R observed since entry. Production PHP derives
+    # this from stored 15-minute feed history; research/tests may pass it
+    # explicitly.
+    peak_r_multiple: float | None = None
 
 
 @dataclass(frozen=True)
@@ -379,6 +383,24 @@ def supervise_position(position: PositionState, market: MarketState) -> Manageme
     sign = _direction_sign(position.side)
     pnl_price = (market.current_price - position.entry_price) * sign
     r_multiple = pnl_price / risk_price
+    peak_r_multiple = r_multiple
+    if market.peak_r_multiple is not None:
+        candidate_peak = float(market.peak_r_multiple)
+        if not math.isfinite(candidate_peak):
+            raise ValueError("peak_r_multiple_invalid")
+        peak_r_multiple = max(r_multiple, candidate_peak)
+
+    locked_r_floor: float | None = None
+    if peak_r_multiple >= 3.0:
+        locked_r_floor = max(1.75, peak_r_multiple - 0.60)
+    elif peak_r_multiple >= 2.5:
+        locked_r_floor = max(1.50, peak_r_multiple - 0.75)
+    elif peak_r_multiple >= 2.0:
+        locked_r_floor = 1.25
+    elif peak_r_multiple >= 1.5:
+        locked_r_floor = 0.75
+    elif peak_r_multiple >= 1.0:
+        locked_r_floor = 0.25
 
     try:
         value = price_value_usd_per_price_unit(
@@ -454,6 +476,52 @@ def supervise_position(position: PositionState, market: MarketState) -> Manageme
             suggested_stop=None,
             suggested_partial_fraction=None,
             reasons=("two_closed_bars_confirmed_strong_opposite_signal",),
+        )
+
+    if market.peak_r_multiple is not None and locked_r_floor is not None:
+        if r_multiple < locked_r_floor:
+            return ManagementAdvice(
+                position_id=position.position_id,
+                competition_id=position.competition_id,
+                symbol=position.symbol,
+                action="EXIT_NOW",
+                urgency="high",
+                r_multiple=r_multiple,
+                unrealized_pnl_usd=unrealized_pnl,
+                thesis_degraded=False,
+                suggested_stop=None,
+                suggested_partial_fraction=None,
+                reasons=(
+                    "profit_retrace_breached_dynamic_floor",
+                    "protect_realized_competition_score",
+                ),
+            )
+
+        if position.side == "LONG":
+            suggested = max(
+                position.current_stop,
+                position.entry_price + risk_price * locked_r_floor,
+            )
+        else:
+            suggested = min(
+                position.current_stop,
+                position.entry_price - risk_price * locked_r_floor,
+            )
+        return ManagementAdvice(
+            position_id=position.position_id,
+            competition_id=position.competition_id,
+            symbol=position.symbol,
+            action="PROTECT",
+            urgency="high" if peak_r_multiple >= 2.0 else "normal",
+            r_multiple=r_multiple,
+            unrealized_pnl_usd=unrealized_pnl,
+            thesis_degraded=False,
+            suggested_stop=suggested,
+            suggested_partial_fraction=None,
+            reasons=(
+                "progressive_profit_lock_from_closed_bar_high_water",
+                "never_loosen_protective_stop",
+            ),
         )
 
     if target1_hit:
