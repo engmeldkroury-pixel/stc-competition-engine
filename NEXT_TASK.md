@@ -273,3 +273,38 @@ Then:
 6. reconcile STC positions to platform truth;
 7. choose the next research experiment from observed failure/outcome evidence rather than trade-count pressure.
 
+## 2026-09-27 — External review triage controlling next actions
+The external reviews were checked against current code. Do not blindly implement their numeric thresholds.
+
+Already implemented/verified:
+- server-side quantity cap;
+- same-symbol open-position block at approval;
+- same-direction post-loss cooldown;
+- deterministic correlation-cluster risk cap;
+- competition clock/pace model;
+- range/ATR volatility normalization;
+- causal HalfTrend research adapter;
+- deploy rollback trap;
+- gate-failure attribution.
+
+New QA/deploy hardening:
+- commit `634de19a3d0404826c4ecffeca2887f4f6af1159`;
+- each optional quality component is tested for LONG/SHORT missing-data symmetry;
+- staged release checksum is verified before touching production;
+- deploy ordering/rollback contract is regression-tested;
+- critical CI: 198 passed, 1 warning.
+
+Next owner intervention remains unchanged:
+1. correct `HOSTINGER_SSH_PRIVATE_KEY` with the private file, not .pub;
+2. rerun secure deployment;
+3. Live Readback;
+4. reconcile ledger to platform truth;
+5. only after reconciliation trust high-water portfolio advice;
+6. then use live gate-failure counts for evidence-based concentration diagnosis.
+
+Research-only next queue:
+- evidence redundancy/ablation;
+- session/asset-class rejection analysis;
+- statistical correlation diagnostics;
+- high-water vs volatility trailing A/B;
+- threshold walk-forward + Monte Carlo robustness.
