@@ -1058,3 +1058,33 @@ Status: IMPLEMENTED / CRITICAL CI VERIFIED / FULL CI TRACKED SEPARATELY.
 - Full-suite result remains separate evidence.
 - Live deployment still waits on owner correction of `HOSTINGER_SSH_PRIVATE_KEY`; failed SSH runs did not replace production files.
 
+### WU-121 — external AI review triage and fail-closed QA hardening
+Status: IMPLEMENTED / CRITICAL VERIFIED / FULL CI TRACKED SEPARATELY.
+- Owner supplied multiple independent architecture/strategy reviews.
+- Durable triage: `docs/EXTERNAL_AI_REVIEW_TRIAGE_2026-09-27.md`.
+- Code hardening commit: `634de19a3d0404826c4ecffeca2887f4f6af1159`.
+- Added independent missing-data symmetry regression for every optional setup-quality component.
+- Added staged release checksum validation before any Hostinger production file is touched.
+- Added deploy rollback/order regression coverage.
+- Added legacy competition-label regression guard.
+- Critical CI run `36272102670`: 198 passed, 1 warning.
+- Production controls already present before this review:
+  - server-side max STC quantity enforcement;
+  - duplicate-open-position approval block;
+  - same-direction loss cooldown;
+  - portfolio and deterministic risk-cluster caps;
+  - competition pace model;
+  - range/ATR volatility normalization;
+  - causal/prefix-invariant HalfTrend research adapter.
+- Rejected as unsupported live changes:
+  - hard-coded statistical correlation 0.70/0.85 thresholds;
+  - fixed -10 score penalty;
+  - immediate ATR-trailing replacement;
+  - changing 84 from Monte Carlo alone.
+- Accepted research queue:
+  - evidence redundancy/ablation;
+  - asset/session gate-failure analysis;
+  - statistical correlation diagnostics;
+  - high-water vs volatility trailing forward A/B;
+  - walk-forward threshold study plus Monte Carlo robustness.
+- Strongest unresolved P0: ledger/platform reconciliation before portfolio-management advice is trusted.
