@@ -190,3 +190,20 @@ Immediate engineering objective:
 6. promote only non-redundant component evidence that passes live/Pine parity and forward shadow checks.
 
 Latest live evidence also shows no current ACTIVE opportunity; NAS100 latest directional setup was quality 84 but blocked by liquidity quality.
+
+## 2026-09-26 — Dual-competition priority update
+
+Capital:
+- keep all 10 symbols under continuous scan;
+- correct actionable-signal concentration through symbol-specific validated research, not universal gate weakening;
+- deploy profit-lock hotfix #169 if not already uploaded.
+
+AMP Futures:
+- current STC ledger: 0/5 qualifying trading days, 0 entries, 0 realized P/L;
+- immediate priority is qualification survivability plus opportunity coverage;
+- PR #171 adds a dedicated 24/7 crypto feed for MBT/MET/MSL/MXP, expands verified Hostinger AMP support to 18 unique production symbols, and adds MUST_TRADE_TODAY visibility + Telegram warning;
+- after merge, the owner must add STC_AMP_CRYPTO_24X7_FEED.pine to a 24/7 CME crypto host chart (recommended CME:MBT1! 15m) and create its webhook alert;
+- after that, verify weekend events reach the server before relying on AMP alerts;
+- next research step: carry exact validated symbol-specific component states into both Capital and AMP shadow/live payloads, preserving live-authority boundaries until parity/forward evidence passes.
+
+Do not activate all 94 AMP symbols blindly; expand in verified batches only after contract value, feed symbol identity, and risk/sizing support are confirmed.
