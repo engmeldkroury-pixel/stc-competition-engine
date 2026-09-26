@@ -214,3 +214,41 @@ Immediately after owner reports upload complete:
 4. verify high-water portfolio fields;
 5. reconcile stale Capital open-position ledger against the actual competition platform;
 6. continue exact Pine/Python parity work for symbol-specific community component signals before any live promotion.
+
+## 2026-09-26 — Secure deployment handoff replaces manual Hostinger upload
+
+A dedicated SSH-key deployment workflow now exists:
+- workflow: `.github/workflows/stc-hostinger-deploy.yml`;
+- approved scope: seven PHP files only;
+- target: existing STC public_html;
+- PHP lint, server-side backup and SHA-256 post-deploy verification are mandatory;
+- `config.php`, SQL and secrets are excluded.
+
+Deployment evidence:
+- run `36264035149`: failed safely before production replacement because the configured private key could not be parsed;
+- workflow hardened in `8f26c50474084f30b4938dee693567eea3717a9b`;
+- run `36264123000`: failed safely in pre-upload validation with explicit diagnosis that `HOSTINGER_SSH_PRIVATE_KEY` is not the private OpenSSH key;
+- no production replacement occurred in either run.
+
+Single owner intervention required:
+1. Edit GitHub Actions repository secret `HOSTINGER_SSH_PRIVATE_KEY`.
+2. Replace its value with the complete contents of local file `stc_hostinger_deploy` (the file WITHOUT `.pub`).
+3. The value must start with `-----BEGIN OPENSSH PRIVATE KEY-----` and end with `-----END OPENSSH PRIVATE KEY-----`.
+4. Do not expose the key in chat.
+
+After the secret is corrected, continue without manual Hostinger file upload:
+1. retrigger secure Hostinger deploy;
+2. require checksum verification;
+3. run Live Readback;
+4. verify fresh dual-competition 84 policy evidence;
+5. reconcile platform/STC open positions;
+6. continue symbol-specific strategy parity/shadow work.
+
+Full cross-chat/external-AI checkpoint:
+- `docs/STC_FULL_SYSTEM_REVIEW_2026-09-26.md`.
+
+Additional strategy consistency issue to repair after deployment/reconciliation:
+- live `event_decision.py` uses shared competition-opportunity 84 for Capital + AMP;
+- advisory `competition_strategy.py` still reports `A_PLUS_ONLY`;
+- centralize the policy contract and regression-test it before any future gate-policy change.
+
