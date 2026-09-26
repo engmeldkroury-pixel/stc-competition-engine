@@ -2654,3 +2654,26 @@ Current next action:
 - Next operational task: reconcile STC ledger state against current platform truth before relying on portfolio-management advice.
 - Fresh post-deploy AMP event is still required for end-to-end confirmation of current competition metadata.
 
+## Platform position reconciliation evidence — 2026-09-27
+Owner supplied current TradingView competition-account screenshots.
+
+Capital.com competition platform currently shows exactly two OPEN positions:
+- CAPITALCOM:NAS100 — LONG — quantity 7.7 — avg fill 30416.1 — TP 30758.6 — SL 30319.1.
+- CAPITALCOM:SPX500 — LONG — quantity 40 — avg fill 7737.3 — TP 7797.0 — SL 7716.0.
+Capital account snapshot also shows realized P/L -3425.26, unrealized P/L +1933.29, trading days 4/3.
+
+AMP Futures platform currently shows no open positions.
+AMP account snapshot shows realized P/L +991.25 and trading days 3/5.
+
+Reconciliation readback run 36273654355 confirmed all four stale STC OPEN rows are origin=manual_external:
+- EURUSD SHORT 137552 @ 1.13677;
+- XAGUSD SHORT 1224.597619 @ 63.157;
+- NAS100 LONG 3.797603 @ 30444.7;
+- SPX500 LONG 19.636645 @ 7705.8.
+
+Disposition:
+- EURUSD and XAGUSD are CLOSED ON PLATFORM but still OPEN in STC.
+- NAS100 and SPX500 are OPEN ON PLATFORM but STC quantity/entry are wrong.
+- Because all four STC rows are manual_external, audited ledger-only VOID reconciliation is available.
+- Do not VOID/re-open yet because the screenshots do not show the actual opening timestamps; current platform trade history is required to preserve chronology/trading-day evidence and to import closed trades accurately.
+
