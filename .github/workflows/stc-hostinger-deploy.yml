@@ -41,7 +41,7 @@ jobs:
           (cd out/release && sha256sum *.php > manifest.sha256)
           tar -C out/release -czf out/stc-release.tar.gz .
 
-      - name: Configure SSH
+      - name: Configure and validate SSH key
         shell: bash
         env:
           SSH_KEY: ${{ secrets.HOSTINGER_SSH_PRIVATE_KEY }}
@@ -51,8 +51,21 @@ jobs:
           test -n "$SSH_KEY"
           test -n "$SSH_HOST"
           mkdir -p "$HOME/.ssh"
-          printf '%s\n' "$SSH_KEY" > "$HOME/.ssh/id_ed25519"
+
+          # Normalize Windows CRLF without ever printing the secret.
+          printf '%s\n' "$SSH_KEY" | tr -d '\r' > "$HOME/.ssh/id_ed25519"
           chmod 600 "$HOME/.ssh/id_ed25519"
+
+          if ! head -n 1 "$HOME/.ssh/id_ed25519" | grep -qx -- '-----BEGIN OPENSSH PRIVATE KEY-----'; then
+            echo "::error::HOSTINGER_SSH_PRIVATE_KEY is not the private OpenSSH key. Replace it with the full contents of stc_hostinger_deploy (the file without .pub)."
+            exit 1
+          fi
+
+          if ! ssh-keygen -y -f "$HOME/.ssh/id_ed25519" >/dev/null 2>&1; then
+            echo "::error::HOSTINGER_SSH_PRIVATE_KEY could not be parsed. Re-copy the full private-key file, preserving BEGIN/END lines."
+            exit 1
+          fi
+
           ssh-keyscan -p 65002 "$SSH_HOST" >> "$HOME/.ssh/known_hosts"
           chmod 600 "$HOME/.ssh/known_hosts"
 
