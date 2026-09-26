@@ -135,6 +135,13 @@ jobs:
                   sort_keys=True,
               )
           )
+          print(
+              "STC_LIVE_AMP_COMPETITION_PROGRESS="
+              + json.dumps(
+                  (data.get("competition_progress") or {}).get("amp-futures-sep-2026") or {},
+                  sort_keys=True,
+              )
+          )
 
           notifications = json.load(open("/tmp/stc_notifications.json", encoding="utf-8"))
           config = notifications.get("config") or {}
