@@ -169,7 +169,7 @@ def test_capital_competition_gate_allows_directional_opportunity_plan():
     assert signal["quality_gate_passed"] is True
     assert signal["setup_grade"] == "COMPETITION_OPPORTUNITY"
     assert signal["competition_mode"] is True
-    assert signal["quality_floor"] == 78
+    assert signal["quality_floor"] == 84
     assert result["decision"]["locked_trade_plan"] is not None
     assert "competition_opportunity_gate=PASSED" in signal["reasons"]
 
@@ -201,7 +201,41 @@ def test_borderline_direction_is_downgraded_to_wait_and_has_no_plan():
     assert signal["quality_gate_passed"] is False
     assert signal["setup_grade"] == "MONITOR_ONLY"
     assert result["decision"]["locked_trade_plan"] is None
-    assert "high_conviction_gate=BLOCKED" in signal["reasons"]
+    assert "competition_opportunity_gate=BLOCKED" in signal["reasons"]
+
+def test_amp_strong_directional_candidate_uses_balanced_competition_gate():
+    payload = {
+        "event_id": "evt-amp-balanced",
+        "event": "bar_close",
+        "competition_id": "amp-futures-sep-2026",
+        "symbol": "CBOT:ZN1!",
+        "timeframe": "15",
+        "time": "2026-09-21T18:00:00Z",
+        "open": 105.0,
+        "high": 105.4,
+        "low": 104.95,
+        "close": 105.35,
+        "volume": 2200,
+        "ema20": 105.20,
+        "ema50": 105.00,
+        "rsi14": 61,
+        "atr14": 0.25,
+        "macd": 0.08,
+        "macd_signal": 0.03,
+        "volume_ratio": 1.8,
+        **_strong_confirmation(),
+        **_strong_history(),
+    }
+    result = decide_bridge_event("evt-amp-balanced", payload)
+    signal = result["decision"]["signal"]
+    assert signal["competition_mode"] is True
+    assert signal["quality_floor"] == 84
+    assert signal["quality_gate_passed"] is True
+    assert signal["setup_grade"] == "COMPETITION_OPPORTUNITY"
+    assert signal["recommendation"] == "LONG"
+    assert "competition_opportunity_gate=PASSED" in signal["reasons"]
+    assert result["decision"]["locked_trade_plan"] is not None
+
 
 def test_directional_candidate_without_1h_confirmation_fails_closed_to_wait():
     payload = {
