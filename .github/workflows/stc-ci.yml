@@ -34,6 +34,7 @@ jobs:
       - name: Run competition-critical tests
         run: >-
           pytest -q
+          tests/test_amp_crypto_24x7_feed.py
           tests/test_api.py
           tests/test_approval.py
           tests/test_bridge_client.py
