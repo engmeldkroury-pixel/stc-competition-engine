@@ -659,6 +659,22 @@ function progressHtml(competitionId){
   +'<div class="row"><span>Recorded trade actions</span><span class="value">'+esc(p.position_actions)+'</span></div>'
   +'<div class="row"><span>Realized competition P/L</span><span class="value">$'+num(p.realized_pnl_usd,2)+'</span></div></div>';
 }
+function signalCoverageHtml(competitionId){
+ const c=snapshot&&snapshot.signal_coverage?snapshot.signal_coverage[competitionId]:null;
+ if(!c)return '';
+ const expected=Number(c.expected_feed_symbols||0);
+ const observed=Number(c.observed_symbols||0);
+ const complete=Boolean(c.feed_complete_now);
+ return '<div class="orderbox"><div class="small">SIGNAL COVERAGE — LIVE</div>'
+  +'<div class="row"><span>Feed symbols arriving</span><span class="value '+(complete?'ok':'bad')+'">'+observed+' / '+expected+'</span></div>'
+  +'<div class="row"><span>Directional candidates now</span><span class="value">'+Number(c.directional_now||0)+'</span></div>'
+  +'<div class="row"><span>ACTIVE opportunities now</span><span class="value">'+Number(c.active_opportunities_now||0)+'</span></div>'
+  +'<div class="row"><span>Monitor-only / WAIT now</span><span class="value">'+Number(c.monitor_only_now||0)+'</span></div>'
+  +'<div class="row"><span>Latest source bar</span><span class="value">'+(c.latest_source_time?formatLocalTime(c.latest_source_time):'-')+'</span></div>'
+  +'<div class="small">'+(complete?'All configured production-feed symbols are arriving.':'One or more configured production-feed symbols are missing from the current STC snapshot.')+'</div>'
+  +'</div>';
+}
+
 function tradeInventoryHtml(competitionId){
  const p=snapshot&&snapshot.competition_progress?snapshot.competition_progress[competitionId]:null;
  const s=riskSummaryFor(competitionId);
@@ -698,6 +714,7 @@ function accountHtml(account,competitionId){
    :'<span class="small">No open risk clusters.</span>';
  return rulesHtml(competitionId)
   +progressHtml(competitionId)
+  +signalCoverageHtml(competitionId)
   +tradeInventoryHtml(competitionId)
   +'<div class="row"><span>Owner-synced equity</span><span class="value">$'+num(account.equity_usd,2)+'</span></div>'
   +'<div class="row"><span>STC risk budget / trade</span><span class="value">'+num(Number(account.risk_fraction)*100,2)+'% • $'+num(tradeRisk,2)+'</span></div>'
