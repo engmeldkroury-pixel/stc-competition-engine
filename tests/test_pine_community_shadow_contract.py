@@ -67,7 +67,7 @@ def test_frozen_production_component_parameters_match_registry_contract():
     amp_c = Path("tradingview/STC_AMP_MTF_FEED_C.pine").read_text(encoding="utf-8")
     amp_d = Path("tradingview/STC_AMP_MTF_FEED_D.pine").read_text(encoding="utf-8")
 
-    assert "bandMultiplier = 1.25" in capital_a
+    assert "frozenTrendiloEvent(1.25)" in capital_a
     assert "atrPeriod = 14" in capital_b and "multiplier = 3.0" in capital_b
     assert "frozenRangeFilterEvent(2.0)" in capital_b
     assert "baselineLength = 100" in amp_b and "sslLength = 20" in amp_b
