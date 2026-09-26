@@ -955,3 +955,26 @@ Status: ACCEPTED / MERGED WITH EXTERNAL CI BLOCKER DISCLOSED.
 - Output is separate from base ensemble and live_authority remains false.
 - GitHub Actions run 35976346795 did not execute steps; CI = NOT RUN.
 - Acceptance basis: bounded research-only diff, explicit fail-closed validation and independent diff review.
+
+
+### WU-118 — exact production component-shadow feed
+Status: CODE PROPOSED / REQUIRES TRADINGVIEW ALERT REFRESH.
+- Purpose: carry exact symbol-specific research component events into the production webhook payload without granting them live authority.
+- Capital shadow events:
+  - ETHUSD SSL Hybrid 60/15;
+  - DOGEUSD Range Filter 100/3 + Schaff 12/26/50/0.5;
+  - EURUSD Trendilo 1/50/0.85/6/1.0;
+  - NAS100 HalfTrend amplitude 5.
+- AMP final-frozen/parity-ready shadow events:
+  - MCL SSL Hybrid 100/20;
+  - MJY Trendilo 1/50/0.85/6/1.25;
+  - ZB Range Filter 100/3.
+- Deliberately excluded rather than approximated: BTCUSD RSI Kernel, USDZAR full ensemble and symbols with no validated 15m profile.
+- Payload field: `community_component_signals`.
+- Existing runtime contract remains research-only:
+  - live_authority=false;
+  - used_in_quality_gate=false;
+  - used_in_risk=false;
+  - used_in_approval=false.
+- Durable design note: `docs/LIVE_COMPONENT_SHADOW_FEED_20260926.md`.
+- Deployment dependency: TradingView alerts must be recreated after the updated Pine scripts are installed because alerts retain a script snapshot.
