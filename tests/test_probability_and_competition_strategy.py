@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+from pathlib import Path
 
 from app.competition_strategy import competition_pace
 from app.probability import estimate_win_probability
@@ -52,3 +53,12 @@ def test_competition_pace_protects_late_prize_zone_score():
     assert r.phase == "PROTECT_SCORE"
     assert r.size_band == "LOW"
     assert r.quality_floor == "COMPETITION_OPPORTUNITY_84"
+
+
+
+def test_competition_pace_source_does_not_reintroduce_legacy_gate_labels():
+    source = Path("app/competition_strategy.py").read_text(encoding="utf-8")
+    assert "A_PLUS_ONLY" not in source
+    assert "KEEP_A_PLUS" not in source
+    assert "COMPETITION_OPPORTUNITY_" in source
+    assert "KEEP_QUALITY" in source

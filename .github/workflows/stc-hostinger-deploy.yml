@@ -105,6 +105,12 @@ jobs:
           mkdir -p "$stage" "$backup"
           tar -xzf "$archive" -C "$stage"
 
+          # Validate the complete staged release before touching production.
+          (
+            cd "$stage"
+            sha256sum -c manifest.sha256
+          )
+
           for f in "${files[@]}"; do
             test -f "$stage/$f"
             if [ -f "$target/$f" ]; then cp -p "$target/$f" "$backup/$f"; fi

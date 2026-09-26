@@ -763,3 +763,21 @@ def test_gate_audit_exposes_failure_reason_counts_by_competition_and_symbol():
     assert "$bucket['per_symbol'][$symbol]['gate_failure_counts'][$failure]++" in snapshot
     assert "$gateAudit['per_symbol'][$symbol]['gate_failure_counts'][$failure]++" in snapshot
     assert "opportunity starvation can be diagnosed without changing the live gate" in snapshot
+
+
+
+def test_secure_hostinger_deploy_validates_stage_before_production_and_rolls_back_on_error():
+    workflow = (ROOT / ".github" / "workflows" / "stc-hostinger-deploy.yml").read_text(encoding="utf-8")
+
+    staged_verify = workflow.index('cd "$stage"')
+    staged_checksum = workflow.index("sha256sum -c manifest.sha256")
+    backup_loop = workflow.index('if [ -f "$target/$f" ]; then cp -p "$target/$f" "$backup/$f"; fi')
+    restore_fn = workflow.index("restore() {")
+    restore_trap = workflow.index("trap 'restore' ERR")
+    production_copy = workflow.index('for f in "${files[@]}"; do cp "$stage/$f" "$target/$f"; done')
+    production_checksum = workflow.index('sha256sum -c "$stage/manifest.sha256"')
+
+    assert staged_verify < staged_checksum < backup_loop
+    assert backup_loop < restore_fn < restore_trap < production_copy < production_checksum
+    assert "config.php" not in workflow
+    assert "migrations/" not in workflow

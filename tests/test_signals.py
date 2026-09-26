@@ -244,3 +244,51 @@ def test_missing_optional_quality_evidence_is_direction_symmetric_and_penalized(
 
     assert long_missing == short_missing
     assert short_missing < short_present
+
+
+
+@pytest.mark.parametrize(
+    "missing_field",
+    [
+        "confirmation_score",
+        "trend_2h_score",
+        "trend_4h_score",
+        "historical_regime",
+        "trend_1m_score",
+        "family_evidence_score",
+    ],
+)
+def test_each_missing_optional_quality_component_is_direction_symmetric(missing_field):
+    long_values = {
+        "short_term_technical": 0.80,
+        "confirmation_score": 0.80,
+        "trend_2h_score": 0.80,
+        "trend_4h_score": 0.80,
+        "historical_regime": 0.80,
+        "trend_1m_score": 0.80,
+        "blended_technical": 0.80,
+        "volatility_quality": 0.50,
+        "liquidity_quality": 0.50,
+        "family_evidence_score": 0.80,
+    }
+    short_values = {
+        key: (-value if value is not None else None)
+        for key, value in long_values.items()
+    }
+    long_values[missing_field] = None
+    short_values[missing_field] = None
+
+    long_missing = setup_quality_score(recommendation="LONG", **long_values)
+    short_missing = setup_quality_score(recommendation="SHORT", **short_values)
+
+    long_present_values = dict(long_values)
+    short_present_values = dict(short_values)
+    long_present_values[missing_field] = 0.80
+    short_present_values[missing_field] = -0.80
+
+    long_present = setup_quality_score(recommendation="LONG", **long_present_values)
+    short_present = setup_quality_score(recommendation="SHORT", **short_present_values)
+
+    assert long_missing == short_missing
+    assert long_present == short_present
+    assert long_missing < long_present
