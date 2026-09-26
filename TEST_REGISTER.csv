@@ -25,3 +25,6 @@ T-STC-SHORT-MISSING-SYMMETRY,PASS_CRITICAL,"Missing optional setup-quality evide
 T-STC-OPTIONAL-MISSING-SYMMETRY,PASS_CRITICAL,"Each optional setup-quality component independently preserves LONG/SHORT missing-data symmetry","Commit 634de19a; critical CI run 36272102670: 198 passed, 1 warning"
 T-STC-DEPLOY-STAGE-CHECKSUM,PASS_CRITICAL,"Staged Hostinger release checksum must validate before production file touch and rollback trap/order is contract-tested","Commit 634de19a; critical CI run 36272102670: 198 passed, 1 warning"
 T-STC-LEGACY-GATE-LABEL-GUARD,PASS_CRITICAL,"Competition strategy source cannot reintroduce A_PLUS_ONLY or KEEP_A_PLUS legacy labels","Commit 634de19a; critical CI run 36272102670: 198 passed, 1 warning"
+T-STC-LEDGER-RECONCILE,PASS,"Owner-confirmed ledger reconciliation and idempotent rerun","Run 36274737170 success; final Capital open NAS100 7.7 + SPX500 40; AMP open 0; Capital days 4; AMP days 3"
+T-STC-VOID-PROGRESS,PASS_CRITICAL_DEPLOYED,"VOID rows do not create synthetic qualifying trading days","Commit 4dfbb26a; critical CI 199 passed 1 warning; deploy 36274716351; reconciliation rerun restored Capital 4 qualifying UTC dates"
+T-STC-POSTRECON-READBACK,PASS,"Production snapshot after reconciliation","Run 36274764925 success; Capital 2 open / 9 closed / -3370.87; AMP 0 open / 2 closed / +991.25"
