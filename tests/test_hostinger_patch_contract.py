@@ -781,3 +781,13 @@ def test_secure_hostinger_deploy_validates_stage_before_production_and_rolls_bac
     assert backup_loop < restore_fn < restore_trap < production_copy < production_checksum
     assert "config.php" not in workflow
     assert "migrations/" not in workflow
+
+
+
+def test_voided_ledger_rows_do_not_count_toward_competition_progress():
+    control = (PATCH / "portfolio_control.php").read_text(encoding="utf-8")
+    assert "FROM stc_positions WHERE competition_id = ? AND status <> 'VOID'" in control
+    assert "SELECT DATE(opened_at_utc) AS trade_date FROM stc_positions WHERE competition_id = ? AND status <> 'VOID'" in control
+    assert "WHERE competition_id = ? AND status = 'CLOSED' AND closed_at_utc IS NOT NULL" in control
+    assert "WHERE p.competition_id = ? AND p.status <> 'VOID' AND e.event_type = 'PARTIAL'" in control
+    assert "WHERE p.competition_id = ? AND p.status <> 'VOID' AND e.event_type IN ('OPEN', 'PARTIAL', 'CLOSE')" in control

@@ -577,22 +577,22 @@ function stc_competition_progress(PDO $pdo, string $competitionId): array {
         . "COALESCE(SUM(status = 'OPEN'), 0) AS open_positions, "
         . "COALESCE(SUM(status = 'CLOSED'), 0) AS closed_positions, "
         . "COALESCE(SUM(realized_pnl_usd), 0) AS realized_pnl_usd "
-        . "FROM stc_positions WHERE competition_id = ?"
+        . "FROM stc_positions WHERE competition_id = ? AND status <> 'VOID'"
     );
     $stmt->execute([$competitionId]);
     $row = $stmt->fetch() ?: [];
 
     $daysStmt = $pdo->prepare(
         "SELECT trade_date FROM ("
-        . "SELECT DATE(opened_at_utc) AS trade_date FROM stc_positions WHERE competition_id = ? "
+        . "SELECT DATE(opened_at_utc) AS trade_date FROM stc_positions WHERE competition_id = ? AND status <> 'VOID' "
         . "UNION "
         . "SELECT DATE(closed_at_utc) AS trade_date FROM stc_positions "
-        . "WHERE competition_id = ? AND closed_at_utc IS NOT NULL "
+        . "WHERE competition_id = ? AND status = 'CLOSED' AND closed_at_utc IS NOT NULL "
         . "UNION "
         . "SELECT DATE(e.created_at_utc) AS trade_date "
         . "FROM stc_position_events e "
         . "JOIN stc_positions p ON p.position_id = e.position_id "
-        . "WHERE p.competition_id = ? AND e.event_type = 'PARTIAL'"
+        . "WHERE p.competition_id = ? AND p.status <> 'VOID' AND e.event_type = 'PARTIAL'"
         . ") q WHERE trade_date IS NOT NULL ORDER BY trade_date"
     );
     $daysStmt->execute([$competitionId, $competitionId, $competitionId]);
@@ -607,7 +607,7 @@ function stc_competition_progress(PDO $pdo, string $competitionId): array {
     $actionStmt = $pdo->prepare(
         "SELECT COUNT(*) FROM stc_position_events e "
         . "JOIN stc_positions p ON p.position_id = e.position_id "
-        . "WHERE p.competition_id = ? AND e.event_type IN ('OPEN', 'PARTIAL', 'CLOSE')"
+        . "WHERE p.competition_id = ? AND p.status <> 'VOID' AND e.event_type IN ('OPEN', 'PARTIAL', 'CLOSE')"
     );
     $actionStmt->execute([$competitionId]);
     $positionActions = (int)$actionStmt->fetchColumn();
