@@ -3,7 +3,8 @@ from __future__ import annotations
 from typing import Mapping
 
 
-EVIDENCE_SOURCE = "research_benchmarks/community_corrected_full26_20260924.json"
+CAPITAL_EVIDENCE_SOURCE = "research_benchmarks/community_corrected_full26_20260924.json"
+AMP_EVIDENCE_SOURCE = "research/community_shadow_registry.json"
 
 CAPITAL_COMMUNITY_15M_PROFILES: dict[str, dict[str, float]] = {
     "CAPITALCOM:BTCUSD": {
@@ -96,6 +97,44 @@ CAPITAL_COMMUNITY_15M_PARAMETERS: dict[str, dict[str, dict[str, float | int]]] =
     },
 }
 
+AMP_COMMUNITY_15M_PROFILES: dict[str, dict[str, float]] = {
+    # Final frozen/shadow survivors only. Keep one strongest exact component
+    # per symbol until Pine/Python live parity is observed in production.
+    "CBOT:ZB1!": {
+        "range_filter_guikroth": 1.0,
+    },
+    "CME_MINI:MJY1!": {
+        "trendilo": 1.0,
+    },
+    "NYMEX:MCL1!": {
+        "ssl_hybrid": 1.0,
+    },
+}
+
+AMP_COMMUNITY_15M_PARAMETERS: dict[str, dict[str, dict[str, float | int]]] = {
+    "CBOT:ZB1!": {
+        "range_filter_guikroth": {
+            "sampling_period": 100,
+            "range_multiplier": 3.0,
+        },
+    },
+    "CME_MINI:MJY1!": {
+        "trendilo": {
+            "smoothing": 1,
+            "lookback": 50,
+            "alma_offset": 0.85,
+            "alma_sigma": 6.0,
+            "band_multiplier": 1.25,
+        },
+    },
+    "NYMEX:MCL1!": {
+        "ssl_hybrid": {
+            "baseline_length": 100,
+            "ssl_length": 20,
+        },
+    },
+}
+
 CAPITAL_NO_VALIDATED_COMMUNITY_PROFILE = frozenset(
     {
         "CAPITALCOM:AUDUSD",
@@ -104,6 +143,42 @@ CAPITAL_NO_VALIDATED_COMMUNITY_PROFILE = frozenset(
         "CAPITALCOM:XAUUSD",
     }
 )
+
+
+AMP_RESEARCHED_15M_UNIVERSE = frozenset(
+    {
+        "CME_MINI:MES1!",
+        "CME_MINI:MNQ1!",
+        "CBOT_MINI:MYM1!",
+        "CME_MINI:M2K1!",
+        "NYMEX:MCL1!",
+        "NYMEX:MNG1!",
+        "COMEX_MINI:MGC1!",
+        "COMEX_MINI:SIL1!",
+        "CME_MINI:M6E1!",
+        "CME_MINI:M6B1!",
+        "CME_MINI:MJY1!",
+        "CME_MINI:M6A1!",
+        "CME:MBT1!",
+        "CME:MET1!",
+        "CBOT:ZN1!",
+        "CBOT:ZB1!",
+    }
+)
+
+AMP_NO_FROZEN_SHADOW_PROFILE = AMP_RESEARCHED_15M_UNIVERSE - frozenset(
+    AMP_COMMUNITY_15M_PROFILES
+)
+
+COMMUNITY_15M_PROFILES = {
+    **CAPITAL_COMMUNITY_15M_PROFILES,
+    **AMP_COMMUNITY_15M_PROFILES,
+}
+
+COMMUNITY_15M_PARAMETERS = {
+    **CAPITAL_COMMUNITY_15M_PARAMETERS,
+    **AMP_COMMUNITY_15M_PARAMETERS,
+}
 
 
 def _normalize_timeframe(timeframe: str) -> str:
@@ -124,7 +199,7 @@ def build_community_component_shadow(
     """
     normalized_timeframe = _normalize_timeframe(timeframe)
     profile = (
-        CAPITAL_COMMUNITY_15M_PROFILES.get(symbol)
+        COMMUNITY_15M_PROFILES.get(symbol)
         if normalized_timeframe == "15"
         else None
     )
@@ -135,13 +210,20 @@ def build_community_component_shadow(
             "NO_VALIDATED_COMMUNITY_PROFILE"
             if normalized_timeframe == "15"
             and symbol in CAPITAL_NO_VALIDATED_COMMUNITY_PROFILE
+            else "NO_FROZEN_SHADOW_PROFILE"
+            if normalized_timeframe == "15"
+            and symbol in AMP_NO_FROZEN_SHADOW_PROFILE
             else "NO_RESEARCH_PROFILE_FOR_SYMBOL_TIMEFRAME"
         )
         return {
             "status": status,
             "symbol": symbol,
             "timeframe": normalized_timeframe,
-            "evidence_source": EVIDENCE_SOURCE,
+            "evidence_source": (
+                CAPITAL_EVIDENCE_SOURCE
+                if symbol.startswith("CAPITALCOM:")
+                else AMP_EVIDENCE_SOURCE
+            ),
             "expected_components": [],
             "normalized_weights": {},
             "selected_parameters": {},
@@ -181,10 +263,14 @@ def build_community_component_shadow(
         ),
         "symbol": symbol,
         "timeframe": normalized_timeframe,
-        "evidence_source": EVIDENCE_SOURCE,
+        "evidence_source": (
+                CAPITAL_EVIDENCE_SOURCE
+                if symbol.startswith("CAPITALCOM:")
+                else AMP_EVIDENCE_SOURCE
+            ),
         "expected_components": list(profile),
         "normalized_weights": dict(profile),
-        "selected_parameters": dict(CAPITAL_COMMUNITY_15M_PARAMETERS.get(symbol, {})),
+        "selected_parameters": dict(COMMUNITY_15M_PARAMETERS.get(symbol, {})),
         "observed_signals": observed,
         "missing_components": missing,
         "unexpected_components_ignored": unexpected,
