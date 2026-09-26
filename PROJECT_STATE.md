@@ -2531,3 +2531,92 @@ Owner intervention required now: YES — only for historical-data access, not fo
   - inner ZIP SHA-256: `9153f76fb6bb861400f5d07cac7fe54e5e653bba56907a275769f34505493ae6`;
   - includes position.php in addition to the previously deployed six PHP files.
 - The XAGUSD trade has NOT been written to STC solely from the Record Trade form screenshot; platform position/history evidence is still required to determine whether it should be recorded as OPEN or imported as CLOSED.
+
+## Secure GitHub -> Hostinger SSH deployment checkpoint — 2026-09-26 18:53 UTC
+
+Owner completed Hostinger SSH-key setup and added the new GitHub Actions secrets without exposing secret values in chat.
+
+Durable deployment workflow:
+- `.github/workflows/stc-hostinger-deploy.yml`;
+- initial workflow commit: `c758d267aa3cbe2dd9aaf24c2b9165426ba802b1`;
+- hardened key-validation commit: `8f26c50474084f30b4938dee693567eea3717a9b`;
+- target allowlist: `/home/u317452451/domains/stc.feama.site/public_html`;
+- approved production scope: approval.php, cloud_control.php, notification_control.php, operator.php, operator_snapshot.php, portfolio_control.php, position.php;
+- no config.php;
+- no SQL migration;
+- no broker execution.
+
+Deployment attempt 1:
+- trigger commit: `c20dd6f0136c1cc2c07157cea63a2657b76d00df`;
+- workflow run: `36264035149`;
+- PHP lint: PASS for all seven approved files;
+- SSH host-key collection: PASS;
+- upload: FAILED before production replacement;
+- root diagnostic: OpenSSH private key could not be parsed by libcrypto;
+- replacement/verification steps: SKIPPED;
+- production files changed: NO.
+
+Deployment hardening:
+- normalize Windows CRLF without logging secret contents;
+- require OpenSSH private-key BEGIN header;
+- validate the private key with ssh-keygen before any upload;
+- fail with sanitized error only.
+
+Deployment attempt 2:
+- trigger commit: `0ab333077488e640af65e243a014b98bc63b0d98`;
+- workflow run: `36264123000`;
+- PHP lint: PASS;
+- private-key validation: FAIL_SAFE;
+- sanitized diagnosis: `HOSTINGER_SSH_PRIVATE_KEY is not the private OpenSSH key`;
+- upload/deploy steps: SKIPPED;
+- production files changed: NO.
+
+Required owner correction:
+- edit GitHub repository secret `HOSTINGER_SSH_PRIVATE_KEY`;
+- replace its value with the full contents of local private key file `stc_hostinger_deploy`, NOT `stc_hostinger_deploy.pub`;
+- value must preserve BEGIN/END OPENSSH PRIVATE KEY lines;
+- do not disclose the value in chat.
+
+## Full system and strategy review checkpoint — 2026-09-26
+
+Durable external-review/cross-chat document:
+- `docs/STC_FULL_SYSTEM_REVIEW_2026-09-26.md`;
+- creation commit: `310f9c0c5e23cf85d644394723e2e6cb0c64f3c6`.
+
+The review records:
+- current architecture;
+- deployment state;
+- historical production incidents and root causes;
+- current competition strategy/gate structure;
+- research/shadow evidence;
+- opportunity concentration;
+- ledger mismatch;
+- profit-protection correction;
+- security boundaries;
+- development priorities;
+- independent-AI review questions.
+
+New policy consistency finding:
+- controlling live path `app/event_decision.py` uses competition mode with shared 84/100 for Capital + AMP;
+- advisory `app/competition_strategy.py` still exposes `A_PLUS_ONLY` pace semantics;
+- this is recorded as semantic/policy drift risk, not evidence that live main is 90;
+- centralize the competition policy contract and regression-test advisory/live/Hostinger consistency after production deployment and account-ledger reconciliation.
+
+Registers updated:
+- `DECISIONS.md`;
+- `BATCH_REGISTER.csv`;
+- `TEST_REGISTER.csv`;
+- `RISK_REGISTER.csv`;
+- `NEXT_TASK.md`;
+- `HANDOFF.md`;
+- `docs/STC_ADAPTIVE_RESEARCH_MASTER_LEDGER.md`.
+
+Current next action:
+1. correct only `HOSTINGER_SSH_PRIVATE_KEY`;
+2. rerun secure Hostinger deployment;
+3. require checksum verification;
+4. run Live Readback;
+5. verify structured dual-competition gate audit and fresh AMP 84 metadata;
+6. reconcile STC open positions to platform truth before trusting portfolio management;
+7. continue exact Pine/Python parity and sealed shadow research without automatic live promotion.
+
