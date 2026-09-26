@@ -1,7 +1,7 @@
 import pytest
 
 from app.models import FactorScores, SignalEvaluationRequest, TradingViewWebhook
-from app.signals import competition_opportunity_assessment, evaluate, liquidity_quality_from_tradingview, setup_quality_score, volatility_quality_from_tradingview
+from app.signals import competition_candidate_recommendation, competition_opportunity_assessment, evaluate, liquidity_quality_from_tradingview, setup_quality_score, volatility_quality_from_tradingview
 
 
 def test_strong_positive_signal_requires_human_approval():
@@ -198,3 +198,49 @@ def test_incident_shapes_do_not_reach_balanced_84_quality_floor(
         family_evidence_score=family,
     )
     assert score < 84
+
+
+def test_frozen_support_never_reverses_existing_generic_direction():
+    rec, source, effective = competition_candidate_recommendation(
+        base_recommendation="LONG",
+        base_composite_score=0.42,
+        frozen_component_score=-1.0,
+        frozen_component_complete=True,
+    )
+    assert rec == "LONG"
+    assert source == "generic_composite"
+    assert effective == pytest.approx(0.42)
+
+
+def test_frozen_support_can_lift_only_near_threshold_wait():
+    rec, source, effective = competition_candidate_recommendation(
+        base_recommendation="WAIT",
+        base_composite_score=0.20,
+        frozen_component_score=1.0,
+        frozen_component_complete=True,
+    )
+    assert rec == "LONG"
+    assert source == "generic_plus_frozen_component"
+    assert effective == pytest.approx(0.36)
+
+    rec2, source2, effective2 = competition_candidate_recommendation(
+        base_recommendation="WAIT",
+        base_composite_score=0.10,
+        frozen_component_score=1.0,
+        frozen_component_complete=True,
+    )
+    assert rec2 == "WAIT"
+    assert source2 == "frozen_support_insufficient"
+    assert effective2 == pytest.approx(0.28)
+
+
+def test_incomplete_frozen_support_cannot_change_wait():
+    rec, source, effective = competition_candidate_recommendation(
+        base_recommendation="WAIT",
+        base_composite_score=-0.20,
+        frozen_component_score=-1.0,
+        frozen_component_complete=False,
+    )
+    assert rec == "WAIT"
+    assert source == "none"
+    assert effective == pytest.approx(-0.20)
