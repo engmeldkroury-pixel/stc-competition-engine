@@ -207,8 +207,18 @@ def decide_bridge_event(event_id: str, payload: dict) -> dict:
 
     quality_floor = 84 if competition_mode else 90
     final_gate_passed = gate_passed and quality_score >= quality_floor
-    if gate_passed and quality_score < quality_floor:
+    if quality_score < quality_floor:
         gate_failures = [*gate_failures, f"setup_quality_below_{quality_floor}"]
+    # A WATCH candidate is informational only: a directional competition setup
+    # that is close enough to the live gate to prepare, but is not an entry.
+    # It never creates a locked plan, approval, sizing or execution authority.
+    watch_candidate = (
+        competition_mode
+        and not final_gate_passed
+        and base_result.recommendation in {"LONG", "SHORT"}
+        and quality_score >= 70
+        and len(gate_failures) <= 3
+    )
     final_recommendation = base_result.recommendation if final_gate_passed else "WAIT"
     gate_name = "competition_opportunity_gate" if competition_mode else "high_conviction_gate"
     gate_reason = f"{gate_name}=PASSED" if final_gate_passed else f"{gate_name}=BLOCKED"
@@ -260,6 +270,13 @@ def decide_bridge_event(event_id: str, payload: dict) -> dict:
     result_dict["quality_floor"] = quality_floor
     result_dict["pre_gate_recommendation"] = base_result.recommendation
     result_dict["quality_gate_failures"] = gate_failures
+    result_dict["watch_candidate"] = watch_candidate
+    result_dict["watch_direction"] = base_result.recommendation if watch_candidate else None
+    result_dict["watch_note"] = (
+        "PREPARE ONLY; no entry, sizing, approval or execution authority."
+        if watch_candidate
+        else None
+    )
     result_dict["community_component_shadow"] = community_component_shadow
     result_dict["live_family_evidence"] = None if family_evidence is None else {
         "score": family_evidence.score,
