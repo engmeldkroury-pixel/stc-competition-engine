@@ -363,3 +363,21 @@ Reason:
 
 Do not reconcile/write the live STC ledger until this final history slice is captured.
 
+## 2026-09-27 — Ledger reconciliation complete; resume strategy/evidence work
+No further owner reconciliation evidence is required for the accepted ledger baseline.
+
+Verified baseline:
+- Capital open positions: NAS100 7.7 LONG @ 30416.071 and SPX500 40 LONG @ 7737.25.
+- Capital qualifying trading days: 4/3.
+- Capital evidenced realized P/L in STC: -3370.87 USD.
+- accepted unattributed platform residual: -54.39 USD; do not fabricate a trade to absorb it.
+- AMP open positions: 0.
+- AMP realized P/L: +991.25 USD.
+- AMP qualifying trading days: 3/5.
+
+Next executable development/evidence tasks:
+1. keep watching for the first fresh AMP post-deploy event and verify `competition_mode=true` + `quality_floor=84`;
+2. use live `gate_failure_counts` to quantify why opportunities concentrate by symbol/asset class;
+3. continue exact Pine/Python parity and forward shadow evidence;
+4. keep execution manual and enforce current quantity/cooldown/risk controls.
+
