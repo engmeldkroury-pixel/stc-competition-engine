@@ -209,27 +209,32 @@ def high_conviction_assessment(
 def competition_candidate_recommendation(
     *,
     base_recommendation: str,
+    base_composite_score: float,
     frozen_component_score: float | None,
     frozen_component_complete: bool,
-    frozen_threshold: float = 0.65,
-) -> tuple[str, str]:
-    """Choose the competition direction source without letting research bypass risk.
+    frozen_weight: float = 0.20,
+) -> tuple[str, str, float]:
+    """Blend sealed-holdout support into near-threshold competition direction.
 
-    Generic LONG/SHORT remains primary. A complete sealed-holdout component
-    profile may create a secondary direction only when the generic composite is
-    WAIT and the frozen weighted event is strong enough. The returned candidate
-    must still pass the normal competition gate and setup-quality floor.
+    Frozen support can contribute only a bounded minority share. It may lift a
+    generic WAIT across the normal +/-0.35 direction threshold only when the
+    base composite was already near that threshold. It cannot reverse an
+    existing generic LONG/SHORT.
     """
+    base = max(-1.0, min(1.0, float(base_composite_score)))
     if base_recommendation in {"LONG", "SHORT"}:
-        return base_recommendation, "generic_composite"
+        return base_recommendation, "generic_composite", base
     if not frozen_component_complete or frozen_component_score is None:
-        return "WAIT", "none"
-    if frozen_component_score >= frozen_threshold:
-        return "LONG", "frozen_component_support"
-    if frozen_component_score <= -frozen_threshold:
-        return "SHORT", "frozen_component_support"
-    return "WAIT", "frozen_component_below_threshold"
+        return "WAIT", "none", base
 
+    weight = max(0.0, min(0.25, float(frozen_weight)))
+    frozen = max(-1.0, min(1.0, float(frozen_component_score)))
+    effective = max(-1.0, min(1.0, (1.0 - weight) * base + weight * frozen))
+    if effective >= 0.35:
+        return "LONG", "generic_plus_frozen_component", effective
+    if effective <= -0.35:
+        return "SHORT", "generic_plus_frozen_component", effective
+    return "WAIT", "frozen_support_insufficient", effective
 
 def competition_opportunity_assessment(
     *,
@@ -248,7 +253,6 @@ def competition_opportunity_assessment(
     family_agreement_ratio: float | None,
     family_aligned_count: int | None,
     family_conflict_count: int | None,
-    frozen_component_score: float | None = None,
 ) -> tuple[bool, list[str]]:
     """Competition-only opportunity gate.
 
@@ -278,11 +282,7 @@ def competition_opportunity_assessment(
         ("intraday_majority_alignment", aligned_intraday >= 2),
         ("short_term_strength", sign * short_term_technical >= 0.55),
         ("blended_technical_strength", sign * blended_technical >= 0.45),
-        (
-            "composite_or_frozen_strength",
-            sign * composite_score >= 0.35
-            or (frozen_component_score is not None and sign * frozen_component_score >= 0.65),
-        ),
+        ("composite_strength", sign * composite_score >= 0.35),
         ("historical_not_strongly_opposed", historical_regime is not None and sign * historical_regime >= -0.15),
         ("trend_1m_present", trend_1m_score is not None),
         ("trend_1m_not_strongly_opposed", trend_1m_score is not None and sign * trend_1m_score >= -0.15),
