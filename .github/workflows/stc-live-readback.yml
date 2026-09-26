@@ -139,6 +139,10 @@ jobs:
                   "status": p.get("status"),
               })
           print("STC_LIVE_OPEN_POSITIONS=" + json.dumps(positions, sort_keys=True))
+          print(
+              "STC_LIVE_ACCOUNT_STATES="
+              + json.dumps(((data.get("portfolio") or {}).get("account_states") or []), sort_keys=True)
+          )
           closed_positions = []
           for p in ((data.get("portfolio") or {}).get("closed_positions_recent") or []):
               closed_positions.append({
