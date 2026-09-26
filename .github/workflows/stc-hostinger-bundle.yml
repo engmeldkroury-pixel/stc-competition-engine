@@ -25,7 +25,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          mkdir -p out/stc-hostinger-hotfix-169
+          mkdir -p out/stc-hostinger-release-178
           for file in \
             approval.php \
             cloud_control.php \
@@ -35,10 +35,10 @@ jobs:
             portfolio_control.php \
             position.php
           do
-            cp "hostinger_patch/${file}" "out/stc-hostinger-hotfix-169/${file}"
+            cp "hostinger_patch/${file}" "out/stc-hostinger-release-178/${file}"
           done
-          cat > out/stc-hostinger-hotfix-169/UPLOAD_README.txt <<'EOF'
-          STC Hostinger hotfix after PR #169
+          cat > out/stc-hostinger-release-178/UPLOAD_README.txt <<'EOF'
+          STC Hostinger release after AMP parity fix #178
           =================================
           Upload these seven PHP files to the existing STC public_html directory.
           Replace the files with the same names.
@@ -60,7 +60,9 @@ jobs:
           - approval-time MAX STC QUANTITY and duplicate/re-entry guardrails;
           - audited VOID support for mistaken manual_external ledger rows;
           - research-only competition gate supply audit;
-          - closed-bar high-water profit protection for open positions.
+          - closed-bar high-water profit protection for open positions;
+          - COMPETITION_OPPORTUNITY eligibility parity for both Capital.com Africa
+            and AMP Futures.
 
           After upload:
           1. STC Live Readback must verify the deployed runtime;
@@ -72,12 +74,12 @@ jobs:
           EOF
           (
             cd out
-            zip -qr stc-hostinger-hotfix-169.zip stc-hostinger-hotfix-169
+            zip -qr stc-hostinger-release-178.zip stc-hostinger-release-178
           )
-          sha256sum out/stc-hostinger-hotfix-169.zip
+          sha256sum out/stc-hostinger-release-178.zip
       - uses: actions/upload-artifact@v4
         with:
-          name: stc-hostinger-hotfix-169-${{ github.run_id }}
-          path: out/stc-hostinger-hotfix-169.zip
+          name: stc-hostinger-release-178-${{ github.run_id }}
+          path: out/stc-hostinger-release-178.zip
           if-no-files-found: error
           retention-days: 30
