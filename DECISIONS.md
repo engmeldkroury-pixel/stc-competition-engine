@@ -61,3 +61,12 @@
 - Therefore the issue is not missing symbol ingestion; it is opportunity-source concentration in the generic live strategy.
 - Do not manufacture equal recommendation counts by lowering all gates.
 - Priority is symbol-specific opportunity sourcing using validated research components, with live/Pine parity and shadow evidence before promotion.
+
+## 2026-09-26 — Dual-competition recovery: AMP Futures is now critical
+- Live readback confirmed AMP Futures had 0 qualifying trading days, 0 entries, 0 open/closed positions and 0 realized P/L in STC while the minimum prize-qualification requirement is 5 trading days.
+- As of 2026-09-26 UTC there are exactly five UTC calendar dates remaining in the competition window: Sep 26, 27, 28, 29 and 30. If the STC ledger is complete, today must count or the 5-day minimum becomes impossible.
+- AMP production coverage was only 16 core symbols although the official competition profile permits 94 symbols.
+- Weekend crypto futures are a special recovery path because CME crypto futures now trade 24/7 except maintenance windows.
+- A dedicated 24/7 AMP crypto feed is required because Pine outer realtime execution follows the host chart; an alert hosted on a weekday-only chart can starve weekend remote crypto updates.
+- Add verified micro crypto support for MBT/MET/MSL/MXP and an explicit qualification-urgency warning.
+- Do not lower the A+ gate merely to generate activity. Qualification warnings are not trade recommendations.
