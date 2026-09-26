@@ -3,7 +3,8 @@ from __future__ import annotations
 from typing import Mapping
 
 
-EVIDENCE_SOURCE = "research_benchmarks/community_corrected_full26_20260924.json"
+CAPITAL_EVIDENCE_SOURCE = "research_benchmarks/community_corrected_full26_20260924.json"
+AMP_EVIDENCE_SOURCE = "github_actions:35964596933/wave3-combined"
 
 CAPITAL_COMMUNITY_15M_PROFILES: dict[str, dict[str, float]] = {
     "CAPITALCOM:BTCUSD": {
@@ -28,6 +29,48 @@ CAPITAL_COMMUNITY_15M_PROFILES: dict[str, dict[str, float]] = {
         "alphatrend": 0.1788421855683715,
         "supertrend_kivanc": 0.1771992492416492,
         "ut_bot_alerts": 0.12194058191586397,
+    },
+}
+
+AMP_COMMUNITY_15M_PROFILES: dict[str, dict[str, float]] = {
+    "NYMEX:MCL1!": {
+        "ssl_hybrid": 0.21132177101758742,
+        "qqe_mod": 0.18665429587529245,
+        "chandelier_exit_everget": 0.1681999714994004,
+        "range_filter_guikroth": 0.12746426014806664,
+        "ut_bot_alerts": 0.1118849249414745,
+        "schaff_trend_cycle": 0.10967817623990596,
+        "squeeze_momentum_lazybear": 0.08479660027827253,
+    },
+    "NYMEX:MNG1!": {
+        "range_filter_guikroth": 1.0,
+    },
+    "COMEX_MINI:MGC1!": {
+        "qqe_mod": 0.5698649457861664,
+        "ssl_hybrid": 0.43013505421383363,
+    },
+    "CME_MINI:MJY1!": {
+        "wavetrend_crosses": 0.29313954752232735,
+        "schaff_trend_cycle": 0.2580276321516121,
+        "waddah_attar_explosion": 0.2570035403438741,
+        "trendilo": 0.19182927998218638,
+    },
+    "CME:MET1!": {
+        "waddah_attar_explosion": 0.6080762173214392,
+        "ut_bot_alerts": 0.39192378267856076,
+    },
+    "CBOT:ZN1!": {
+        "schaff_trend_cycle": 0.3704593624494359,
+        "alphatrend": 0.35614555898192934,
+        "qqe_mod": 0.27339507856863476,
+    },
+    "CBOT:ZB1!": {
+        "range_filter_guikroth": 0.2320986383034729,
+        "chandelier_exit_everget": 0.2063520940279631,
+        "waddah_attar_explosion": 0.18337368787086122,
+        "qqe_mod": 0.13019654494176194,
+        "ssl_hybrid": 0.12469713822952401,
+        "halftrend_everget": 0.12328189662641696,
     },
 }
 
@@ -96,6 +139,129 @@ CAPITAL_COMMUNITY_15M_PARAMETERS: dict[str, dict[str, dict[str, float | int]]] =
     },
 }
 
+AMP_COMMUNITY_15M_PARAMETERS: dict[str, dict[str, dict[str, float | int]]] = {
+    "NYMEX:MCL1!": {
+        "ssl_hybrid": {"baseline_length": 100, "ssl_length": 20},
+        "qqe_mod": {
+            "rsi_period": 6,
+            "smoothing": 5,
+            "fast_factor": 2.5,
+            "slow_factor": 1.61,
+            "threshold": 2.0,
+            "bb_length": 50,
+            "bb_mult": 0.35,
+        },
+        "chandelier_exit_everget": {"period": 14, "multiplier": 2.0},
+        "range_filter_guikroth": {"sampling_period": 50, "range_multiplier": 2.0},
+        "ut_bot_alerts": {"atr_period": 10, "key_value": 1.5},
+        "schaff_trend_cycle": {
+            "cycle_length": 12,
+            "fast_length": 26,
+            "slow_length": 50,
+            "smoothing": 0.5,
+        },
+        "squeeze_momentum_lazybear": {"length": 20, "bb_mult": 2.0, "kc_mult": 1.5},
+    },
+    "NYMEX:MNG1!": {
+        "range_filter_guikroth": {"sampling_period": 100, "range_multiplier": 2.0},
+    },
+    "COMEX_MINI:MGC1!": {
+        "qqe_mod": {
+            "rsi_period": 8,
+            "smoothing": 5,
+            "fast_factor": 3.0,
+            "slow_factor": 1.8,
+            "threshold": 3.0,
+            "bb_length": 40,
+            "bb_mult": 0.35,
+        },
+        "ssl_hybrid": {"baseline_length": 60, "ssl_length": 15},
+    },
+    "CME_MINI:MJY1!": {
+        "wavetrend_crosses": {
+            "channel_length": 14,
+            "average_length": 21,
+            "signal_length": 4,
+        },
+        "schaff_trend_cycle": {
+            "cycle_length": 12,
+            "fast_length": 26,
+            "slow_length": 50,
+            "smoothing": 0.5,
+        },
+        "waddah_attar_explosion": {
+            "fast_length": 12,
+            "slow_length": 26,
+            "bb_length": 20,
+            "bb_mult": 2.0,
+            "sensitivity": 100.0,
+            "dead_zone_atr_period": 100,
+            "dead_zone_mult": 3.0,
+        },
+        "trendilo": {
+            "smoothing": 1,
+            "lookback": 50,
+            "alma_offset": 0.85,
+            "alma_sigma": 6.0,
+            "band_multiplier": 1.25,
+        },
+    },
+    "CME:MET1!": {
+        "waddah_attar_explosion": {
+            "fast_length": 12,
+            "slow_length": 26,
+            "bb_length": 20,
+            "bb_mult": 2.0,
+            "sensitivity": 100.0,
+            "dead_zone_atr_period": 100,
+            "dead_zone_mult": 3.0,
+        },
+        "ut_bot_alerts": {"atr_period": 14, "key_value": 2.0},
+    },
+    "CBOT:ZN1!": {
+        "schaff_trend_cycle": {
+            "cycle_length": 12,
+            "fast_length": 26,
+            "slow_length": 50,
+            "smoothing": 0.5,
+        },
+        "alphatrend": {"period": 20, "coefficient": 1.0},
+        "qqe_mod": {
+            "rsi_period": 8,
+            "smoothing": 5,
+            "fast_factor": 3.0,
+            "slow_factor": 1.8,
+            "threshold": 3.0,
+            "bb_length": 40,
+            "bb_mult": 0.35,
+        },
+    },
+    "CBOT:ZB1!": {
+        "range_filter_guikroth": {"sampling_period": 100, "range_multiplier": 3.0},
+        "chandelier_exit_everget": {"period": 14, "multiplier": 3.0},
+        "waddah_attar_explosion": {
+            "fast_length": 20,
+            "slow_length": 40,
+            "bb_length": 20,
+            "bb_mult": 2.0,
+            "sensitivity": 150.0,
+            "dead_zone_atr_period": 100,
+            "dead_zone_mult": 3.7,
+        },
+        "qqe_mod": {
+            "rsi_period": 6,
+            "smoothing": 5,
+            "fast_factor": 3.0,
+            "slow_factor": 1.61,
+            "threshold": 3.0,
+            "bb_length": 50,
+            "bb_mult": 0.35,
+        },
+        "ssl_hybrid": {"baseline_length": 60, "ssl_length": 15},
+        "halftrend_everget": {"amplitude": 5},
+    },
+}
+
 CAPITAL_NO_VALIDATED_COMMUNITY_PROFILE = frozenset(
     {
         "CAPITALCOM:AUDUSD",
@@ -105,73 +271,40 @@ CAPITAL_NO_VALIDATED_COMMUNITY_PROFILE = frozenset(
     }
 )
 
+AMP_NO_VALIDATED_COMMUNITY_PROFILE = frozenset(
+    {
+        "CME_MINI:MES1!",
+        "CME_MINI:MNQ1!",
+        "CBOT_MINI:MYM1!",
+        "CME_MINI:M2K1!",
+        "COMEX_MINI:SIL1!",
+        "CME_MINI:M6E1!",
+        "CME_MINI:M6B1!",
+        "CME_MINI:M6A1!",
+        "CME:MBT1!",
+    }
+)
 
-AMP_FROZEN_15M_PROFILES: dict[str, dict[str, float]] = {
-    # Single-component frozen survivors can be represented without inventing
-    # a new ensemble weighting scheme.
-    "CBOT:ZB1!": {
-        "range_filter_guikroth": 1.0,
-    },
-    "NYMEX:MCL1!": {
-        "ssl_hybrid": 1.0,
-    },
+COMMUNITY_15M_PROFILES = {
+    **CAPITAL_COMMUNITY_15M_PROFILES,
+    **AMP_COMMUNITY_15M_PROFILES,
 }
 
-AMP_FROZEN_15M_PARAMETERS: dict[str, dict[str, dict[str, float | int]]] = {
-    "CBOT:ZB1!": {
-        "range_filter_guikroth": {
-            "sampling_period": 100,
-            "range_multiplier": 3.0,
-        },
-    },
-    "NYMEX:MCL1!": {
-        "ssl_hybrid": {
-            "baseline_length": 100,
-            "ssl_length": 20,
-        },
-    },
+COMMUNITY_15M_PARAMETERS = {
+    **CAPITAL_COMMUNITY_15M_PARAMETERS,
+    **AMP_COMMUNITY_15M_PARAMETERS,
 }
-
-AMP_CANDIDATE_ONLY_15M: dict[str, dict[str, dict]] = {
-    # MJY has several independently validated/frozen candidates, but no
-    # accepted combined weight. Preserve the evidence without fabricating a
-    # weighted ensemble.
-    "CME_MINI:MJY1!": {
-        "alphatrend": {
-            "state": "SHADOW",
-            "selected_parameters": {"period": 20, "coefficient": 1.0},
-        },
-        "waddah_attar_explosion": {
-            "state": "SHADOW",
-            "selected_parameters": {
-                "fast_length": 12,
-                "slow_length": 26,
-                "sensitivity": 100,
-                "bb_length": 20,
-                "bb_mult": 2.0,
-                "atr_length": 100,
-                "dead_zone_mult": 3.0,
-            },
-        },
-        "trendilo": {
-            "state": "MULTITF_CONFIRMED",
-            "selected_parameters": {
-                "smoothing": 1,
-                "lookback": 50,
-                "alma_offset": 0.85,
-                "alma_sigma": 6.0,
-                "band_multiplier": 1.25,
-            },
-        },
-    },
-}
-
-AMP_EVIDENCE_SOURCE = "research/community_shadow_registry.json"
 
 
 def _normalize_timeframe(timeframe: str) -> str:
     value = str(timeframe).strip().lower()
     return "15" if value in {"15", "15m"} else value
+
+
+def _evidence_source_for(symbol: str) -> str:
+    if symbol in AMP_COMMUNITY_15M_PROFILES or symbol in AMP_NO_VALIDATED_COMMUNITY_PROFILE:
+        return AMP_EVIDENCE_SOURCE
+    return CAPITAL_EVIDENCE_SOURCE
 
 
 def build_community_component_shadow(
@@ -186,66 +319,25 @@ def build_community_component_shadow(
     by the frozen research profile is present in the payload.
     """
     normalized_timeframe = _normalize_timeframe(timeframe)
-    profile = None
-    parameters: dict[str, dict[str, float | int]] = {}
-    evidence_source = EVIDENCE_SOURCE
-    if normalized_timeframe == "15":
-        if symbol in CAPITAL_COMMUNITY_15M_PROFILES:
-            profile = CAPITAL_COMMUNITY_15M_PROFILES[symbol]
-            parameters = CAPITAL_COMMUNITY_15M_PARAMETERS.get(symbol, {})
-        elif symbol in AMP_FROZEN_15M_PROFILES:
-            profile = AMP_FROZEN_15M_PROFILES[symbol]
-            parameters = AMP_FROZEN_15M_PARAMETERS.get(symbol, {})
-            evidence_source = AMP_EVIDENCE_SOURCE
-
+    profile = (
+        COMMUNITY_15M_PROFILES.get(symbol)
+        if normalized_timeframe == "15"
+        else None
+    )
     supplied = dict(component_signals or {})
-
-    if profile is None and normalized_timeframe == "15" and symbol in AMP_CANDIDATE_ONLY_15M:
-        candidates = AMP_CANDIDATE_ONLY_15M[symbol]
-        expected = set(candidates)
-        observed = {
-            name: float(value)
-            for name, value in supplied.items()
-            if name in expected
-        }
-        missing = sorted(expected - set(observed))
-        unexpected = sorted(set(supplied) - expected)
-        selected_parameters = {
-            name: dict(meta.get("selected_parameters", {}))
-            for name, meta in candidates.items()
-        }
-        return {
-            "status": (
-                "CANDIDATE_ONLY_SHADOW_EVIDENCE"
-                if observed
-                else "AWAITING_CANDIDATE_SIGNALS"
-            ),
-            "symbol": symbol,
-            "timeframe": normalized_timeframe,
-            "evidence_source": AMP_EVIDENCE_SOURCE,
-            "expected_components": list(candidates),
-            "normalized_weights": {},
-            "selected_parameters": selected_parameters,
-            "candidate_states": {
-                name: str(meta.get("state", "SHADOW"))
-                for name, meta in candidates.items()
-            },
-            "observed_signals": observed,
-            "missing_components": missing,
-            "unexpected_components_ignored": unexpected,
-            "complete": not missing,
-            "weighted_score": None,
-            "live_authority": False,
-            "used_in_quality_gate": False,
-            "used_in_risk": False,
-            "used_in_approval": False,
-        }
+    evidence_source = _evidence_source_for(symbol)
 
     if profile is None:
+        has_known_no_profile = (
+            normalized_timeframe == "15"
+            and (
+                symbol in CAPITAL_NO_VALIDATED_COMMUNITY_PROFILE
+                or symbol in AMP_NO_VALIDATED_COMMUNITY_PROFILE
+            )
+        )
         status = (
             "NO_VALIDATED_COMMUNITY_PROFILE"
-            if normalized_timeframe == "15"
-            and symbol in CAPITAL_NO_VALIDATED_COMMUNITY_PROFILE
+            if has_known_no_profile
             else "NO_RESEARCH_PROFILE_FOR_SYMBOL_TIMEFRAME"
         )
         return {
@@ -295,7 +387,7 @@ def build_community_component_shadow(
         "evidence_source": evidence_source,
         "expected_components": list(profile),
         "normalized_weights": dict(profile),
-        "selected_parameters": dict(parameters),
+        "selected_parameters": dict(COMMUNITY_15M_PARAMETERS.get(symbol, {})),
         "observed_signals": observed,
         "missing_components": missing,
         "unexpected_components_ignored": unexpected,
