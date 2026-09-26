@@ -516,11 +516,14 @@ function cardHtml(c,i){
  const canApprove=active&&(c.recommendation==='LONG'||c.recommendation==='SHORT')&&!!c.locked_trade_plan&&sizingAllowed&&macroAllowed&&!cooldownActive&&controlOpen&&latestCompatible;
  const competitionLabel=c.competition_id==='amp-futures-sep-2026'?'AMP Futures':'Capital.com Africa';
  const recoveryOnly=isLockedPlanVisible(c)&&!active;
- const statusBadge=c.recommendation==='WAIT'
+ const statusBadge=c.watch_candidate
+   ?'<span class="badge blocked">WATCH / PREPARE</span>'
+   :c.recommendation==='WAIT'
    ?'<span class="badge blocked">WAIT</span>'
    :(active?'<span class="badge active">ACTIVE NOW</span>':recoveryOnly?'<span class="badge blocked">RECOVERY ONLY</span>':'<span class="badge expired">EXPIRED</span>');
  let blockReason='';
  if(c.has_open_position)blockReason='An executed position is already tracked for this symbol. New signals are used to manage that position, not to create a replacement trade.';
+ else if(c.watch_candidate)blockReason='WATCH / PREPARE ONLY: directional setup is near the competition gate but is NOT a trade. Do not enter until STC produces an ACTIVE NEW PLAN.';
  else if(c.quality_gate_passed===false&&c.pre_gate_recommendation&&c.pre_gate_recommendation!=='WAIT')blockReason='MONITOR ONLY: this directional candidate failed its required quality gate and cannot be approved or notified as a trade.';
  else if(!active&&c.recommendation!=='WAIT')blockReason='Expired opportunities are removed automatically from opportunity lists.';
  else if(active&&!latestCompatible)blockReason='The locked plan is still shown so an already-filled trade can be recorded, but the newest confirmed bar is no longer aligned. Do not create a new entry from this plan.';
@@ -545,7 +548,7 @@ function cardHtml(c,i){
      +'<div class="ticket-note">Telegram/server signal received, but STC already tracks an open position for this symbol. Use the Portfolio Supervisor; do not add a new trade from this signal.</div></div>';
  }else{
    ticket='<div class="'+ticketClass+'"><div class="ticket-title">EXECUTION TICKET</div>'
-     +'<div class="ticket-action '+cls+'">'+esc(c.recommendation==='LONG'?'BUY / LONG':c.recommendation==='SHORT'?'SELL / SHORT':'DO NOT ENTER')+' • '+esc(c.symbol)+'</div>';
+     +'<div class="ticket-action '+cls+'">'+esc(c.watch_candidate?('WATCH '+(c.watch_direction||c.pre_gate_recommendation||'' )+' — DO NOT ENTER'):c.recommendation==='LONG'?'BUY / LONG':c.recommendation==='SHORT'?'SELL / SHORT':'DO NOT ENTER')+' • '+esc(c.symbol)+'</div>';
  }
  if(!c.has_open_position&&p){
    ticket+='<div class="ticket-grid">'
