@@ -117,3 +117,16 @@ Project history/evidence:
 
 ## One next executable action
 Correct `HOSTINGER_SSH_PRIVATE_KEY`; then rerun secure Hostinger deployment and Live Readback. No other owner action is required before that.
+
+## Latest strategy correctness additions
+- Policy centralization: `81415fbcafd64e3202fbf7150a1c21e1bfe807c0`.
+- Gate-failure attribution: `d0089bb99d9da9938f711e1d744ea9d9c1351aef`.
+- Missing-evidence SHORT asymmetry fix: `760796b58f0d763ea54b9fc452a8cd8aba119a49`.
+- Corrected-code critical CI: 191 passed, 1 warning.
+- Independent reviewer prompt: `docs/EXTERNAL_AI_REVIEW_PROMPT_2026-09-26.md`.
+
+Important correctness fix:
+A missing optional score previously used raw `-1.0` before direction-sign multiplication; on SHORT this could become `+1.0` and inflate setup quality. Missing evidence is now direction-symmetric and fail-closed.
+
+The only owner blocker before automated Hostinger deployment is correcting `HOSTINGER_SSH_PRIVATE_KEY` with the private file (no `.pub`).
+

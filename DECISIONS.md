@@ -89,3 +89,9 @@
 - This advisory/live semantic mismatch is not evidence that the live gate is 90, but it is a policy-drift risk and must be reconciled before relying on the pace object for automation or UI decisions.
 - Do not change live weights or thresholds merely to fix naming; first centralize the policy contract and lock it with regression tests.
 
+## 2026-09-26 — Missing evidence is always fail-closed in setup quality
+- Optional missing MTF/family evidence must never become positive evidence because of LONG/SHORT sign normalization.
+- `setup_quality_score()` now applies direction alignment only to real values and maps missing values to the same penalty for both LONG and SHORT.
+- This is a correctness fix, not a gate relaxation.
+- Per-symbol gate-failure attribution is accepted as read-only research evidence for diagnosing opportunity concentration before any live weight/threshold change.
+

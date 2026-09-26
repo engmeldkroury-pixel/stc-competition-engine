@@ -252,3 +252,24 @@ Additional strategy consistency issue to repair after deployment/reconciliation:
 - advisory `competition_strategy.py` still reports `A_PLUS_ONLY`;
 - centralize the policy contract and regression-test it before any future gate-policy change.
 
+## 2026-09-26 — Strategy correctness work completed while deployment is blocked
+Completed on main:
+- centralized Capital/AMP competition policy constants and removed advisory A_PLUS_ONLY drift;
+- added per-competition/per-symbol gate-failure attribution to Hostinger readback;
+- fixed a direction-asymmetric missing-evidence bug that could inflate SHORT setup quality;
+- added regression tests;
+- competition-critical CI on the corrected code passed 191 tests with 1 warning;
+- created independent-review prompt `docs/EXTERNAL_AI_REVIEW_PROMPT_2026-09-26.md`.
+
+Only owner intervention currently required:
+- correct `HOSTINGER_SSH_PRIVATE_KEY` so it contains the full private key file `stc_hostinger_deploy`, not the one-line `.pub` key.
+
+Then:
+1. trigger secure Hostinger deployment;
+2. require seven-file checksum verification;
+3. run Live Readback;
+4. use new gate-failure counts to diagnose concentration by symbol;
+5. require fresh AMP competition_mode=true / quality_floor=84 evidence;
+6. reconcile STC positions to platform truth;
+7. choose the next research experiment from observed failure/outcome evidence rather than trade-count pressure.
+
