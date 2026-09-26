@@ -1,0 +1,220 @@
+name: STC Ledger Reconcile
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "ops/LEDGER_RECONCILE_TRIGGER"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: stc-ledger-reconcile
+  cancel-in-progress: false
+
+jobs:
+  reconcile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      STC_OWNER_TOKEN: ${{ secrets.STC_OWNER_TOKEN }}
+    steps:
+      - name: Reconcile owner-confirmed competition ledger
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "${STC_OWNER_TOKEN:-}"
+          python - <<'PY'
+          import json, math, os, urllib.request, urllib.error
+
+          BASE = "https://stc.feama.site"
+          TOKEN = os.environ["STC_OWNER_TOKEN"]
+
+          def request(path, method="GET", body=None):
+              data = None if body is None else json.dumps(body).encode("utf-8")
+              req = urllib.request.Request(
+                  BASE + path,
+                  data=data,
+                  method=method,
+                  headers={
+                      "Authorization": f"Bearer {TOKEN}",
+                      "Content-Type": "application/json",
+                      "User-Agent": "stc-ledger-reconcile/1.0",
+                  },
+              )
+              try:
+                  with urllib.request.urlopen(req, timeout=25) as resp:
+                      return json.loads(resp.read().decode("utf-8"))
+              except urllib.error.HTTPError as exc:
+                  raw = exc.read().decode("utf-8", errors="replace")
+                  raise RuntimeError(f"{method} {path} failed HTTP {exc.code}: {raw[:800]}") from exc
+
+          def snapshot():
+              return request("/operator_snapshot.php")
+
+          def near(a, b, tol=1e-6):
+              return abs(float(a) - float(b)) <= max(tol, abs(float(b))*1e-8)
+
+          stale_ids = {
+              "pos-d105686e5a029f0ef9d23cfbd44b48c0f0f826f1": "EURUSD closed on platform",
+              "pos-19b02095ae722d4d5758b38d1c1ff85ba25a909a": "XAGUSD closed on platform",
+              "pos-94dbd8c6ef7c9d005d33b96917eedad5059dbdf0": "NAS100 stale quantity/entry replaced from platform truth",
+              "pos-06645ae7fbeddd2b4fa4ec8e5dd2287839e19e34": "SPX500 stale quantity/entry replaced from platform truth",
+          }
+
+          closed_trades = [
+              dict(competition_id="capital-africa-sep-2026", symbol="CAPITALCOM:SPX500", side="LONG", quantity=20.0, entry_price=7730.2, exit_price=7704.6, opened_at_utc="2026-09-25T09:04:00Z", closed_at_utc="2026-09-25T14:05:00Z", realized_pnl_usd=-542.87),
+              dict(competition_id="capital-africa-sep-2026", symbol="CAPITALCOM:BTCUSD", side="LONG", quantity=0.5, entry_price=85026.25, exit_price=84800.05, opened_at_utc="2026-09-25T11:23:00Z", closed_at_utc="2026-09-25T11:33:00Z", realized_pnl_usd=-121.59),
+              dict(competition_id="capital-africa-sep-2026", symbol="CAPITALCOM:EURUSD", side="SHORT", quantity=137550.0, entry_price=1.137, exit_price=1.139, opened_at_utc="2026-09-24T13:47:00Z", closed_at_utc="2026-09-25T08:13:00Z", realized_pnl_usd=-379.31),
+              dict(competition_id="capital-africa-sep-2026", symbol="CAPITALCOM:SPX500", side="LONG", quantity=39.2, entry_price=7697.1, exit_price=7690.7, opened_at_utc="2026-09-24T18:05:00Z", closed_at_utc="2026-09-24T20:17:00Z", realized_pnl_usd=-311.20),
+              dict(competition_id="capital-africa-sep-2026", symbol="CAPITALCOM:SPX500", side="LONG", quantity=20.0, entry_price=7705.1, exit_price=7690.8, opened_at_utc="2026-09-24T17:21:00Z", closed_at_utc="2026-09-24T17:45:00Z", realized_pnl_usd=-316.79),
+              dict(competition_id="capital-africa-sep-2026", symbol="CAPITALCOM:XAGUSD", side="SHORT", quantity=3730.0, entry_price=63.24, exit_price=63.593, opened_at_utc="2026-09-24T15:03:00Z", closed_at_utc="2026-09-24T16:15:00Z", realized_pnl_usd=-1362.81),
+              dict(competition_id="capital-africa-sep-2026", symbol="CAPITALCOM:ETHUSD", side="LONG", quantity=9.02, entry_price=2772.35, exit_price=2753.74, opened_at_utc="2026-09-21T21:07:00Z", closed_at_utc="2026-09-22T00:58:00Z", realized_pnl_usd=-172.80),
+              dict(competition_id="capital-africa-sep-2026", symbol="CAPITALCOM:BTCUSD", side="LONG", quantity=0.22, entry_price=86384.45, exit_price=85979.65, opened_at_utc="2026-09-21T22:28:00Z", closed_at_utc="2026-09-22T00:55:00Z", realized_pnl_usd=-92.72),
+              dict(competition_id="capital-africa-sep-2026", symbol="CAPITALCOM:BTCUSD", side="LONG", quantity=0.23, entry_price=86648.2, exit_price=86358.7, opened_at_utc="2026-09-21T21:09:00Z", closed_at_utc="2026-09-21T22:28:00Z", realized_pnl_usd=-70.78),
+              dict(competition_id="amp-futures-sep-2026", symbol="CME:MET1!", side="LONG", quantity=25.0, entry_price=2777.5, exit_price=2761.5, opened_at_utc="2026-09-21T21:14:00Z", closed_at_utc="2026-09-22T00:56:00Z", realized_pnl_usd=-40.00),
+              dict(competition_id="amp-futures-sep-2026", symbol="CBOT:ZN1!", side="SHORT", quantity=3.0, entry_price=105.328, exit_price=104.984, opened_at_utc="2026-09-23T14:47:00Z", closed_at_utc="2026-09-23T17:02:00Z", realized_pnl_usd=1031.25),
+          ]
+
+          current_open = [
+              dict(competition_id="capital-africa-sep-2026", symbol="CAPITALCOM:NAS100", side="LONG", quantity=7.7, entry_price=30416.071, initial_stop=30319.1, current_stop=30319.1, target1=30758.5, target2=30758.6, opened_at_utc="2026-09-24T20:13:00Z"),
+              dict(competition_id="capital-africa-sep-2026", symbol="CAPITALCOM:SPX500", side="LONG", quantity=40.0, entry_price=7737.25, initial_stop=7716.0, current_stop=7716.0, target1=7796.9, target2=7797.0, opened_at_utc="2026-09-25T16:34:00Z"),
+          ]
+
+          s = snapshot()
+          open_rows = ((s.get("portfolio") or {}).get("positions") or [])
+          closed_rows = ((s.get("portfolio") or {}).get("closed_positions_recent") or [])
+
+          # Fail closed if an unknown open position exists.
+          allowed_existing_ids = set(stale_ids)
+          for row in open_rows:
+              pid = str(row.get("position_id") or "")
+              if pid not in allowed_existing_ids:
+                  # Allow an already-reconciled exact current position on a safe rerun.
+                  exact = any(
+                      row.get("competition_id") == t["competition_id"]
+                      and row.get("symbol") == t["symbol"]
+                      and row.get("side") == t["side"]
+                      and near(row.get("quantity"), t["quantity"])
+                      and near(row.get("entry_price"), t["entry_price"])
+                      for t in current_open
+                  )
+                  if not exact:
+                      raise RuntimeError(f"unexpected open STC position blocks reconciliation: {pid} {row.get('symbol')}")
+
+          # VOID only the known stale manual_external rows that still exist.
+          for pid, reason in stale_ids.items():
+              s = snapshot()
+              row = next((x for x in ((s.get("portfolio") or {}).get("positions") or []) if x.get("position_id") == pid), None)
+              if row is None:
+                  print(f"SKIP_VOID already absent {pid}")
+                  continue
+              if row.get("origin") != "manual_external":
+                  raise RuntimeError(f"refusing to void non-manual_external row {pid}")
+              out = request("/position.php", "POST", {
+                  "action": "VOID",
+                  "position_id": pid,
+                  "confirm_void": True,
+                  "reason": "Owner-confirmed platform ledger reconciliation 2026-09-27: " + reason,
+              })
+              if out.get("ok") is not True:
+                  raise RuntimeError(f"VOID failed for {pid}: {out}")
+              print(f"VOID_OK {pid}")
+
+          def closed_match(row, t):
+              return (
+                  row.get("competition_id") == t["competition_id"]
+                  and row.get("symbol") == t["symbol"]
+                  and row.get("side") == t["side"]
+                  and near(row.get("initial_quantity"), t["quantity"])
+                  and near(row.get("entry_price"), t["entry_price"])
+                  and near(row.get("exit_price"), t["exit_price"])
+                  and near(row.get("realized_pnl_usd"), t["realized_pnl_usd"], 0.01)
+                  and str(row.get("opened_at_utc") or "").startswith(t["opened_at_utc"][:16].replace("T"," "))
+                  and str(row.get("closed_at_utc") or "").startswith(t["closed_at_utc"][:16].replace("T"," "))
+              )
+
+          # Import owner-confirmed closed trades, skipping exact matches on safe reruns.
+          for t in closed_trades:
+              s = snapshot()
+              rows = ((s.get("portfolio") or {}).get("closed_positions_recent") or [])
+              if any(closed_match(row, t) for row in rows):
+                  print(f"SKIP_CLOSED already imported {t['competition_id']} {t['symbol']} {t['opened_at_utc']}")
+                  continue
+              body = dict(t)
+              body["action"] = "IMPORT_CLOSED"
+              body["note"] = "Owner-confirmed TradingView competition history. Local Egypt UTC+03 converted to UTC. Residual Capital platform P/L difference of -54.39 USD intentionally left unattributed rather than fabricated."
+              out = request("/position.php", "POST", body)
+              if out.get("ok") is not True:
+                  raise RuntimeError(f"IMPORT_CLOSED failed {t['symbol']}: {out}")
+              print(f"IMPORT_CLOSED_OK {t['competition_id']} {t['symbol']} {t['realized_pnl_usd']}")
+
+          # Recreate only the two positions currently open on the platform.
+          for t in current_open:
+              s = snapshot()
+              rows = ((s.get("portfolio") or {}).get("positions") or [])
+              same_symbol = [row for row in rows if row.get("competition_id") == t["competition_id"] and row.get("symbol") == t["symbol"]]
+              exact = [
+                  row for row in same_symbol
+                  if row.get("side") == t["side"]
+                  and near(row.get("quantity"), t["quantity"])
+                  and near(row.get("entry_price"), t["entry_price"])
+                  and near(row.get("current_stop"), t["current_stop"])
+                  and near(row.get("target2"), t["target2"])
+              ]
+              if exact:
+                  print(f"SKIP_OPEN already exact {t['symbol']}")
+                  continue
+              if same_symbol:
+                  raise RuntimeError(f"unexpected remaining open row for {t['symbol']}: {same_symbol}")
+              body = dict(t)
+              body.update({
+                  "action": "OPEN",
+                  "origin": "manual_external",
+                  "note": "Owner-confirmed current TradingView competition position. Platform exposes one TP; target1 is a synthetic checkpoint 0.1 below final TP solely because the current STC schema requires target1 < target2. Initial stop is recorded from the currently visible platform stop because separate historical initial-stop evidence is unavailable.",
+              })
+              out = request("/position.php", "POST", body)
+              if out.get("ok") is not True:
+                  raise RuntimeError(f"OPEN reconcile failed {t['symbol']}: {out}")
+              print(f"OPEN_OK {t['symbol']} qty={t['quantity']} entry={t['entry_price']}")
+
+          final = snapshot()
+          final_open = ((final.get("portfolio") or {}).get("positions") or [])
+          if len(final_open) != 2:
+              raise RuntimeError(f"expected exactly 2 open positions after reconciliation, got {len(final_open)}")
+          for t in current_open:
+              row = next((x for x in final_open if x.get("symbol") == t["symbol"]), None)
+              if row is None or not near(row.get("quantity"), t["quantity"]) or not near(row.get("entry_price"), t["entry_price"]):
+                  raise RuntimeError(f"post-reconcile open mismatch for {t['symbol']}: {row}")
+
+          progress = final.get("competition_progress") or {}
+          cap = progress.get("capital-africa-sep-2026") or {}
+          amp = progress.get("amp-futures-sep-2026") or {}
+          print("RECONCILE_FINAL_OPEN=" + json.dumps([
+              {
+                  "competition_id": r.get("competition_id"),
+                  "symbol": r.get("symbol"),
+                  "side": r.get("side"),
+                  "quantity": r.get("quantity"),
+                  "entry_price": r.get("entry_price"),
+                  "current_stop": r.get("current_stop"),
+                  "target2": r.get("target2"),
+              }
+              for r in final_open
+          ], sort_keys=True))
+          print("RECONCILE_CAPITAL_PROGRESS=" + json.dumps(cap, sort_keys=True))
+          print("RECONCILE_AMP_PROGRESS=" + json.dumps(amp, sort_keys=True))
+
+          if int(cap.get("qualifying_trading_days") or 0) != 4:
+              raise RuntimeError(f"Capital trading-day mismatch after reconciliation: {cap}")
+          if int(amp.get("qualifying_trading_days") or 0) != 3:
+              raise RuntimeError(f"AMP trading-day mismatch after reconciliation: {amp}")
+          if not near(float(amp.get("realized_pnl_usd") or 0), 991.25, 0.01):
+              raise RuntimeError(f"AMP realized P/L mismatch after reconciliation: {amp}")
+          if not near(float(cap.get("realized_pnl_usd") or 0), -3370.87, 0.01):
+              raise RuntimeError(f"Capital imported known-trade P/L mismatch after reconciliation: {cap}")
+
+          print("RECONCILIATION_OK residual_capital_unattributed_usd=-54.39")
+          PY
