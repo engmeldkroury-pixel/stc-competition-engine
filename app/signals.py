@@ -165,6 +165,7 @@ def high_conviction_assessment(
     trend_2h_score: float | None,
     trend_4h_score: float | None,
     trend_1m_score: float | None,
+    frozen_component_score: float | None,
     family_evidence_score: float | None,
     family_agreement_ratio: float | None,
     family_aligned_count: int | None,
@@ -204,6 +205,31 @@ def high_conviction_assessment(
     failed = [name for name, ok in checks if not ok]
     return failed == [], failed
 
+
+
+def competition_candidate_recommendation(
+    *,
+    base_recommendation: str,
+    frozen_component_score: float | None,
+    frozen_component_complete: bool,
+    frozen_threshold: float = 0.65,
+) -> tuple[str, str]:
+    """Choose the competition direction source without letting research bypass risk.
+
+    Generic LONG/SHORT remains primary. A complete sealed-holdout component
+    profile may create a secondary direction only when the generic composite is
+    WAIT and the frozen weighted event is strong enough. The returned candidate
+    must still pass the normal competition gate and setup-quality floor.
+    """
+    if base_recommendation in {"LONG", "SHORT"}:
+        return base_recommendation, "generic_composite"
+    if not frozen_component_complete or frozen_component_score is None:
+        return "WAIT", "none"
+    if frozen_component_score >= frozen_threshold:
+        return "LONG", "frozen_component_support"
+    if frozen_component_score <= -frozen_threshold:
+        return "SHORT", "frozen_component_support"
+    return "WAIT", "frozen_component_below_threshold"
 
 
 def competition_opportunity_assessment(
@@ -252,7 +278,11 @@ def competition_opportunity_assessment(
         ("intraday_majority_alignment", aligned_intraday >= 2),
         ("short_term_strength", sign * short_term_technical >= 0.55),
         ("blended_technical_strength", sign * blended_technical >= 0.45),
-        ("composite_strength", sign * composite_score >= 0.35),
+        (
+            "composite_or_frozen_strength",
+            sign * composite_score >= 0.35
+            or (frozen_component_score is not None and sign * frozen_component_score >= 0.65),
+        ),
         ("historical_not_strongly_opposed", historical_regime is not None and sign * historical_regime >= -0.15),
         ("trend_1m_present", trend_1m_score is not None),
         ("trend_1m_not_strongly_opposed", trend_1m_score is not None and sign * trend_1m_score >= -0.15),
