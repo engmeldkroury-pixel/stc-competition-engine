@@ -103,3 +103,11 @@
 - Asset-class/session normalization is a research hypothesis to be tested using gate-failure distributions before live policy changes.
 - Platform truth remains authoritative over an unreconciled STC position ledger.
 - No portfolio-management output should be treated as authoritative until ledger reconciliation is exact.
+
+## 2026-09-27 — Owner-accepted reconciliation tolerance
+- Capital platform realized P/L exceeds the fully evidenced/imported trade-history total by 54.39 USD.
+- Owner explicitly decided that further forensic reconciliation of this small residual is not worth delaying the project.
+- STC must preserve the residual as an unattributed limitation; it must not fabricate a balancing trade, fee, or adjustment.
+- Current open-position/platform parity and trading-day parity are treated as the controlling reconciliation acceptance criteria.
+- Ledger-only VOID rows must never count toward competition progress.
+
