@@ -40,3 +40,12 @@
 - Before changing the live gate, compare recent production signal supply under strict A+ and a balanced competition proxy using the same stored signal context.
 - Any future relaxed tier must preserve higher-timeframe non-opposition, family breadth, conflict limits, reduced risk, and manual approval.
 - Telegram/server notifications and owner-console visibility must represent the same actionable event stream; PR #166 is the controlling parity fix.
+
+## 2026-09-26 — Profit-protection release
+- PR #169 merged after green full CI and competition-critical CI.
+- Open-position management now uses a closed-bar high-water R mark and a progressive locked-profit floor.
+- If current R falls below the earned locked floor, STC recommends EXIT_NOW rather than allowing a large unrealized gain to drift back toward the original stop.
+- This was cross-checked against the observed NAS100 and SPX500 profit-giveback incidents.
+- Execution remains manual; the change is management advice, not broker automation.
+- Latest Hostinger bundle workflow run: 36225098256.
+- Latest deployment artifact: stc-hostinger-hotfix-169-36225098256, artifact id 10900587381.
