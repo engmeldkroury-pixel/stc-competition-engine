@@ -61,3 +61,16 @@
 - Therefore the issue is not missing symbol ingestion; it is opportunity-source concentration in the generic live strategy.
 - Do not manufacture equal recommendation counts by lowering all gates.
 - Priority is symbol-specific opportunity sourcing using validated research components, with live/Pine parity and shadow evidence before promotion.
+
+## 2026-09-26 — Dual-competition parity and AMP specialization
+- Live pre-deployment readback proved the deployed AMP runtime is stale:
+  - competition_mode is absent/null;
+  - live reasons still report high_conviction_gate;
+  - live quality floor remains 90/100;
+  - AMP NEW_LOCKED_PLAN notification count is zero in the current audit window.
+- Current main instead treats both Capital and AMP as competition mode with a shared 84/100 opportunity floor while retaining manual approval, sizing and risk controls.
+- Consolidated Hostinger PHP bundle run 36248177372 and full CI run 36248177360 both succeeded.
+- AMP core production feeds currently scan 16 symbols.
+- Seven AMP core symbols have validated exact-provider Wave-3 15m research profiles: MCL, MNG, MGC, MJY, MET, ZN and ZB.
+- PR #185 merged as 5173c1296a01573ff2bca94729eabf08a3b29b35 after full and critical CI success.
+- AMP component profiles remain research/shadow-only until exact causal Pine payload parity is demonstrated. No approximate Pine mapping may receive live authority.
