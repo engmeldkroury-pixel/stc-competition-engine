@@ -95,3 +95,11 @@
 - This is a correctness fix, not a gate relaxation.
 - Per-symbol gate-failure attribution is accepted as read-only research evidence for diagnosing opportunity concentration before any live weight/threshold change.
 
+## 2026-09-27 — External AI review disposition
+- Do not adopt arbitrary live correlation rules such as 0.70/0.85 or a fixed -10 quality penalty without same-provider out-of-sample evidence.
+- Existing deterministic risk clusters remain the production concentration control; statistical correlation is research-only for now.
+- Do not replace progressive high-water management directly with ATR trailing; compare alternatives in shadow/forward evidence first.
+- Monte Carlo is a robustness tool for out-of-sample trade paths, not a standalone optimizer for the 84 threshold.
+- Asset-class/session normalization is a research hypothesis to be tested using gate-failure distributions before live policy changes.
+- Platform truth remains authoritative over an unreconciled STC position ledger.
+- No portfolio-management output should be treated as authoritative until ledger reconciliation is exact.
