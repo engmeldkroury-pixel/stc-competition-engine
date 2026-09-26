@@ -130,3 +130,28 @@ A missing optional score previously used raw `-1.0` before direction-sign multip
 
 The only owner blocker before automated Hostinger deployment is correcting `HOSTINGER_SSH_PRIVATE_KEY` with the private file (no `.pub`).
 
+## Reconciliation superseding checkpoint — 2026-09-27
+The stale-ledger blocker is RESOLVED to the owner-accepted evidence standard.
+
+Evidence:
+- reconciliation workflow `.github/workflows/stc-ledger-reconcile.yml`;
+- initial write run `36274630447`;
+- VOID progress-count bug fixed in `4dfbb26a6c65ed80ef57e7e53e0f76a474f09c8e`;
+- Hostinger correction deploy `36274716351`;
+- idempotent successful reconciliation run `36274737170`;
+- final production readback `36274764925`.
+
+Current Capital open ledger:
+- NAS100 LONG 7.7 @ 30416.071, SL 30319.1, TP 30758.6;
+- SPX500 LONG 40 @ 7737.25, SL 7716.0, TP 7797.0.
+
+Competition progress:
+- Capital: 4 qualifying UTC trading days, 9 closed, 2 open, evidenced realized P/L -3370.87 USD.
+- AMP: 3 qualifying UTC trading days, 2 closed, 0 open, realized P/L +991.25 USD.
+- Owner accepted leaving Capital residual -54.39 USD unattributed.
+
+Do not invent a synthetic trade for that residual.
+
+Next unresolved production proof:
+- first natural post-deploy AMP signal carrying `competition_mode=true` and `quality_floor=84`.
+
