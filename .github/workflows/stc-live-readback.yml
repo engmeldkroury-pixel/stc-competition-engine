@@ -64,6 +64,27 @@ jobs:
           cards.sort(key=lambda row: row.get("symbol") or "")
           print("STC_LIVE_CAPITAL_SIGNAL_READBACK=" + json.dumps(cards, sort_keys=True))
 
+          amp_cards = []
+          for card in data.get("cards") or []:
+              if card.get("competition_id") != "amp-futures-sep-2026":
+                  continue
+              amp_cards.append({
+                  "symbol": card.get("symbol"),
+                  "source_time": card.get("source_time"),
+                  "recommendation": card.get("recommendation"),
+                  "pre_gate_recommendation": card.get("pre_gate_recommendation"),
+                  "setup_grade": card.get("setup_grade"),
+                  "setup_quality_score": card.get("setup_quality_score"),
+                  "quality_gate_passed_live_php": card.get("quality_gate_passed"),
+                  "quality_gate_failures": card.get("quality_gate_failures"),
+                  "locked_plan_present_live_php": card.get("locked_trade_plan") is not None,
+                  "opportunity_active_live_php": card.get("opportunity_active"),
+                  "has_open_position": card.get("has_open_position"),
+                  "composite_score": card.get("composite_score"),
+              })
+          amp_cards.sort(key=lambda row: row.get("symbol") or "")
+          print("STC_LIVE_AMP_SIGNAL_READBACK=" + json.dumps(amp_cards, sort_keys=True))
+
           active = []
           for card in data.get("cards") or []:
               if card.get("competition_id") != "capital-africa-sep-2026":
@@ -136,6 +157,18 @@ jobs:
               if typ in by_symbol[sym]:
                   by_symbol[sym][typ] += 1
           print("STC_LIVE_NOTIFICATION_SYMBOL_COUNTS=" + json.dumps(dict(sorted(by_symbol.items())), sort_keys=True))
+          amp_events = [
+              e for e in events
+              if e.get("competition_id") == "amp-futures-sep-2026"
+          ]
+          amp_by_symbol = defaultdict(lambda: {"total": 0, "NEW_LOCKED_PLAN": 0, "POSITION_MANAGEMENT": 0})
+          for e in amp_events:
+              sym = e.get("symbol") or "NONE"
+              typ = e.get("event_type") or "UNKNOWN"
+              amp_by_symbol[sym]["total"] += 1
+              if typ in amp_by_symbol[sym]:
+                  amp_by_symbol[sym][typ] += 1
+          print("STC_LIVE_AMP_NOTIFICATION_SYMBOL_COUNTS=" + json.dumps(dict(sorted(amp_by_symbol.items())), sort_keys=True))
           print("STC_LIVE_NOTIFICATION_CONFIG=" + json.dumps(config, sort_keys=True))
           print(
               "STC_LIVE_NOTIFICATION_RECENT="
