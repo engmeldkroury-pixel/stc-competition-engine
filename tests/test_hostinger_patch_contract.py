@@ -764,6 +764,8 @@ def test_amp_weekend_crypto_support_and_qualification_urgency_are_owner_visible(
     assert "MUST_TRADE_TODAY" in control
     assert "STC QUALIFICATION URGENT" in ui
     assert "maybeNotifyQualification()" in ui
+    assert "Verified coverage after 24x7 crypto alert" in ui
+    assert "Official competition universe" in ui
 
 
 def test_amp_qualification_urgency_reaches_server_notifications_without_trade_authority():
