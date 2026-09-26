@@ -7,7 +7,7 @@ from pydantic import ValidationError
 from .approval import build_approval_envelope
 from .calibration_registry import calibration_to_public_dict, lookup_runtime_calibration
 from .competition_profiles import get_profile
-from .community_shadow import build_community_component_shadow
+from .community_shadow import build_community_component_shadow, build_frozen_competition_component_support
 from .evidence_engine import aggregate_live_family_scores
 from .models import FactorScores, SignalEvaluationRequest, TradingViewWebhook
 from .pipeline_receipt import build_pipeline_receipt
@@ -17,6 +17,7 @@ from .signals import (
     confirmation_score_from_tradingview,
     historical_regime_from_tradingview,
     high_conviction_assessment,
+    competition_candidate_recommendation,
     competition_opportunity_assessment,
     liquidity_quality_from_tradingview,
     setup_quality_score,
@@ -103,6 +104,11 @@ def decide_bridge_event(event_id: str, payload: dict) -> dict:
         str(tv.timeframe),
         tv.community_component_signals,
     )
+    frozen_component_support = build_frozen_competition_component_support(
+        tv.symbol,
+        str(tv.timeframe),
+        tv.community_component_signals,
+    )
     short_term_technical = short_term_score_from_tradingview(tv)
     confirmation_score = confirmation_score_from_tradingview(tv)
     historical_regime = historical_regime_from_tradingview(tv)
@@ -150,13 +156,18 @@ def decide_bridge_event(event_id: str, payload: dict) -> dict:
         ),
     )
     base_result = evaluate(req).model_copy(update={"signal_id": deterministic_signal_id(event_id)})
+    candidate_recommendation, direction_source = competition_candidate_recommendation(
+        base_recommendation=base_result.recommendation,
+        frozen_component_score=frozen_component_support["weighted_score"],
+        frozen_component_complete=bool(frozen_component_support["complete"]),
+    )
     competition_mode = tv.competition_id in {
         "capital-africa-sep-2026",
         "amp-futures-sep-2026",
     }
     if competition_mode:
         gate_passed, gate_failures = competition_opportunity_assessment(
-            recommendation=base_result.recommendation,
+            recommendation=candidate_recommendation,
             composite_score=base_result.composite_score,
             short_term_technical=short_term_technical,
             historical_regime=historical_regime,
@@ -167,6 +178,7 @@ def decide_bridge_event(event_id: str, payload: dict) -> dict:
             trend_2h_score=tv.trend_2h_score,
             trend_4h_score=tv.trend_4h_score,
             trend_1m_score=tv.trend_1m_score,
+            frozen_component_score=frozen_component_support["weighted_score"],
             family_evidence_score=None if family_evidence is None else family_evidence.score,
             family_agreement_ratio=None if family_evidence is None else family_evidence.agreement_ratio,
             family_aligned_count=None if family_evidence is None else family_evidence.aligned_families,
@@ -192,7 +204,7 @@ def decide_bridge_event(event_id: str, payload: dict) -> dict:
         )
 
     quality_score = setup_quality_score(
-        recommendation=base_result.recommendation,
+        recommendation=candidate_recommendation,
         short_term_technical=short_term_technical,
         confirmation_score=confirmation_score,
         trend_2h_score=tv.trend_2h_score,
@@ -209,7 +221,7 @@ def decide_bridge_event(event_id: str, payload: dict) -> dict:
     final_gate_passed = gate_passed and quality_score >= quality_floor
     if gate_passed and quality_score < quality_floor:
         gate_failures = [*gate_failures, f"setup_quality_below_{quality_floor}"]
-    final_recommendation = base_result.recommendation if final_gate_passed else "WAIT"
+    final_recommendation = candidate_recommendation if final_gate_passed else "WAIT"
     gate_name = "competition_opportunity_gate" if competition_mode else "high_conviction_gate"
     gate_reason = f"{gate_name}=PASSED" if final_gate_passed else f"{gate_name}=BLOCKED"
     gate_details = (
@@ -259,8 +271,11 @@ def decide_bridge_event(event_id: str, payload: dict) -> dict:
     result_dict["competition_mode"] = competition_mode
     result_dict["quality_floor"] = quality_floor
     result_dict["pre_gate_recommendation"] = base_result.recommendation
+    result_dict["competition_candidate_recommendation"] = candidate_recommendation
+    result_dict["direction_source"] = direction_source
     result_dict["quality_gate_failures"] = gate_failures
     result_dict["community_component_shadow"] = community_component_shadow
+    result_dict["frozen_component_support"] = frozen_component_support
     result_dict["live_family_evidence"] = None if family_evidence is None else {
         "score": family_evidence.score,
         "agreement_ratio": family_evidence.agreement_ratio,
