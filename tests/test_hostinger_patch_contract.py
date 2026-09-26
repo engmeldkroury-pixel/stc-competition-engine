@@ -405,7 +405,16 @@ def test_competition_progress_is_exposed_with_qualification_days_and_trade_count
     assert "return 3;" in control
     assert "return 5;" in control
     assert "'competition_progress' => [" in snapshot
-    for label in ("Qualifying trading days", "Days remaining", "Trades entered", "Open / closed", "Recorded trade actions", "Realized competition P/L"):
+    for label in (
+        "Qualifying trading days",
+        "Qualification days still needed",
+        "UTC calendar dates left incl. today",
+        "Qualification status",
+        "Trades entered",
+        "Open / closed",
+        "Recorded trade actions",
+        "Realized competition P/L",
+    ):
         assert label in ui
 
 
@@ -737,3 +746,20 @@ def test_php_portfolio_supervisor_tracks_closed_bar_high_water_profit_lock():
     assert "Peak closed-bar R:" in notify
     assert "Locked R floor:" in notify
     assert "192" in notify
+
+
+def test_amp_weekend_crypto_support_and_qualification_urgency_are_owner_visible():
+    control = (PATCH / "portfolio_control.php").read_text(encoding="utf-8")
+    ui = (PATCH / "operator.php").read_text(encoding="utf-8")
+
+    for symbol in ("CME:MBT1!", "CME:MET1!", "CME:MSL1!", "CME:MXP1!"):
+        assert symbol in control
+    assert "'CME:MSL1!' => 25.0" in control
+    assert "'CME:MXP1!' => 2500.0" in control
+    assert "'official_allowed_symbols' => 94" in control
+    assert "'production_feed_symbols' => 18" in control
+    assert "'qualification_urgency' => $qualificationUrgency" in control
+    assert "'must_trade_today' => $qualificationUrgency === 'MUST_TRADE_TODAY'" in control
+    assert "MUST_TRADE_TODAY" in control
+    assert "STC QUALIFICATION URGENT" in ui
+    assert "maybeNotifyQualification()" in ui
