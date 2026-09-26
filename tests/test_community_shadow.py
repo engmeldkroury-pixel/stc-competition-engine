@@ -138,3 +138,87 @@ def test_invalid_shadow_signal_value_is_stored_as_context_only():
     assert result["status"] == "ingested_context"
     assert result["decision"]["action"] == "store_context_only"
     assert result["decision"]["reason"] == "insufficient_signal_payload"
+
+
+def test_amp_zb_frozen_range_filter_shadow_is_weighted_research_only():
+    shadow = build_community_component_shadow(
+        "CBOT:ZB1!",
+        "15",
+        {"range_filter_guikroth": -0.75},
+    )
+    assert shadow["status"] == "COMPLETE_SHADOW_EVIDENCE"
+    assert shadow["weighted_score"] == -0.75
+    assert shadow["normalized_weights"] == {"range_filter_guikroth": 1.0}
+    assert shadow["selected_parameters"]["range_filter_guikroth"]["sampling_period"] == 100
+    assert shadow["evidence_source"] == "research/community_shadow_registry.json"
+    assert shadow["live_authority"] is False
+    assert shadow["used_in_quality_gate"] is False
+    assert shadow["used_in_risk"] is False
+    assert shadow["used_in_approval"] is False
+
+
+def test_amp_mcl_frozen_ssl_shadow_is_weighted_research_only():
+    shadow = build_community_component_shadow(
+        "NYMEX:MCL1!",
+        "15m",
+        {"ssl_hybrid": 1.0},
+    )
+    assert shadow["status"] == "COMPLETE_SHADOW_EVIDENCE"
+    assert shadow["weighted_score"] == 1.0
+    assert shadow["normalized_weights"] == {"ssl_hybrid": 1.0}
+    assert shadow["selected_parameters"]["ssl_hybrid"] == {
+        "baseline_length": 100,
+        "ssl_length": 20,
+    }
+    assert shadow["live_authority"] is False
+
+
+def test_amp_mjy_candidates_are_observed_without_inventing_ensemble_weight():
+    shadow = build_community_component_shadow(
+        "CME_MINI:MJY1!",
+        "15",
+        {
+            "alphatrend": 1.0,
+            "waddah_attar_explosion": 1.0,
+            "trendilo": -1.0,
+        },
+    )
+    assert shadow["status"] == "CANDIDATE_ONLY_SHADOW_EVIDENCE"
+    assert shadow["complete"] is True
+    assert shadow["weighted_score"] is None
+    assert shadow["normalized_weights"] == {}
+    assert shadow["candidate_states"]["trendilo"] == "MULTITF_CONFIRMED"
+    assert shadow["candidate_states"]["alphatrend"] == "SHADOW"
+    assert shadow["selected_parameters"]["trendilo"]["lookback"] == 50
+    assert shadow["live_authority"] is False
+    assert shadow["used_in_quality_gate"] is False
+    assert shadow["used_in_risk"] is False
+    assert shadow["used_in_approval"] is False
+
+
+def test_amp_mjy_without_component_payload_waits_for_candidate_signals():
+    shadow = build_community_component_shadow(
+        "CME_MINI:MJY1!",
+        "15",
+        None,
+    )
+    assert shadow["status"] == "AWAITING_CANDIDATE_SIGNALS"
+    assert shadow["complete"] is False
+    assert shadow["weighted_score"] is None
+    assert sorted(shadow["missing_components"]) == [
+        "alphatrend",
+        "trendilo",
+        "waddah_attar_explosion",
+    ]
+
+
+def test_amp_nonprofile_symbol_does_not_receive_invented_shadow_weight():
+    shadow = build_community_component_shadow(
+        "CME_MINI:MES1!",
+        "15",
+        {"range_filter_guikroth": 1.0},
+    )
+    assert shadow["status"] == "NO_RESEARCH_PROFILE_FOR_SYMBOL_TIMEFRAME"
+    assert shadow["weighted_score"] is None
+    assert shadow["normalized_weights"] == {}
+    assert shadow["unexpected_components_ignored"] == ["range_filter_guikroth"]
