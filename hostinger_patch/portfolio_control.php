@@ -46,6 +46,8 @@ function stc_price_value_usd(string $competitionId, string $symbol, float $refer
             'CME_MINI:M6A1!' => 10000.0,
             'CME:MBT1!' => 0.1,
             'CME:MET1!' => 0.1,
+            'CME:MSL1!' => 25.0,
+            'CME:MXP1!' => 2500.0,
             'CBOT:ZN1!' => 1000.0,
             'CBOT:ZB1!' => 1000.0,
         ];
@@ -448,6 +450,8 @@ function stc_max_open_position(string $competitionId, string $symbol): ?float {
             'CME_MINI:M6A1!' => 25.0,
             'CME:MBT1!' => 25.0,
             'CME:MET1!' => 25.0,
+            'CME:MSL1!' => 5.0,
+            'CME:MXP1!' => 5.0,
             'CBOT:ZN1!' => 100.0,
             'CBOT:ZB1!' => 100.0,
         ];
@@ -551,7 +555,14 @@ function stc_competition_rule_summary(string $competitionId): array {
             'leverage' => [
                 'futures' => 20.0,
             ],
-            'production_feed_symbols' => 16,
+            'production_feed_symbols' => 18,
+            'official_allowed_symbols' => 94,
+            'weekend_crypto_feed_symbols' => [
+                'CME:MBT1!',
+                'CME:MET1!',
+                'CME:MSL1!',
+                'CME:MXP1!',
+            ],
             'official_rules_url' => 'https://www.tradingview.com/the-leap/amp-futures-september-2026/rules/',
         ];
     }
@@ -604,6 +615,26 @@ function stc_competition_progress(PDO $pdo, string $competitionId): array {
     $qualifyingDays = count($dates);
     $daysRemaining = max(0, $requiredDays - $qualifyingDays);
 
+    $rule = stc_competition_rule_summary($competitionId);
+    $now = new DateTimeImmutable('now', new DateTimeZone('UTC'));
+    $end = new DateTimeImmutable((string)$rule['end_utc']);
+    $today = new DateTimeImmutable($now->format('Y-m-d') . 'T00:00:00+00:00');
+    $endDate = new DateTimeImmutable($end->format('Y-m-d') . 'T00:00:00+00:00');
+    $calendarDatesAvailable = $now < $end
+        ? max(0, (int)$today->diff($endDate)->format('%a') + 1)
+        : 0;
+    $todayAlreadyCounts = in_array($now->format('Y-m-d'), $dates, true);
+    $datesStillNeeded = max(0, $requiredDays - $qualifyingDays);
+    if ($datesStillNeeded === 0) {
+        $qualificationUrgency = 'QUALIFIED';
+    } elseif ($calendarDatesAvailable < $datesStillNeeded) {
+        $qualificationUrgency = 'INSUFFICIENT_REMAINING_UTC_DATES';
+    } elseif (!$todayAlreadyCounts && $calendarDatesAvailable === $datesStillNeeded) {
+        $qualificationUrgency = 'MUST_TRADE_TODAY';
+    } else {
+        $qualificationUrgency = 'ON_TRACK';
+    }
+
     $actionStmt = $pdo->prepare(
         "SELECT COUNT(*) FROM stc_position_events e "
         . "JOIN stc_positions p ON p.position_id = e.position_id "
@@ -617,6 +648,11 @@ function stc_competition_progress(PDO $pdo, string $competitionId): array {
         'qualifying_trading_days' => $qualifyingDays,
         'required_trading_days' => $requiredDays,
         'days_remaining' => $daysRemaining,
+        'qualifying_days_remaining' => $daysRemaining,
+        'utc_calendar_dates_remaining_including_today' => $calendarDatesAvailable,
+        'today_utc_already_qualifies' => $todayAlreadyCounts,
+        'qualification_urgency' => $qualificationUrgency,
+        'must_trade_today' => $qualificationUrgency === 'MUST_TRADE_TODAY',
         'eligible_by_days' => $daysRemaining === 0,
         'qualifying_dates_utc' => $dates,
         'total_entries' => (int)($row['total_entries'] ?? 0),
@@ -655,6 +691,8 @@ function stc_risk_cluster(string $symbol): string {
         'CME_MINI:M6A1!' => 'fx_usd',
         'CME:MBT1!' => 'crypto',
         'CME:MET1!' => 'crypto',
+        'CME:MSL1!' => 'crypto',
+        'CME:MXP1!' => 'crypto',
         'CBOT:ZN1!' => 'rates',
         'CBOT:ZB1!' => 'rates',
     ];
