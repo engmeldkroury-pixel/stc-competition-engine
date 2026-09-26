@@ -308,3 +308,13 @@ Research-only next queue:
 - statistical correlation diagnostics;
 - high-water vs volatility trailing A/B;
 - threshold walk-forward + Monte Carlo robustness.
+
+## 2026-09-27 — Deployment complete; reconciliation evidence required
+- Hostinger deployment run `36273149982`: SUCCESS.
+- Live Readback run `36273178907`: SUCCESS.
+- No further SSH/Hostinger setup is required.
+- Next task is platform-versus-STC position reconciliation before portfolio/high-water management is trusted.
+- Owner should provide a current Positions/Open Positions screenshot from each active competition account, showing symbol, side, quantity, entry, and stop/TP when visible.
+- Do not modify STC ledger rows until the comparison is complete.
+- Separately, wait for the next natural AMP event to confirm fresh post-deploy competition metadata.
+
