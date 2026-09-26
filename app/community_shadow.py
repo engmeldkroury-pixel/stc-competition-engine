@@ -105,6 +105,100 @@ CAPITAL_NO_VALIDATED_COMMUNITY_PROFILE = frozenset(
     }
 )
 
+AMP_COMMUNITY_15M_EVIDENCE_SOURCE = (
+    "github-actions:35916027610/stc-native-community-15m"
+)
+
+# Stable AMP profiles from the verified 2026-09-23 exact-provider 15m run.
+# Symbols whose profile changed in later research waves (ZB/MJY/MCL) are
+# intentionally excluded until their post-wave weights are reconciled.
+AMP_COMMUNITY_15M_PROFILES: dict[str, dict[str, float]] = {
+    "NYMEX:MNG1!": {
+        "range_filter_guikroth": 1.0,
+    },
+    "COMEX_MINI:MGC1!": {
+        "qqe_mod": 0.5698649457861664,
+        "ssl_hybrid": 0.43013505421383363,
+    },
+    "CBOT:ZN1!": {
+        "schaff_trend_cycle": 0.3704593624494359,
+        "alphatrend": 0.35614555898192934,
+        "qqe_mod": 0.27339507856863476,
+    },
+    "CME:MET1!": {
+        "waddah_attar_explosion": 0.6080762173214392,
+        "ut_bot_alerts": 0.39192378267856076,
+    },
+}
+
+AMP_COMMUNITY_15M_PARAMETERS: dict[str, dict[str, dict[str, float | int]]] = {
+    "NYMEX:MNG1!": {
+        "range_filter_guikroth": {
+            "sampling_period": 100,
+            "range_multiplier": 2.0,
+        },
+    },
+    "COMEX_MINI:MGC1!": {
+        "qqe_mod": {
+            "rsi_period": 8,
+            "smoothing": 5,
+            "fast_factor": 3.0,
+            "slow_factor": 1.8,
+            "threshold": 3.0,
+            "bb_length": 40,
+            "bb_mult": 0.35,
+        },
+        "ssl_hybrid": {
+            "baseline_length": 60,
+            "ssl_length": 15,
+        },
+    },
+    "CBOT:ZN1!": {
+        "schaff_trend_cycle": {
+            "cycle_length": 12,
+            "fast_length": 26,
+            "slow_length": 50,
+            "smoothing": 0.5,
+        },
+        "alphatrend": {
+            "period": 20,
+            "coefficient": 1.0,
+        },
+        "qqe_mod": {
+            "rsi_period": 8,
+            "smoothing": 5,
+            "fast_factor": 3.0,
+            "slow_factor": 1.8,
+            "threshold": 3.0,
+            "bb_length": 40,
+            "bb_mult": 0.35,
+        },
+    },
+    "CME:MET1!": {
+        "waddah_attar_explosion": {
+            "fast_length": 12,
+            "slow_length": 26,
+            "bb_length": 20,
+            "bb_mult": 2.0,
+            "sensitivity": 100.0,
+            "dead_zone_atr_period": 100,
+            "dead_zone_mult": 3.0,
+        },
+        "ut_bot_alerts": {
+            "atr_period": 14,
+            "key_value": 2.0,
+        },
+    },
+}
+
+AMP_PROFILE_RECONCILIATION_PENDING = frozenset(
+    {
+        "CBOT:ZB1!",
+        "CME_MINI:MJY1!",
+        "NYMEX:MCL1!",
+    }
+)
+
 
 def _normalize_timeframe(timeframe: str) -> str:
     value = str(timeframe).strip().lower()
@@ -123,16 +217,25 @@ def build_community_component_shadow(
     by the frozen research profile is present in the payload.
     """
     normalized_timeframe = _normalize_timeframe(timeframe)
-    profile = (
-        CAPITAL_COMMUNITY_15M_PROFILES.get(symbol)
-        if normalized_timeframe == "15"
-        else None
-    )
+    profile = None
+    selected_parameters: dict[str, dict[str, float | int]] = {}
+    evidence_source = EVIDENCE_SOURCE
+    if normalized_timeframe == "15":
+        if symbol in CAPITAL_COMMUNITY_15M_PROFILES:
+            profile = CAPITAL_COMMUNITY_15M_PROFILES[symbol]
+            selected_parameters = CAPITAL_COMMUNITY_15M_PARAMETERS.get(symbol, {})
+        elif symbol in AMP_COMMUNITY_15M_PROFILES:
+            profile = AMP_COMMUNITY_15M_PROFILES[symbol]
+            selected_parameters = AMP_COMMUNITY_15M_PARAMETERS.get(symbol, {})
+            evidence_source = AMP_COMMUNITY_15M_EVIDENCE_SOURCE
     supplied = dict(component_signals or {})
 
     if profile is None:
         status = (
-            "NO_VALIDATED_COMMUNITY_PROFILE"
+            "PROFILE_RECONCILIATION_PENDING"
+            if normalized_timeframe == "15"
+            and symbol in AMP_PROFILE_RECONCILIATION_PENDING
+            else "NO_VALIDATED_COMMUNITY_PROFILE"
             if normalized_timeframe == "15"
             and symbol in CAPITAL_NO_VALIDATED_COMMUNITY_PROFILE
             else "NO_RESEARCH_PROFILE_FOR_SYMBOL_TIMEFRAME"
@@ -141,7 +244,7 @@ def build_community_component_shadow(
             "status": status,
             "symbol": symbol,
             "timeframe": normalized_timeframe,
-            "evidence_source": EVIDENCE_SOURCE,
+            "evidence_source": evidence_source,
             "expected_components": [],
             "normalized_weights": {},
             "selected_parameters": {},
@@ -181,10 +284,10 @@ def build_community_component_shadow(
         ),
         "symbol": symbol,
         "timeframe": normalized_timeframe,
-        "evidence_source": EVIDENCE_SOURCE,
+        "evidence_source": evidence_source,
         "expected_components": list(profile),
         "normalized_weights": dict(profile),
-        "selected_parameters": dict(CAPITAL_COMMUNITY_15M_PARAMETERS.get(symbol, {})),
+        "selected_parameters": dict(selected_parameters),
         "observed_signals": observed,
         "missing_components": missing,
         "unexpected_components_ignored": unexpected,
