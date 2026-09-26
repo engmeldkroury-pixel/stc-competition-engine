@@ -757,7 +757,8 @@ def test_amp_weekend_crypto_support_and_qualification_urgency_are_owner_visible(
     assert "'CME:MSL1!' => 25.0" in control
     assert "'CME:MXP1!' => 2500.0" in control
     assert "'official_allowed_symbols' => 94" in control
-    assert "'production_feed_symbols' => 18" in control
+    assert "'production_feed_symbols' => 16" in control
+    assert "'verified_feed_symbols_after_24x7_crypto_alert' => 18" in control
     assert "'qualification_urgency' => $qualificationUrgency" in control
     assert "'must_trade_today' => $qualificationUrgency === 'MUST_TRADE_TODAY'" in control
     assert "MUST_TRADE_TODAY" in control
