@@ -128,11 +128,11 @@ selected =
     0.0
 
 plot(selected, "Selected frozen/candidate event", style=plot.style_columns)
-plot(profile == "CBOT:ZB1!" ? zbRange : na, "ZB Range Filter", display=display.data_window)
-plot(profile == "NYMEX:MCL1!" ? mclSsl : na, "MCL SSL Hybrid", display=display.data_window)
-plot(profile == "CME_MINI:MJY1!" ? mjyTrendilo : na, "MJY Trendilo", display=display.data_window)
-plot(profile == "CME_MINI:MJY1!" ? mjyAlpha : na, "MJY AlphaTrend", display=display.data_window)
-plot(profile == "CME_MINI:MJY1!" ? mjyWae : na, "MJY WAE", display=display.data_window)
+plot(profile == "CBOT:ZB1!" ? zbRange : na, "ZB Range Filter event", display=display.data_window)
+plot(profile == "NYMEX:MCL1!" ? mclSsl : na, "MCL SSL Hybrid event", display=display.data_window)
+plot(profile == "CME_MINI:MJY1!" ? mjyTrendilo : na, "MJY Trendilo event", display=display.data_window)
+plot(profile == "CME_MINI:MJY1!" ? mjyAlpha : na, "MJY AlphaTrend event", display=display.data_window)
+plot(profile == "CME_MINI:MJY1!" ? mjyWae : na, "MJY WAE event", display=display.data_window)
 
 plotshape(selected > 0, title="Shadow LONG event", style=shape.triangleup, location=location.bottom, size=size.tiny, text="S+")
 plotshape(selected < 0, title="Shadow SHORT event", style=shape.triangledown, location=location.top, size=size.tiny, text="S-")
