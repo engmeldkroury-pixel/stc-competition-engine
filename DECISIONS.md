@@ -49,3 +49,15 @@
 - Execution remains manual; the change is management advice, not broker automation.
 - Latest Hostinger bundle workflow run: 36225098256.
 - Latest deployment artifact: stc-hostinger-hotfix-169-36225098256, artifact id 10900587381.
+
+## 2026-09-26 — Capital opportunity concentration audit
+- Live production feed coverage is 10/10 Capital symbols; no symbol is omitted from the TradingView A/B feeds.
+- Notification history shows actionable NEW_LOCKED_PLAN events are materially concentrated:
+  - SPX500: 22;
+  - NAS100: 19;
+  - BTCUSD: 3;
+  - ETHUSD: 1;
+  - all other Capital symbols: 0 NEW_LOCKED_PLAN in the current 50-event audit window.
+- Therefore the issue is not missing symbol ingestion; it is opportunity-source concentration in the generic live strategy.
+- Do not manufacture equal recommendation counts by lowering all gates.
+- Priority is symbol-specific opportunity sourcing using validated research components, with live/Pine parity and shadow evidence before promotion.
