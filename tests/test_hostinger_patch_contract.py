@@ -580,6 +580,7 @@ def test_competition_opportunity_grade_is_centralized_end_to_end():
     assert "function stc_signal_quality_gate_eligible" in cloud
     assert "COMPETITION_OPPORTUNITY" in cloud
     assert "capital-africa-sep-2026" in cloud
+    assert "amp-futures-sep-2026" in cloud
     assert "competition_mode" in cloud
     for text in (snapshot, approval, notify, control):
         assert "stc_signal_quality_gate_eligible($signal)" in text
