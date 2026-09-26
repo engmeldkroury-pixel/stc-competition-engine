@@ -381,6 +381,13 @@ try {
             'research_calibration' => is_array($signal['research_calibration'] ?? null) ? $signal['research_calibration'] : [
                 'status' => 'UNAVAILABLE',
             ],
+            'community_component_shadow' => is_array($signal['community_component_shadow'] ?? null) ? $signal['community_component_shadow'] : [
+                'status' => 'UNAVAILABLE',
+                'live_authority' => false,
+                'used_in_quality_gate' => false,
+                'used_in_risk' => false,
+                'used_in_approval' => false,
+            ],
             'pre_gate_recommendation' => (string)($signal['pre_gate_recommendation'] ?? ($signal['recommendation'] ?? 'WAIT')),
             'quality_gate_failures' => is_array($signal['quality_gate_failures'] ?? null) ? $signal['quality_gate_failures'] : [],
             'reasons' => is_array($signal['reasons'] ?? null) ? $signal['reasons'] : [],
