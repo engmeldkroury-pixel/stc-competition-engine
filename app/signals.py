@@ -165,7 +165,6 @@ def high_conviction_assessment(
     trend_2h_score: float | None,
     trend_4h_score: float | None,
     trend_1m_score: float | None,
-    frozen_component_score: float | None,
     family_evidence_score: float | None,
     family_agreement_ratio: float | None,
     family_aligned_count: int | None,
@@ -249,6 +248,7 @@ def competition_opportunity_assessment(
     family_agreement_ratio: float | None,
     family_aligned_count: int | None,
     family_conflict_count: int | None,
+    frozen_component_score: float | None = None,
 ) -> tuple[bool, list[str]]:
     """Competition-only opportunity gate.
 
