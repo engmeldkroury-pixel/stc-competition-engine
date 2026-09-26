@@ -150,7 +150,10 @@ def decide_bridge_event(event_id: str, payload: dict) -> dict:
         ),
     )
     base_result = evaluate(req).model_copy(update={"signal_id": deterministic_signal_id(event_id)})
-    competition_mode = tv.competition_id == "capital-africa-sep-2026"
+    competition_mode = tv.competition_id in {
+        "capital-africa-sep-2026",
+        "amp-futures-sep-2026",
+    }
     if competition_mode:
         gate_passed, gate_failures = competition_opportunity_assessment(
             recommendation=base_result.recommendation,
@@ -201,7 +204,7 @@ def decide_bridge_event(event_id: str, payload: dict) -> dict:
         family_evidence_score=None if family_evidence is None else family_evidence.score,
     )
 
-    quality_floor = 78 if competition_mode else 90
+    quality_floor = 84 if competition_mode else 90
     final_gate_passed = gate_passed and quality_score >= quality_floor
     if gate_passed and quality_score < quality_floor:
         gate_failures = [*gate_failures, f"setup_quality_below_{quality_floor}"]
