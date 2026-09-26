@@ -2645,3 +2645,12 @@ Current next action:
 - Current deterministic correlation-cluster risk caps remain active.
 - Current ATR volatility quality is already range/ATR normalized.
 - HalfTrend Python research adapter already has causal prefix-invariance coverage; live authority remains blocked on exact Pine parity + forward evidence.
+
+## Production deployment checkpoint — 2026-09-27
+- Secure Hostinger deployment run `36273149982`: SUCCESS.
+- All seven approved PHP files passed pre-deploy and post-deploy checksum verification.
+- Live Readback run `36273178907`: SUCCESS.
+- Production `competition_gate_audit` is now populated with Capital + AMP per-symbol failure attribution.
+- Next operational task: reconcile STC ledger state against current platform truth before relying on portfolio-management advice.
+- Fresh post-deploy AMP event is still required for end-to-end confirmation of current competition metadata.
+
