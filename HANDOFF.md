@@ -1,88 +1,119 @@
 # STC HANDOFF
 
-HANDOFF_STATUS: ACTIVE_LIVE_HOTFIX_VERIFIED  
-FROM_EXECUTOR: CODEX-0  
-TO_EXECUTOR_OR_REVIEWER: Next STC chat / Mohamed  
-TASK_OR_BATCH_ID: STC-20260924-CAPITAL-LIVE-HOTFIX  
+HANDOFF_STATUS: ACTIVE_DEPLOYMENT_BLOCKED_ON_ONE_OWNER_SECRET_CORRECTION  
+FROM_EXECUTOR: ChatGPT / STC project control  
+TO_EXECUTOR_OR_REVIEWER: Next STC chat / Mohamed / independent AI reviewer  
+TASK_OR_BATCH_ID: STC-20260926-SECURE-DEPLOY-STRATEGY-REVIEW  
 REPOSITORY: engmeldkroury-pixel/stc-competition-engine  
-CURRENT_MAIN_AFTER_ACCEPTED_SOURCE_WORK: includes PR #145, #146, #148, #149 and #150.
+DEFAULT_BRANCH: main  
+REPORTING_DATE: 2026-09-26
 
-## Completed work
-- Capital competition gate is live in Python/main.
-- Production processing has accepted live Capital events.
-- Live readback proved EURUSD SHORT / COMPETITION_OPPORTUNITY / quality 80.
-- Deployed Hostinger PHP is stale and rejects/hides that grade.
-- Six-file Hostinger hotfix bundle is built and SHA-256 recorded.
-- Community corrected 26-symbol research is archived.
-- Research-only community shadow plumbing is merged.
-- Six-symbol Python parity reference run completed.
+## Controlling boundaries
+- No automatic broker execution.
+- Human approval and manual competition order entry remain mandatory.
+- No secret values in repo/chat.
+- No silent provider substitution.
+- Setup quality is not win probability.
+- Platform account evidence overrides stale STC ledger state until reconciliation.
+- Research/shadow evidence cannot gain live authority without parity, forward evidence and explicit promotion.
 
-## Hostinger hotfix verification
-- Owner upload completed.
-- Post-upload Live Readback succeeded.
-- One-time expired EURUSD COMPETITION_OPPORTUNITY probe returned `expired_plan`, not `quality_gate_not_passed`.
-- The PR #145 A_PLUS-only mismatch is therefore closed in production.
-- Telegram is configured and prior deliveries show HTTP 200.
+## Current main policy
+- Capital.com Africa: competition mode.
+- AMP Futures: competition mode.
+- Shared competition-opportunity setup-quality floor: 84/100.
+- Higher-timeframe non-opposition, family evidence, liquidity/volatility quality and existing risk controls remain enforced.
+- Hostinger current-main eligibility accepts COMPETITION_OPPORTUNITY for both competitions.
 
-## Next live gate
-1. Observe the next fresh natural Capital COMPETITION_OPPORTUNITY.
-2. Require deployed `quality_gate_passed=true`.
-3. Confirm a locked plan is exposed while valid.
-4. Confirm Telegram NEW_LOCKED_PLAN delivery.
-5. Only then show Mohamed the manual competition order ticket.
+## Production deployment state
+A secure SSH-key deployment channel now exists:
+- workflow: `.github/workflows/stc-hostinger-deploy.yml`;
+- approved deploy scope: seven PHP files only;
+- PHP lint before upload;
+- server-side backup;
+- SHA-256 post-deploy verification;
+- no config.php;
+- no SQL migration.
 
-## Parallel research continuation
-Implement Pine streams against `research_benchmarks/community_pine_parity_manifest_20260924.json`.
-Do not promote community weights before exact parity evidence.
+Approved files:
+1. approval.php
+2. cloud_control.php
+3. notification_control.php
+4. operator.php
+5. operator_snapshot.php
+6. portfolio_control.php
+7. position.php
 
-## Protected scope
-- no automatic broker execution;
-- no secrets in repo/chat;
-- no silent provider substitution;
-- no setup-quality-as-win-probability claim;
-- no weight promotion without parity and separate acceptance.
+Hostinger target:
+`/home/u317452451/domains/stc.feama.site/public_html`
 
+## Current blocker
+Two deployment attempts failed safely before any production replacement:
+- run 36264035149: private key parse/libcrypto failure;
+- run 36264123000: hardened validation proved `HOSTINGER_SSH_PRIVATE_KEY` is not the private OpenSSH key.
 
-## Pine candidate status
-- PR #152 merged as `529f8efc3fa9bce06de16236dd8275cd6fb42c25`.
-- Diagnostic file: `tradingview/STC_COMMUNITY_SHADOW_PARITY_CANDIDATE.pine`.
-- Critical CI passed.
-- TradingView compile and exact event parity remain pending and are required before production-feed integration.
+Required owner action:
+- replace only GitHub Secret `HOSTINGER_SSH_PRIVATE_KEY` with the COMPLETE contents of local file `stc_hostinger_deploy` (without `.pub`);
+- it must begin with `-----BEGIN OPENSSH PRIVATE KEY-----` and end with `-----END OPENSSH PRIVATE KEY-----`;
+- do not paste the key in chat.
 
+No Hostinger production file was replaced by the failed runs.
 
-## Current live owner action — EURUSD
-- Fresh post-hotfix opportunity verified at 13:30 UTC.
-- SHORT / COMPETITION_OPPORTUNITY / 80/100.
-- Entry zone: 1.13479407..1.13706593.
-- Stop: 1.13933779.
-- Final TP: 1.127410525.
-- STC proposed quantity: 137552.49003.
-- Valid until: 14:00 UTC.
-- Telegram delivery: sent HTTP 200.
-- Direct scanner quote: unavailable due TradingView 429.
-- Next required human input: current EURUSD competition-platform price (and screenshot if the quantity field is shown as lots rather than units).
+## After owner correction
+1. retrigger STC Hostinger Deploy;
+2. require seven-file checksum verification;
+3. run permanent Live Readback;
+4. require structured dual-competition gate audit;
+5. require fresh AMP signal evidence with `competition_mode=true` and `quality_floor=84`;
+6. verify notification parity and high-water fields;
+7. reconcile STC open-position ledger to the actual competition platform before trusting portfolio-management output.
 
+## Strategy/research state
+- All 10 Capital symbols are scanned; opportunity concentration is not a scan-coverage defect.
+- Current actionable notification history is concentrated mainly in SPX500, NAS100, BTCUSD and ETHUSD.
+- Symbol-specific research/shadow direction:
+  - DOGEUSD: Range Filter + Schaff;
+  - EURUSD: Trendilo;
+  - ETHUSD: SSL Hybrid;
+  - NAS100: HalfTrend;
+  - then BTCUSD and USDZAR.
+- AMP exact-provider Wave-3 profile-ready core symbols:
+  - MCL, MNG, MGC, MJY, MET, ZN, ZB.
+- These remain research/shadow-only until exact causal Pine/Python parity and forward shadow evidence are complete.
+- No universal community composite is accepted.
+- QQE+SSL+WAE composite remains rejected from promotion.
+- Lorentzian corrected benchmark is only partially authoritative (2/17 completed subset); VuManChu diagnostic result is 0/26.
+- Adaptive shadow recalibration is sealed-batch/minimum-sample/capped and cannot self-promote live weights.
 
-## Locked-plan recovery incident
-- EURUSD was manually entered on TradingView, but STC approval was not completed before the next bar refresh.
-- Do NOT place a duplicate EURUSD order.
-- Root cause fixed in PR #155; Record Trade competition-field clarity fixed in PR #156.
-- New combined Hostinger ZIP SHA-256: `560ecbd32ecc82280ee385cedca179930904999c992e55b3d66bba33e9c585b7`.
-- Before recording the existing EURUSD position in STC, obtain the actual TradingView position row showing quantity, average fill, and whether SL/TP are truly attached.
+## Current strategy consistency debt
+- `app/event_decision.py` is the controlling live gate and uses shared 84 for Capital + AMP.
+- `app/competition_strategy.py` still exposes advisory `A_PLUS_ONLY` pace semantics.
+- Treat this as semantic/policy drift risk, not as evidence of a live 90 floor.
+- Next code-quality task after deployment/account reconciliation: centralize competition policy and add regression tests across advisory/live/Hostinger contracts.
 
+## Historical incidents already corrected in code
+- stale Hostinger eligibility vs current main;
+- locked-plan disappearance after a newer monitor-only bar;
+- Record Trade blank competition/bare-symbol target mismatch;
+- Record Trade browser-time/open-time rejection;
+- oversize fill recording and duplicate/same-direction re-entry;
+- weak profit protection after large MFE;
+- notification/server-console parity.
 
-## EURUSD position is now recorded
-- Do NOT open another EURUSD trade merely to make STC recognize it.
-- STC position id: `pos-d105686e5a029f0ef9d23cfbd44b48c0f0f826f1`.
-- Verified open position: SHORT 137552 @ 1.13677, stop 1.13930, management checkpoint 1.130818315, final TP 1.12740.
-- Live Readback run 36014399954 confirms open_positions=1 and total_entries=1.
-- The invalid_position_target defect is fixed in PR #157, but the final seven-file Hostinger bundle still requires owner upload before the UI/server fix is live.
+## Still unresolved operational issue
+STC position ledger was proven stale versus the competition platform. Do not treat portfolio supervision as authoritative until positions/quantities/entry/stop/TP are reconciled.
 
+## Durable review
+Full architecture + incident + strategy review:
+`docs/STC_FULL_SYSTEM_REVIEW_2026-09-26.md`
 
-## XAGUSD recovery incident
-- Record Trade failed with `manual_position_open_time_outside_competition_window`.
-- PR #158 merged; final 7-file Hostinger bundle SHA-256:
-  `9153f76fb6bb861400f5d07cac7fe54e5e653bba56907a275769f34505493ae6`.
-- Live Hostinger was still on the older Record Trade UI at last verification.
-- Do NOT duplicate the XAGUSD trade.
-- Before STC ledger recovery, verify whether the actual platform trade is still OPEN or already CLOSED.
+Project history/evidence:
+- `PROJECT_STATE.md`
+- `NEXT_TASK.md`
+- `DECISIONS.md`
+- `BATCH_REGISTER.csv`
+- `TEST_REGISTER.csv`
+- `RISK_REGISTER.csv`
+- `docs/STC_ADAPTIVE_RESEARCH_MASTER_LEDGER.md`
+
+## One next executable action
+Correct `HOSTINGER_SSH_PRIVATE_KEY`; then rerun secure Hostinger deployment and Live Readback. No other owner action is required before that.
