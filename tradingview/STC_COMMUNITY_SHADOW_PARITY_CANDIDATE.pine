@@ -12,7 +12,10 @@ profile = input.string(
         "CAPITALCOM:EURUSD",
         "CAPITALCOM:ETHUSD",
         "CAPITALCOM:DOGEUSD",
-        "CAPITALCOM:NAS100"
+        "CAPITALCOM:NAS100",
+        "NYMEX:MCL1!",
+        "CME_MINI:MJY1!",
+        "CBOT:ZB1!"
     ]
 )
 
@@ -30,9 +33,38 @@ trendiloSignal() =>
     event = currentState != 0 and currentState != previousState ? currentState : 0
     [currentState, event]
 
+trendiloMjySignal() =>
+    smoothing = 1
+    lookback = 50
+    almaOffset = 0.85
+    almaSigma = 6.0
+    bandMultiplier = 1.25
+    pch = math.abs(close) > 1e-15 ? (close - close[smoothing]) / close * 100.0 : 0.0
+    avpch = ta.alma(pch, lookback, almaOffset, almaSigma)
+    rms = bandMultiplier * math.sqrt(ta.sma(avpch * avpch, lookback))
+    currentState = not na(avpch) and not na(rms) ? (avpch > rms ? 1 : avpch < -rms ? -1 : 0) : 0
+    previousState = nz(currentState[1], 0)
+    event = currentState != 0 and currentState != previousState ? currentState : 0
+    [currentState, event]
+
 sslHybridSignal() =>
     baselineLength = 60
     sslLength = 15
+    baseline = ta.ema(close, baselineLength)
+    highMa = ta.ema(high, sslLength)
+    lowMa = ta.ema(low, sslLength)
+    int state = 0
+    state := not na(baseline) and not na(highMa) and not na(lowMa) ?
+         (close > highMa and close > baseline ? 1 :
+          close < lowMa and close < baseline ? -1 :
+          nz(state[1], 0)) :
+         nz(state[1], 0)
+    event = state != 0 and state != nz(state[1], 0) ? state : 0
+    [state, event]
+
+sslHybridMclSignal() =>
+    baselineLength = 100
+    sslLength = 20
     baseline = ta.ema(close, baselineLength)
     highMa = ta.ema(high, sslLength)
     lowMa = ta.ema(low, sslLength)
@@ -142,7 +174,9 @@ halfTrendSignal() =>
     [state, event]
 
 [trendiloState, trendiloEvent] = trendiloSignal()
+[mjyTrendiloState, mjyTrendiloEvent] = trendiloMjySignal()
 [sslState, sslEvent] = sslHybridSignal()
+[mclSslState, mclSslEvent] = sslHybridMclSignal()
 [rangeState, rangeEvent] = rangeFilterSignal()
 [schaffState, schaffEvent] = schaffSignal()
 [halfTrendState, halfTrendEvent] = halfTrendSignal()
@@ -152,6 +186,9 @@ selectedEvent =
     profile == "CAPITALCOM:ETHUSD" ? sslEvent :
     profile == "CAPITALCOM:DOGEUSD" ? (rangeEvent != 0 ? rangeEvent : schaffEvent) :
     profile == "CAPITALCOM:NAS100" ? halfTrendEvent :
+    profile == "NYMEX:MCL1!" ? mclSslEvent :
+    profile == "CME_MINI:MJY1!" ? mjyTrendiloEvent :
+    profile == "CBOT:ZB1!" ? rangeEvent :
     0.0
 
 plot(selectedEvent, "Selected event", style=plot.style_columns)
@@ -160,6 +197,9 @@ plot(profile == "CAPITALCOM:ETHUSD" ? sslEvent : na, "SSL Hybrid event", display
 plot(profile == "CAPITALCOM:DOGEUSD" ? rangeEvent : na, "Range Filter event", display=display.data_window)
 plot(profile == "CAPITALCOM:DOGEUSD" ? schaffEvent : na, "Schaff event", display=display.data_window)
 plot(profile == "CAPITALCOM:NAS100" ? halfTrendEvent : na, "HalfTrend event", display=display.data_window)
+plot(profile == "NYMEX:MCL1!" ? mclSslEvent : na, "MCL SSL Hybrid event", display=display.data_window)
+plot(profile == "CME_MINI:MJY1!" ? mjyTrendiloEvent : na, "MJY Trendilo event", display=display.data_window)
+plot(profile == "CBOT:ZB1!" ? rangeEvent : na, "ZB Range Filter event", display=display.data_window)
 
 plotshape(selectedEvent > 0, title="Shadow LONG event", style=shape.triangleup, location=location.bottom, size=size.tiny, text="S+")
 plotshape(selectedEvent < 0, title="Shadow SHORT event", style=shape.triangledown, location=location.top, size=size.tiny, text="S-")
