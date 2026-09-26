@@ -397,6 +397,24 @@ function macroHtml(m){
  return html;
 }
 
+function communityShadowHtml(c){
+ const sh=c.community_component_shadow||null;
+ if(!sh || sh.status==='UNAVAILABLE')return '';
+ const observed=sh.observed_signals||{};
+ const entries=Object.entries(observed);
+ const pills=entries.length
+   ?entries.map(([k,v])=>'<span class="pill">'+esc(k)+' '+(Number(v)>=0?'+':'')+num(v,2)+'</span>').join('')
+   :'<span class="small">No exact component event on this bar.</span>';
+ const weighted=sh.weighted_score===null||sh.weighted_score===undefined?'-':(Number(sh.weighted_score)>=0?'+':'')+num(sh.weighted_score,2);
+ const complete=sh.complete===true?'COMPLETE':'INCOMPLETE';
+ return '<div class="orderbox" style="margin-top:8px"><div class="small">EXACT COMPONENT SHADOW — RESEARCH ONLY</div>'
+   +'<div class="row"><span>Status</span><span class="value">'+esc(sh.status||'-')+' • '+complete+'</span></div>'
+   +'<div class="row"><span>Weighted shadow score</span><span class="value">'+esc(weighted)+'</span></div>'
+   +'<div class="small" style="margin-top:6px">'+pills+'</div>'
+   +'<div class="small wait" style="margin-top:6px">No live authority • not used in quality gate, risk, approval, or execution.</div>'
+   +'</div>';
+}
+
 function convictionHtml(c){
  const q=Number(c.setup_quality_score);
  const qText=Number.isFinite(q)?Math.round(q)+'/100':'not scored';
@@ -466,7 +484,9 @@ function convictionHtml(c){
    +'<div class="small">Setup Quality is not win probability. Probability is shown only after out-of-sample + forward calibration on the same live entry timeframe.</div>'
    +featureHtml
    +'<div class="small" style="margin-top:6px">'+mtf+'</div>'
-   +familyHtml+'</div>';
+   +familyHtml
+   +communityShadowHtml(c)
+   +'</div>';
 }
 
 function latestLockedPlanContextHtml(c){
@@ -595,8 +615,9 @@ function maybeNotify(cards){
    const key=String(c.locked_trade_plan.plan_id||c.signal_id);
    if(seenSignalPlans.has(key))continue;
    const oi=c.order_instruction||{};
-   const body=c.symbol+' • A+ '+c.recommendation+' • Quality '+(Number.isFinite(Number(c.setup_quality_score))?Math.round(Number(c.setup_quality_score))+'/100':'-')+' • '+(oi.order_type||'ENTRY')+' • Entry '+formatPlatformPrice(c.symbol,c.locked_trade_plan.entry_min,'floor')+' - '+formatPlatformPrice(c.symbol,c.locked_trade_plan.entry_max,'ceil')+' • SL '+planPriceText(c,c.locked_trade_plan.initial_stop,'stop')+' • Final TP '+planPriceText(c,c.locked_trade_plan.target2,'target')+' • Expires '+formatLocalTime(c.locked_trade_plan.valid_until);
-   document.title='A+ '+c.recommendation+' • '+c.symbol+' • STC';
+   const grade=String(c.setup_grade||'QUALIFIED').replaceAll('_',' ');
+   const body=c.symbol+' • '+grade+' • '+c.recommendation+' • Quality '+(Number.isFinite(Number(c.setup_quality_score))?Math.round(Number(c.setup_quality_score))+'/100':'-')+' • '+(oi.order_type||'ENTRY')+' • Entry '+formatPlatformPrice(c.symbol,c.locked_trade_plan.entry_min,'floor')+' - '+formatPlatformPrice(c.symbol,c.locked_trade_plan.entry_max,'ceil')+' • SL '+planPriceText(c,c.locked_trade_plan.initial_stop,'stop')+' • Final TP '+planPriceText(c,c.locked_trade_plan.target2,'target')+' • Expires '+formatLocalTime(c.locked_trade_plan.valid_until);
+   document.title=grade+' • '+c.recommendation+' • '+c.symbol+' • STC';
    if('Notification' in window && Notification.permission==='granted'){
      new Notification('STC QUALIFIED PLAN',{body,tag:key,requireInteraction:true});
      seenSignalPlans.add(key);
