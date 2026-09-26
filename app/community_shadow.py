@@ -106,6 +106,69 @@ CAPITAL_NO_VALIDATED_COMMUNITY_PROFILE = frozenset(
 )
 
 
+AMP_FROZEN_15M_PROFILES: dict[str, dict[str, float]] = {
+    # Single-component frozen survivors can be represented without inventing
+    # a new ensemble weighting scheme.
+    "CBOT:ZB1!": {
+        "range_filter_guikroth": 1.0,
+    },
+    "NYMEX:MCL1!": {
+        "ssl_hybrid": 1.0,
+    },
+}
+
+AMP_FROZEN_15M_PARAMETERS: dict[str, dict[str, dict[str, float | int]]] = {
+    "CBOT:ZB1!": {
+        "range_filter_guikroth": {
+            "sampling_period": 100,
+            "range_multiplier": 3.0,
+        },
+    },
+    "NYMEX:MCL1!": {
+        "ssl_hybrid": {
+            "baseline_length": 100,
+            "ssl_length": 20,
+        },
+    },
+}
+
+AMP_CANDIDATE_ONLY_15M: dict[str, dict[str, dict]] = {
+    # MJY has several independently validated/frozen candidates, but no
+    # accepted combined weight. Preserve the evidence without fabricating a
+    # weighted ensemble.
+    "CME_MINI:MJY1!": {
+        "alphatrend": {
+            "state": "SHADOW",
+            "selected_parameters": {"period": 20, "coefficient": 1.0},
+        },
+        "waddah_attar_explosion": {
+            "state": "SHADOW",
+            "selected_parameters": {
+                "fast_length": 12,
+                "slow_length": 26,
+                "sensitivity": 100,
+                "bb_length": 20,
+                "bb_mult": 2.0,
+                "atr_length": 100,
+                "dead_zone_mult": 3.0,
+            },
+        },
+        "trendilo": {
+            "state": "MULTITF_CONFIRMED",
+            "selected_parameters": {
+                "smoothing": 1,
+                "lookback": 50,
+                "alma_offset": 0.85,
+                "alma_sigma": 6.0,
+                "band_multiplier": 1.25,
+            },
+        },
+    },
+}
+
+AMP_EVIDENCE_SOURCE = "research/community_shadow_registry.json"
+
+
 def _normalize_timeframe(timeframe: str) -> str:
     value = str(timeframe).strip().lower()
     return "15" if value in {"15", "15m"} else value
@@ -123,12 +186,60 @@ def build_community_component_shadow(
     by the frozen research profile is present in the payload.
     """
     normalized_timeframe = _normalize_timeframe(timeframe)
-    profile = (
-        CAPITAL_COMMUNITY_15M_PROFILES.get(symbol)
-        if normalized_timeframe == "15"
-        else None
-    )
+    profile = None
+    parameters: dict[str, dict[str, float | int]] = {}
+    evidence_source = EVIDENCE_SOURCE
+    if normalized_timeframe == "15":
+        if symbol in CAPITAL_COMMUNITY_15M_PROFILES:
+            profile = CAPITAL_COMMUNITY_15M_PROFILES[symbol]
+            parameters = CAPITAL_COMMUNITY_15M_PARAMETERS.get(symbol, {})
+        elif symbol in AMP_FROZEN_15M_PROFILES:
+            profile = AMP_FROZEN_15M_PROFILES[symbol]
+            parameters = AMP_FROZEN_15M_PARAMETERS.get(symbol, {})
+            evidence_source = AMP_EVIDENCE_SOURCE
+
     supplied = dict(component_signals or {})
+
+    if profile is None and normalized_timeframe == "15" and symbol in AMP_CANDIDATE_ONLY_15M:
+        candidates = AMP_CANDIDATE_ONLY_15M[symbol]
+        expected = set(candidates)
+        observed = {
+            name: float(value)
+            for name, value in supplied.items()
+            if name in expected
+        }
+        missing = sorted(expected - set(observed))
+        unexpected = sorted(set(supplied) - expected)
+        selected_parameters = {
+            name: dict(meta.get("selected_parameters", {}))
+            for name, meta in candidates.items()
+        }
+        return {
+            "status": (
+                "CANDIDATE_ONLY_SHADOW_EVIDENCE"
+                if observed
+                else "AWAITING_CANDIDATE_SIGNALS"
+            ),
+            "symbol": symbol,
+            "timeframe": normalized_timeframe,
+            "evidence_source": AMP_EVIDENCE_SOURCE,
+            "expected_components": list(candidates),
+            "normalized_weights": {},
+            "selected_parameters": selected_parameters,
+            "candidate_states": {
+                name: str(meta.get("state", "SHADOW"))
+                for name, meta in candidates.items()
+            },
+            "observed_signals": observed,
+            "missing_components": missing,
+            "unexpected_components_ignored": unexpected,
+            "complete": not missing,
+            "weighted_score": None,
+            "live_authority": False,
+            "used_in_quality_gate": False,
+            "used_in_risk": False,
+            "used_in_approval": False,
+        }
 
     if profile is None:
         status = (
@@ -141,7 +252,7 @@ def build_community_component_shadow(
             "status": status,
             "symbol": symbol,
             "timeframe": normalized_timeframe,
-            "evidence_source": EVIDENCE_SOURCE,
+            "evidence_source": evidence_source,
             "expected_components": [],
             "normalized_weights": {},
             "selected_parameters": {},
@@ -181,10 +292,10 @@ def build_community_component_shadow(
         ),
         "symbol": symbol,
         "timeframe": normalized_timeframe,
-        "evidence_source": EVIDENCE_SOURCE,
+        "evidence_source": evidence_source,
         "expected_components": list(profile),
         "normalized_weights": dict(profile),
-        "selected_parameters": dict(CAPITAL_COMMUNITY_15M_PARAMETERS.get(symbol, {})),
+        "selected_parameters": dict(parameters),
         "observed_signals": observed,
         "missing_components": missing,
         "unexpected_components_ignored": unexpected,
