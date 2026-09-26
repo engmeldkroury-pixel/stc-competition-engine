@@ -555,7 +555,8 @@ function stc_competition_rule_summary(string $competitionId): array {
             'leverage' => [
                 'futures' => 20.0,
             ],
-            'production_feed_symbols' => 18,
+            'production_feed_symbols' => 16,
+            'verified_feed_symbols_after_24x7_crypto_alert' => 18,
             'official_allowed_symbols' => 94,
             'weekend_crypto_feed_symbols' => [
                 'CME:MBT1!',
