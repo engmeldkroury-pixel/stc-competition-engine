@@ -381,3 +381,30 @@ Next executable development/evidence tasks:
 3. continue exact Pine/Python parity and forward shadow evidence;
 4. keep execution manual and enforce current quantity/cooldown/risk controls.
 
+## 2026-09-27 — Full live strategy exposed for independent review
+Owner reported the live Capital leaderboard leader is already above 38%, invalidating the earlier stale cached leaderboard figure used in chat.
+
+Durable live-strategy specification:
+- `docs/STC_LIVE_STRATEGY_A_TO_Z_2026-09-27.md`
+- source commit `551c8055396da60a6c25c5f2f2e52aeadf9a062e`
+
+Independent AI review prompt:
+- `docs/STC_STRATEGY_REVIEW_PROMPT_2026-09-27.md`
+- source commit `edee07044d282a94bce2037460f36b09009e2781`
+
+Important current-live review facts:
+- Capital + AMP live floor = 84 competition-opportunity quality.
+- 15m entry feed + prior closed 1h/2h/4h/1D/1M context.
+- Default live family priors are generic because calibration registry currently has zero active records.
+- Community/symbol-specific research remains shadow-only.
+- Live base composite reserves 10% news+macro but bridge currently sends both as zero; macro acts separately as approval blackout.
+- Current production sizing still uses seed account equity values 100k Capital / 250k AMP with risk_fraction 0.005.
+- Production PHP uses single-TP target1 protect behavior, while app/portfolio.py still contains an older partial-take-profit branch.
+- AMP production core scans 16 symbols although the competition profile permits many more.
+- Current 0.5% risk / 2.5R architecture should be reviewed as an objective-function mismatch against a >38% live leaderboard, not automatically replaced by higher risk.
+
+Next strategy action:
+- obtain independent reviews against the A-to-Z spec;
+- compare findings to code;
+- patch only verified correctness/design issues one at a time with regression and rollback evidence.
+
