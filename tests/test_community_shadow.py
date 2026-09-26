@@ -138,3 +138,60 @@ def test_invalid_shadow_signal_value_is_stored_as_context_only():
     assert result["status"] == "ingested_context"
     assert result["decision"]["action"] == "store_context_only"
     assert result["decision"]["reason"] == "insufficient_signal_payload"
+
+
+def test_amp_zb_shadow_uses_frozen_range_filter_profile():
+    shadow = build_community_component_shadow(
+        "CBOT:ZB1!",
+        "15",
+        {"range_filter_guikroth": -1.0},
+    )
+    assert shadow["status"] == "COMPLETE_SHADOW_EVIDENCE"
+    assert shadow["weighted_score"] == -1.0
+    assert shadow["normalized_weights"] == {"range_filter_guikroth": 1.0}
+    assert shadow["selected_parameters"]["range_filter_guikroth"] == {
+        "sampling_period": 100,
+        "range_multiplier": 3.0,
+    }
+    assert shadow["evidence_source"] == "research/community_shadow_registry.json"
+    assert shadow["live_authority"] is False
+
+
+def test_amp_mjy_shadow_uses_multitf_confirmed_trendilo_profile():
+    shadow = build_community_component_shadow(
+        "CME_MINI:MJY1!",
+        "15m",
+        {"trendilo": 1.0},
+    )
+    assert shadow["status"] == "COMPLETE_SHADOW_EVIDENCE"
+    assert shadow["weighted_score"] == 1.0
+    assert shadow["selected_parameters"]["trendilo"]["lookback"] == 50
+    assert shadow["selected_parameters"]["trendilo"]["band_multiplier"] == 1.25
+    assert shadow["live_authority"] is False
+    assert shadow["used_in_quality_gate"] is False
+
+
+def test_amp_mcl_shadow_uses_frozen_ssl_hybrid_profile():
+    shadow = build_community_component_shadow(
+        "NYMEX:MCL1!",
+        "15",
+        {"ssl_hybrid": 1.0},
+    )
+    assert shadow["status"] == "COMPLETE_SHADOW_EVIDENCE"
+    assert shadow["normalized_weights"] == {"ssl_hybrid": 1.0}
+    assert shadow["selected_parameters"]["ssl_hybrid"] == {
+        "baseline_length": 100,
+        "ssl_length": 20,
+    }
+
+
+def test_amp_researched_symbol_without_frozen_survivor_does_not_invent_profile():
+    shadow = build_community_component_shadow(
+        "CME_MINI:MES1!",
+        "15",
+        {"trendilo": 1.0},
+    )
+    assert shadow["status"] == "NO_FROZEN_SHADOW_PROFILE"
+    assert shadow["normalized_weights"] == {}
+    assert shadow["weighted_score"] is None
+    assert shadow["unexpected_components_ignored"] == ["trendilo"]
