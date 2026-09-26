@@ -383,6 +383,16 @@ try {
             ],
             'pre_gate_recommendation' => (string)($signal['pre_gate_recommendation'] ?? ($signal['recommendation'] ?? 'WAIT')),
             'quality_gate_failures' => is_array($signal['quality_gate_failures'] ?? null) ? $signal['quality_gate_failures'] : [],
+            'watch_candidate' => ($signal['watch_candidate'] ?? false) === true,
+            'watch_direction' => ($signal['watch_candidate'] ?? false) === true
+                ? (string)($signal['watch_direction'] ?? '')
+                : null,
+            'watch_note' => ($signal['watch_candidate'] ?? false) === true
+                ? (string)($signal['watch_note'] ?? '')
+                : null,
+            'community_component_shadow' => is_array($signal['community_component_shadow'] ?? null)
+                ? $signal['community_component_shadow']
+                : null,
             'reasons' => is_array($signal['reasons'] ?? null) ? $signal['reasons'] : [],
             'latest_signal_context' => $latestSignalContext,
             'envelope' => $envelope,
