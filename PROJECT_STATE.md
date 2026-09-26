@@ -2677,3 +2677,33 @@ Disposition:
 - Because all four STC rows are manual_external, audited ledger-only VOID reconciliation is available.
 - Do not VOID/re-open yet because the screenshots do not show the actual opening timestamps; current platform trade history is required to preserve chronology/trading-day evidence and to import closed trades accurately.
 
+## Ledger reconciliation accepted and verified — 2026-09-27
+Owner explicitly accepted leaving the remaining Capital platform realized-P/L difference of -54.39 USD unattributed rather than continuing evidence collection.
+
+Reconciliation execution:
+- first reconciliation run `36274630447` performed the ledger writes successfully but final validation detected an STC progress bug: ledger-only VOID rows gained a current closed date and were incorrectly counted as an extra qualifying trading day.
+- bug fix commit: `4dfbb26a6c65ed80ef57e7e53e0f76a474f09c8e`.
+- correction: VOID rows are now excluded from competition position counts, trading-day dates, partial-event dates, and action counts.
+- critical CI for the correction: 199 passed, 1 warning.
+- correction deploy run `36274716351`: SUCCESS.
+- idempotent reconciliation rerun `36274737170`: SUCCESS.
+- post-reconciliation Live Readback run `36274764925`: SUCCESS.
+
+Verified current STC open positions now match the platform evidence:
+- NAS100 LONG — 7.7 @ 30416.071 — current stop 30319.1 — final TP 30758.6.
+- SPX500 LONG — 40 @ 7737.25 — current stop 7716.0 — final TP 7797.0.
+- AMP open positions: 0.
+
+Verified historical ledger:
+- Capital closed positions imported: 9.
+- Capital realized P/L represented by evidenced trades: -3370.87 USD.
+- accepted unattributed platform residual: -54.39 USD.
+- Capital qualifying trading days: 4, matching platform 4/3.
+- AMP closed positions imported: 2.
+- AMP realized P/L: +991.25 USD, exact platform match.
+- AMP qualifying trading days: 3, matching platform 3/5.
+
+The four stale manual_external rows were ledger-only VOIDed; no broker order was sent.
+
+Fresh post-deploy AMP 84 metadata remains pending because current AMP signal cards are still historical pre-deploy rows.
+
