@@ -166,6 +166,7 @@ def decide_bridge_event(event_id: str, payload: dict) -> dict:
             confirmation_score=confirmation_score,
             trend_2h_score=tv.trend_2h_score,
             trend_4h_score=tv.trend_4h_score,
+            trend_1m_score=tv.trend_1m_score,
             family_evidence_score=None if family_evidence is None else family_evidence.score,
             family_agreement_ratio=None if family_evidence is None else family_evidence.agreement_ratio,
             family_aligned_count=None if family_evidence is None else family_evidence.aligned_families,
