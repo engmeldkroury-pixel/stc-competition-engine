@@ -1,9 +1,124 @@
 //@version=6
-indicator("STC AMP MTF Feed B v1.1 Family Breadth", overlay=true)
+indicator("STC AMP MTF Feed B v1.2 Component Shadow", overlay=true)
 
 competitionId = input.string("amp-futures-sep-2026", "Competition ID", options=["amp-futures-sep-2026"], group="Production feed")
 feedTf = input.timeframe("15", "Production feed timeframe", options=["15"], group="Production feed")
 feedEnabled = input.bool(true, "Enable webhook feed", group="Production feed")
+
+// Exact frozen research-component events are emitted as SHADOW evidence only.
+// They do not change the live gate, risk, approval, or execution decision.
+trendiloEvent(int smoothing, int lookback, float almaOffset, float almaSigma, float bandMultiplier) =>
+    pch = math.abs(close) > 1e-15 ? (close - close[smoothing]) / close * 100.0 : 0.0
+    avpch = ta.alma(pch, lookback, almaOffset, almaSigma)
+    rms = bandMultiplier * math.sqrt(ta.sma(avpch * avpch, lookback))
+    currentState = not na(avpch) and not na(rms) ? (avpch > rms ? 1 : avpch < -rms ? -1 : 0) : 0
+    previousState = nz(currentState[1], 0)
+    currentState != 0 and currentState != previousState ? currentState : 0
+
+sslHybridEvent(int baselineLength, int sslLength) =>
+    baseline = ta.ema(close, baselineLength)
+    highMa = ta.ema(high, sslLength)
+    lowMa = ta.ema(low, sslLength)
+    int state = 0
+    state := not na(baseline) and not na(highMa) and not na(lowMa) ?
+         (close > highMa and close > baseline ? 1 :
+          close < lowMa and close < baseline ? -1 :
+          nz(state[1], 0)) :
+         nz(state[1], 0)
+    state != 0 and state != nz(state[1], 0) ? state : 0
+
+rangeFilterEvent(int samplingPeriod, float rangeMultiplier) =>
+    change = math.abs(close - close[1])
+    first = ta.ema(change, samplingPeriod)
+    second = ta.ema(first, samplingPeriod * 2 - 1)
+    float filt = na
+    previousFilter = filt[1]
+    if not na(second)
+        smoothRange = second * rangeMultiplier
+        if na(previousFilter)
+            filt := close
+        else if close > previousFilter
+            filt := math.max(previousFilter, close - smoothRange)
+        else if close < previousFilter
+            filt := math.min(previousFilter, close + smoothRange)
+        else
+            filt := previousFilter
+    int direction = 0
+    previousDirection = nz(direction[1], 0)
+    if not na(filt) and not na(previousFilter)
+        rising = filt > previousFilter
+        falling = filt < previousFilter
+        direction := close > filt and rising ? 1 : close < filt and falling ? -1 : previousDirection
+    else
+        direction := previousDirection
+    direction != 0 and direction != previousDirection ? direction : 0
+
+schaffEvent(int cycleLength, int fastLength, int slowLength, float alpha) =>
+    fast = ta.ema(close, fastLength)
+    slow = ta.ema(close, slowLength)
+    macdLine = fast - slow
+    lowM = ta.lowest(macdLine, cycleLength)
+    highM = ta.highest(macdLine, cycleLength)
+    rawK1 = not na(lowM) and not na(highM) ? (highM == lowM ? 0.0 : 100.0 * (macdLine - lowM) / (highM - lowM)) : na
+    float d1 = na
+    previousD1 = nz(d1[1], rawK1)
+    d1 := not na(rawK1) ? previousD1 + alpha * (rawK1 - previousD1) : na
+    lowD1 = ta.lowest(d1, cycleLength)
+    highD1 = ta.highest(d1, cycleLength)
+    rawK2 = not na(lowD1) and not na(highD1) ? (highD1 == lowD1 ? 0.0 : 100.0 * (d1 - lowD1) / (highD1 - lowD1)) : na
+    float stc = na
+    previousStc = nz(stc[1], rawK2)
+    stc := not na(rawK2) ? previousStc + alpha * (rawK2 - previousStc) : na
+    now = stc
+    previous = stc[1]
+    older = stc[2]
+    event = 0.0
+    if not na(now) and not na(previous) and not na(older)
+        event := older >= previous and previous < now and previous <= 25.0 ? 1.0 :
+             older <= previous and previous > now and previous >= 75.0 ? -1.0 :
+             previous <= 50.0 and now > 50.0 ? 0.65 :
+             previous >= 50.0 and now < 50.0 ? -0.65 : 0.0
+    event
+
+halfTrendEvent(int amplitude) =>
+    highPrice = ta.highest(high, amplitude)
+    lowPrice = ta.lowest(low, amplitude)
+    highMa = ta.sma(high, amplitude)
+    lowMa = ta.sma(low, amplitude)
+    var int trend = 0
+    var int nextTrend = 0
+    var float maxLowPrice = low
+    var float minHighPrice = high
+    previousTrend = trend
+    if bar_index >= amplitude - 1
+        if nextTrend == 1
+            maxLowPrice := math.max(lowPrice, maxLowPrice)
+            if highMa < maxLowPrice and close < low[1]
+                trend := 1
+                nextTrend := 0
+                minHighPrice := highPrice
+        else
+            minHighPrice := math.min(highPrice, minHighPrice)
+            if lowMa > minHighPrice and close > high[1]
+                trend := 0
+                nextTrend := 1
+                maxLowPrice := lowPrice
+    trend != previousTrend ? (trend == 0 ? 1.0 : -1.0) : 0.0
+
+componentEvent(string symbol, string component, int intA, int intB, int intC, float floatA, float floatB, float floatC) =>
+    request.security(
+        symbol,
+        feedTf,
+        component == "trendilo" ? trendiloEvent(intA, intB, floatA, floatB, floatC) :
+        component == "ssl_hybrid" ? sslHybridEvent(intA, intB) :
+        component == "range_filter" ? rangeFilterEvent(intA, floatA) :
+        component == "schaff" ? schaffEvent(intA, intB, intC, floatA) :
+        component == "halftrend" ? halfTrendEvent(intA) : 0.0,
+        gaps=barmerge.gaps_off,
+        lookahead=barmerge.lookahead_off,
+        ignore_invalid_symbol=false
+    )
+
 
 type FeedBar
     int t
@@ -162,7 +277,8 @@ makeHistoryBar() =>
 historyBar(string symbol) =>
     request.security(symbol, "1D", makeHistoryBar(), gaps=barmerge.gaps_off, lookahead=barmerge.lookahead_on, ignore_invalid_symbol=false)
 
-buildMessage(string symbol, FeedBar d, ConfirmBar q, TrendBar t2, TrendBar t4, HistoryBar h, TrendBar m) =>
+buildMessage(string symbol, FeedBar d, ConfirmBar q, TrendBar t2, TrendBar t4, HistoryBar h, TrendBar m, string communityJson) =>
+    communityField = str.length(communityJson) > 0 ? '"community_component_signals":' + communityJson + ',' : ""
     eventId = competitionId + "|" + symbol + "|" + feedTf + "|" + str.tostring(d.t)
     msg = (
         '{"event_id":"' + eventId + '",' +
@@ -192,6 +308,7 @@ buildMessage(string symbol, FeedBar d, ConfirmBar q, TrendBar t2, TrendBar t4, H
         '"family_smc_liquidity":' + str.tostring(d.familySmcLiquidity) + ',' +
         '"family_price_action":' + str.tostring(d.familyPriceAction) + ',' +
         '"family_microstructure":' + str.tostring(d.familyMicrostructure) + ',' +
+        communityField +
         '"confirm_timeframe":"60",' +
         '"confirm_time":"' + str.format_time(q.t, "yyyy-MM-dd\'T\'HH:mm:ss\'Z\'", "UTC") + '",' +
         '"confirm_close":' + str.tostring(q.c) + ',' +
@@ -259,18 +376,25 @@ silH = historyBar("COMEX_MINI:SIL1!")
 silM = monthlyBar("COMEX_MINI:SIL1!")
 varip int lastSIL = na
 
+mclSsl = componentEvent("NYMEX:MCL1!", "ssl_hybrid", 100, 20, 0, 0.0, 0.0, 0.0)
+
+mclCommunity = '{"ssl_hybrid":' + str.tostring(mclSsl) + '}'
+mngCommunity = ""
+mgcCommunity = ""
+silCommunity = ""
+
 if feedEnabled and barstate.isconfirmed and barstate.isrealtime
     if not na(mcl.t) and not na(mcl.c) and not na(mclC.t) and not na(mcl2.t) and not na(mcl4.t) and not na(mclH.t) and not na(mclM.t) and (na(lastMCL) or mcl.t != lastMCL)
         lastMCL := mcl.t
-        alert(buildMessage("NYMEX:MCL1!", mcl, mclC, mcl2, mcl4, mclH, mclM), alert.freq_all)
+        alert(buildMessage("NYMEX:MCL1!", mcl, mclC, mcl2, mcl4, mclH, mclM, mclCommunity), alert.freq_all)
     if not na(mng.t) and not na(mng.c) and not na(mngC.t) and not na(mng2.t) and not na(mng4.t) and not na(mngH.t) and not na(mngM.t) and (na(lastMNG) or mng.t != lastMNG)
         lastMNG := mng.t
-        alert(buildMessage("NYMEX:MNG1!", mng, mngC, mng2, mng4, mngH, mngM), alert.freq_all)
+        alert(buildMessage("NYMEX:MNG1!", mng, mngC, mng2, mng4, mngH, mngM, mngCommunity), alert.freq_all)
     if not na(mgc.t) and not na(mgc.c) and not na(mgcC.t) and not na(mgc2.t) and not na(mgc4.t) and not na(mgcH.t) and not na(mgcM.t) and (na(lastMGC) or mgc.t != lastMGC)
         lastMGC := mgc.t
-        alert(buildMessage("COMEX_MINI:MGC1!", mgc, mgcC, mgc2, mgc4, mgcH, mgcM), alert.freq_all)
+        alert(buildMessage("COMEX_MINI:MGC1!", mgc, mgcC, mgc2, mgc4, mgcH, mgcM, mgcCommunity), alert.freq_all)
     if not na(sil.t) and not na(sil.c) and not na(silC.t) and not na(sil2.t) and not na(sil4.t) and not na(silH.t) and not na(silM.t) and (na(lastSIL) or sil.t != lastSIL)
         lastSIL := sil.t
-        alert(buildMessage("COMEX_MINI:SIL1!", sil, silC, sil2, sil4, silH, silM), alert.freq_all)
+        alert(buildMessage("COMEX_MINI:SIL1!", sil, silC, sil2, sil4, silH, silM, silCommunity), alert.freq_all)
 
 plot(na, title="STC AMP MTF B", display=display.none)
