@@ -206,6 +206,36 @@ def high_conviction_assessment(
 
 
 
+def competition_candidate_recommendation(
+    *,
+    base_recommendation: str,
+    base_composite_score: float,
+    frozen_component_score: float | None,
+    frozen_component_complete: bool,
+    frozen_weight: float = 0.20,
+) -> tuple[str, str, float]:
+    """Blend sealed-holdout support into near-threshold competition direction.
+
+    Frozen support can contribute only a bounded minority share. It may lift a
+    generic WAIT across the normal +/-0.35 direction threshold only when the
+    base composite was already near that threshold. It cannot reverse an
+    existing generic LONG/SHORT.
+    """
+    base = max(-1.0, min(1.0, float(base_composite_score)))
+    if base_recommendation in {"LONG", "SHORT"}:
+        return base_recommendation, "generic_composite", base
+    if not frozen_component_complete or frozen_component_score is None:
+        return "WAIT", "none", base
+
+    weight = max(0.0, min(0.25, float(frozen_weight)))
+    frozen = max(-1.0, min(1.0, float(frozen_component_score)))
+    effective = max(-1.0, min(1.0, (1.0 - weight) * base + weight * frozen))
+    if effective >= 0.35:
+        return "LONG", "generic_plus_frozen_component", effective
+    if effective <= -0.35:
+        return "SHORT", "generic_plus_frozen_component", effective
+    return "WAIT", "frozen_support_insufficient", effective
+
 def competition_opportunity_assessment(
     *,
     recommendation: str,

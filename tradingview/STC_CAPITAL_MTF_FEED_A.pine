@@ -28,6 +28,7 @@ type FeedBar
     float familySmcLiquidity
     float familyPriceAction
     float familyMicrostructure
+    float frozenTrendilo
 
 type ConfirmBar
     int t
@@ -62,6 +63,18 @@ type HistoryBar
 
 clampScore(float x) =>
     math.max(-1.0, math.min(1.0, x))
+
+frozenTrendiloEvent(float bandMultiplier) =>
+    smoothing = 1
+    lookback = 50
+    almaOffset = 0.85
+    almaSigma = 6.0
+    pch = math.abs(close) > 1e-15 ? (close - close[smoothing]) / close * 100.0 : 0.0
+    avpch = ta.alma(pch, lookback, almaOffset, almaSigma)
+    rms = bandMultiplier * math.sqrt(ta.sma(avpch * avpch, lookback))
+    currentState = not na(avpch) and not na(rms) ? (avpch > rms ? 1 : avpch < -rms ? -1 : 0) : 0
+    previousState = nz(currentState[1], 0)
+    currentState != 0 and currentState != previousState ? float(currentState) : 0.0
 
 makeFeedBar() =>
     [macdLine, signalLine, _] = ta.macd(close, 12, 26, 9)
@@ -103,7 +116,8 @@ makeFeedBar() =>
     familyPriceAction = clampScore(engulf * 0.55 + clampScore(clv) * 0.45)
     efficiency = math.abs(body) / barRange
     familyMicrostructure = clampScore(barDir * (efficiency * 0.60 + participation * 0.40))
-    FeedBar.new(time, open, high, low, close, volume, e20, e50, r, a, macdLine, signalLine, vr, familyTrend, familyMomentum, familyVolatility, familyVolume, familyVwap, familyMarketStructure, familySmcLiquidity, familyPriceAction, familyMicrostructure)
+    frozenTrendilo = frozenTrendiloEvent(1.25)
+    FeedBar.new(time, open, high, low, close, volume, e20, e50, r, a, macdLine, signalLine, vr, familyTrend, familyMomentum, familyVolatility, familyVolume, familyVwap, familyMarketStructure, familySmcLiquidity, familyPriceAction, familyMicrostructure, frozenTrendilo)
 
 feedBar(string symbol) =>
     request.security(symbol, feedTf, makeFeedBar(), gaps=barmerge.gaps_off, lookahead=barmerge.lookahead_off, ignore_invalid_symbol=false)
@@ -164,6 +178,7 @@ historyBar(string symbol) =>
 
 buildMessage(string symbol, FeedBar d, ConfirmBar q, TrendBar t2, TrendBar t4, HistoryBar h, TrendBar m) =>
     eventId = competitionId + "|" + symbol + "|" + feedTf + "|" + str.tostring(d.t)
+    communityJson = symbol == "CAPITALCOM:BTCUSD" ? ',"community_component_signals":{"trendilo":' + str.tostring(d.frozenTrendilo) + '}' : ""
     msg = (
         '{"event_id":"' + eventId + '",' +
         '"event":"bar_close",' +
@@ -223,6 +238,7 @@ buildMessage(string symbol, FeedBar d, ConfirmBar q, TrendBar t2, TrendBar t4, H
         '"history_momentum_126":' + str.tostring(h.momentum126) + ',' +
         '"history_momentum_252":' + str.tostring(h.momentum252) + ',' +
         '"history_volatility_20":' + str.tostring(h.volatility20) +
+        communityJson +
         '}'
     )
     msg
