@@ -720,11 +720,16 @@ def test_snapshot_exposes_research_only_competition_gate_opportunity_audit():
     assert "'competition_gate_audit' => $gateAudit" in snapshot
     assert "'strict_a_plus_proxy' => 0" in snapshot
     assert "'balanced_competition_proxy' => 0" in snapshot
+    assert "'current_84_structural_proxy' => 0" in snapshot
+    assert "'by_competition' => [" in snapshot
+    assert "'capital-africa-sep-2026' => $newAuditBucket()" in snapshot
+    assert "'amp-futures-sep-2026' => $newAuditBucket()" in snapshot
     assert "'authority' => 'research_audit_only'" in snapshot
     assert "'gte_78' => 0" in snapshot
     assert "'gte_84' => 0" in snapshot
     assert "'gte_90' => 0" in snapshot
     assert "They do not create or approve trades." in snapshot
+    assert "Approximates the shared 84 competition gate" in snapshot
 
 
 def test_php_portfolio_supervisor_tracks_closed_bar_high_water_profit_lock():
