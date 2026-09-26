@@ -529,6 +529,58 @@ try {
         $closedPositions[] = stc_position_public($closedRow);
     }
 
+    $signalCoverage = [];
+    foreach (['capital-africa-sep-2026', 'amp-futures-sep-2026'] as $coverageCompetitionId) {
+        $rule = stc_competition_rule_summary($coverageCompetitionId);
+        $signalCoverage[$coverageCompetitionId] = [
+            'competition_id' => $coverageCompetitionId,
+            'expected_feed_symbols' => (int)($rule['production_feed_symbols'] ?? 0),
+            'observed_symbols' => 0,
+            'directional_now' => 0,
+            'active_opportunities_now' => 0,
+            'monitor_only_now' => 0,
+            'latest_source_time' => null,
+            'symbols' => [],
+        ];
+    }
+    foreach ($cards as $coverageCard) {
+        $cid = (string)($coverageCard['competition_id'] ?? '');
+        if (!isset($signalCoverage[$cid])) {
+            continue;
+        }
+        $symbol = (string)($coverageCard['symbol'] ?? '');
+        if ($symbol === '') {
+            continue;
+        }
+        $signalCoverage[$cid]['symbols'][$symbol] = true;
+        $recommendation = (string)($coverageCard['recommendation'] ?? 'WAIT');
+        $preGate = (string)($coverageCard['pre_gate_recommendation'] ?? $recommendation);
+        if (in_array($preGate, ['LONG', 'SHORT'], true)) {
+            $signalCoverage[$cid]['directional_now']++;
+        }
+        if (($coverageCard['opportunity_active'] ?? false) === true) {
+            $signalCoverage[$cid]['active_opportunities_now']++;
+        }
+        if ($recommendation === 'WAIT') {
+            $signalCoverage[$cid]['monitor_only_now']++;
+        }
+        $sourceTime = (string)($coverageCard['source_time'] ?? '');
+        if ($sourceTime !== '' && (
+            $signalCoverage[$cid]['latest_source_time'] === null
+            || strcmp($sourceTime, (string)$signalCoverage[$cid]['latest_source_time']) > 0
+        )) {
+            $signalCoverage[$cid]['latest_source_time'] = $sourceTime;
+        }
+    }
+    foreach ($signalCoverage as $cid => $coverageRow) {
+        $symbols = array_keys($coverageRow['symbols']);
+        sort($symbols);
+        $signalCoverage[$cid]['symbols'] = $symbols;
+        $signalCoverage[$cid]['observed_symbols'] = count($symbols);
+        $expected = (int)$coverageRow['expected_feed_symbols'];
+        $signalCoverage[$cid]['feed_complete_now'] = $expected > 0 && count($symbols) >= $expected;
+    }
+
     $gateAudit = [
         'scope' => 'recent_signal_created_rows_from_operator_snapshot_query',
         'rows_examined' => count($signalRows),
@@ -677,6 +729,7 @@ try {
             'amp-futures-sep-2026' => stc_competition_progress($pdo, 'amp-futures-sep-2026'),
         ],
         'cards' => $cards,
+        'signal_coverage' => $signalCoverage,
         'competition_gate_audit' => $gateAudit,
         'portfolio' => [
             'positions' => $positions,
