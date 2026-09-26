@@ -41,3 +41,24 @@ def test_community_pine_candidate_exposes_each_component_event_separately_for_pa
         "HalfTrend event",
     ):
         assert label in source
+
+
+def test_community_pine_candidate_covers_frozen_amp_profiles():
+    source = Path("tradingview/STC_COMMUNITY_SHADOW_PARITY_CANDIDATE.pine").read_text(encoding="utf-8")
+    for symbol in ("NYMEX:MCL1!", "CME_MINI:MJY1!", "CBOT:ZB1!"):
+        assert symbol in source
+
+    # MCL frozen SSL Hybrid parameters.
+    assert "baselineLength = 100" in source
+    assert "sslLength = 20" in source
+
+    # MJY MULTITF_CONFIRMED Trendilo parameters.
+    assert "bandMultiplier = 1.25" in source
+    assert "MJY Trendilo event" in source
+
+    # ZB frozen Range Filter reuses the causal 100 / 3.0 profile.
+    assert "ZB Range Filter event" in source
+    assert "samplingPeriod = 100" in source
+    assert "rangeMultiplier = 3.0" in source
+
+    assert "MCL SSL Hybrid event" in source
