@@ -529,9 +529,27 @@ try {
         $closedPositions[] = stc_position_public($closedRow);
     }
 
+    $newAuditBucket = static function (): array {
+        return [
+            'rows' => 0,
+            'directional_rows' => 0,
+            'historical_live_passed' => 0,
+            'quality_bins' => [
+                'gte_78' => 0,
+                'gte_84' => 0,
+                'gte_90' => 0,
+            ],
+            'strict_a_plus_proxy' => 0,
+            'balanced_competition_proxy' => 0,
+            'current_84_structural_proxy' => 0,
+            'per_symbol' => [],
+        ];
+    };
+
     $gateAudit = [
         'scope' => 'recent_signal_created_rows_from_operator_snapshot_query',
         'rows_examined' => count($signalRows),
+        // Legacy Capital-only summary retained for backward compatibility.
         'capital_rows' => 0,
         'capital_directional_rows' => 0,
         'historical_live_passed' => 0,
@@ -543,8 +561,13 @@ try {
         'strict_a_plus_proxy' => 0,
         'balanced_competition_proxy' => 0,
         'per_symbol' => [],
+        'by_competition' => [
+            'capital-africa-sep-2026' => $newAuditBucket(),
+            'amp-futures-sep-2026' => $newAuditBucket(),
+        ],
         'authority' => 'research_audit_only',
         'note' => 'Proxy counts compare recent stored signal context. They do not create or approve trades.',
+        'current_84_structural_proxy_note' => 'Approximates the shared 84 competition gate from stored MTF/family/composite fields; live volatility/liquidity/blended-technical factors are not replayed here.',
     ];
 
     foreach ($signalRows as $auditRow) {
@@ -555,33 +578,48 @@ try {
         if (!is_array($auditPayload) || !is_array($auditSignal)) {
             continue;
         }
-        if (($auditPayload['competition_id'] ?? '') !== 'capital-africa-sep-2026') {
+
+        $competitionId = (string)($auditPayload['competition_id'] ?? '');
+        if (!isset($gateAudit['by_competition'][$competitionId])) {
             continue;
         }
+        $bucket =& $gateAudit['by_competition'][$competitionId];
+        $bucket['rows']++;
+        if ($competitionId === 'capital-africa-sep-2026') {
+            $gateAudit['capital_rows']++;
+        }
 
-        $gateAudit['capital_rows']++;
         $direction = (string)($auditSignal['pre_gate_recommendation']
             ?? $auditSignal['recommendation']
             ?? 'WAIT');
         if (!in_array($direction, ['LONG', 'SHORT'], true)) {
+            unset($bucket);
             continue;
         }
-        $gateAudit['capital_directional_rows']++;
+
+        $bucket['directional_rows']++;
+        if ($competitionId === 'capital-africa-sep-2026') {
+            $gateAudit['capital_directional_rows']++;
+        }
+
         $sign = $direction === 'LONG' ? 1.0 : -1.0;
         $quality = isset($auditSignal['setup_quality_score'])
             ? (int)$auditSignal['setup_quality_score']
             : 0;
-        if ($quality >= 78) {
-            $gateAudit['quality_bins']['gte_78']++;
-        }
-        if ($quality >= 84) {
-            $gateAudit['quality_bins']['gte_84']++;
-        }
-        if ($quality >= 90) {
-            $gateAudit['quality_bins']['gte_90']++;
+        foreach ([78, 84, 90] as $floor) {
+            if ($quality >= $floor) {
+                $key = 'gte_' . $floor;
+                $bucket['quality_bins'][$key]++;
+                if ($competitionId === 'capital-africa-sep-2026') {
+                    $gateAudit['quality_bins'][$key]++;
+                }
+            }
         }
         if (($auditSignal['quality_gate_passed'] ?? false) === true) {
-            $gateAudit['historical_live_passed']++;
+            $bucket['historical_live_passed']++;
+            if ($competitionId === 'capital-africa-sep-2026') {
+                $gateAudit['historical_live_passed']++;
+            }
         }
 
         $tf = is_array($auditSignal['timeframe_confirmation'] ?? null)
@@ -610,6 +648,7 @@ try {
         $familyConflicts = is_numeric($family['conflicting_families'] ?? null)
             ? (int)$family['conflicting_families']
             : null;
+        $composite = $aligned($auditSignal['composite_score'] ?? null, $sign);
 
         $strictProxy = $quality >= 90
             && $entry !== null && $entry >= 0.75
@@ -635,23 +674,69 @@ try {
             && $familyAligned !== null && $familyAligned >= 5
             && $familyConflicts !== null && $familyConflicts <= 1;
 
+        $intradayAligned = 0;
+        foreach ([$h1, $h2, $h4] as $intradayValue) {
+            if ($intradayValue !== null && $intradayValue >= 0.35) {
+                $intradayAligned++;
+            }
+        }
+        $current84StructuralProxy = $quality >= 84
+            && $entry !== null && $entry >= 0.55
+            && $intradayAligned >= 2
+            && $d1 !== null && $d1 >= -0.15
+            && $m1 !== null && $m1 >= -0.15
+            && $familyScore !== null && $familyScore >= 0.25
+            && $familyAgreement !== null && $familyAgreement >= 0.55
+            && $familyAligned !== null && $familyAligned >= 4
+            && $familyConflicts !== null && $familyConflicts <= 3
+            && $composite !== null && $composite >= 0.35;
+
         $symbol = (string)($auditPayload['symbol'] ?? 'UNKNOWN');
-        if (!isset($gateAudit['per_symbol'][$symbol])) {
-            $gateAudit['per_symbol'][$symbol] = [
+        if (!isset($bucket['per_symbol'][$symbol])) {
+            $bucket['per_symbol'][$symbol] = [
                 'directional_rows' => 0,
                 'strict_a_plus_proxy' => 0,
                 'balanced_competition_proxy' => 0,
+                'current_84_structural_proxy' => 0,
             ];
         }
-        $gateAudit['per_symbol'][$symbol]['directional_rows']++;
+        $bucket['per_symbol'][$symbol]['directional_rows']++;
         if ($strictProxy) {
-            $gateAudit['strict_a_plus_proxy']++;
-            $gateAudit['per_symbol'][$symbol]['strict_a_plus_proxy']++;
+            $bucket['strict_a_plus_proxy']++;
+            $bucket['per_symbol'][$symbol]['strict_a_plus_proxy']++;
+            if ($competitionId === 'capital-africa-sep-2026') {
+                $gateAudit['strict_a_plus_proxy']++;
+            }
         }
         if ($balancedProxy) {
-            $gateAudit['balanced_competition_proxy']++;
-            $gateAudit['per_symbol'][$symbol]['balanced_competition_proxy']++;
+            $bucket['balanced_competition_proxy']++;
+            $bucket['per_symbol'][$symbol]['balanced_competition_proxy']++;
+            if ($competitionId === 'capital-africa-sep-2026') {
+                $gateAudit['balanced_competition_proxy']++;
+            }
         }
+        if ($current84StructuralProxy) {
+            $bucket['current_84_structural_proxy']++;
+            $bucket['per_symbol'][$symbol]['current_84_structural_proxy']++;
+        }
+
+        if ($competitionId === 'capital-africa-sep-2026') {
+            if (!isset($gateAudit['per_symbol'][$symbol])) {
+                $gateAudit['per_symbol'][$symbol] = [
+                    'directional_rows' => 0,
+                    'strict_a_plus_proxy' => 0,
+                    'balanced_competition_proxy' => 0,
+                ];
+            }
+            $gateAudit['per_symbol'][$symbol]['directional_rows']++;
+            if ($strictProxy) {
+                $gateAudit['per_symbol'][$symbol]['strict_a_plus_proxy']++;
+            }
+            if ($balancedProxy) {
+                $gateAudit['per_symbol'][$symbol]['balanced_competition_proxy']++;
+            }
+        }
+        unset($bucket);
     }
 
     stc_json([
