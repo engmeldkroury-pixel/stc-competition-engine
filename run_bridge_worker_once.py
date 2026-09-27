@@ -9,6 +9,25 @@ from app.bridge_client import BridgeClient, BridgeClientError
 from app.serverless_worker import run_serverless_drain
 
 
+def is_transient_bridge_failure(exc: Exception) -> bool:
+    """Classify transport/edge failures that are safe to defer to the next durable-queue drain."""
+    if isinstance(exc, httpx.TransportError):
+        return True
+    if isinstance(exc, BridgeClientError):
+        message = str(exc)
+        transient_markers = (
+            "claim_failed:403:<!DOCTYPE html",
+            "claim_failed:403:<html",
+            "claim_failed:429:",
+            "claim_failed:500:",
+            "claim_failed:502:",
+            "claim_failed:503:",
+            "claim_failed:504:",
+        )
+        return any(marker in message for marker in transient_markers)
+    return False
+
+
 def main() -> None:
     base_url = os.environ.get("STC_BRIDGE_URL", "https://stc.feama.site").strip()
     token = os.environ.get("STC_WORKER_TOKEN", "").strip()
@@ -37,6 +56,13 @@ def main() -> None:
             if attempt < 2:
                 time.sleep(2 ** attempt)
     if last_error is not None:
+        if is_transient_bridge_failure(last_error):
+            print(
+                "::warning::STC bridge temporarily unreachable after retries; "
+                "durable queue is left intact for the next processor run. "
+                f"error={type(last_error).__name__}:{last_error}"
+            )
+            return
         raise last_error
 
 
