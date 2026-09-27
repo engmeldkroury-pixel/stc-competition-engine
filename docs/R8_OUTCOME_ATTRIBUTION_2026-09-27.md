@@ -62,3 +62,10 @@ Status: IMPLEMENTED ON DEVELOPMENT BRANCH; NOT YET MERGED OR PRODUCTION VERIFIED
 3. Do not claim complete history or OOS profitability from the bounded capture.
 4. Record actual mature sample/coverage deficits; then prepare de-overlapped exit/ATR ablation with a frozen holdout.
 5. Remove all temporary branch source-transfer helpers before merge.
+
+
+## STC-R8-FINAL-20260927 - superseding acceptance checkpoint
+
+PR190 merged9a1c32e09fc43a5eff02fd3f6094581440b2aedc after fullCI36343737101:536passed1warning. Main tree exactly matches tested source. Production readback36344826332 SUCCESS19:34:12Z; no PHP deployment or live parameter changes. A new natural frozen seed has not yet been observed.
+
+Read-only history36344024376SUCCESS produced real bounded evidence, not a validated strategy winner. See R8_HISTORY_RESULTS_2026-09-27.md for1947legacy observations and extensive censoring. Extra exporter/cohortdiagnostic tools remain research-only. All prior failed attempts and local dependency limitations are retained as historical evidence. CURRENT_CHECKPOINT.md is the latest resume entrypoint.

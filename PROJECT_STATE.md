@@ -1,3 +1,7 @@
+# Current resume pointer - 2026-09-27 R8 acceptance
+
+Read `CURRENT_CHECKPOINT.md` first. R8 core was squash-merged via PR190 at `9a1c32e09fc43a5eff02fd3f6094581440b2aedc` after full CI: 536 passed / 1 warning. The historical sections below remain intact; their earlier pending statuses are dated history, not the current checkpoint.
+
 # STC PROJECT STATE
 
 Last updated: 2026-09-21
@@ -2783,3 +2787,18 @@ Owner requested continued engineering and durable history after repeated stop-ou
 - Screenshot financial figures and the one visible BTC stop-out are recorded as historical owner evidence, NOT a live equity attestation or exhaustive trade import.
 - Local targeted 82 passed; critical 273 passed. Full CI, main merge and production capture remain pending at this checkpoint.
 - Full specification and next acceptance steps: docs/R8_OUTCOME_ATTRIBUTION_2026-09-27.md.
+
+
+## STC-R8-FINAL-20260927 - verified acceptance and historical evidence
+
+R8 core accepted and merged via PR190, code SHA 9a1c32e09fc43a5eff02fd3f6094581440b2aedc, tree befe7ecccd184a0f4283b56af4eca1dbd562f6fc. PR CI 36343737101: critical SUCCESS; full SUCCESS, 536 passed / 1 warning in 972.44 seconds. No test was removed. Post-merge main CI 36344826384 is a separate repeat of the identical code tree; it was still running at this checkpoint.
+
+Post-merge production readback 36344826332 SUCCESS at 2026-09-27T19:34:12Z: active opportunities empty; NAS100 and SPX500 remain recorded OPEN/HOLD because last signal history is 2026-09-25T20:30:00Z and stale. Rotation candidates null. This is STC's recorded state, not independent broker verification or a fresh market HOLD recommendation. Both account states remain ineligible initial_profile_seed values; screenshot equity was not attested for sizing. Telegram configured; STC email not configured. No runtime controls or positions were changed.
+
+Historical evidence run 36344024376 SUCCESS: latest 5000 of 9630 matching signal rows, 26 instruments, 1947 legacy reconstructed hypotheses. Statuses: 1416 censored, 508 no-entry, 23 full-horizon-complete. Twenty-three same paths reached 1R then stopped before 2.5R (5 BTC, 5 ETH), but these overlap and are not executed trades or a calibrated win rate. Earliest-entry full-horizon blocking leaves 142 entered observations, 141 censored / 1 complete. All original geometry is legacy reconstructed. See docs/R8_HISTORY_RESULTS_2026-09-27.md.
+
+New reconciliation gap: STC recorded Capital realized P/L -3370.87 and four qualifying days; owner screenshot shows -3566.10 and five days. Difference -195.23 USD, not explained solely by the visible BTC loss -140.8432. Do not auto-invent missing fills/fees or overwrite the account as fresh. Recent screenshot trades are not a complete reconciled broker ledger.
+
+The TradingView connector returned 550 CAPITALCOM:BTCUSD 15-minute bars in a separate read-only probe (Sep22 00:15Z to Sep27 19:30Z). Its warning says delayed data and excludes some market sessions. Provider/time/closed-bar and overlap checks are not complete; no bars from that probe were merged into the validated outcome report. It is a candidate backfill source, not proof that all gaps are solved.
+
+No live 84/Boolean/monthly/ATR/risk changes or broker actions. Core R8 is merged; forward persistence of a new natural frozen seed is still to be observed. Research-only exporter/diagnostics remain on research/r8-history-evidence-20260927. Next exact work: source continuity and actual-fill reconciliation, then fixed-horizon same-cohort exit/ATR OOS comparison.

@@ -1,3 +1,7 @@
+# Resume here - R8 accepted 2026-09-27
+
+Authoritative latest handoff: `CURRENT_CHECKPOINT.md`. Do not restart R1-R7 or reimplement R8. Core R8 PR190 is merged with 536 passing tests. Next batch is **R9: source continuity and actual-fill reconciliation before exit/ATR selection**. Earlier task sections below are preserved history.
+
 # NEXT TASK
 
 Updated: 2026-09-24 19:05 UTC
@@ -496,3 +500,14 @@ Implemented on `stc-r8-outcome-attribution-20260927`: frozen rejected/accepted d
 - Full GitHub CI is still required; local full run lacks pinned Lorentzian dependency. Do not claim full acceptance yet.
 - Next: PR full CI -> bounded production report -> evidence/coverage review -> de-overlapped stop/target/ATR ablation with frozen holdout.
 - Preserve live 84/Boolean/1M/ATR/0.005 risk and manual execution. Do not refresh account timestamp from an undated screenshot.
+
+
+## STC-R8-FINAL-20260927 - next execution contract
+
+1. Read CURRENT_CHECKPOINT.md and confirm main SHA / any newer commits. Reuse R8 core and the research branch tools; do not repeat source extraction or prior patches unnecessarily.
+2. Observe a natural post-merge signal containing a valid frozen research_outcome_seed. Do not create synthetic trading events or claim forward capture just from a successful readback.
+3. Reconcile exact-provider history: validate TradingView candidate bars against stored OHLC at overlapping times, timestamp convention, confirmed-bar cutoff and session coverage. Do not mix providers or infer missing bars. Candidate read-only probe succeeded for CAPITALCOM:BTCUSD 15m with 550 bars, but is not integrated. The report currently selects signal_created rows; diagnose selection/session gaps separately from upstream feed gaps.
+4. Reconcile the executed-trade ledger with broker fills and original plan IDs. STC Capital realized -3370.87 / four days differs from owner screenshot -3566.10 / five days. Preserve the unverified screenshot separately; do not refresh live sizing eligibility from it.
+5. Add fixed-horizon mark-to-market for unresolved exits and compare 1/1.5/2/2.5 single-TP policies and existing versus volatility/structure-aware stops on the SAME non-overlapping entry cohort. Include actual costs where available, cost sensitivity, gaps and ambiguity. Do not optimize only settled trades.
+6. Freeze chronological train/validation/holdout boundaries, purge overlap, keep Capital/AMP and asset/timeframe results separate, and withhold live promotion without OOS evidence. Continue ablation/84-vs-Boolean/monthly/asset-specific/AMP work after data readiness.
+7. Keep 84, Boolean, monthly, ATR geometry and 0.005 risk unchanged. Manual execution only. Log each completed change/test/readback and each unresolved blocker; no profitability guarantee.

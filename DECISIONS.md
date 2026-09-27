@@ -131,3 +131,15 @@
 - Censor unknown time gaps, unresolved horizons and missing data. Never turn missing outcomes into losses or wins silently.
 - Report overlapping rejected-signal counts descriptively; no probability or gate-benefit claim without de-overlap, holdout and causal ablation.
 - Current live threshold, filters, geometry and risk remain unchanged until evidence-backed promotion.
+
+
+## STC-R8-FINAL-20260927 - accepted engineering, unapproved strategy promotion
+
+- Accept PR190 core after CI36343737101 proved 536 tests pass; squash merge9a1c32e09fc43a5eff02fd3f6094581440b2aedc. All source-transfer helper files are absent from the main tree.
+- Preserve original history and publish CURRENT_CHECKPOINT.md as first-read resume pointer.
+- Readback36344826332 succeeded at19:34:12Z, but stale market/account data remain stale; HOLD is a data-freshness fallback, not a fresh recommendation.
+- Treat the 5000-row report as bounded, censored, overlapping legacy research. Twenty-three 1R-then-stop cases justify testing exits, not universally replacing live2.5R with1R.
+- Treat the visible BTC commissions (about0.063819 planned-risk R for its shown levels) as a warning that0.02R is a proxy, not a universal measured cost.
+- Record the -195.23USD realized-P/L reconciliation difference between screenshot and STC; do not fabricate missing transactions or attest fresh equity.
+- Treat returned TradingView BTC history as an unvalidated candidate backfill source until provider/time/session/overlap checks pass. No probe bar was merged into the accepted research dataset.
+- No live threshold/risk/stop/target/position/notification/approval changes. R9 priority is data/fill reconciliation before controlled same-cohort OOS exit/ATR selection.
