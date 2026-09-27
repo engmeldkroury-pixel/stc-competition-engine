@@ -221,6 +221,14 @@ function stc_notify_signal_event(PDO $pdo, array $config, string $eventId): arra
     if (!in_array($direction, ['LONG', 'SHORT'], true)) {
         return ['ok' => true, 'skipped' => true, 'reason' => 'wait_signal'];
     }
+
+    $runtime = stc_runtime_control_row($pdo);
+    if (($runtime['kill_switch'] ?? false) === true) {
+        return ['ok' => true, 'skipped' => true, 'reason' => 'kill_switch_entry_pause'];
+    }
+    if (($runtime['safe_mode'] ?? false) === true) {
+        return ['ok' => true, 'skipped' => true, 'reason' => 'safe_mode_entry_pause'];
+    }
     $setupGrade = (string)($signal['setup_grade'] ?? '');
     if (!stc_signal_quality_gate_eligible($signal)) {
         return ['ok' => true, 'skipped' => true, 'reason' => 'quality_gate_not_passed'];

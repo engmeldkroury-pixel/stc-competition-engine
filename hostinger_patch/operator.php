@@ -258,6 +258,7 @@ function runtimeHtml(r){
   +'<div class="row"><span>Version</span><span class="value">'+esc(r.version)+'</span></div>'
   +'<div class="controls" style="margin-top:10px"><input id="reason" placeholder="Reason for control change">'
   +'<button class="safe" onclick="setControls(false,false)">Enable manual approval mode</button>'
+  +'<button onclick="setControls(true,false)">Pause new entries; keep management</button>'
   +'<button class="danger" onclick="setControls(true,true)">SAFE + KILL ON</button></div>'
   +'<div class="small" style="margin-top:8px">Changing controls does not execute any trade.</div>';
 }
