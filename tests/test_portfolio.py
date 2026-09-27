@@ -162,11 +162,12 @@ def test_two_strong_opposite_closed_bars_exit_to_prevent_thesis_drift():
     assert advice.thesis_degraded is True
 
 
-def test_target1_recommends_partial_profit_and_breakeven_protection():
+def test_target1_keeps_full_position_and_protects_breakeven():
     advice = supervise_position(pos(), market(current_price=7831))
-    assert advice.action == "PARTIAL_TAKE_PROFIT"
-    assert advice.suggested_partial_fraction == 0.50
+    assert advice.action == "PROTECT"
+    assert advice.suggested_partial_fraction is None
     assert advice.suggested_stop == 7800
+    assert "single_take_profit_mode_keep_full_quantity_and_protect" in advice.reasons
 
 
 def test_one_r_profit_recommends_protection_not_rotation():
