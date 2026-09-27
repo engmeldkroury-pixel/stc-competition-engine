@@ -263,6 +263,18 @@ function stc_notify_signal_event(PDO $pdo, array $config, string $eventId): arra
     }
 
     $account = stc_account_state_for($pdo, $competitionId);
+    if (!is_array($account)) {
+        return ['ok' => true, 'skipped' => true, 'reason' => 'account_state_unavailable'];
+    }
+    $freshness = stc_account_state_freshness($account);
+    if (($freshness['eligible'] ?? false) !== true) {
+        return [
+            'ok' => true,
+            'skipped' => true,
+            'reason' => 'account_state_not_fresh',
+            'details' => $freshness,
+        ];
+    }
     $sizingText = 'MAX STC QUANTITY: update account state / sizing before manual entry.';
     if (is_array($account)) {
         $openStmt = $pdo->prepare(
@@ -284,12 +296,21 @@ function stc_notify_signal_event(PDO $pdo, array $config, string $eventId): arra
             $riskPct = ((float)$account['equity_usd']) > 0
                 ? ((float)$sizing['risk_amount_usd'] / (float)$account['equity_usd']) * 100.0
                 : 0.0;
+            if (($sizing['allowed_by_position_limit'] ?? false) !== true
+                || ($sizing['allowed_by_risk_policy'] ?? false) !== true
+                || (float)($sizing['proposed_quantity'] ?? 0.0) <= 0.0) {
+                return ['ok' => true, 'skipped' => true, 'reason' => 'risk_capacity_unavailable_after_sizing'];
+            }
             $sizingText = 'MAX STC QUANTITY: ' . rtrim(rtrim(number_format((float)$sizing['proposed_quantity'], 6, '.', ''), '0'), '.')
                 . ' | DO NOT EXCEED; smaller is allowed'
                 . ' | Risk budget USD ' . number_format((float)$sizing['risk_amount_usd'], 2, '.', '')
                 . ' (' . number_format($riskPct, 3, '.', '') . '%)';
         } catch (Throwable $e) {
-            $sizingText = 'Sizing blocked: ' . $e->getMessage();
+            return [
+                'ok' => true,
+                'skipped' => true,
+                'reason' => 'risk_capacity_unavailable',
+            ];
         }
     }
 

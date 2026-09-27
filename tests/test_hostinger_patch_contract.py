@@ -791,3 +791,32 @@ def test_voided_ledger_rows_do_not_count_toward_competition_progress():
     assert "WHERE competition_id = ? AND status = 'CLOSED' AND closed_at_utc IS NOT NULL" in control
     assert "WHERE p.competition_id = ? AND p.status <> 'VOID' AND e.event_type = 'PARTIAL'" in control
     assert "WHERE p.competition_id = ? AND p.status <> 'VOID' AND e.event_type IN ('OPEN', 'PARTIAL', 'CLOSE')" in control
+
+
+
+def test_account_state_freshness_is_fail_closed_and_ticket_bound():
+    control = (PATCH / "portfolio_control.php").read_text(encoding="utf-8")
+    approval = (PATCH / "approval.php").read_text(encoding="utf-8")
+    notify = (PATCH / "notification_control.php").read_text(encoding="utf-8")
+    snapshot = (PATCH / "operator_snapshot.php").read_text(encoding="utf-8")
+
+    assert "function stc_account_state_freshness" in control
+    assert "account_state_source_not_owner_manual" in control
+    assert "account_state_stale" in control
+    assert "account_state_not_fresh:" in control
+    assert "approval_account_state_version_changed" in control
+    assert "'account_state_version' =>" in approval
+    assert "'account_state_freshness' =>" in approval
+    assert "'reason' => 'account_state_not_fresh'" in notify
+    assert "'reason' => 'risk_capacity_unavailable_after_sizing'" in notify
+    assert "'freshness' => stc_account_state_freshness($row, $now)" in snapshot
+
+
+def test_signal_notifications_require_fresh_account_and_real_capacity():
+    notify = (PATCH / "notification_control.php").read_text(encoding="utf-8")
+    assert "account_state_unavailable" in notify
+    assert "stc_account_state_freshness($account)" in notify
+    assert "allowed_by_position_limit" in notify
+    assert "allowed_by_risk_policy" in notify
+    assert "proposed_quantity" in notify
+    assert "risk_capacity_unavailable_after_sizing" in notify

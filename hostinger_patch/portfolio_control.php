@@ -180,6 +180,35 @@ function stc_validate_stc_plan_position(PDO $pdo, array $body): array {
         }
     }
 
+    if (is_array($executionTicket)) {
+        $ticketVersion = (int)($executionTicket['account_state_version'] ?? 0);
+        $accountStmt = $pdo->prepare(
+            'SELECT equity_usd, risk_fraction, source, version, updated_at_utc FROM stc_account_state '
+            . 'WHERE competition_id = ? LIMIT 1'
+        );
+        $accountStmt->execute([$competitionId]);
+        $account = $accountStmt->fetch();
+        if ($account === false) {
+            stc_json(['ok' => false, 'error' => 'account_state_unavailable'], 409);
+        }
+        $freshness = stc_account_state_freshness($account);
+        if (($freshness['eligible'] ?? false) !== true) {
+            stc_json([
+                'ok' => false,
+                'error' => 'account_state_not_fresh',
+                'reasons' => $freshness['reasons'] ?? [],
+            ], 409);
+        }
+        if ($ticketVersion <= 0 || $ticketVersion !== (int)($account['version'] ?? 0)) {
+            stc_json([
+                'ok' => false,
+                'error' => 'approval_account_state_version_changed',
+                'ticket_account_state_version' => $ticketVersion,
+                'current_account_state_version' => (int)($account['version'] ?? 0),
+            ], 409);
+        }
+    }
+
     return [
         'plan' => $plan,
         'signal_id' => $signalId,
@@ -767,6 +796,51 @@ function stc_propose_position_size(
 }
 
 
+function stc_account_state_freshness(
+    array $account,
+    ?DateTimeImmutable $now = null,
+    int $maxAgeSeconds = 86400
+): array {
+    $now = $now ?? new DateTimeImmutable('now', new DateTimeZone('UTC'));
+    $source = trim((string)($account['source'] ?? ''));
+    $equity = (float)($account['equity_usd'] ?? 0.0);
+    $version = (int)($account['version'] ?? 0);
+    $updated = stc_parse_utc(trim((string)($account['updated_at_utc'] ?? '')));
+    $reasons = [];
+    $ageSeconds = null;
+
+    if ($source !== 'owner_manual') {
+        $reasons[] = 'account_state_source_not_owner_manual';
+    }
+    if (!is_finite($equity) || $equity <= 0.0) {
+        $reasons[] = 'account_state_equity_invalid';
+    }
+    if ($version <= 0) {
+        $reasons[] = 'account_state_version_invalid';
+    }
+    if ($updated === null) {
+        $reasons[] = 'account_state_timestamp_invalid';
+    } else {
+        $ageSeconds = $now->getTimestamp() - $updated->getTimestamp();
+        if ($ageSeconds < -300) {
+            $reasons[] = 'account_state_from_future';
+        } elseif ($ageSeconds > max(1, $maxAgeSeconds)) {
+            $reasons[] = 'account_state_stale';
+        }
+    }
+
+    return [
+        'eligible' => $reasons === [],
+        'reasons' => $reasons,
+        'source' => $source,
+        'version' => $version,
+        'updated_at_utc' => $updated?->format(DateTimeInterface::ATOM),
+        'age_seconds' => $ageSeconds,
+        'max_age_seconds' => max(1, $maxAgeSeconds),
+    ];
+}
+
+
 function stc_current_position_sizing_for_plan(
     PDO $pdo,
     string $competitionId,
@@ -775,13 +849,18 @@ function stc_current_position_sizing_for_plan(
     float $stopPrice
 ): array {
     $accountStmt = $pdo->prepare(
-        'SELECT equity_usd, risk_fraction, source, updated_at_utc FROM stc_account_state '
+        'SELECT equity_usd, risk_fraction, source, version, updated_at_utc FROM stc_account_state '
         . 'WHERE competition_id = ? LIMIT 1'
     );
     $accountStmt->execute([$competitionId]);
     $account = $accountStmt->fetch();
     if ($account === false) {
         throw new RuntimeException('account_state_unavailable');
+    }
+    $freshness = stc_account_state_freshness($account);
+    if (($freshness['eligible'] ?? false) !== true) {
+        $reason = implode(',', (array)($freshness['reasons'] ?? []));
+        throw new RuntimeException('account_state_not_fresh:' . ($reason !== '' ? $reason : 'unknown'));
     }
 
     $qtyStmt = $pdo->prepare(
@@ -831,7 +910,9 @@ function stc_current_position_sizing_for_plan(
         $clusterOpenRiskUsd
     );
     $sizing['account_state_source'] = (string)($account['source'] ?? '');
+    $sizing['account_state_version'] = (int)($account['version'] ?? 0);
     $sizing['account_state_updated_at_utc'] = $account['updated_at_utc'] ?? null;
+    $sizing['account_state_freshness'] = $freshness;
     return $sizing;
 }
 

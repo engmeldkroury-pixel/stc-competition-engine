@@ -204,6 +204,10 @@ try {
                             'risk_amount_usd' => (float)$positionSizing['risk_amount_usd'],
                             'risk_budget_usd' => (float)$positionSizing['risk_budget_usd'],
                             'risk_fraction' => (float)$positionSizing['risk_fraction'],
+                            'account_state_source' => (string)($positionSizing['account_state_source'] ?? ''),
+                            'account_state_version' => (int)($positionSizing['account_state_version'] ?? 0),
+                            'account_state_updated_at_utc' => $positionSizing['account_state_updated_at_utc'] ?? null,
+                            'account_state_freshness' => $positionSizing['account_state_freshness'] ?? null,
                             'order_instruction' => $orderInstruction,
                             'do_not_exceed_quantity' => true,
                             'smaller_quantity_allowed' => true,
@@ -212,7 +216,13 @@ try {
                         ];
                     }
                 } catch (Throwable $e) {
-                    $reasons[] = 'risk_capacity_unavailable';
+                    if (str_starts_with($e->getMessage(), 'account_state_not_fresh:')) {
+                        $reasons[] = 'account_state_not_fresh';
+                    } elseif ($e->getMessage() === 'account_state_unavailable') {
+                        $reasons[] = 'account_state_unavailable';
+                    } else {
+                        $reasons[] = 'risk_capacity_unavailable';
+                    }
                 }
             }
 

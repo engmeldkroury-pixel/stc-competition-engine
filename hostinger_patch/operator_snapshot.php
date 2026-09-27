@@ -24,6 +24,7 @@ try {
             'source' => (string)$row['source'],
             'version' => (int)$row['version'],
             'updated_at_utc' => $row['updated_at_utc'],
+            'freshness' => stc_account_state_freshness($row, $now),
         ];
     }
 
