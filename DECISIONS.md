@@ -143,3 +143,14 @@
 - Record the -195.23USD realized-P/L reconciliation difference between screenshot and STC; do not fabricate missing transactions or attest fresh equity.
 - Treat returned TradingView BTC history as an unvalidated candidate backfill source until provider/time/session/overlap checks pass. No probe bar was merged into the accepted research dataset.
 - No live threshold/risk/stop/target/position/notification/approval changes. R9 priority is data/fill reconciliation before controlled same-cohort OOS exit/ATR selection.
+
+
+## R9 accepted evidence checkpoint - 2026-09-27T20:30:40.269361+00:00
+Core PR191 merged at 2a3b8aecae6bc53e1b5222c658e2a300500c3d2f; critical and full CI36347047903 succeeded. This is tested research infrastructure, not a promoted profitable strategy. No live gates, initial ATR stops, risk0.005, positions, broker actions, equity freshness or notifications changed.
+Corrected read36347045013, artifact10940971609: all9639matching signal rows admitted,206late decisions retained as expired, zero receipt/source/seed/plan quarantine. Three naturally persisted R8 frozen seeds verified. Dataset08979d9c931fe3f1d799ae76afb15ce01682ac989662c5fd041264f860d227a3;3519hypotheses and170original plans.
+Fixed-horizon same-cohort analysis:249selected,73valued/176unknown. Protection research36347455391 succeeded; none of the tested shorter targets, breakeven or trailing variants justified promotion. All are exploratory counterfactuals, not owner trades or an untouched holdout.
+Exact BTCprice overlays restored27observed missing candles in research only after35and143zero-disagreement overlap checks. Supplement94781fc1057c4c44b7a6d96df69f517ed1d376d243fe651be85f494d8975a665 has75commonlyvalued/174unknown. MNQarchive112overlaps/27disagreements was NOT merged. Do not average or rank differing cohorts as measured improvement.
+The195.23USD screenshot/ledger delta equals prior documented54.39residual plus visibleBTC140.8432loss to displayed cents. Old residual remains unattributed; no trade imported without exact close time/identity. Closest BTCplan hasTP85189.5655 versus screenshot85500; source linkage is tentative only.
+Details:docs/R9_RESULTS_2026-09-27.md. Additional experiments and price-overlay tooling remain on research/r9-protection-20260927, not live runtime code. Future protocol is registered, not evaluated or scheduled; preserve purge/embargo and no-retuning boundaries.
+
+Decision: preserve unfavorable empirical findings; do not substitute a tighter target or wider stop for evidence. Late entry expiry and valid historical candle retention are different contracts.

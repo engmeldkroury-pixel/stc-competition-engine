@@ -511,3 +511,13 @@ Implemented on `stc-r8-outcome-attribution-20260927`: frozen rejected/accepted d
 5. Add fixed-horizon mark-to-market for unresolved exits and compare 1/1.5/2/2.5 single-TP policies and existing versus volatility/structure-aware stops on the SAME non-overlapping entry cohort. Include actual costs where available, cost sensitivity, gaps and ambiguity. Do not optimize only settled trades.
 6. Freeze chronological train/validation/holdout boundaries, purge overlap, keep Capital/AMP and asset/timeframe results separate, and withhold live promotion without OOS evidence. Continue ablation/84-vs-Boolean/monthly/asset-specific/AMP work after data readiness.
 7. Keep 84, Boolean, monthly, ATR geometry and 0.005 risk unchanged. Manual execution only. Log each completed change/test/readback and each unresolved blocker; no profitability guarantee.
+
+
+## R10 next executable batch after R9
+Read the latest CURRENT_CHECKPOINT first; do not restart R1-R9.
+1. Investigate MNQsource close discrepancies and remaining source/quote timing gaps. Current-source bar confirmation versus host-chart confirmation is a hypothesis to test, not a proven cause. Do not change live Pine feeds without verified source parity and compilation/runtime tests.
+2. Run controlled entry-timing and volatility/structure-aware initial-stop experiments on the same entry opportunities, maintaining monetary risk and realistic fee/spread exposure. Existing open stops must not be widened for recovery.
+3. Preserve and expand natural frozen-seed capture. Historical accepted/rejected reconstructed hypotheses are not independent executed trades. Separate asset, timeframe, competition and gate strata.
+4. Complete execution-to-plan reconciliation only with exact fill/close identifiers and timestamps. Opera browser read failed as disconnected in this session. No Capital.com API account is required; previous project history parks that optional route.
+5. For prospective protocol evidence from2026-09-28T00:00Z, purge training windows overlapping evaluation and apply a horizon-sized embargo when fitting/tuning. Do not retune on the evaluation data. No automated promotion or win probability.
+No owner upload or account refresh is needed to use this engineering update. No fresh trade recommendation is issued.

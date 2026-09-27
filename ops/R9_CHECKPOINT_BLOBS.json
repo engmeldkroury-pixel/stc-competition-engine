@@ -1,0 +1,66 @@
+{
+  "checkpoint_id": "STC-R9-FINAL-20260927",
+  "main_base_sha": "2a3b8aecae6bc53e1b5222c658e2a300500c3d2f",
+  "merged_code_sha": "2a3b8aecae6bc53e1b5222c658e2a300500c3d2f",
+  "ci_run": 36347047903,
+  "files": {
+    "PROJECT_STATE.md": {
+      "before_blob": "a4a769d81cb92a2db9adcdf6bcaaa5e07a6882d2",
+      "after_blob": "5dfdf2c91b6c243dc97f3b8a1be0eeda35e7ef5c",
+      "before_bytes": 171929,
+      "after_bytes": 173816
+    },
+    "NEXT_TASK.md": {
+      "before_blob": "244878e2f07a167c87ef32eb53dc2ae35b2defa5",
+      "after_blob": "c242b49304e22116081e28944e6191f62d5062ff",
+      "before_bytes": 27583,
+      "after_bytes": 29017
+    },
+    "DECISIONS.md": {
+      "before_blob": "0e9f93bcf19ed8fa83cb9a5d1bc24c632b697362",
+      "after_blob": "43381d3d23b108839796d3ac0c2ffc8535bc838a",
+      "before_bytes": 12665,
+      "after_bytes": 14748
+    },
+    "docs/STC_ADAPTIVE_RESEARCH_MASTER_LEDGER.md": {
+      "before_blob": "e510a92b76d69897ae131bc9b8e07930813b39a4",
+      "after_blob": "656e0c1fd9f7a4f052abbc2a08a271def74574ab",
+      "before_bytes": 64094,
+      "after_bytes": 67414
+    },
+    "docs/R9_DATA_EXIT_AUDIT_2026-09-27.md": {
+      "before_blob": "874cddd0cd0adad84a40e39375b0d749a06cd0fa",
+      "after_blob": "26aad1a468f1d0d48f40898bd7c69117a3f4c1db",
+      "before_bytes": 2248,
+      "after_bytes": 4135
+    },
+    "CURRENT_CHECKPOINT.md": {
+      "before_blob": "4ce88a7d5c2b8160c32bce0264531ff3f1a92e76",
+      "after_blob": "0e88520fce5f5d4170608557f684d8e14e14147a",
+      "before_bytes": 5882,
+      "after_bytes": 9282
+    },
+    "BATCH_REGISTER.csv": {
+      "before_blob": "ba7f279f22ad39d0e16c978eb2f3c5ce424a4012",
+      "after_blob": "3c464421feec878f450c4abd0dc470cec6e657ba",
+      "before_bytes": 9126,
+      "after_bytes": 9545
+    },
+    "TEST_REGISTER.csv": {
+      "before_blob": "7acc9e08c7cbae215bb0a7a7df7d6623bf3e423d",
+      "after_blob": "103579512eb0a4a5a2af87a7661ae15527343cde",
+      "before_bytes": 7736,
+      "after_bytes": 8124
+    },
+    "RISK_REGISTER.csv": {
+      "before_blob": "6f6f8801834d9447f2c56300948a830defebc885",
+      "after_blob": "92165abb29670fd2d0c8f4a1c43acdde7ee75446",
+      "before_bytes": 11553,
+      "after_bytes": 12429
+    },
+    "docs/R9_RESULTS_2026-09-27.md": {
+      "before_blob": null,
+      "after_blob": "49db368b1fe1c39ffc71b21a31ca0525046eead3"
+    }
+  }
+}

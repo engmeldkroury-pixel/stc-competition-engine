@@ -33,3 +33,7 @@ STC-POSTAUDIT-PROD-20260927,VERIFIED_DEPLOYED,"Consolidated R3b/R5/R6 Hostinger 
 STC-R8,IMPLEMENTED_LOCAL_CRITICAL_PASS,Causal rejected-trade attribution; no live promotion,82 focused / 273 critical local passed; see R8 doc,PR full CI then bounded production capture
 STC-R8-FINAL-20260927,ACCEPTED_CORE_RESEARCH_NOT_PROMOTED,Frozen research seeds and causal rejected-signal attribution,PR190 merged9a1c32e09fc43a5eff02fd3f6094581440b2aedc; CI36343737101 536passed1warning; readback36344826332SUCCESS,R9 source continuity and actual-fill reconciliation; verify first natural frozen seed
 STC-R8-HISTORY-20260927,EVIDENCE_CAPTURED_LIMITED,Read-only latest5000 signal rows across26 symbols plus non-overlap and cost diagnostics,run36344024376 artifact10939992635;1947legacy hypotheses;1416censored508noentry23complete;research branch tools,Do not promote exits; validate candidate exact-provider backfill and compare same-cohort OOS with fixed-horizon marks
+
+
+STC-R9-CORE,MERGED_CI_VERIFIED,Validated dataset and paired exit research,PR191 2a3b8aecae6bc53e1b5222c658e2a300500c3d2f; CI36347047903; read36347045013,R10 entry/source/initial-stop evidence
+STC-R9-PROTECTION,TESTED_RESEARCH_NO_PROMOTION,Closed-bar protection and reviewed BTCsupplements,Research36347455391; 27observed bars added in local reviewed dataset,Investigate source discrepancies; preserve frozen protocol

@@ -1177,3 +1177,21 @@ Historical evidence now exists: run36344024376 captured latest5000/9630 signal r
 Fee proxy warning: screenshot BTC commissions alone are0.063819R; report0.02R is not measured. STC Capital realized ledger-3370.87/fourdays differs from screenshot-3566.10/fivedays; reconcile, do not invent fills.
 
 TradingView read-only history probe returned550BTC15m bars spanningSep22..Sep27; delayed/session-limited source remains unvalidated and unintegrated. Next batchR9: contiguous exact-provider history plus actual-fill/plan-ID reconciliation, then same-cohort fixed-horizon exit/ATR ablation with chronological purged holdout. Research-only tools/results live on research/r8-history-evidence-20260927; main has the accepted core and durable handoff docs. See CURRENT_CHECKPOINT.md and docs/R8_HISTORY_RESULTS_2026-09-27.md.
+
+
+## R9 accepted evidence checkpoint - 2026-09-27T20:30:40.269361+00:00
+Core PR191 merged at 2a3b8aecae6bc53e1b5222c658e2a300500c3d2f; critical and full CI36347047903 succeeded. This is tested research infrastructure, not a promoted profitable strategy. No live gates, initial ATR stops, risk0.005, positions, broker actions, equity freshness or notifications changed.
+Corrected read36347045013, artifact10940971609: all9639matching signal rows admitted,206late decisions retained as expired, zero receipt/source/seed/plan quarantine. Three naturally persisted R8 frozen seeds verified. Dataset08979d9c931fe3f1d799ae76afb15ce01682ac989662c5fd041264f860d227a3;3519hypotheses and170original plans.
+Fixed-horizon same-cohort analysis:249selected,73valued/176unknown. Protection research36347455391 succeeded; none of the tested shorter targets, breakeven or trailing variants justified promotion. All are exploratory counterfactuals, not owner trades or an untouched holdout.
+Exact BTCprice overlays restored27observed missing candles in research only after35and143zero-disagreement overlap checks. Supplement94781fc1057c4c44b7a6d96df69f517ed1d376d243fe651be85f494d8975a665 has75commonlyvalued/174unknown. MNQarchive112overlaps/27disagreements was NOT merged. Do not average or rank differing cohorts as measured improvement.
+The195.23USD screenshot/ledger delta equals prior documented54.39residual plus visibleBTC140.8432loss to displayed cents. Old residual remains unattributed; no trade imported without exact close time/identity. Closest BTCplan hasTP85189.5655 versus screenshot85500; source linkage is tentative only.
+Details:docs/R9_RESULTS_2026-09-27.md. Additional experiments and price-overlay tooling remain on research/r9-protection-20260927, not live runtime code. Future protocol is registered, not evaluated or scheduled; preserve purge/embargo and no-retuning boundaries.
+
+## R10 next executable batch after R9
+Read the latest CURRENT_CHECKPOINT first; do not restart R1-R9.
+1. Investigate MNQsource close discrepancies and remaining source/quote timing gaps. Current-source bar confirmation versus host-chart confirmation is a hypothesis to test, not a proven cause. Do not change live Pine feeds without verified source parity and compilation/runtime tests.
+2. Run controlled entry-timing and volatility/structure-aware initial-stop experiments on the same entry opportunities, maintaining monetary risk and realistic fee/spread exposure. Existing open stops must not be widened for recovery.
+3. Preserve and expand natural frozen-seed capture. Historical accepted/rejected reconstructed hypotheses are not independent executed trades. Separate asset, timeframe, competition and gate strata.
+4. Complete execution-to-plan reconciliation only with exact fill/close identifiers and timestamps. Opera browser read failed as disconnected in this session. No Capital.com API account is required; previous project history parks that optional route.
+5. For prospective protocol evidence from2026-09-28T00:00Z, purge training windows overlapping evaluation and apply a horizon-sized embargo when fitting/tuning. Do not retune on the evaluation data. No automated promotion or win probability.
+No owner upload or account refresh is needed to use this engineering update. No fresh trade recommendation is issued.
