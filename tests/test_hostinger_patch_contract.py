@@ -856,3 +856,20 @@ def test_operator_and_notification_use_same_management_history_window():
     assert "192" in snapshot
     assert "192" in notify
     assert "PARTIAL_TAKE_PROFIT" not in (PATCH / "portfolio_control.php").read_text(encoding="utf-8")
+
+
+
+def test_safe_mode_pauses_new_entry_notifications_but_keeps_portfolio_management_path():
+    notify = (PATCH / "notification_control.php").read_text(encoding="utf-8")
+    ui = (PATCH / "operator.php").read_text(encoding="utf-8")
+    signal_start = notify.index("function stc_notify_signal_event")
+    portfolio_start = notify.index("function stc_notify_portfolio")
+    signal_fn = notify[signal_start:portfolio_start]
+    portfolio_fn = notify[portfolio_start:]
+
+    assert "stc_runtime_control_row($pdo)" in signal_fn
+    assert "safe_mode_entry_pause" in signal_fn
+    assert "kill_switch_entry_pause" in signal_fn
+    assert "safe_mode_entry_pause" not in portfolio_fn
+    assert "Pause new entries; keep management" in ui
+    assert "setControls(true,false)" in ui
