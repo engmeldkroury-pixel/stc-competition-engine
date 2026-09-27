@@ -430,3 +430,17 @@ Next action:
 3. separately prepare/test two correctness patches: stale-equity freshness block and Python/PHP exit-policy parity;
 4. do not deploy either correctness patch until regression checks are green and owner impact is explicit.
 
+## 2026-09-27 — Final GPT-6 Pro / Codex Work audit prompt prepared
+Use:
+- `docs/GPT6_PRO_CODEX_WORK_FINAL_STC_FULL_AUDIT_PROMPT_2026-09-27.md`
+- commit `1e188145bf3d8fd79fe666f20825768ca5467cbc`
+
+Next owner action:
+1. Open GPT-6 Pro in Codex/Work with access to the GitHub repository.
+2. Send the full prompt unchanged.
+3. Ensure the model can inspect the repo before accepting any `VERIFIED_FROM_CODE` claim.
+4. Return the complete audit/report here.
+5. Do not allow the external reviewer to modify the repository during the audit pass.
+
+After the report returns, STC should execute only the single immediate batch selected after reconciling the reviewer findings against current code/live evidence.
+
