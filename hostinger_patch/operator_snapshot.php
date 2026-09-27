@@ -442,11 +442,11 @@ try {
             $pdo,
             (string)$positionRow['competition_id'],
             (string)$positionRow['symbol'],
-            192
+            4096
         );
         $advice = stc_supervise_position($positionRow, $history);
         $public['management'] = $advice;
-        $public['latest_signal_history'] = $history;
+        $public['latest_signal_history'] = array_slice($history, -192);
 
         try {
             $value = stc_price_value_usd(

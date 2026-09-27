@@ -870,3 +870,19 @@ def test_snapshot_exposes_exact_boolean_quality_gate_quadrants():
         "boolean_false_quality_false",
     ):
         assert key in snapshot
+
+
+
+def test_management_history_is_post_entry_freshness_gated_and_channel_parity_uses_long_window():
+    control = (PATCH / "portfolio_control.php").read_text(encoding="utf-8")
+    snapshot = (PATCH / "operator_snapshot.php").read_text(encoding="utf-8")
+    notify = (PATCH / "notification_control.php").read_text(encoding="utf-8")
+
+    assert "function stc_management_history_freshness" in control
+    assert "signal_history_stale" in control
+    assert "post_entry_history_unavailable" in control
+    assert "history_freshness" in control
+    assert "min($limit, 4096)" in control
+    assert "(string)$positionRow['symbol'],\n            4096" in snapshot
+    assert "array_slice($history, -192)" in snapshot
+    assert "(string)$position['symbol'],\n            4096" in notify

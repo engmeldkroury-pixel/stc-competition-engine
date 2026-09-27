@@ -443,7 +443,7 @@ function stc_notify_portfolio(PDO $pdo, array $config): array {
             $pdo,
             (string)$position['competition_id'],
             (string)$position['symbol'],
-            192
+            4096
         );
         $advice = stc_supervise_position($position, $history);
         if (($advice['action'] ?? 'HOLD') === 'HOLD') {
