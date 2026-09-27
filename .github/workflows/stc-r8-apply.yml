@@ -1,0 +1,46 @@
+name: STC R8 Verified Branch Changeset
+on:
+  push:
+    branches: [stc-r8-outcome-attribution-20260927]
+    paths: [.github/workflows/stc-r8-apply.yml]
+permissions:
+  contents: write
+jobs:
+  apply:
+    if: github.ref == 'refs/heads/stc-r8-outcome-attribution-20260927'
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: stc-r8-outcome-attribution-20260927
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate and apply the locally tested source changeset
+        run: |
+          python - <<'PY'
+          import base64, hashlib, lzma, pathlib, subprocess
+          encoded = ''.join(pathlib.Path(f'ops/R8_SOURCE_PATCH_{i}.b64').read_text().strip() for i in (1, 2))
+          patch = lzma.decompress(base64.b64decode(encoded, validate=True))
+          assert hashlib.sha256(patch).hexdigest() == 'ab15645c21ef5226d54a664ad866eab53c64ad4f9c5dddabd964c0f4d6c2eb12'
+          target = pathlib.Path('/tmp/r8.patch'); target.write_bytes(patch)
+          allowed = {'app/outcome_attribution.py','app/outcome_report.py','app/event_decision.py','scripts/run_outcome_attribution.py','tests/test_outcome_attribution.py','docs/R8_OUTCOME_ATTRIBUTION_2026-09-27.md','NEXT_TASK.md','PROJECT_STATE.md','DECISIONS.md','docs/STC_ADAPTIVE_RESEARCH_MASTER_LEDGER.md','BATCH_REGISTER.csv','TEST_REGISTER.csv','RISK_REGISTER.csv'}
+          names = {line.split('\t',2)[2] for line in subprocess.check_output(['git','apply','--numstat',str(target)], text=True).splitlines()}
+          assert names == allowed, names
+          subprocess.run(['git','apply','--check',str(target)],check=True)
+          subprocess.run(['git','apply',str(target)],check=True)
+          PY
+      - name: Install pinned project dependencies
+        run: pip install -r requirements.txt
+      - name: Verify outcome and existing execution contracts
+        run: pytest -q tests/test_outcome_attribution.py tests/test_event_decision.py tests/test_trade_plan.py tests/test_cloud_approval.py tests/test_serverless_worker.py tests/test_notification_contract.py
+      - name: Commit source to development branch only
+        run: |
+          git config user.name 'STC Engineering'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add app/outcome_attribution.py app/outcome_report.py app/event_decision.py scripts/run_outcome_attribution.py tests/test_outcome_attribution.py docs/R8_OUTCOME_ATTRIBUTION_2026-09-27.md NEXT_TASK.md PROJECT_STATE.md DECISIONS.md docs/STC_ADAPTIVE_RESEARCH_MASTER_LEDGER.md BATCH_REGISTER.csv TEST_REGISTER.csv RISK_REGISTER.csv
+          git diff --cached --check
+          git commit -m 'feat(R8): causal rejected-signal outcomes, regression tests and durable ledger'
+          git push origin HEAD:stc-r8-outcome-attribution-20260927
+          git rev-parse HEAD
