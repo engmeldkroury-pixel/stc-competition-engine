@@ -1,0 +1,62 @@
+name: STC R9 Protection Research Only
+on:
+  push:
+    branches: [research/r9-protection-20260927]
+    paths: [.github/workflows/stc-r9-protection-research.yml]
+permissions:
+  contents: read
+  actions: read
+jobs:
+  experiment:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: |
+          pip install -r requirements.txt
+          pytest -q tests/test_protection_experiment.py tests/test_r9_late_decisions.py tests/test_r9_data_exit_audit.py tests/test_outcome_attribution.py
+      - uses: actions/download-artifact@v4
+        with:
+          name: stc-r9-data-exit-evidence
+          run-id: 36347045013
+          github-token: ${{ github.token }}
+          path: /tmp/r9-input
+      - name: Compare unchanged candidate policies on fixed historical evidence
+        run: |
+          python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          from app.outcome_dataset import validate_dataset,digest
+          from app.protection_experiment import compare_protection
+          from app.exit_policy_audit import audit_exit_policies
+          root=Path('/tmp/r9-input');out=Path('/tmp/r9-protection');out.mkdir()
+          manifest=json.loads((root/'manifest.json').read_text())
+          for name,sha in manifest['file_sha256'].items():
+              assert hashlib.sha256((root/name).read_bytes()).hexdigest()==sha
+          data=json.loads((root/'normalized-dataset.json').read_text());validate_dataset(data)
+          assert data['dataset_sha256']=='08979d9c931fe3f1d799ae76afb15ce01682ac989662c5fd041264f860d227a3'
+          reports={str(c):compare_protection(data,cost_r=c) for c in (0.0,0.02,0.05,0.10)}
+          common=set.intersection(*(set(r['common_event_ids']) for r in reports.values()))
+          for cost,report in reports.items():
+              (out/('protection-cost-'+cost+'.json')).write_text(json.dumps(report,indent=2,sort_keys=True)+'\n')
+          plans={p['source_event_id']:p for p in data['original_plans']}
+          subset=[s for s in data['seeds'] if s['event_id'] in plans and abs(s['stop']-plans[s['event_id']]['initial_stop'])<1e-8 and abs(s['plan_mid']-plans[s['event_id']]['entry_mid'])<1e-8]
+          selected=dict(data);selected['seeds']=subset
+          selected['parent_dataset_sha256']=data['dataset_sha256'];selected['subset_scope']='original_locked_plan_geometry_not_executed_trades'
+          selected['dataset_sha256']=digest({k:v for k,v in selected.items() if k!='dataset_sha256'})
+          (out/'locked-plan-protection.json').write_text(json.dumps(compare_protection(selected),indent=2,sort_keys=True)+'\n')
+          (out/'locked-plan-targets.json').write_text(json.dumps(audit_exit_policies(selected),indent=2,sort_keys=True)+'\n')
+          brief={'source_dataset_sha256':data['dataset_sha256'],'code_sha':os.environ['GITHUB_SHA'],'historical_exploration_only':True,'common_across_costs_n':len(common),'matched_original_plans':len(subset),'cost_0_02_statistics':reports['0.02']['policy_statistics'],'live_promotion_allowed':False,'execution':'none','file_sha256':{p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in out.iterdir()}}
+          (out/'experiment-manifest.json').write_text(json.dumps(brief,indent=2,sort_keys=True)+'\n')
+          print('STC_R9_PROTECTION='+json.dumps(brief,sort_keys=True))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: stc-r9-protection-research
+          path: /tmp/r9-protection/*.json
+          retention-days: 7
