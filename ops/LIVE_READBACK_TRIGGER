@@ -1,2 +1,2 @@
-2026-09-27T16:45:00+03:00
-Verify STC-R3a position management parity and 192-bar history effect on current open positions.
+2026-09-27T21:29:00+03:00
+Verify deployed R3b/R5/R6 controls, paused entry alerts, open-position freshness, gate diagnostics, account-state freshness, and notification config.
