@@ -1,2 +1,2 @@
-2026-09-27T01:08:00+03:00
-Deploy competition-progress VOID exclusion fix after ledger reconciliation.
+2026-09-27T16:24:00+03:00
+Deploy STC-R1 fail-closed stale-equity / account-version binding / unactionable Telegram suppression after critical CI passed 201 tests.
