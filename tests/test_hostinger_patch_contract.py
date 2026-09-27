@@ -735,7 +735,7 @@ def test_snapshot_exposes_research_only_competition_gate_opportunity_audit():
 def test_php_portfolio_supervisor_tracks_closed_bar_high_water_profit_lock():
     control = (PATCH / "portfolio_control.php").read_text(encoding="utf-8")
     notify = (PATCH / "notification_control.php").read_text(encoding="utf-8")
-    assert "min($limit, 192)" in control
+    assert "min($limit, 4096)" in control
     assert "$peakR = $r;" in control
     assert "$lockedR = max(1.50, $peakR - 0.75);" in control
     assert "$lockedR = max(1.75, $peakR - 0.60);" in control
@@ -743,7 +743,7 @@ def test_php_portfolio_supervisor_tracks_closed_bar_high_water_profit_lock():
     assert "progressive_profit_lock_from_closed_bar_high_water" in control
     assert "Peak closed-bar R:" in notify
     assert "Locked R floor:" in notify
-    assert "192" in notify
+    assert "4096" in notify
 
 
 def test_competition_opportunity_eligibility_is_symmetric_for_capital_and_amp():
@@ -853,8 +853,9 @@ def test_operator_and_notification_use_same_management_history_window():
     notify = (PATCH / "notification_control.php").read_text(encoding="utf-8")
     assert "stc_recent_signal_states" in snapshot
     assert "stc_recent_signal_states" in notify
-    assert "192" in snapshot
-    assert "192" in notify
+    assert "4096" in snapshot
+    assert "4096" in notify
+    assert "array_slice($history, -192)" in snapshot
     assert "PARTIAL_TAKE_PROFIT" not in (PATCH / "portfolio_control.php").read_text(encoding="utf-8")
 
 
@@ -870,6 +871,23 @@ def test_snapshot_exposes_exact_boolean_quality_gate_quadrants():
         "boolean_false_quality_false",
     ):
         assert key in snapshot
+
+
+
+def test_management_history_is_post_entry_freshness_gated_and_channel_parity_uses_long_window():
+    control = (PATCH / "portfolio_control.php").read_text(encoding="utf-8")
+    snapshot = (PATCH / "operator_snapshot.php").read_text(encoding="utf-8")
+    notify = (PATCH / "notification_control.php").read_text(encoding="utf-8")
+
+    assert "function stc_management_history_freshness" in control
+    assert "int $maxAgeSeconds = 7200" in control
+    assert "signal_history_stale" in control
+    assert "post_entry_history_unavailable" in control
+    assert "history_freshness" in control
+    assert "min($limit, 4096)" in control
+    assert "(string)$positionRow['symbol'],\n            4096" in snapshot
+    assert "array_slice($history, -192)" in snapshot
+    assert "(string)$position['symbol'],\n            4096" in notify
 
 
 

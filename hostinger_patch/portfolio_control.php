@@ -218,7 +218,7 @@ function stc_validate_stc_plan_position(PDO $pdo, array $body): array {
 }
 
 function stc_recent_signal_states(PDO $pdo, string $competitionId, string $symbol, int $limit = 3): array {
-    $limit = max(1, min($limit, 192));
+    $limit = max(1, min($limit, 4096));
     $stmt = $pdo->prepare(
         'SELECT payload_json, result_json FROM stc_webhook_events '
         . "WHERE status = 'ingested' "
@@ -246,6 +246,68 @@ function stc_recent_signal_states(PDO $pdo, string $competitionId, string $symbo
     return array_reverse($items);
 }
 
+function stc_management_history_freshness(
+    array $history,
+    ?DateTimeImmutable $now = null,
+    int $maxAgeSeconds = 7200
+): array {
+    $now = $now ?? new DateTimeImmutable('now', new DateTimeZone('UTC'));
+    $maxAgeSeconds = max(60, $maxAgeSeconds);
+    if ($history === []) {
+        return [
+            'fresh' => false,
+            'reason' => 'no_fresh_signal_history',
+            'latest_signal_time' => null,
+            'age_seconds' => null,
+            'max_age_seconds' => $maxAgeSeconds,
+        ];
+    }
+
+    $latest = $history[count($history) - 1];
+    $raw = trim((string)($latest['time'] ?? ''));
+    try {
+        $latestTime = new DateTimeImmutable($raw, new DateTimeZone('UTC'));
+        $latestTime = $latestTime->setTimezone(new DateTimeZone('UTC'));
+    } catch (Throwable $e) {
+        return [
+            'fresh' => false,
+            'reason' => 'signal_history_time_invalid',
+            'latest_signal_time' => $raw !== '' ? $raw : null,
+            'age_seconds' => null,
+            'max_age_seconds' => $maxAgeSeconds,
+        ];
+    }
+
+    $ageSeconds = $now->getTimestamp() - $latestTime->getTimestamp();
+    if ($ageSeconds < -300) {
+        return [
+            'fresh' => false,
+            'reason' => 'signal_history_from_future',
+            'latest_signal_time' => $latestTime->format(DateTimeInterface::ATOM),
+            'age_seconds' => $ageSeconds,
+            'max_age_seconds' => $maxAgeSeconds,
+        ];
+    }
+    if ($ageSeconds > $maxAgeSeconds) {
+        return [
+            'fresh' => false,
+            'reason' => 'signal_history_stale',
+            'latest_signal_time' => $latestTime->format(DateTimeInterface::ATOM),
+            'age_seconds' => $ageSeconds,
+            'max_age_seconds' => $maxAgeSeconds,
+        ];
+    }
+
+    return [
+        'fresh' => true,
+        'reason' => 'fresh',
+        'latest_signal_time' => $latestTime->format(DateTimeInterface::ATOM),
+        'age_seconds' => max(0, $ageSeconds),
+        'max_age_seconds' => $maxAgeSeconds,
+    ];
+}
+
+
 function stc_supervise_position(array $position, array $history): array {
     if ($history === []) {
         return [
@@ -256,7 +318,46 @@ function stc_supervise_position(array $position, array $history): array {
             'thesis_degraded' => false,
             'suggested_stop' => (float)$position['current_stop'],
             'suggested_partial_fraction' => null,
+            'history_freshness' => stc_management_history_freshness([]),
             'reasons' => ['no_fresh_signal_history'],
+        ];
+    }
+
+    $openedTs = strtotime((string)($position['opened_at_utc'] ?? '') . ' UTC');
+    $postEntryHistory = [];
+    foreach ($history as $item) {
+        $itemTs = strtotime((string)($item['time'] ?? ''));
+        if ($openedTs !== false && $itemTs !== false && $itemTs < $openedTs) {
+            continue;
+        }
+        $postEntryHistory[] = $item;
+    }
+    if ($postEntryHistory === []) {
+        return [
+            'action' => 'HOLD',
+            'urgency' => 'normal',
+            'r_multiple' => null,
+            'unrealized_pnl_usd' => null,
+            'thesis_degraded' => false,
+            'suggested_stop' => (float)$position['current_stop'],
+            'suggested_partial_fraction' => null,
+            'history_freshness' => stc_management_history_freshness([]),
+            'reasons' => ['post_entry_history_unavailable'],
+        ];
+    }
+    $history = $postEntryHistory;
+    $freshness = stc_management_history_freshness($history);
+    if (($freshness['fresh'] ?? false) !== true) {
+        return [
+            'action' => 'HOLD',
+            'urgency' => 'normal',
+            'r_multiple' => null,
+            'unrealized_pnl_usd' => null,
+            'thesis_degraded' => false,
+            'suggested_stop' => (float)$position['current_stop'],
+            'suggested_partial_fraction' => null,
+            'history_freshness' => $freshness,
+            'reasons' => [(string)($freshness['reason'] ?? 'signal_history_stale')],
         ];
     }
 
@@ -282,7 +383,6 @@ function stc_supervise_position(array $position, array $history): array {
     // This allows competition management to protect a meaningful fraction of
     // large unrealized gains even after the market starts retracing.
     $peakR = $r;
-    $openedTs = strtotime((string)($position['opened_at_utc'] ?? '') . ' UTC');
     foreach ($history as $item) {
         $itemTs = strtotime((string)($item['time'] ?? ''));
         if ($openedTs !== false && $itemTs !== false && $itemTs < $openedTs) {
@@ -375,6 +475,7 @@ function stc_supervise_position(array $position, array $history): array {
             'thesis_degraded' => true,
             'suggested_stop' => null,
             'suggested_partial_fraction' => null,
+            'history_freshness' => $freshness,
             'reasons' => ['two_closed_bars_confirmed_strong_opposite_signal'],
         ];
     }
@@ -440,6 +541,7 @@ function stc_supervise_position(array $position, array $history): array {
         'thesis_degraded' => false,
         'suggested_stop' => $currentStop,
         'suggested_partial_fraction' => null,
+        'history_freshness' => $freshness,
         'reasons' => ['original_thesis_not_invalidated', 'no_confirmed_exit_condition'],
     ];
 }
