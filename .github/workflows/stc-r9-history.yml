@@ -1,0 +1,58 @@
+name: STC R9 Read Only Data and Exit Audit
+on:
+  push:
+    branches: [stc-r9-data-exit-audit-20260927]
+    paths: [ops/R9_HISTORY_READY]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: stc-r9-read-only-audit
+  cancel-in-progress: false
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate research code before reading production
+        run: |
+          pip install -r requirements.txt
+          pytest -q tests/test_r9_data_exit_audit.py tests/test_outcome_attribution.py
+      - name: Configure existing SSH identity without exposing secrets
+        env:
+          SSH_KEY: ${{ secrets.HOSTINGER_SSH_PRIVATE_KEY }}
+          SSH_HOST: ${{ secrets.HOSTINGER_SSH_HOST }}
+        run: |
+          set -euo pipefail
+          umask 077
+          test -n "$SSH_KEY"; test -n "$SSH_HOST"
+          mkdir -p "$HOME/.ssh"
+          printf '%s\n' "$SSH_KEY" | tr -d '\r' > "$HOME/.ssh/id_ed25519"
+          ssh-keygen -y -f "$HOME/.ssh/id_ed25519" >/dev/null 2>&1
+          ssh-keyscan -p 65002 "$SSH_HOST" > "$HOME/.ssh/known_hosts" 2>/dev/null
+      - name: Read a wider consistent snapshot without database writes
+        env:
+          SSH_HOST: ${{ secrets.HOSTINGER_SSH_HOST }}
+          SSH_USER: ${{ secrets.HOSTINGER_SSH_USER }}
+          TARGET: ${{ secrets.HOSTINGER_STC_PUBLIC_HTML }}
+        run: |
+          set -euo pipefail
+          umask 077
+          [[ "$TARGET" =~ ^/home/[A-Za-z0-9_-]+/domains/stc\.feama\.site/public_html$ ]]
+          ssh -o BatchMode=yes -o ConnectTimeout=15 -p 65002 "$SSH_USER@$SSH_HOST" "php /dev/stdin '$TARGET'" < scripts/export_r9_history.php > "$RUNNER_TEMP/stc-r9-private-source.json"
+      - name: Validate receipts and create normalized research evidence
+        run: python scripts/run_r9_audit.py --input "$RUNNER_TEMP/stc-r9-private-source.json" --output-dir /tmp/stc-r9-evidence --horizon-bars 32 --cost-r 0.02
+      - uses: actions/upload-artifact@v4
+        with:
+          name: stc-r9-data-exit-evidence
+          path: /tmp/stc-r9-evidence/*.json
+          retention-days: 7
+      - name: Remove private raw input and temporary credential copy
+        if: always()
+        run: rm -f "$RUNNER_TEMP/stc-r9-private-source.json" "$HOME/.ssh/id_ed25519"
