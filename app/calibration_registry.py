@@ -119,6 +119,10 @@ def runtime_calibration_usable(
 ) -> tuple[bool, tuple[str, ...]]:
     now = as_of.astimezone(UTC)
     reasons: list[str] = []
+    if record.informational_only:
+        reasons.append("research_record_informational_only")
+    if record.generated_at_utc > now:
+        reasons.append("research_generated_in_future")
     age_days = (now - record.data_end_utc).total_seconds() / 86400.0
     if age_days < -0.01:
         reasons.append("research_data_end_is_in_future")

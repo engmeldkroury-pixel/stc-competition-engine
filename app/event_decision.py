@@ -119,6 +119,12 @@ def decide_bridge_event(event_id: str, payload: dict) -> dict:
     calibration_matches_entry_timeframe = (
         calibration is not None and str(calibration.timeframe) == str(tv.timeframe)
     )
+    calibration_live_authorized = (
+        calibration_matches_entry_timeframe
+        and calibration is not None
+        and calibration.informational_only is False
+        and calibration.generated_at_utc <= tv.time
+    )
     family_evidence = aggregate_live_family_scores(
         {
             "trend": tv.family_trend,
@@ -133,12 +139,12 @@ def decide_bridge_event(event_id: str, payload: dict) -> dict:
         },
         strategy_id=(
             calibration.strategy_id
-            if calibration_matches_entry_timeframe and calibration is not None
+            if calibration_live_authorized and calibration is not None
             else None
         ),
         family_weight_override=(
             calibration.family_weights
-            if calibration_matches_entry_timeframe and calibration is not None
+            if calibration_live_authorized and calibration is not None
             else None
         ),
     )
@@ -271,7 +277,7 @@ def decide_bridge_event(event_id: str, payload: dict) -> dict:
         "family_scores": dict(family_evidence.family_scores),
         "family_weights_used": dict(family_evidence.family_weights_used),
         "strategy_id": family_evidence.strategy_id,
-        "calibration_applied": calibration_matches_entry_timeframe,
+        "calibration_applied": calibration_live_authorized,
         "calibration_timeframe": None if calibration is None else calibration.timeframe,
         "entry_timeframe": str(tv.timeframe),
     }

@@ -79,6 +79,7 @@ def test_runtime_registry_fails_closed_when_stale_or_unprofitable(tmp_path):
         data_end_utc=now - timedelta(days=30),
         generated_at_utc=now - timedelta(days=29),
     )
+    record["informational_only"] = False
     path = tmp_path / "registry.json"
     path.write_text(
         json.dumps({
@@ -104,6 +105,7 @@ def test_runtime_registry_returns_only_current_robust_record(tmp_path):
         data_end_utc=now - timedelta(hours=2),
         generated_at_utc=now - timedelta(hours=1),
     )
+    record["informational_only"] = False
     path = tmp_path / "registry.json"
     path.write_text(
         json.dumps({
@@ -134,6 +136,7 @@ def test_runtime_lookup_filters_by_exact_timeframe(tmp_path):
         data_end_utc=now - timedelta(hours=2),
         generated_at_utc=now - timedelta(hours=1),
     )
+    one_hour["informational_only"] = False
     fifteen = dict(one_hour)
     fifteen["timeframe"] = "15"
     fifteen["strategy_id"] = "breakout_expansion"
@@ -179,3 +182,46 @@ def test_runtime_candidate_requires_validated_feature_participation():
             data_end_utc=now,
             generated_at_utc=now,
         )
+
+
+
+def test_informational_registry_record_never_has_live_authority(tmp_path):
+    now = datetime(2026, 9, 22, tzinfo=UTC)
+    record = candidate_record_from_research_result(
+        _research_result(),
+        data_end_utc=now - timedelta(hours=2),
+        generated_at_utc=now - timedelta(hours=1),
+    )
+    assert record["informational_only"] is True
+    path = tmp_path / "informational.json"
+    path.write_text(
+        json.dumps({"schema_version": "stc-calibration-registry-v1", "records": [record]}),
+        encoding="utf-8",
+    )
+    load_registry.cache_clear()
+    found, reasons = lookup_runtime_calibration(
+        "CAPITALCOM:XAUUSD", as_of=now, path=str(path)
+    )
+    assert found is None
+    assert "research_record_informational_only" in reasons
+
+
+def test_future_generated_registry_record_never_has_live_authority(tmp_path):
+    now = datetime(2026, 9, 22, tzinfo=UTC)
+    record = candidate_record_from_research_result(
+        _research_result(),
+        data_end_utc=now - timedelta(hours=2),
+        generated_at_utc=now + timedelta(hours=1),
+    )
+    record["informational_only"] = False
+    path = tmp_path / "future.json"
+    path.write_text(
+        json.dumps({"schema_version": "stc-calibration-registry-v1", "records": [record]}),
+        encoding="utf-8",
+    )
+    load_registry.cache_clear()
+    found, reasons = lookup_runtime_calibration(
+        "CAPITALCOM:XAUUSD", as_of=now, path=str(path)
+    )
+    assert found is None
+    assert "research_generated_in_future" in reasons
