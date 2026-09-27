@@ -827,3 +827,21 @@ def test_account_state_freshness_accepts_mysql_utc_timestamp_format():
     control = (PATCH / "portfolio_control.php").read_text(encoding="utf-8")
     assert "preg_match('/^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}$/'" in control
     assert "new DateTimeImmutable($updatedRaw, new DateTimeZone('UTC'))" in control
+
+
+
+def test_r2_unknown_risk_is_fail_closed_and_caps_are_independent():
+    control = (PATCH / "portfolio_control.php").read_text(encoding="utf-8")
+    snapshot = (PATCH / "operator_snapshot.php").read_text(encoding="utf-8")
+    approval = (PATCH / "approval.php").read_text(encoding="utf-8")
+
+    assert "$portfolioCap = $equity * 0.03;" in control
+    assert "$clusterCap = $equity * 0.015;" in control
+    assert "portfolio_risk_unavailable:" in control
+    assert "$riskUnavailableByCompetition" in snapshot
+    assert "position_risk_unavailable" in snapshot
+    assert "function stc_recent_outstanding_execution_ticket" in control
+    assert "outstanding_execution_ticket" in approval
+    assert "'ticket_version' => 'stc-execution-ticket-v2'" in approval
+    assert "'portfolio_risk_cap_fraction' => 0.03" in approval
+    assert "'cluster_risk_cap_fraction' => 0.015" in approval

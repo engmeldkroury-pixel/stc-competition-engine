@@ -362,3 +362,10 @@ def test_aggregate_open_risk_includes_cluster_breakdown():
     assert result["clusters"]["equity_indices"]["open_positions"] == 2
     # MES: 20 points * $5 * 2 = $200; MNQ: 50 * $2 = $100.
     assert result["clusters"]["equity_indices"]["initial_risk_usd"] == 300
+
+
+
+def test_portfolio_caps_are_independent_of_trade_risk_fraction():
+    source = (Path(__file__).resolve().parents[1] / "app" / "portfolio.py").read_text(encoding="utf-8")
+    assert "portfolio_risk_cap = equity_usd * 0.03" in source
+    assert "cluster_risk_cap = equity_usd * 0.015" in source

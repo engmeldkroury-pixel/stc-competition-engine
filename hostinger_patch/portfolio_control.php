@@ -902,7 +902,9 @@ function stc_current_position_sizing_for_plan(
             $risk = abs((float)$row['entry_price'] - (float)$row['initial_stop'])
                 * (float)$row['quantity'] * $value;
         } catch (Throwable $e) {
-            $risk = 0.0;
+            throw new RuntimeException(
+                'portfolio_risk_unavailable:' . (string)($row['symbol'] ?? 'UNKNOWN')
+            );
         }
         $portfolioOpenRiskUsd += $risk;
         if (stc_risk_cluster((string)$row['symbol']) === $targetCluster) {
@@ -927,6 +929,30 @@ function stc_current_position_sizing_for_plan(
     $sizing['account_state_freshness'] = $freshness;
     return $sizing;
 }
+
+function stc_recent_outstanding_execution_ticket(
+    PDO $pdo,
+    string $competitionId,
+    string $excludeSignalId = '',
+    int $freshnessSeconds = 60
+): ?array {
+    $freshnessSeconds = max(1, min($freshnessSeconds, 600));
+    $sql = 'SELECT approval_id, signal_id, symbol, decided_at_utc '
+        . 'FROM stc_signal_approvals '
+        . "WHERE competition_id = ? AND decision = 'approved' "
+        . 'AND decided_at_utc >= DATE_SUB(UTC_TIMESTAMP(), INTERVAL ' . $freshnessSeconds . ' SECOND) ';
+    $params = [$competitionId];
+    if ($excludeSignalId !== '') {
+        $sql .= 'AND signal_id <> ? ';
+        $params[] = $excludeSignalId;
+    }
+    $sql .= 'ORDER BY id DESC LIMIT 1';
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute($params);
+    $row = $stmt->fetch();
+    return $row === false ? null : $row;
+}
+
 
 function stc_recent_same_direction_loss_cooldown(
     PDO $pdo,

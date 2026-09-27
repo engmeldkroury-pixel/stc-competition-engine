@@ -41,6 +41,7 @@ try {
         'capital-africa-sep-2026' => 0.0,
         'amp-futures-sep-2026' => 0.0,
     ];
+    $riskUnavailableByCompetition = [];
     $riskByCluster = [];
     $riskStmt = $pdo->query(
         "SELECT competition_id, symbol, quantity, entry_price, initial_stop "
@@ -54,7 +55,11 @@ try {
             $risk = abs((float)$row['entry_price'] - (float)$row['initial_stop'])
                 * (float)$row['quantity'] * $value;
         } catch (Throwable $e) {
-            $risk = 0.0;
+            $riskUnavailableByCompetition[$cid][] = [
+                'symbol' => $symbol,
+                'reason' => 'position_risk_unavailable',
+            ];
+            continue;
         }
         $riskByCompetition[$cid] = (float)($riskByCompetition[$cid] ?? 0.0) + $risk;
         $clusterKey = $cid . '|' . stc_risk_cluster($symbol);

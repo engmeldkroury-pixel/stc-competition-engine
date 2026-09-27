@@ -137,6 +137,16 @@ try {
             $reasons[] = 'same_direction_loss_cooldown';
         }
 
+        $outstandingTicket = stc_recent_outstanding_execution_ticket(
+            $pdo,
+            $competitionId,
+            $signalId,
+            60
+        );
+        if (is_array($outstandingTicket)) {
+            $reasons[] = 'outstanding_execution_ticket';
+        }
+
         $validUntil = stc_parse_utc((string)($envelope['valid_until'] ?? ''));
         if ($validUntil === null || $now >= $validUntil) {
             $reasons[] = 'signal_expired';
@@ -191,7 +201,7 @@ try {
                             (float)$lockedPlan['entry_max']
                         );
                         $executionTicket = [
-                            'ticket_version' => 'stc-execution-ticket-v1',
+                            'ticket_version' => 'stc-execution-ticket-v2',
                             'competition_id' => $competitionId,
                             'symbol' => $symbol,
                             'direction' => (string)$lockedPlan['direction'],
@@ -213,6 +223,8 @@ try {
                             'smaller_quantity_allowed' => true,
                             'manual_execution_only' => true,
                             'freshness_seconds' => 60,
+                            'portfolio_risk_cap_fraction' => 0.03,
+                            'cluster_risk_cap_fraction' => 0.015,
                         ];
                     }
                 } catch (Throwable $e) {
