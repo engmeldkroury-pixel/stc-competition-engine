@@ -124,8 +124,13 @@ def revalidate_envelope(envelope: dict, current: dict, now: datetime | None = No
         reasons.append("price_outside_envelope")
 
     score = float(current.get("current_signal_score", 0.0))
-    floor = float(envelope.get("reference_signal_score", 0.0)) - float(envelope.get("max_signal_score_drop", 0.15))
-    if score < floor:
+    reference_score = float(envelope.get("reference_signal_score", 0.0))
+    allowed_drop = float(envelope.get("max_signal_score_drop", 0.15))
+    side_sign = 1.0 if reference_score >= 0.0 else -1.0
+    aligned_reference = side_sign * reference_score
+    aligned_current = side_sign * score
+    floor = aligned_reference - allowed_drop
+    if aligned_current < floor:
         reasons.append("signal_degraded")
 
     if current.get("current_market_state_hash") != envelope.get("market_state_hash"):
