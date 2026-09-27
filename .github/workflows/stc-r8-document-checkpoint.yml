@@ -1,0 +1,26 @@
+name: STC R8 Historical Register Checkpoint
+on:
+  push:
+    branches: [research/r8-history-evidence-20260927]
+    paths: [ops/R8_FINAL_CHECKPOINT.json]
+permissions:
+  contents: write
+jobs:
+  document:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: research/r8-history-evidence-20260927
+      - name: Append verified checkpoint without deleting historical bytes
+        run: python ops/R8_DOC_APPEND.py . ops/R8_FINAL_CHECKPOINT.json
+      - name: Commit documentation to research branch only
+        run: |
+          git config user.name 'STC Engineering'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add PROJECT_STATE.md NEXT_TASK.md DECISIONS.md BATCH_REGISTER.csv TEST_REGISTER.csv RISK_REGISTER.csv docs/STC_ADAPTIVE_RESEARCH_MASTER_LEDGER.md docs/R8_OUTCOME_ATTRIBUTION_2026-09-27.md docs/R8_EVIDENCE_CHECKPOINT_2026-09-27.md docs/R8_HISTORY_RESULTS_2026-09-27.md CURRENT_CHECKPOINT.md ops/R8_CHECKPOINT_BLOBS.json
+          git diff --cached --check
+          git commit -m 'docs(R8): preserve final verified evidence and exact continuation checkpoint'
+          git push origin HEAD:research/r8-history-evidence-20260927
+          git rev-parse HEAD
