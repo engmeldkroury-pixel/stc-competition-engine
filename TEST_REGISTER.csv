@@ -42,3 +42,8 @@ STC-R8-FINAL-20260927,PASS,Full PR CI including all prior and new regression tes
 T-STC-R8-HISTORY-20260927,PASS_WITH_DATA_LIMITATIONS,Read-only history exporter projection/receipt integrity and bounded retrieval,run36344024376SUCCESS;5000/9630rows;0projectionfailures;0quarantines;derived artifact10939992635
 T-STC-R8-DIAGNOSTICS-20260927,LOCAL_PASS_RESEARCH_BRANCH_ONLY,Outcome-independent non-overlap; same-path pairing; proxy-cost sensitivity; no live promotion,12 local tests passed across diagnostics/export/reader; these additional research tools are not in core PR190 full-CI count
 T-STC-R8-READBACK-20260927,PASS_STALE_DATA_RETAINED,Post-merge recorded position/account/notification state,run36344826332SUCCESS19:34:12Z;2recordedopenpositionsHOLDstale;active[];rotationnull;accounteligiblefalse;telegramtrue/emailfalse
+
+
+T-STC-R9-FULL,PASS,Critical and full exact PRhead tests,CI36347047903 head0c38010df68ff6076af0a723e8c9caff45e5912c
+T-STC-R9-READ,PASS,Late expiry and dataset receipt/source consistency,Read36347045013;9639rows;206late;0quarantine;3frozen
+T-STC-R9-RESEARCH,PASS_RESEARCH_ONLY,Protection and supplementary source checks,Research36347455391;109focused remote;17protection/supplement local
