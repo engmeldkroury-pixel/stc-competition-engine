@@ -137,6 +137,9 @@ jobs:
                   "source_signal_id": p.get("source_signal_id"),
                   "opened_at_utc": p.get("opened_at_utc"),
                   "status": p.get("status"),
+                  "management": p.get("management"),
+                  "latest_signal_history": p.get("latest_signal_history"),
+                  "rotation_candidate": p.get("rotation_candidate"),
               })
           print("STC_LIVE_OPEN_POSITIONS=" + json.dumps(positions, sort_keys=True))
           print(
