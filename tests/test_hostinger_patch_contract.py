@@ -856,3 +856,17 @@ def test_operator_and_notification_use_same_management_history_window():
     assert "192" in snapshot
     assert "192" in notify
     assert "PARTIAL_TAKE_PROFIT" not in (PATCH / "portfolio_control.php").read_text(encoding="utf-8")
+
+
+
+def test_snapshot_exposes_exact_boolean_quality_gate_quadrants():
+    snapshot = (PATCH / "operator_snapshot.php").read_text(encoding="utf-8")
+    assert "gate_diagnostics_rows" in snapshot
+    assert "gate_quadrants" in snapshot
+    for key in (
+        "boolean_true_quality_true",
+        "boolean_true_quality_false",
+        "boolean_false_quality_true",
+        "boolean_false_quality_false",
+    ):
+        assert key in snapshot
