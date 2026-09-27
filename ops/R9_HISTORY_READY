@@ -1,2 +1,4 @@
-R9 read-only history acceptance run after local 306 critical tests passed.
+R9 second read-only capture after late-decision validation correction.
+95 focused R8/R9 tests passed locally, including three new causal expiry cases.
+Expired signals remain NO_ENTRY; source candles can support other historical paths.
 No broker/account/approval/stop/target or notification writes.
