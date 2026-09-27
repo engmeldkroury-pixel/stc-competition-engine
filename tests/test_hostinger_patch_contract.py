@@ -820,3 +820,10 @@ def test_signal_notifications_require_fresh_account_and_real_capacity():
     assert "allowed_by_risk_policy" in notify
     assert "proposed_quantity" in notify
     assert "risk_capacity_unavailable_after_sizing" in notify
+
+
+
+def test_account_state_freshness_accepts_mysql_utc_timestamp_format():
+    control = (PATCH / "portfolio_control.php").read_text(encoding="utf-8")
+    assert "preg_match('/^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}$/'" in control
+    assert "new DateTimeImmutable($updatedRaw, new DateTimeZone('UTC'))" in control

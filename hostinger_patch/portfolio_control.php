@@ -805,7 +805,19 @@ function stc_account_state_freshness(
     $source = trim((string)($account['source'] ?? ''));
     $equity = (float)($account['equity_usd'] ?? 0.0);
     $version = (int)($account['version'] ?? 0);
-    $updated = stc_parse_utc(trim((string)($account['updated_at_utc'] ?? '')));
+    $updatedRaw = trim((string)($account['updated_at_utc'] ?? ''));
+    $updated = null;
+    if ($updatedRaw !== '') {
+        if (preg_match('/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/', $updatedRaw) === 1) {
+            try {
+                $updated = new DateTimeImmutable($updatedRaw, new DateTimeZone('UTC'));
+            } catch (Throwable $e) {
+                $updated = null;
+            }
+        } else {
+            $updated = stc_parse_utc($updatedRaw);
+        }
+    }
     $reasons = [];
     $ageSeconds = null;
 
