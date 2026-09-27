@@ -29,6 +29,7 @@ from .signals import (
     volatility_quality_from_tradingview,
 )
 from .trade_plan import build_locked_trade_plan
+from .outcome_attribution import build_outcome_seed
 
 
 def deterministic_signal_id(event_id: str) -> str:
@@ -338,6 +339,12 @@ def decide_bridge_event(event_id: str, payload: dict) -> dict:
         }
     envelope = build_approval_envelope(payload, result.composite_score)
     locked_plan = build_locked_trade_plan(event_id, payload, result_dict, envelope)
+    # Inert research namespace: rejected setups never become locked/live plans.
+    research_seed, research_seed_error = None, None
+    try:
+        research_seed = build_outcome_seed(event_id, payload, result_dict, envelope)
+    except (ValueError, KeyError, TypeError) as exc:
+        research_seed_error = type(exc).__name__
     status = "analyzed"
     action = "signal_created"
     return {
@@ -348,6 +355,8 @@ def decide_bridge_event(event_id: str, payload: dict) -> dict:
             "signal": result_dict,
             "approval_envelope": envelope,
             "locked_trade_plan": locked_plan,
+            "research_outcome_seed": research_seed,
+            "research_outcome_seed_error": research_seed_error,
             "execution": "manual_approval_required",
         },
         "receipt": build_pipeline_receipt(

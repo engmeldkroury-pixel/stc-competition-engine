@@ -37,3 +37,4 @@ T-STC-POSTAUDIT-DEPLOY,PASS,"Secure seven-file Hostinger deployment of R3b/R5/R6
 T-STC-POSTAUDIT-READBACK,PASS,"Production readback after consolidated deploy","Run 36340789086 success; stale management -> HOLD; active opportunities empty; email=false Telegram=true; gate quadrants exposed"
 T-STC-R3B-STALE-HOLD,PASS_PRODUCTION,"Stale Friday signal history cannot issue fresh actionable management advice","Readback 36340789086: NAS100 and SPX500 both HOLD with reason signal_history_stale"
 T-STC-GATE-QUADRANTS,OBSERVING,"Exact Boolean-vs-quality quadrant diagnostics","Readback 36340789086: 3 post-R6 diagnostic rows, all boolean_false_quality_false; insufficient sample for policy change"
+T-STC-R8-LOCAL,PASS,Causal outcome and execution-isolation regressions,82 focused; 273 critical; full remote CI pending

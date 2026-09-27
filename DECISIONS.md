@@ -122,3 +122,12 @@
 - Exact Boolean-vs-quality gate quadrants are now observational evidence only, not a trigger for immediate strategy relaxation.
 - Human approval and manual platform execution remain mandatory.
 
+
+## 2026-09-27 - R8 causal diagnostic contract
+- Capture pre-gate directional hypotheses in a separate inert research namespace; no locked plan or approval is created for a rejected signal.
+- Use the frozen decision envelope and actual availability time. No backdated entry or refreshed historical expiry.
+- Resolve known opening-price gaps before unknown intrabar ordering; simultaneous stop/target touches remain explicitly ambiguous with conservative stop-first scoring.
+- Preserve planned-R versus fill-R, and distinguish pre-stop excursions from post-stop rebound.
+- Censor unknown time gaps, unresolved horizons and missing data. Never turn missing outcomes into losses or wins silently.
+- Report overlapping rejected-signal counts descriptively; no probability or gate-benefit claim without de-overlap, holdout and causal ablation.
+- Current live threshold, filters, geometry and risk remain unchanged until evidence-backed promotion.
