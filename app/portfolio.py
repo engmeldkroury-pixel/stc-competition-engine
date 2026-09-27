@@ -265,8 +265,10 @@ def propose_position_size(
     commission_per_unit = 2.0 * entry_price * value_per_price_unit * profile.commission_rate
     total_risk_per_unit = stop_risk_per_unit + commission_per_unit
     configured_trade_budget = equity * risk_fraction
-    portfolio_cap = equity * risk_fraction * portfolio_risk_multiple
-    cluster_cap = equity * risk_fraction * cluster_risk_multiple
+    # Absolute account heat caps stay independent of the per-trade risk fraction.
+    # At the current 0.5% trade risk these remain the established 3% / 1.5% policy.
+    portfolio_cap = equity * 0.03
+    cluster_cap = equity * 0.015
     remaining_portfolio = max(0.0, portfolio_cap - portfolio_open_risk_usd)
     remaining_cluster = max(0.0, cluster_cap - cluster_open_risk_usd)
     risk_budget = min(configured_trade_budget, remaining_portfolio, remaining_cluster)
@@ -302,7 +304,7 @@ def propose_position_size(
 
     note = (
         "Provisional STC sizing only; human approval and manual order entry required. "
-        "Risk fraction and concentration multiples are STC risk controls, not official competition limits."
+        "Risk fraction and fixed concentration caps are STC risk controls, not official competition limits."
     )
     if competition_id == "capital-africa-sep-2026":
         note += " Broker quantity-step rounding must be confirmed in the order ticket."
