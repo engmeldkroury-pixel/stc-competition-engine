@@ -1,0 +1,91 @@
+name: STC R9 Historical Checkpoint
+on:
+  push:
+    branches: [research/r9-protection-20260927]
+    paths: [ops/R9_CHECKPOINT_READY]
+permissions:
+  contents: write
+  actions: read
+jobs:
+  checkpoint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+      - name: Read fresh main and append verified history to research branch only
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          git fetch origin main --depth=1
+          python - <<'PY'
+          import csv,io,json,os,subprocess,urllib.request
+          from pathlib import Path
+          from datetime import datetime,timezone
+          repo='engmeldkroury-pixel/stc-competition-engine'
+          def api(path):
+              req=urllib.request.Request('https://api.github.com/repos/'+repo+'/'+path,headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json'})
+              with urllib.request.urlopen(req,timeout=20) as response:return json.load(response)
+          pr=api('pulls/191');assert pr['merged'] is True
+          jobs=api('actions/runs/36347047903/jobs')['jobs']
+          assert all(any(j['name']==name and j['conclusion']=='success' for j in jobs) for name in ('critical','full'))
+          def git(*args,**kwargs):return subprocess.check_output(['git',*args],**kwargs)
+          base=git('rev-parse','origin/main').decode().strip()
+          assert git('rev-parse','origin/main:app/outcome_dataset.py').decode().strip()=='b30841febad2a1f71fd7d2e3e3df01024e18633d'
+          merged=pr['merge_commit_sha'];now=datetime.now(timezone.utc).isoformat()
+          summary=f'''## R9 accepted evidence checkpoint - {now}
+          Core PR191 merged at {merged}; critical and full CI36347047903 succeeded. This is tested research infrastructure, not a promoted profitable strategy. No live gates, initial ATR stops, risk0.005, positions, broker actions, equity freshness or notifications changed.
+          Corrected read36347045013, artifact10940971609: all9639matching signal rows admitted,206late decisions retained as expired, zero receipt/source/seed/plan quarantine. Three naturally persisted R8 frozen seeds verified. Dataset08979d9c931fe3f1d799ae76afb15ce01682ac989662c5fd041264f860d227a3;3519hypotheses and170original plans.
+          Fixed-horizon same-cohort analysis:249selected,73valued/176unknown. Protection research36347455391 succeeded; none of the tested shorter targets, breakeven or trailing variants justified promotion. All are exploratory counterfactuals, not owner trades or an untouched holdout.
+          Exact BTCprice overlays restored27observed missing candles in research only after35and143zero-disagreement overlap checks. Supplement94781fc1057c4c44b7a6d96df69f517ed1d376d243fe651be85f494d8975a665 has75commonlyvalued/174unknown. MNQarchive112overlaps/27disagreements was NOT merged. Do not average or rank differing cohorts as measured improvement.
+          The195.23USD screenshot/ledger delta equals prior documented54.39residual plus visibleBTC140.8432loss to displayed cents. Old residual remains unattributed; no trade imported without exact close time/identity. Closest BTCplan hasTP85189.5655 versus screenshot85500; source linkage is tentative only.
+          Details:docs/R9_RESULTS_2026-09-27.md. Additional experiments and price-overlay tooling remain on research/r9-protection-20260927, not live runtime code. Future protocol is registered, not evaluated or scheduled; preserve purge/embargo and no-retuning boundaries.
+          '''
+          next_task='''## R10 next executable batch after R9
+          Read the latest CURRENT_CHECKPOINT first; do not restart R1-R9.
+          1. Investigate MNQsource close discrepancies and remaining source/quote timing gaps. Current-source bar confirmation versus host-chart confirmation is a hypothesis to test, not a proven cause. Do not change live Pine feeds without verified source parity and compilation/runtime tests.
+          2. Run controlled entry-timing and volatility/structure-aware initial-stop experiments on the same entry opportunities, maintaining monetary risk and realistic fee/spread exposure. Existing open stops must not be widened for recovery.
+          3. Preserve and expand natural frozen-seed capture. Historical accepted/rejected reconstructed hypotheses are not independent executed trades. Separate asset, timeframe, competition and gate strata.
+          4. Complete execution-to-plan reconciliation only with exact fill/close identifiers and timestamps. Opera browser read failed as disconnected in this session. No Capital.com API account is required; previous project history parks that optional route.
+          5. For prospective protocol evidence from2026-09-28T00:00Z, purge training windows overlapping evaluation and apply a horizon-sized embargo when fitting/tuning. Do not retune on the evaluation data. No automated promotion or win probability.
+          No owner upload or account refresh is needed to use this engineering update. No fresh trade recommendation is issued.
+          '''
+          changes={};paths=[]
+          def put(path,addition,prepend=False):
+              old=git('show','origin/main:'+path)
+              new=addition.encode()+b'\n\n--- Prior checkpoint history preserved below ---\n\n'+old if prepend else old+b'\n\n'+addition.encode()
+              assert new.endswith(old) if prepend else new.startswith(old)
+              target=Path(path);target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(new)
+              changes[path]={'before_blob':git('hash-object','--stdin',input=old).decode().strip(),'after_blob':git('hash-object','-w','--stdin',input=new).decode().strip(),'before_bytes':len(old),'after_bytes':len(new)};paths.append(path)
+          put('PROJECT_STATE.md',summary)
+          put('NEXT_TASK.md',next_task)
+          put('DECISIONS.md',summary+'\nDecision: preserve unfavorable empirical findings; do not substitute a tighter target or wider stop for evidence. Late entry expiry and valid historical candle retention are different contracts.\n')
+          put('docs/STC_ADAPTIVE_RESEARCH_MASTER_LEDGER.md',summary+'\n'+next_task)
+          put('docs/R9_DATA_EXIT_AUDIT_2026-09-27.md',summary)
+          put('CURRENT_CHECKPOINT.md','# STC latest checkpoint - R9\n\n'+summary+'\n'+next_task,True)
+          registers={
+            'BATCH_REGISTER.csv':[
+              ['STC-R9-CORE','MERGED_CI_VERIFIED','Validated dataset and paired exit research',f'PR191 {merged}; CI36347047903; read36347045013','R10 entry/source/initial-stop evidence'],
+              ['STC-R9-PROTECTION','TESTED_RESEARCH_NO_PROMOTION','Closed-bar protection and reviewed BTCsupplements','Research36347455391; 27observed bars added in local reviewed dataset','Investigate source discrepancies; preserve frozen protocol']],
+            'TEST_REGISTER.csv':[
+              ['T-STC-R9-FULL','PASS','Critical and full exact PRhead tests','CI36347047903 head0c38010df68ff6076af0a723e8c9caff45e5912c'],
+              ['T-STC-R9-READ','PASS','Late expiry and dataset receipt/source consistency','Read36347045013;9639rows;206late;0quarantine;3frozen'],
+              ['T-STC-R9-RESEARCH','PASS_RESEARCH_ONLY','Protection and supplementary source checks','Research36347455391;109focused remote;17protection/supplement local']],
+            'RISK_REGISTER.csv':[
+              ['R-STC-R9-MISSING','OPEN','HIGH','Research coverage','174of249supplemented selected paths remain unknown','Reviewed dataset94781fc1','No imputed wins/losses or universal target change','Complete exact-source paths'],
+              ['R-STC-R9-MNQ','OPEN','HIGH','Source fidelity','27of112overlapping MNQarchive bars disagree','Exact tolerance0comparison','Do not merge MNQarchive','Audit source confirmation and delay'],
+              ['R-STC-R9-LEDGER','PARTIAL_ARITHMETIC_ONLY','MEDIUM','Execution evidence','195.23delta explained but fill close identity and old54.39residual attribution remain absent','Screenshot calculation -3566.1032','No synthetic trades or equity attestation','Obtain exact execution evidence'],
+              ['R-STC-R9-PROMOTION','CONTROLLED','HIGH','Strategy selection','Tested exits do not justify live promotion; sparse selected legacy data','73base/75supplemented paired cases','Keep live configuration unchanged','Independent representative future evidence']]}
+          for path,rows in registers.items():
+              stream=io.StringIO();csv.writer(stream,lineterminator='\n').writerows(rows);put(path,stream.getvalue())
+          result_path='docs/R9_RESULTS_2026-09-27.md';blob=git('hash-object','-w',result_path).decode().strip()
+          changes[result_path]={'before_blob':None,'after_blob':blob};paths.append(result_path)
+          payload={'checkpoint_id':'STC-R9-FINAL-20260927','main_base_sha':base,'merged_code_sha':merged,'ci_run':36347047903,'files':changes}
+          Path('ops/R9_CHECKPOINT_BLOBS.json').write_text(json.dumps(payload,indent=2)+'\n');paths.append('ops/R9_CHECKPOINT_BLOBS.json')
+          git('add','--',*paths)
+          print(json.dumps({'main_base_sha':base,'paths':paths,'historical_bytes_preserved':True}))
+          PY
+          git config user.name 'STC Engineering'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'docs(R9): append verified acceptance, findings, risks and R10 handoff'
+          git push origin HEAD:research/r9-protection-20260927
