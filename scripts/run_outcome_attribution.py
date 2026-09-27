@@ -23,14 +23,14 @@ def main() -> int:
     source.add_argument("--input", type=Path)
     source.add_argument("--bridge-url")
     parser.add_argument("--token-env", default="STC_WORKER_TOKEN")
-    parser.add_argument("--limit", type=int, default=1000)
+    parser.add_argument("--limit", type=int, default=100)
     parser.add_argument("--as-of", help="ISO time with timezone; default current UTC")
     parser.add_argument("--horizon-bars", type=int, default=32)
     parser.add_argument("--cost-r", type=float, default=0.02, help="Round-trip COST PROXY per frozen planned R")
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
-    if not 1 <= args.limit <= 10000:
-        parser.error("limit must be 1..10000; server may apply a smaller cap")
+    if not 1 <= args.limit <= 100:
+        parser.error("limit must be 1..100, matching the existing authenticated inbox contract")
     cutoff = utc(args.as_of) if args.as_of else datetime.now(timezone.utc)
     if args.input:
         inbox = json.loads(args.input.read_text(encoding="utf-8"))
@@ -44,7 +44,9 @@ def main() -> int:
         try:
             inbox = BridgeClient(args.bridge_url, token, timeout_seconds=30).inbox(status="ingested", limit=args.limit)
         except Exception as exc:
-            print(f"Read-only inbox fetch failed ({type(exc).__name__}); response body withheld.", file=sys.stderr)
+            parts = str(exc).split(":", 2)
+            status = parts[1] if len(parts) > 1 and parts[1].isdigit() and len(parts[1]) == 3 else "unknown"
+            print(f"Read-only inbox fetch failed ({type(exc).__name__}, HTTP {status}); response body withheld.", file=sys.stderr)
             return 2
     report = report_from_inbox(inbox, as_of=cutoff, horizon_bars=args.horizon_bars,
                               cost_r=args.cost_r, requested_limit=args.limit if args.bridge_url else None)

@@ -1,2 +1,2 @@
-2026-09-27 R8 initial bounded read-only production outcome capture.
-No account, position, approval, notification or broker writes.
+2026-09-27 R8 bounded read-only capture v2: honor existing 1..100 inbox scan contract.
+Initial run 36343409127 failed during GET; no write or trade occurred. Preserve HTTP status diagnostics without response bodies.

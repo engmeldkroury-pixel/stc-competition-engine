@@ -26,7 +26,7 @@ jobs:
         run: >-
           python scripts/run_outcome_attribution.py
           --bridge-url https://stc.feama.site
-          --limit 1000 --horizon-bars 32 --cost-r 0.02
+          --limit 100 --horizon-bars 32 --cost-r 0.02
           --output /tmp/stc-r8-outcome-report.json
       - name: Record exact code and report digest
         run: |
