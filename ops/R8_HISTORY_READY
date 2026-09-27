@@ -1,0 +1,2 @@
+2026-09-27 R8 evidence expansion after inbox scan returned only Sep21 records.
+Read only: existing SSH authorization; SELECT from stc_webhook_events in consistent READ ONLY transaction; no file deployment, account changes, approval or broker actions.

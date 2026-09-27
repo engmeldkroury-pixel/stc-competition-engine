@@ -1,0 +1,63 @@
+name: STC R8 Historical Evidence Read Only
+on:
+  push:
+    branches: [research/r8-history-evidence-20260927]
+    paths: [ops/R8_HISTORY_READY]
+permissions:
+  contents: read
+jobs:
+  history:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install and test research reader only
+        run: |
+          pip install 'httpx>=0.28,<1' 'pytest>=8,<9'
+          pytest -q tests/test_outcome_history_export.py tests/test_outcome_reader_contract.py
+      - name: Configure existing SSH access without exposing secrets
+        env:
+          SSH_KEY: ${{ secrets.HOSTINGER_SSH_PRIVATE_KEY }}
+          SSH_HOST: ${{ secrets.HOSTINGER_SSH_HOST }}
+        run: |
+          set -euo pipefail
+          umask 077
+          test -n "$SSH_KEY"; test -n "$SSH_HOST"
+          mkdir -p "$HOME/.ssh"
+          printf '%s\n' "$SSH_KEY" | tr -d '\r' > "$HOME/.ssh/id_ed25519"
+          ssh-keygen -y -f "$HOME/.ssh/id_ed25519" >/dev/null 2>&1
+          ssh-keyscan -p 65002 "$SSH_HOST" > "$HOME/.ssh/known_hosts" 2>/dev/null
+      - name: Read existing database using a read-only transaction
+        env:
+          SSH_HOST: ${{ secrets.HOSTINGER_SSH_HOST }}
+          SSH_USER: ${{ secrets.HOSTINGER_SSH_USER }}
+          TARGET: ${{ secrets.HOSTINGER_STC_PUBLIC_HTML }}
+        run: |
+          set -euo pipefail
+          umask 077
+          [[ "$TARGET" =~ ^/home/[A-Za-z0-9_-]+/domains/stc\.feama\.site/public_html$ ]]
+          ssh -o BatchMode=yes -o ConnectTimeout=15 -p 65002 "$SSH_USER@$SSH_HOST" "php /dev/stdin '$TARGET'" < scripts/export_outcome_history.php > "$RUNNER_TEMP/stc-r8-source.json"
+      - name: Evaluate outcomes and preserve only derived evidence
+        run: |
+          python scripts/run_outcome_attribution.py --input "$RUNNER_TEMP/stc-r8-source.json" --horizon-bars 32 --cost-r 0.02 --output /tmp/stc-r8-history-outcomes.json
+          python - <<'PY'
+          import hashlib,json,os,pathlib
+          source=json.loads(pathlib.Path(os.environ['RUNNER_TEMP'],'stc-r8-source.json').read_text())
+          p=pathlib.Path('/tmp/stc-r8-history-outcomes.json')
+          meta={'code_sha':os.environ['GITHUB_SHA'],'report_sha256':hashlib.sha256(p.read_bytes()).hexdigest(),'source_snapshot':source['source_snapshot'],'source_data_uploaded_as_artifact':False,'execution':'none'}
+          pathlib.Path('/tmp/stc-r8-history-manifest.json').write_text(json.dumps(meta,indent=2)+'\n')
+          print('STC_R8_HISTORY_MANIFEST='+json.dumps(meta,sort_keys=True))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: stc-r8-history-evidence
+          path: |
+            /tmp/stc-r8-history-outcomes.json
+            /tmp/stc-r8-history-manifest.json
+          retention-days: 7
+      - name: Remove temporary source and SSH credential copy
+        if: always()
+        run: rm -f "$RUNNER_TEMP/stc-r8-source.json" "$HOME/.ssh/id_ed25519"
