@@ -1,2 +1,2 @@
-2026-09-27T16:24:00+03:00
-Deploy STC-R1 fail-closed stale-equity / account-version binding / unactionable Telegram suppression after critical CI passed 201 tests.
+2026-09-27T16:31:00+03:00
+Redeploy STC-R1 after MySQL UTC account timestamp parser correction; critical CI passed 202 tests.
