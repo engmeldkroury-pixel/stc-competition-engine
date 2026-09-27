@@ -549,6 +549,13 @@ try {
             'balanced_competition_proxy' => 0,
             'current_84_structural_proxy' => 0,
             'gate_failure_counts' => [],
+            'gate_diagnostics_rows' => 0,
+            'gate_quadrants' => [
+                'boolean_true_quality_true' => 0,
+                'boolean_true_quality_false' => 0,
+                'boolean_false_quality_true' => 0,
+                'boolean_false_quality_false' => 0,
+            ],
             'per_symbol' => [],
         ];
     };
@@ -568,6 +575,13 @@ try {
         'strict_a_plus_proxy' => 0,
         'balanced_competition_proxy' => 0,
         'gate_failure_counts' => [],
+        'gate_diagnostics_rows' => 0,
+        'gate_quadrants' => [
+            'boolean_true_quality_true' => 0,
+            'boolean_true_quality_false' => 0,
+            'boolean_false_quality_true' => 0,
+            'boolean_false_quality_false' => 0,
+        ],
         'per_symbol' => [],
         'by_competition' => [
             'capital-africa-sep-2026' => $newAuditBucket(),
@@ -708,9 +722,36 @@ try {
                 'balanced_competition_proxy' => 0,
                 'current_84_structural_proxy' => 0,
                 'gate_failure_counts' => [],
+                'gate_diagnostics_rows' => 0,
+                'gate_quadrants' => [
+                    'boolean_true_quality_true' => 0,
+                    'boolean_true_quality_false' => 0,
+                    'boolean_false_quality_true' => 0,
+                    'boolean_false_quality_false' => 0,
+                ],
             ];
         }
         $bucket['per_symbol'][$symbol]['directional_rows']++;
+
+        $gateDiag = is_array($auditSignal['gate_diagnostics'] ?? null)
+            ? $auditSignal['gate_diagnostics']
+            : null;
+        if ($gateDiag !== null
+            && array_key_exists('boolean_gate_passed', $gateDiag)
+            && array_key_exists('setup_quality_passed', $gateDiag)) {
+            $booleanPass = ($gateDiag['boolean_gate_passed'] ?? false) === true;
+            $qualityPass = ($gateDiag['setup_quality_passed'] ?? false) === true;
+            $quadrantKey = ($booleanPass ? 'boolean_true_' : 'boolean_false_')
+                . ($qualityPass ? 'quality_true' : 'quality_false');
+            $bucket['gate_diagnostics_rows']++;
+            $bucket['gate_quadrants'][$quadrantKey]++;
+            $bucket['per_symbol'][$symbol]['gate_diagnostics_rows']++;
+            $bucket['per_symbol'][$symbol]['gate_quadrants'][$quadrantKey]++;
+            if ($competitionId === 'capital-africa-sep-2026') {
+                $gateAudit['gate_diagnostics_rows']++;
+                $gateAudit['gate_quadrants'][$quadrantKey]++;
+            }
+        }
 
         $persistedFailures = is_array($auditSignal['quality_gate_failures'] ?? null)
             ? $auditSignal['quality_gate_failures']
@@ -762,9 +803,26 @@ try {
                     'strict_a_plus_proxy' => 0,
                     'balanced_competition_proxy' => 0,
                     'gate_failure_counts' => [],
+                    'gate_diagnostics_rows' => 0,
+                    'gate_quadrants' => [
+                        'boolean_true_quality_true' => 0,
+                        'boolean_true_quality_false' => 0,
+                        'boolean_false_quality_true' => 0,
+                        'boolean_false_quality_false' => 0,
+                    ],
                 ];
             }
             $gateAudit['per_symbol'][$symbol]['directional_rows']++;
+            if ($gateDiag !== null
+                && array_key_exists('boolean_gate_passed', $gateDiag)
+                && array_key_exists('setup_quality_passed', $gateDiag)) {
+                $booleanPass = ($gateDiag['boolean_gate_passed'] ?? false) === true;
+                $qualityPass = ($gateDiag['setup_quality_passed'] ?? false) === true;
+                $quadrantKey = ($booleanPass ? 'boolean_true_' : 'boolean_false_')
+                    . ($qualityPass ? 'quality_true' : 'quality_false');
+                $gateAudit['per_symbol'][$symbol]['gate_diagnostics_rows']++;
+                $gateAudit['per_symbol'][$symbol]['gate_quadrants'][$quadrantKey]++;
+            }
             if ($strictProxy) {
                 $gateAudit['per_symbol'][$symbol]['strict_a_plus_proxy']++;
             }

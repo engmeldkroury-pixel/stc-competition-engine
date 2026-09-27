@@ -199,6 +199,9 @@ def decide_bridge_event(event_id: str, payload: dict) -> dict:
             family_conflict_count=None if family_evidence is None else family_evidence.conflicting_families,
         )
 
+    structural_gate_passed = bool(gate_passed)
+    structural_gate_failures = list(gate_failures)
+
     quality_score = setup_quality_score(
         recommendation=base_result.recommendation,
         short_term_technical=short_term_technical,
@@ -214,8 +217,9 @@ def decide_bridge_event(event_id: str, payload: dict) -> dict:
     )
 
     quality_floor = COMPETITION_OPPORTUNITY_QUALITY_FLOOR if competition_mode else STRICT_QUALITY_FLOOR
-    final_gate_passed = gate_passed and quality_score >= quality_floor
-    if gate_passed and quality_score < quality_floor:
+    quality_threshold_passed = quality_score >= quality_floor
+    final_gate_passed = structural_gate_passed and quality_threshold_passed
+    if structural_gate_passed and not quality_threshold_passed:
         gate_failures = [*gate_failures, f"setup_quality_below_{quality_floor}"]
     final_recommendation = base_result.recommendation if final_gate_passed else "WAIT"
     gate_name = "competition_opportunity_gate" if competition_mode else "high_conviction_gate"
@@ -255,6 +259,14 @@ def decide_bridge_event(event_id: str, payload: dict) -> dict:
     })
     result_dict = result.model_dump()
     result_dict["quality_gate_passed"] = final_gate_passed
+    result_dict["gate_diagnostics"] = {
+        "boolean_gate_passed": structural_gate_passed,
+        "setup_quality_passed": quality_threshold_passed,
+        "joint_gate_passed": final_gate_passed,
+        "setup_quality_score": quality_score,
+        "quality_floor": quality_floor,
+        "structural_gate_failures": structural_gate_failures,
+    }
     result_dict["setup_quality_score"] = quality_score
     result_dict["setup_quality_label"] = f"{quality_score}/100 setup quality; not a win probability"
     result_dict["setup_grade"] = (

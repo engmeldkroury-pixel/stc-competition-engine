@@ -234,6 +234,27 @@ class TradingViewWebhook(BaseModel):
         return self
 
     @model_validator(mode="after")
+    def validate_context_times_are_causal(self):
+        base_time = self.time
+        if base_time.tzinfo is None or base_time.utcoffset() is None:
+            raise ValueError("event time must include timezone")
+        for name in (
+            "confirm_time",
+            "trend_2h_time",
+            "trend_4h_time",
+            "trend_1m_time",
+            "history_time",
+        ):
+            context_time = getattr(self, name)
+            if context_time is None:
+                continue
+            if context_time.tzinfo is None or context_time.utcoffset() is None:
+                raise ValueError(f"{name} must include timezone")
+            if context_time > base_time:
+                raise ValueError(f"{name} must not be later than event time")
+        return self
+
+    @model_validator(mode="after")
     def validate_live_family_evidence(self):
         names = (
             "family_trend",

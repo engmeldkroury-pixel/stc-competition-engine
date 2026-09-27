@@ -1,3 +1,5 @@
+import pytest
+from app.models import TradingViewWebhook
 from app.event_decision import decide_bridge_event, deterministic_signal_id
 
 
@@ -480,3 +482,56 @@ def test_informational_calibration_cannot_reweight_live_family_evidence(monkeypa
     assert evidence["calibration_applied"] is False
     assert evidence["strategy_id"] is None
     assert result["decision"]["signal"]["research_calibration"]["status"] == "AVAILABLE_INFORMATIONAL"
+
+
+
+def _causal_context_payload():
+    return {
+        "event_id": "evt-causal",
+        "event": "bar_close",
+        "competition_id": "capital-africa-sep-2026",
+        "symbol": "CAPITALCOM:NAS100",
+        "timeframe": "15",
+        "time": "2026-09-21T18:00:00Z",
+        "open": 100.0,
+        "high": 101.0,
+        "low": 99.0,
+        "close": 100.5,
+        "volume": 1000.0,
+        "ema20": 100.0,
+        "ema50": 99.0,
+        "rsi14": 60.0,
+        "atr14": 1.0,
+        "macd": 1.0,
+        "macd_signal": 0.5,
+        "volume_ratio": 1.0,
+    }
+
+
+def test_tradingview_context_times_accept_prior_closed_evidence():
+    payload = _causal_context_payload()
+    payload["trend_2h_time"] = "2026-09-21T16:00:00Z"
+    payload["trend_2h_score"] = 0.5
+    tv = TradingViewWebhook(**payload)
+    assert tv.trend_2h_score == 0.5
+
+
+def test_tradingview_context_times_reject_future_evidence():
+    payload = _causal_context_payload()
+    payload["trend_2h_time"] = "2026-09-21T20:00:00Z"
+    payload["trend_2h_score"] = 0.5
+    with pytest.raises(ValueError, match="trend_2h_time must not be later than event time"):
+        TradingViewWebhook(**payload)
+
+
+def test_signal_exposes_boolean_quality_gate_quadrants_without_changing_decision():
+    payload = _causal_context_payload()
+    result = decide_bridge_event("evt-gate-diag", payload)
+    signal = result["decision"]["signal"]
+    diag = signal["gate_diagnostics"]
+    assert diag["joint_gate_passed"] == signal["quality_gate_passed"]
+    assert diag["setup_quality_score"] == signal["setup_quality_score"]
+    assert diag["quality_floor"] == signal["quality_floor"]
+    assert isinstance(diag["boolean_gate_passed"], bool)
+    assert isinstance(diag["setup_quality_passed"], bool)
+    assert isinstance(diag["structural_gate_failures"], list)
