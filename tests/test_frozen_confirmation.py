@@ -78,6 +78,10 @@ def _trade(signal_index, result_r, exit_reason="TARGET", hold=2):
         exit_reason=exit_reason,
         evidence_score=0.8,
         agreement_ratio=0.8,
+        plan_risk_per_unit=1.0,
+        fill_risk_per_unit=1.0,
+        plan_r_multiple=result_r,
+        fill_r_multiple=result_r,
     )
 
 
