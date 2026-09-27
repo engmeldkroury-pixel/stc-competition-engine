@@ -442,7 +442,7 @@ try {
             $pdo,
             (string)$positionRow['competition_id'],
             (string)$positionRow['symbol'],
-            3
+            192
         );
         $advice = stc_supervise_position($positionRow, $history);
         $public['management'] = $advice;

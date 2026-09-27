@@ -845,3 +845,14 @@ def test_r2_unknown_risk_is_fail_closed_and_caps_are_independent():
     assert "'ticket_version' => 'stc-execution-ticket-v2'" in approval
     assert "'portfolio_risk_cap_fraction' => 0.03" in approval
     assert "'cluster_risk_cap_fraction' => 0.015" in approval
+
+
+
+def test_operator_and_notification_use_same_management_history_window():
+    snapshot = (PATCH / "operator_snapshot.php").read_text(encoding="utf-8")
+    notify = (PATCH / "notification_control.php").read_text(encoding="utf-8")
+    assert "stc_recent_signal_states" in snapshot
+    assert "stc_recent_signal_states" in notify
+    assert "192" in snapshot
+    assert "192" in notify
+    assert "PARTIAL_TAKE_PROFIT" not in (PATCH / "portfolio_control.php").read_text(encoding="utf-8")

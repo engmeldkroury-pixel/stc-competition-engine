@@ -537,14 +537,17 @@ def supervise_position(position: PositionState, market: MarketState) -> Manageme
             position_id=position.position_id,
             competition_id=position.competition_id,
             symbol=position.symbol,
-            action="PARTIAL_TAKE_PROFIT",
+            action="PROTECT",
             urgency="normal",
             r_multiple=r_multiple,
             unrealized_pnl_usd=unrealized_pnl,
             thesis_degraded=False,
             suggested_stop=protective,
-            suggested_partial_fraction=0.50,
-            reasons=("target1_reached", "reduce_risk_and_protect_remainder"),
+            suggested_partial_fraction=None,
+            reasons=(
+                "management_checkpoint_reached",
+                "single_take_profit_mode_keep_full_quantity_and_protect",
+            ),
         )
 
     if r_multiple >= 1.0:
