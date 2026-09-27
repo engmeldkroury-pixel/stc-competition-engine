@@ -1,2 +1,2 @@
-2026-09-27T21:29:00+03:00
-Verify deployed R3b/R5/R6 controls, paused entry alerts, open-position freshness, gate diagnostics, account-state freshness, and notification config.
+2026-09-27 R8 acceptance readback after main merge.
+Verify current production account freshness, open-position evidence, signal freshness and notification config without changing controls.

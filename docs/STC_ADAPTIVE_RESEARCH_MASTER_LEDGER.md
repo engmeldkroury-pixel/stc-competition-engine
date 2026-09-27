@@ -1155,3 +1155,14 @@ Status: VERIFIED / PRODUCTION DEPLOYED WHERE APPLICABLE.
 - Current exact gate-quadrant sample is too small to justify 84/Boolean changes.
 - Next research work unit: rejected-trade outcome attribution, then redundancy/ablation and asset-class geometry studies.
 
+
+### WU-127 - R8 rejected-signal outcome attribution
+Status: IMPLEMENTED / LOCAL CRITICAL VERIFIED / PR FULL CI AND PRODUCTION CAPTURE PENDING.
+- Inert frozen research seeds cover both accepted and rejected directional setups.
+- Exact failed clauses, Boolean/quality quadrants and provenance persist without granting live authority.
+- Next-full-open replay at 1/1.5/2/2.5 R handles missing coverage, same-bar ambiguity, gaps, costs and actual-fill R.
+- Pre-stop excursion bounds and full-window MFE/MAE prevent counting post-stop recoveries as winning trades.
+- Validated bounded inbox report is GET-only and explicitly not a complete portfolio backtest.
+- 82 local focused tests and 273 local critical tests passed; local full suite awaits absent pinned Lorentzian dependency via GitHub CI.
+- Current stop/target problem remains a hypothesis requiring observed paths, not a parameter-fix claim.
+- Next work: full CI -> production evidence -> de-overlapped frozen-holdout ATR/exit ablation.

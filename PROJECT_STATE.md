@@ -2774,3 +2774,12 @@ Controlling next sequence:
 4. Continue research-only rejected-trade outcome attribution and gate-quadrant accumulation before changing 84/Boolean/1M/ATR rules.
 5. Keep human approval + manual broker entry mandatory.
 
+
+## 2026-09-27 - R8 outcome-attribution development checkpoint
+Owner requested continued engineering and durable history after repeated stop-outs.
+- Source baseline verified: f90944277b70d0e21b6a28ec8672929eff8d4f0a.
+- Inert frozen research seeds and causal outcome/report engine implemented; no live strategy or risk parameter promotion.
+- Rejected market orders and canceled bracket orders are not assumed to be losing filled trades.
+- Screenshot financial figures and the one visible BTC stop-out are recorded as historical owner evidence, NOT a live equity attestation or exhaustive trade import.
+- Local targeted 82 passed; critical 273 passed. Full CI, main merge and production capture remain pending at this checkpoint.
+- Full specification and next acceptance steps: docs/R8_OUTCOME_ATTRIBUTION_2026-09-27.md.

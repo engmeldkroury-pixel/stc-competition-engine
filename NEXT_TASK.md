@@ -488,3 +488,11 @@ Communication:
 - STC internal email is disabled; Telegram remains configured.
 - GitHub account-level Actions emails require the signed-in GitHub notification setting if the owner wants zero GitHub mail regardless of workflow outcome.
 
+
+## 2026-09-27 - R8 development checkpoint (supersedes the earlier next-engineering item)
+Implemented on `stc-r8-outcome-attribution-20260927`: frozen rejected/accepted directional seeds, causal next-full-open outcome replay, gap-stop and same-bar ambiguity handling, planned-R/fill-R separation, exact-clause/quadrant attribution and authenticated GET-only report runner.
+- Evidence/detail: `docs/R8_OUTCOME_ATTRIBUTION_2026-09-27.md`.
+- Local targeted tests 82 passed; competition-critical selection 273 passed.
+- Full GitHub CI is still required; local full run lacks pinned Lorentzian dependency. Do not claim full acceptance yet.
+- Next: PR full CI -> bounded production report -> evidence/coverage review -> de-overlapped stop/target/ATR ablation with frozen holdout.
+- Preserve live 84/Boolean/1M/ATR/0.005 risk and manual execution. Do not refresh account timestamp from an undated screenshot.

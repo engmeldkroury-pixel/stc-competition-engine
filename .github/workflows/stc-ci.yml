@@ -54,6 +54,7 @@ jobs:
           tests/test_serverless_worker.py
           tests/test_signals.py
           tests/test_trade_plan.py
+          tests/test_outcome_attribution.py
 
   full:
     runs-on: ubuntu-latest
