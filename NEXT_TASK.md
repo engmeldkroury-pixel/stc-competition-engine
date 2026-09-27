@@ -408,3 +408,25 @@ Next strategy action:
 - compare findings to code;
 - patch only verified correctness/design issues one at a time with regression and rollback evidence.
 
+## 2026-09-27 — External AI review round 1 triaged against code + live audit
+Created:
+- `docs/EXTERNAL_AI_REVIEW_TRIAGE_ROUND1_2026-09-27.md`
+- commit `62e621f2903730ef2c2b9bb2b8df750ae89af31f`
+
+Key verified findings:
+- opportunity starvation is real;
+- latest Capital audit: 135 directional rows, only 2 current-84 structural proxy passes;
+- dominant recent Capital failure counts: intraday_majority_alignment 92, family_direction_alignment 85, short_term_strength 64, family_breadth 58;
+- monthly opposition only 5 recent failures, so removing 1M now is not evidence-backed;
+- stale account equity remains a real sizing correctness issue;
+- Python/PHP target1 policy drift remains real;
+- reviewer claims that news/macro zero directly corrupts the 84 setup-quality scale are incorrect: 84 is a separate setup_quality_score with no news/macro inputs;
+- missing MTF evidence is already fail-closed/penalized and direction-symmetric in code/tests;
+- ATR-bound removal, 1M removal, 84 lowering, Boolean-gate removal, and risk increase remain unapproved research hypotheses.
+
+Next action:
+1. keep live 84/risk/Boolean/1M/ATR behavior unchanged;
+2. build rejected-trade outcome attribution (MFE/MAE, 1.5R/2.5R-before-stop) by failed gate clause;
+3. separately prepare/test two correctness patches: stale-equity freshness block and Python/PHP exit-policy parity;
+4. do not deploy either correctness patch until regression checks are green and owner impact is explicit.
+
