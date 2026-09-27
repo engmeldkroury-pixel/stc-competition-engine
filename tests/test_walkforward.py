@@ -406,5 +406,9 @@ def test_walkforward_gap_through_stop_uses_first_executable_open(monkeypatch):
     assert trade.exit_index == 262
     assert trade.exit_price == pytest.approx(80.0)
     assert trade.exit_reason == "STOP_GAP"
-    assert trade.fill_risk_per_unit == pytest.approx(3.0)
-    assert trade.result_r == pytest.approx((80.0 - 100.0) / 3.0)
+    # Conservative LONG fill occurs at 101 inside the traded entry zone, so
+    # fill-R must use the actual 101-to-97 risk distance rather than midpoint plan-R.
+    assert trade.entry_price == pytest.approx(101.0)
+    assert trade.plan_risk_per_unit == pytest.approx(3.0)
+    assert trade.fill_risk_per_unit == pytest.approx(4.0)
+    assert trade.result_r == pytest.approx((80.0 - 101.0) / 4.0)
