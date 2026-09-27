@@ -116,7 +116,11 @@ def test_backtest_enters_next_bar_and_treats_ambiguous_bar_conservatively(monkey
     assert trade.entry_max == 101.0
     assert trade.entry_price == 101.0
     assert trade.entry_wait_bars == 1
-    assert trade.result_r == pytest.approx(-1.1)
+    assert trade.plan_risk_per_unit == pytest.approx(10.0)
+    assert trade.fill_risk_per_unit == pytest.approx(11.0)
+    assert trade.plan_r_multiple == pytest.approx(-1.1)
+    assert trade.fill_r_multiple == pytest.approx(-1.0)
+    assert trade.result_r == pytest.approx(-1.0)
     assert stats.losses == 1
 
 
@@ -358,3 +362,49 @@ def test_optional_signal_gate_can_block_an_otherwise_valid_signal(monkeypatch):
     )
     assert trades == []
     assert stats.trades == 0
+
+
+
+def test_walkforward_gap_through_stop_uses_first_executable_open(monkeypatch):
+    bars = _bars(300, slope=0.0)
+    bars[261] = Bar(
+        timestamp=bars[261].timestamp,
+        open=100.0, high=101.0, low=99.0, close=100.0, volume=1000.0,
+    )
+    bars[262] = Bar(
+        timestamp=bars[262].timestamp,
+        open=80.0, high=82.0, low=79.0, close=81.0, volume=1000.0,
+    )
+    dummy = HistoricalFeatureSnapshot(
+        symbol="TEST:X", timeframe="15", timestamp=bars[260].timestamp,
+        values={}, observations=(),
+    )
+    summary = EvidenceSummary(
+        score=0.9, agreement_ratio=1.0, independent_confirmations=8,
+        hard_confirmations=3, family_scores={}, family_weights_used={},
+        conflicts=(), strongest_features=(),
+    )
+    monkeypatch.setattr(wf, "_signal", lambda *args, **kwargs: (1, 0.9, summary))
+    monkeypatch.setattr(wf, "entry_price_bounds", lambda *args, **kwargs: (99.0, 101.0, 0.01))
+    monkeypatch.setattr(
+        wf, "calculate_plan_levels",
+        lambda *args, **kwargs: {
+            "entry_mid": 100.0, "initial_stop": 97.0, "target1": 104.5,
+            "target2": 107.5, "risk_per_unit": 3.0,
+        },
+    )
+    params = BacktestParams(
+        threshold=0.5, stop_atr=1.2, target_r=2.5,
+        max_hold_bars=5, round_turn_cost_r=0.0,
+    )
+    trades, _ = backtest_strategy(
+        "TEST:X", "15", bars, {260: dummy}, "trend_pullback", params,
+        start_index=260, end_index=270,
+    )
+    assert len(trades) == 1
+    trade = trades[0]
+    assert trade.exit_index == 262
+    assert trade.exit_price == pytest.approx(80.0)
+    assert trade.exit_reason == "STOP_GAP"
+    assert trade.fill_risk_per_unit == pytest.approx(3.0)
+    assert trade.result_r == pytest.approx((80.0 - 100.0) / 3.0)

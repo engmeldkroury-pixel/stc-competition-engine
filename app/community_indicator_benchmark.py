@@ -130,9 +130,10 @@ def backtest_indicator_signals(
     atr = atr_by_index(bars, 14)
     trades: list[IndicatorTrade] = []
     i = max(15, start_index)
-    final_index = min(end_index, len(bars) - 2)
+    outcome_end_index = min(end_index, len(bars) - 1)
+    final_signal_index = min(outcome_end_index - 1, len(bars) - 2)
 
-    while i <= final_index:
+    while i <= final_signal_index:
         strength = float(signals.get(i, 0.0))
         if abs(strength) < p.min_signal_strength or i not in atr:
             i += 1
@@ -146,7 +147,7 @@ def backtest_indicator_signals(
             continue
         stop = entry_price - direction * risk
         target = entry_price + direction * risk * p.target_r
-        last = min(entry_index + p.max_hold_bars, final_index + 1)
+        last = min(entry_index + p.max_hold_bars, outcome_end_index)
 
         exit_index = last
         exit_price = bars[last].close
@@ -163,6 +164,13 @@ def backtest_indicator_signals(
                 break
 
             bar = bars[j]
+            stop_gap = (direction > 0 and bar.open <= stop) or (direction < 0 and bar.open >= stop)
+            if stop_gap:
+                exit_index = j
+                exit_price = bar.open
+                exit_reason = "stop_gap_first_executable_price"
+                break
+
             stop_hit = bar.low <= stop if direction > 0 else bar.high >= stop
             target_hit = bar.high >= target if direction > 0 else bar.low <= target
             if stop_hit and target_hit:

@@ -53,6 +53,10 @@ class TradeOutcome:
     exit_reason: str
     evidence_score: float
     agreement_ratio: float
+    plan_risk_per_unit: float
+    fill_risk_per_unit: float
+    plan_r_multiple: float
+    fill_r_multiple: float
 
 
 @dataclass(frozen=True)
@@ -392,9 +396,13 @@ def backtest_strategy(
             continue
 
         entry_i, entry = entry_match
-        risk = levels["risk_per_unit"]
-        stop = levels["initial_stop"]
-        target = levels["target2"]
+        plan_risk = float(levels["risk_per_unit"])
+        stop = float(levels["initial_stop"])
+        target = float(levels["target2"])
+        fill_risk = abs(float(entry) - stop)
+        if plan_risk <= 0 or fill_risk <= 0:
+            i += 1
+            continue
         last_i = min(end_index, entry_i + params.max_hold_bars)
 
         exit_i = last_i
@@ -403,6 +411,12 @@ def backtest_strategy(
 
         for j in range(entry_i, last_i + 1):
             b = bars[j]
+            stop_gap = (side > 0 and b.open <= stop) or (side < 0 and b.open >= stop)
+            if stop_gap:
+                exit_i = j
+                exit_price = b.open
+                reason = "STOP_GAP"
+                break
             if side > 0:
                 stop_hit = b.low <= stop
                 target_hit = b.high >= target
@@ -426,8 +440,11 @@ def backtest_strategy(
                 reason = "TARGET"
                 break
 
-        gross_r = side * (exit_price - entry) / risk
-        result_r = gross_r - params.round_turn_cost_r
+        gross_plan_r = side * (exit_price - entry) / plan_risk
+        gross_fill_r = side * (exit_price - entry) / fill_risk
+        plan_r_multiple = gross_plan_r - params.round_turn_cost_r
+        fill_r_multiple = gross_fill_r - params.round_turn_cost_r
+        result_r = fill_r_multiple
         trades.append(
             TradeOutcome(
                 strategy_id=strategy_id,
@@ -447,6 +464,10 @@ def backtest_strategy(
                 exit_reason=reason,
                 evidence_score=score,
                 agreement_ratio=summary.agreement_ratio,
+                plan_risk_per_unit=plan_risk,
+                fill_risk_per_unit=fill_risk,
+                plan_r_multiple=plan_r_multiple,
+                fill_r_multiple=fill_r_multiple,
             )
         )
         i = max(i + 1, exit_i + 1)
@@ -538,7 +559,9 @@ def _segment_stability(
     used = 0
     for n in range(3):
         a = start + n * width
-        b = end if n == 2 else min(end, a + width)
+        b_exclusive = end if n == 2 else min(end, a + width)
+        if b_exclusive <= a:
+            continue
         _, stats = backtest_strategy(
             symbol,
             timeframe,
@@ -547,7 +570,7 @@ def _segment_stability(
             strategy_id,
             params,
             start_index=a,
-            end_index=b,
+            end_index=b_exclusive - 1,
             signal_gate=signal_gate,
         )
         if stats.trades >= 3:
@@ -585,7 +608,7 @@ def walk_forward_validate(
             strategy_id,
             params,
             start_index=260,
-            end_index=train_end,
+            end_index=train_end - 1,
             signal_gate=signal_gate,
         )
         candidates.append((_objective(stats), params, stats))
@@ -605,7 +628,7 @@ def walk_forward_validate(
         strategy_id,
         best_params,
         start_index=train_end,
-        end_index=test_end,
+        end_index=test_end - 1,
         signal_gate=signal_gate,
     )
     _, forward_stats = backtest_strategy(
