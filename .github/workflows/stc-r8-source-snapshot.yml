@@ -1,0 +1,26 @@
+name: STC R8 Source Snapshot
+on:
+  push:
+    branches: [stc-r8-outcome-attribution-20260927]
+    paths: [.github/workflows/stc-r8-source-snapshot.yml]
+permissions:
+  contents: read
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Export tracked source only
+        run: |
+          git archive --format=zip HEAD -o /tmp/stc-r8-source.zip
+          git rev-parse HEAD > /tmp/stc-r8-source-sha.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: stc-r8-source
+          path: |
+            /tmp/stc-r8-source.zip
+            /tmp/stc-r8-source-sha.txt
+          retention-days: 3
