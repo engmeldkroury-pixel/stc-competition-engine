@@ -879,6 +879,7 @@ def test_management_history_is_post_entry_freshness_gated_and_channel_parity_use
     notify = (PATCH / "notification_control.php").read_text(encoding="utf-8")
 
     assert "function stc_management_history_freshness" in control
+    assert "int $maxAgeSeconds = 7200" in control
     assert "signal_history_stale" in control
     assert "post_entry_history_unavailable" in control
     assert "history_freshness" in control
