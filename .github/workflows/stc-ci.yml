@@ -55,6 +55,7 @@ jobs:
           tests/test_signals.py
           tests/test_trade_plan.py
           tests/test_outcome_attribution.py
+          tests/test_r9_data_exit_audit.py
 
   full:
     runs-on: ubuntu-latest
