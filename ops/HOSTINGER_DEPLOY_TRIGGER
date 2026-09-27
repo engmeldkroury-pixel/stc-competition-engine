@@ -1,2 +1,2 @@
-2026-09-27T16:31:00+03:00
-Redeploy STC-R1 after MySQL UTC account timestamp parser correction; critical CI passed 202 tests.
+2026-09-27T16:36:00+03:00
+Deploy STC-R2 fail-closed unknown risk, fixed 3%/1.5% account heat caps, and one fresh outstanding execution ticket per competition; critical CI 204 passed.
