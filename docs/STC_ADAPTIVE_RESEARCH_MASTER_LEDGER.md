@@ -1166,3 +1166,14 @@ Status: IMPLEMENTED / LOCAL CRITICAL VERIFIED / PR FULL CI AND PRODUCTION CAPTUR
 - 82 local focused tests and 273 local critical tests passed; local full suite awaits absent pinned Lorentzian dependency via GitHub CI.
 - Current stop/target problem remains a hypothesis requiring observed paths, not a parameter-fix claim.
 - Next work: full CI -> production evidence -> de-overlapped frozen-holdout ATR/exit ablation.
+
+
+## WU128 - STC-R8-FINAL-20260927
+
+Core outcome attribution is accepted: PR190 merged9a1c32e09fc43a5eff02fd3f6094581440b2aedc after536passed1warning, CI36343737101. Readback36344826332 succeeded19:34:12Z without changing account, positions or notifications. First natural post-merge frozen seed remains unobserved at this checkpoint.
+
+Historical evidence now exists: run36344024376 captured latest5000/9630 signal rows across26symbols, all15m;1947legacy reconstructed hypotheses (936Capital1011AMP).1416censored508noentry23complete. Paired1R-then-stop-before2.5R count23 (5BTC5ETH) is descriptive, not an independent trade win rate. Nonoverlap142entered/141censored/1complete makes sample weakness explicit. Four post-stop2.5R rebounds remain losses. No live target or stop change approved.
+
+Fee proxy warning: screenshot BTC commissions alone are0.063819R; report0.02R is not measured. STC Capital realized ledger-3370.87/fourdays differs from screenshot-3566.10/fivedays; reconcile, do not invent fills.
+
+TradingView read-only history probe returned550BTC15m bars spanningSep22..Sep27; delayed/session-limited source remains unvalidated and unintegrated. Next batchR9: contiguous exact-provider history plus actual-fill/plan-ID reconciliation, then same-cohort fixed-horizon exit/ATR ablation with chronological purged holdout. Research-only tools/results live on research/r8-history-evidence-20260927; main has the accepted core and durable handoff docs. See CURRENT_CHECKPOINT.md and docs/R8_HISTORY_RESULTS_2026-09-27.md.

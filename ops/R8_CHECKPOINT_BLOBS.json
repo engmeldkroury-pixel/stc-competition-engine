@@ -1,0 +1,70 @@
+{
+  "checkpoint_id": "STC-R8-FINAL-20260927",
+  "code_ci_run": 36343737101,
+  "merged_code_sha": "9a1c32e09fc43a5eff02fd3f6094581440b2aedc",
+  "files": {
+    "PROJECT_STATE.md": {
+      "before_blob": "adc47c16cea6f4995c039e12c14afbee2c5f485b",
+      "after_blob": "a4a769d81cb92a2db9adcdf6bcaaa5e07a6882d2",
+      "before_bytes": 168924,
+      "after_bytes": 171929
+    },
+    "NEXT_TASK.md": {
+      "before_blob": "3c18d88a0746ff271d3287b0b1498b981fbcfcb7",
+      "after_blob": "244878e2f07a167c87ef32eb53dc2ae35b2defa5",
+      "before_bytes": 25355,
+      "after_bytes": 27583
+    },
+    "DECISIONS.md": {
+      "before_blob": "2f032dcda5c45506428dcdbce005397e13c748b9",
+      "after_blob": "0e9f93bcf19ed8fa83cb9a5d1bc24c632b697362",
+      "before_bytes": 11309,
+      "after_bytes": 12665
+    },
+    "BATCH_REGISTER.csv": {
+      "before_blob": "2df7053be4440b7d0b3dfea502230b2da5692dbc",
+      "after_blob": "ba7f279f22ad39d0e16c978eb2f3c5ce424a4012",
+      "before_bytes": 8439,
+      "after_bytes": 9126
+    },
+    "TEST_REGISTER.csv": {
+      "before_blob": "885acd0d091cdaef6a9aedbdc037e2592715a8ca",
+      "after_blob": "7acc9e08c7cbae215bb0a7a7df7d6623bf3e423d",
+      "before_bytes": 6763,
+      "after_bytes": 7736
+    },
+    "RISK_REGISTER.csv": {
+      "before_blob": "e2f3b2edb00a4bed803f0c9edf6f096f8472b13f",
+      "after_blob": "6f6f8801834d9447f2c56300948a830defebc885",
+      "before_bytes": 9868,
+      "after_bytes": 11553
+    },
+    "docs/STC_ADAPTIVE_RESEARCH_MASTER_LEDGER.md": {
+      "before_blob": "6aaf5c8ef1ef763a6cc70e848bacaa7c1f87e84a",
+      "after_blob": "e510a92b76d69897ae131bc9b8e07930813b39a4",
+      "before_bytes": 62566,
+      "after_bytes": 64094
+    },
+    "docs/R8_OUTCOME_ATTRIBUTION_2026-09-27.md": {
+      "before_blob": "0e7ba946db389f55e778b2767f5dbcd572791b34",
+      "after_blob": "3080f2375c82d282a3985f6b8bc6dff90726b62d",
+      "before_bytes": 5664,
+      "after_bytes": 6414
+    },
+    "docs/R8_EVIDENCE_CHECKPOINT_2026-09-27.md": {
+      "before_blob": "9cda3507683180cccf8ffc3268ca452e07582f18",
+      "after_blob": "2e4e1cf997a4935e6fd3f65a53ec167ec0edb3d7",
+      "before_bytes": 2110,
+      "after_bytes": 3283
+    },
+    "CURRENT_CHECKPOINT.md": {
+      "before_blob": null,
+      "after_blob": "4ce88a7d5c2b8160c32bce0264531ff3f1a92e76",
+      "before_bytes": 0,
+      "after_bytes": 5882
+    },
+    "docs/R8_HISTORY_RESULTS_2026-09-27.md": {
+      "after_blob": "e6154e6cff659ce35c5f9b7bbeb324e1c3db42fa"
+    }
+  }
+}
