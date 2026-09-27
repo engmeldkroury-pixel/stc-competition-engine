@@ -444,3 +444,19 @@ Next owner action:
 
 After the report returns, STC should execute only the single immediate batch selected after reconciling the reviewer findings against current code/live evidence.
 
+## 2026-09-27 — R1 accepted; owner equity refresh is the only entry prerequisite, then R2
+R1 is deployed and production-readback verified.
+
+Immediate owner prerequisite before any new entry:
+- refresh current Capital and AMP equity in the existing Owner Console from the actual competition platform.
+- keep risk_fraction at 0.005.
+- do not use the old seed values.
+Until refreshed, new entry sizing/approval and Telegram plan alerts intentionally fail closed.
+
+Current open-position policy:
+- do not open a replacement merely because another signal appears.
+- manage existing NAS100/SPX500 until fresh market evidence after reopen; stored Friday readback has no rotation candidate.
+- NAS100 stored state=PROTECT; SPX500 stored state=HOLD, but R3 will repair durable management/high-water semantics before management is considered fully authoritative across long history.
+
+Next engineering batch after owner/account prerequisite:
+- STC-R2 fail-closed unknown open risk + capacity integrity / ticket reservation design, per independent audit.

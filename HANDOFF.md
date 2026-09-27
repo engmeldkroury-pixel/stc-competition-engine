@@ -155,3 +155,15 @@ Do not invent a synthetic trade for that residual.
 Next unresolved production proof:
 - first natural post-deploy AMP signal carrying `competition_mode=true` and `quality_floor=84`.
 
+## 2026-09-27 — R1 production checkpoint
+R1 account-freshness and actionable-only Telegram gating is DEPLOYED/VERIFIED.
+- final deploy: 36322065756 SUCCESS.
+- final readback: 36322085806 SUCCESS.
+- critical CI: 202 passed, 1 warning.
+- account states are correctly shown ineligible because they are stale initial_profile_seed rows.
+- STC email=false, Telegram=true.
+- no active opportunities.
+- open Capital positions unchanged: NAS100 7.7 LONG and SPX500 40 LONG.
+- no current rotation candidate.
+
+Bridge transient failure mitigation is in main at c4f5d061; common network/HTML-edge failures no longer need to fail the workflow after retries. GitHub account email settings still require a one-time signed-in UI change if the owner wants absolutely no GitHub Actions email for genuine failures.

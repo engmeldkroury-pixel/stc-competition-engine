@@ -2707,3 +2707,35 @@ The four stale manual_external rows were ledger-only VOIDed; no broker order was
 
 Fresh post-deploy AMP 84 metadata remains pending because current AMP signal cards are still historical pre-deploy rows.
 
+## 2026-09-27 — STC-R1 deployed: fail-closed account freshness + actionable-only entry notifications
+
+Owner requested implementation of the independent audit roadmap, Telegram-only STC notifications, suppression of entry alerts when there is no usable risk capacity, and current-position verification.
+
+Implemented/deployed:
+- R1 implementation commit `344aa9c24ed8a8d8d901e3036806d8ba049137b4`.
+- MySQL UTC timestamp correction `571aa5fe5ba2ec76fcefdda950f0700ca4c4869d`.
+- final R1 deploy run `36322065756`: SUCCESS.
+- final production readback run `36322085806`: SUCCESS.
+- R1 critical CI: 202 passed, 1 warning.
+- account state is now fail-closed unless source is owner_manual, equity/version/timestamp are valid, and attestation age <=24h.
+- execution tickets bind to account_state_version and are rejected if the account version changes.
+- Telegram NEW PLAN dispatch now skips stale/unavailable account state and unusable risk/position capacity.
+- STC internal email channel remains disabled; Telegram configured=true.
+
+Current production account state is intentionally ineligible:
+- Capital seed equity 100000, source initial_profile_seed, version 1, stale about 486k seconds.
+- AMP seed equity 250000, source initial_profile_seed, version 1, stale about 486k seconds.
+Therefore no new STC entry should be treated as actionable until the owner refreshes current platform equity in the existing Owner Console.
+
+Current positions/readback:
+- NAS100 LONG 7.7 @30416.071, stored stop 30319.1, T2 30758.6. Stored Friday supervisor says PROTECT / suggested stop 30537.28475, but the independent audit identified non-durable/windowed peak semantics; do not treat this stale weekend advice as a fresh platform instruction.
+- SPX500 LONG 40 @7737.25, stored stop 7716, T2 7797. Stored Friday supervisor says HOLD.
+- rotation_candidate=null for both.
+- active opportunities=[].
+- AMP has no open positions and remains 3/5 qualifying days.
+
+Bridge email-noise mitigation:
+- commit `c4f5d061eb95627ffd0fff8b920e9a8d4db34092` treats network-unreachable, HTML edge 403, 429 and 5xx claim failures as deferred durable-queue drains after retries rather than failed workflow runs.
+- genuine auth/contract errors still fail.
+- subsequent inspected processor runs were SUCCESS/CANCELLED rather than FAILURE.
+- GitHub account-level email preference itself was NOT changed because the available cloud browser was not signed into GitHub.

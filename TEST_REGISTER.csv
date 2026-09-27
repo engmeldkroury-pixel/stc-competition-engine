@@ -28,3 +28,6 @@ T-STC-LEGACY-GATE-LABEL-GUARD,PASS_CRITICAL,"Competition strategy source cannot 
 T-STC-LEDGER-RECONCILE,PASS,"Owner-confirmed ledger reconciliation and idempotent rerun","Run 36274737170 success; final Capital open NAS100 7.7 + SPX500 40; AMP open 0; Capital days 4; AMP days 3"
 T-STC-VOID-PROGRESS,PASS_CRITICAL_DEPLOYED,"VOID rows do not create synthetic qualifying trading days","Commit 4dfbb26a; critical CI 199 passed 1 warning; deploy 36274716351; reconciliation rerun restored Capital 4 qualifying UTC dates"
 T-STC-POSTRECON-READBACK,PASS,"Production snapshot after reconciliation","Run 36274764925 success; Capital 2 open / 9 closed / -3370.87; AMP 0 open / 2 closed / +991.25"
+T-STC-R1-CRITICAL,PASS,"R1 account freshness / ticket binding / notification gating regression","202 passed, 1 warning on commit 571aa5fe"
+T-STC-R1-DEPLOY,PASS,"Secure R1 Hostinger deployment","Run 36322065756 SUCCESS with PHP validation, staged upload, backup and verification"
+T-STC-R1-READBACK,PASS,"Production account freshness projection after timestamp fix","Run 36322085806: both seed accounts eligible=false with source_not_owner_manual + stale; email=false Telegram=true"

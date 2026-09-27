@@ -1120,3 +1120,21 @@ Status: VERIFIED / OWNER ACCEPTED.
   - 3 qualifying UTC trading days.
 - No broker action was sent during any reconciliation step.
 
+### WU-124 — STC-R1 account freshness and notification gating
+Status: VERIFIED DEPLOYED.
+- Implemented the independent-audit immediate batch R1.
+- Fail-closed account-state eligibility requires owner_manual source, valid positive equity, version and timestamp, and <=24h attestation age.
+- Ticket records account-state version and compliant fill validation rejects version drift.
+- NEW PLAN Telegram notification is not dispatched when account state is unavailable/stale/seed or sizing/risk capacity is unusable.
+- Timestamp parser correction was required because MySQL UTC columns are returned as Y-m-d H:i:s.
+- Critical CI: 202 passed, 1 warning.
+- Deploy run 36322065756: success.
+- Readback 36322085806: success; both account seeds correctly ineligible; STC email=false / Telegram=true; active opportunities empty.
+- No strategy threshold, risk fraction, Boolean gate, monthly rule, ATR geometry, or open broker position was changed.
+
+### WU-125 — transient bridge workflow failure-noise mitigation
+Status: CODE ACTIVE / CONTINUE OBSERVATION.
+- Prior failures reproduced network unreachable and HTML edge 403 before durable queue claim.
+- c4f5d061 classifies transport failures plus HTML-edge 403 / 429 / 5xx as transient after existing retries and exits with warning so the next durable-queue drain can continue.
+- JSON auth 403 and claim contract failures remain fatal.
+- This reduces false GitHub Actions failure emails but does not modify the user's GitHub account notification preference.
