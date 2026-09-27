@@ -1,0 +1,5 @@
+R9 core PR191 merged: 2a3b8aecae6bc53e1b5222c658e2a300500c3d2f.
+Exact PR head 0c38010df68ff6076af0a723e8c9caff45e5912c passed critical/full CI36347047903.
+Full job108698146982: 572 passed, 1 existing Starlette/httpx warning, 965.46s.
+Append history on research branch only; promote only reviewed documentation blobs to fresh main.
+Additional conditional pictured-BTC replay is documented in docs/R9_BTC_CASE_REPLAY_2026-09-27.md; no confirmed broker close timestamp or strategy promotion.
