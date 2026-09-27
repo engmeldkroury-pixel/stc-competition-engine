@@ -1,0 +1,36 @@
+{
+  "schema": "stc-frozen-protection-protocol-v1",
+  "created_date_utc": "2026-09-27",
+  "research_only": true,
+  "execution": "none",
+  "live_promotion_allowed": false,
+  "training_evidence": {
+    "scope": "exploratory_already_observed_historical_data",
+    "dataset_sha256": "08979d9c931fe3f1d799ae76afb15ce01682ac989662c5fd041264f860d227a3",
+    "cutoff": "2026-09-27T20:10:47Z",
+    "is_untouched_holdout": false
+  },
+  "future_evidence": {
+    "earliest_signal_available_at": "2026-09-28T00:00:00Z",
+    "latest_entry_before": "2026-10-01T00:00:00Z",
+    "only_original_frozen_at_decision_seeds": true,
+    "no_parameter_retuning_in_this_protocol": true,
+    "horizon_bars": 32,
+    "min_time_between_train_cutoff_and_future_start_hours": 3.82,
+    "no_automatic_scoring_or_notification_schedule_created": true,
+    "evaluation_status": "NOT_YET_EVALUATED",
+    "note": "This is prospective protocol registration, not evidence collection or a successful holdout. Existing natural feed may accumulate seeds; execution requires a later explicit read-only audit. Any new parameter set requires a new dated protocol and an untouched later evaluation window."
+  },
+  "policies": {
+    "fixed_single_tp_2_5r": {"activation_r": null, "lock_r": null, "giveback_r": null},
+    "closed_1r_fee_proxy_breakeven": {"activation_r": 1.0, "lock_r": "cost", "giveback_r": null},
+    "closed_1_5r_lock_0_5r": {"activation_r": 1.5, "lock_r": 0.5, "giveback_r": null},
+    "closed_1_5r_trail_0_75r": {"activation_r": 1.5, "lock_r": 0.5, "giveback_r": 0.75}
+  },
+  "cost_r_sensitivity": [0.0, 0.02, 0.05, 0.10],
+  "primary_comparison": "same_nonoverlapping_entry_ids_across_policies; paired_net_plan_R_with_terminal_marks_and_ambiguity_bounds",
+  "required_stratification": ["competition", "symbol", "timeframe", "provenance", "gate_quadrant"],
+  "unresolved_cases": "report_unknown; never_impute_price_path_or_treat_missingness_as_loss_or_win",
+  "execution_latency": "idealized_next_bar_stop_activation; not_measured_manual_latency",
+  "live_decision": "BLOCKED_PENDING_DATA_QUALITY_REPRESENTATIVE_INDEPENDENT_EVIDENCE_AND_EXPLICIT_REVIEW"
+}
