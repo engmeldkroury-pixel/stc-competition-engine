@@ -62,6 +62,7 @@ def prepare_dataset(inbox: dict, *, as_of: datetime) -> dict:
     source_hash = digest(inbox)  # Reject an entire non-canonical (NaN/Inf) snapshot.
     versions, errors, entries = defaultdict(list), Counter(), []
     plans = []
+    stage_errors, late_events = Counter(), set()
     duplicates = 0
     for row in inbox['events']:
         if not isinstance(row, dict):
@@ -69,6 +70,7 @@ def prepare_dataset(inbox: dict, *, as_of: datetime) -> dict:
         else:
             versions[str(row.get('event_id', ''))].append(row)
     for event_id, rows in sorted(versions.items()):
+        stage = 'receipt'
         try:
             if len({digest(row) for row in rows}) != 1:
                 errors['conflicting_event_duplicates'] += len(rows)
@@ -79,11 +81,13 @@ def prepare_dataset(inbox: dict, *, as_of: datetime) -> dict:
             if d.get('action') != 'signal_created':
                 errors['non_signal_event'] += 1
                 continue
+            stage = 'bar'
             minutes = timeframe_duration_minutes(str(payload.get('timeframe', '')))
             b = clean_bar({**payload, 'timeframe_minutes': minutes})
             if utc(b['time']) + timedelta(minutes=minutes) > as_of:
                 errors['unclosed_source_bar'] += 1
                 continue
+            stage = 'envelope'
             signal, envelope = d['signal'], d['approval_envelope']
             signal_id = 'bridge-' + hashlib.sha256(event_id.encode()).hexdigest()[:32]
             if signal.get('signal_id') != signal_id or receipt.get('signal_id') != signal_id:
@@ -94,8 +98,14 @@ def prepare_dataset(inbox: dict, *, as_of: datetime) -> dict:
             if not lo <= ref <= hi or ref != b['close']:
                 raise ValueError('invalid_price_envelope')
             issued, expires = utc(envelope['issued_at']), utc(envelope['valid_until'])
-            if expires <= issued or issued > as_of:
+            source_close = utc(b['time']) + timedelta(minutes=minutes)
+            if expires <= source_close or issued > as_of:
                 raise ValueError('invalid_decision_window')
+            # A delayed decision is ineligible for entry, not an invalid candle.
+            # Retain its original expiry; never retime it to regain eligibility.
+            if issued >= expires:
+                late_events.add(event_id)
+            stage = 'seed'
             seed = d.get('research_outcome_seed')
             if seed is not None:
                 validate_seed(seed)
@@ -109,6 +119,7 @@ def prepare_dataset(inbox: dict, *, as_of: datetime) -> dict:
                                           provenance='LEGACY_RECONSTRUCTED_GEOMETRY')
             if seed is not None:
                 validate_seed(seed)
+            stage = 'original_plan'
             plan = d.get('locked_trade_plan')
             if plan is not None:
                 if plan.get('levels_locked') is not True or plan.get('execution') != 'manual_only':
@@ -136,6 +147,7 @@ def prepare_dataset(inbox: dict, *, as_of: datetime) -> dict:
         except (ValueError, TypeError, KeyError, AttributeError, OverflowError):
             # Do not reflect raw source exception text into public logs/artifacts.
             errors['invalid_source_record'] += 1
+            stage_errors[stage] += 1
     grouped = defaultdict(list)
     for b, s, receipt in entries:
         grouped[(*series_key(b), b['time'])].append((b, s, receipt))
@@ -156,6 +168,8 @@ def prepare_dataset(inbox: dict, *, as_of: datetime) -> dict:
                 source_scope='VALIDATED_SIGNAL_BARS_NOT_COMPLETE_MARKET_OR_BROKER_HISTORY',
                 raw_inbox_sha256=source_hash, source_rows=len(inbox['events']),
                 exact_duplicate_rows_ignored=duplicates, quarantine_counts=dict(sorted(errors.items())),
+                invalid_record_stage_counts=dict(sorted(stage_errors.items())),
+                late_decision_rows_retained=len(late_events & valid_event_ids),
                 bars=bars, seeds=sorted(seeds, key=lambda s: (s['available_at'], s['event_id'])),
                 receipt_proofs=receipts, original_plans=[p for p in plans if p['source_event_id'] in valid_event_ids])
     data['dataset_sha256'] = digest(data)
