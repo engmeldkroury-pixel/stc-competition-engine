@@ -460,3 +460,31 @@ Current open-position policy:
 
 Next engineering batch after owner/account prerequisite:
 - STC-R2 fail-closed unknown open risk + capacity integrity / ticket reservation design, per independent audit.
+
+## 2026-09-27 21:29 EEST — Current controlling next task
+Core correctness/hardening batches R1-R7 are now on main; the Hostinger-relevant subset is deployed and production-readback verified.
+
+Verified evidence:
+- main full CI: run `36327999156` = 473 passed, 1 warning;
+- latest secure deploy: `36340722601` = SUCCESS;
+- latest live readback: `36340789086` = SUCCESS.
+
+Owner action NOW:
+- **Nothing**, if the intention is to avoid new entries because current usable capital/equity has not been refreshed. The system is intentionally fail-closed and will not treat a new plan as actionable.
+- To re-enable actionable new entries later, update actual Capital and AMP equity in Owner Console; keep `risk_fraction=0.005`.
+
+Open-position action:
+- NAS100 and SPX500 remain open in the reconciled ledger.
+- Current management is `HOLD` solely because the newest signal history is stale; do not act on old Friday PROTECT/HOLD calculations.
+- Re-evaluate on the first fresh market bars. A fresh `PROTECT`, `EXIT_NOW`, or rotation signal may supersede HOLD.
+
+Next engineering batch:
+1. build rejected-trade outcome attribution (MFE/MAE, +1R/+1.5R/+2R/+2.5R-before-stop, exact failed gate clauses);
+2. accumulate exact Boolean-vs-quality quadrants;
+3. only then run redundancy/ablation and threshold/1M/ATR experiments;
+4. no live threshold/risk relaxation until OOS evidence supports it.
+
+Communication:
+- STC internal email is disabled; Telegram remains configured.
+- GitHub account-level Actions emails require the signed-in GitHub notification setting if the owner wants zero GitHub mail regardless of workflow outcome.
+

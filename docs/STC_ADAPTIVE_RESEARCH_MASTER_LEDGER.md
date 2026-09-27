@@ -1138,3 +1138,20 @@ Status: CODE ACTIVE / CONTINUE OBSERVATION.
 - c4f5d061 classifies transport failures plus HTML-edge 403 / 429 / 5xx as transient after existing retries and exits with warning so the next durable-queue drain can continue.
 - JSON auth 403 and claim contract failures remain fatal.
 - This reduces false GitHub Actions failure emails but does not modify the user's GitHub account notification preference.
+
+### WU-126 — independent-review implementation checkpoint
+Status: VERIFIED / PRODUCTION DEPLOYED WHERE APPLICABLE.
+- R2 risk/capacity integrity deployed and readback verified.
+- R3a single-TP management parity deployed; R3b subsequently hardened stale/post-entry management evidence.
+- R4 research calibration cannot obtain live authority without explicit promotion.
+- R5 signed-score revalidation is LONG/SHORT direction-normalized.
+- R6 context times are causal and exact Boolean-vs-quality quadrants are emitted for research.
+- R7 research engine now prevents split leakage, models gap-through-stop at first executable open, and separates plan-R from fill-R.
+- Consolidated current code full CI: run 36327999156 = 473 passed, 1 warning.
+- Consolidated Hostinger deploy: run 36340722601 = success.
+- Consolidated live readback: run 36340789086 = success.
+- Live open positions NAS100/SPX500 now fail closed to HOLD because latest market evidence is stale from Friday.
+- New actionable entries remain blocked by stale/ineligible seed account state until owner refreshes real equity.
+- Current exact gate-quadrant sample is too small to justify 84/Boolean changes.
+- Next research work unit: rejected-trade outcome attribution, then redundancy/ablation and asset-class geometry studies.
+

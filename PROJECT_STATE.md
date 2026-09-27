@@ -2739,3 +2739,38 @@ Bridge email-noise mitigation:
 - genuine auth/contract errors still fail.
 - subsequent inspected processor runs were SUCCESS/CANCELLED rather than FAILURE.
 - GitHub account-level email preference itself was NOT changed because the available cloud browser was not signed into GitHub.
+
+## 2026-09-27 21:29 EEST — Independent-review implementation checkpoint
+- Controlling code baseline before trigger-only commits: `7b566ae5af0795b1091f578c75098dc7d696cab8`.
+- Full CI run `36327999156`: **PASS — 473 passed, 1 warning**.
+- Secure Hostinger deploy trigger commit `b3003c7a86c31e89e1d63131e5232d6cb7055ea8`; deploy run `36340722601`: **SUCCESS**.
+- Production verification trigger commit `580ae6ce7e278c61b6bc23d11d45f215aeebfb05`; Live Readback run `36340789086`: **SUCCESS**.
+- Production now includes:
+  - R1 stale-equity/account-version fail-closed controls;
+  - R2 unknown-risk/capacity integrity and fixed portfolio/cluster-cap parity;
+  - R3a Python/PHP single-TP management parity;
+  - R3b stale-management-evidence fail-closed HOLD behavior and longer post-entry history window;
+  - R4 research calibration live-authority boundary;
+  - R5 direction-normalized approval revalidation;
+  - R6 causal context-time validation plus exact Boolean-vs-quality diagnostic quadrants;
+  - R7 research split leakage correction, gap-stop handling, and plan-R/fill-R semantics.
+- Current live open positions remain exactly:
+  - NAS100 LONG 7.7 @ 30416.071, stop 30319.1, T2 30758.6;
+  - SPX500 LONG 40 @ 7737.25, stop 7716.0, T2 7797.0.
+- Both positions currently return `HOLD` because latest signal history is stale from Friday; stale history can no longer emit an actionable PROTECT/EXIT recommendation.
+- `rotation_candidate=null` for both; `active_opportunities=[]`.
+- Current account states remain intentionally ineligible for new entries: seed/source not owner_manual and stale. New actionable sizing/approval/Telegram NEW PLAN messages therefore remain fail-closed until fresh owner equity is entered.
+- STC notification config readback: `email_configured=false`, `telegram_configured=true`.
+- GitHub Actions account-level email preference was not changed; workflow-failure noise was mitigated in code and recent bridge processor runs are SUCCESS/CANCELLED rather than FAILURE.
+- Capital progress: 4/3 qualifying days, evidenced realized P/L -3370.87 USD, 2 open.
+- AMP progress: 3/5 qualifying days, realized P/L +991.25 USD, 0 open; readback reported 2 days remaining.
+- Exact gate diagnostics have only 3 fresh post-R6 rows so far, all Boolean=false / quality=false. This is insufficient evidence to change the 84 floor or Boolean gate.
+- Draft PRs #187 and #188 were closed as superseded because corrected/equivalent changes are already on main.
+
+Controlling next sequence:
+1. No owner action is required while new entries should remain paused; stale/ineligible account state intentionally blocks them.
+2. If the owner wants new entries enabled again, refresh actual Capital/AMP equity in Owner Console; do not reuse seed equity.
+3. At next market reopen/fresh bars, rerun position management before changing NAS100/SPX500 stops or exits.
+4. Continue research-only rejected-trade outcome attribution and gate-quadrant accumulation before changing 84/Boolean/1M/ATR rules.
+5. Keep human approval + manual broker entry mandatory.
+

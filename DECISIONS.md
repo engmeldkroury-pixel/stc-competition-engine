@@ -111,3 +111,14 @@
 - Current open-position/platform parity and trading-day parity are treated as the controlling reconciliation acceptance criteria.
 - Ledger-only VOID rows must never count toward competition progress.
 
+## 2026-09-27 — Post-audit production-control decisions
+- Account equity freshness is a hard prerequisite for new actionable entries; stale/seed account state fails closed.
+- Position management must fail closed to HOLD when post-entry market evidence is stale. Old bars may not generate a fresh PROTECT/EXIT instruction.
+- Production single-TP management remains authoritative; no Python-only partial take-profit branch may diverge from PHP semantics.
+- Research calibration/community components have no live authority unless explicitly promoted after parity + OOS/forward evidence.
+- Context timestamps must be causal; higher-timeframe/history evidence later than the event time is rejected.
+- Approval signal degradation is direction-normalized so LONG and SHORT revalidation are symmetric.
+- Keep the live 84 floor, Boolean gate, 1M context, 0.5% risk, and ATR geometry unchanged while exact rejected-trade outcomes are still missing.
+- Exact Boolean-vs-quality gate quadrants are now observational evidence only, not a trigger for immediate strategy relaxation.
+- Human approval and manual platform execution remain mandatory.
+
