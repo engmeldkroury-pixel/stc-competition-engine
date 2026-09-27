@@ -1,0 +1,46 @@
+name: STC Outcome Attribution Read Only
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, stc-r8-outcome-attribution-20260927]
+    paths: [ops/OUTCOME_ATTRIBUTION_TRIGGER]
+permissions:
+  contents: read
+concurrency:
+  group: stc-outcome-attribution-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install read-only report dependency
+        run: pip install 'httpx>=0.28,<1'
+      - name: Read bounded authenticated inbox and evaluate causal outcomes
+        env:
+          STC_WORKER_TOKEN: ${{ secrets.STC_WORKER_TOKEN }}
+        run: >-
+          python scripts/run_outcome_attribution.py
+          --bridge-url https://stc.feama.site
+          --limit 1000 --horizon-bars 32 --cost-r 0.02
+          --output /tmp/stc-r8-outcome-report.json
+      - name: Record exact code and report digest
+        run: |
+          python - <<'PY'
+          import hashlib,json,os,pathlib
+          path=pathlib.Path('/tmp/stc-r8-outcome-report.json')
+          manifest={'code_sha':os.environ['GITHUB_SHA'],'report_sha256':hashlib.sha256(path.read_bytes()).hexdigest(),'research_only':True,'execution':'none','raw_inbox_exported':False}
+          pathlib.Path('/tmp/stc-r8-manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
+          print(json.dumps(manifest,sort_keys=True))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: stc-r8-outcome-report
+          path: |
+            /tmp/stc-r8-outcome-report.json
+            /tmp/stc-r8-manifest.json
+          retention-days: 7
