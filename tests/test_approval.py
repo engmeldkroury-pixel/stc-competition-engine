@@ -113,3 +113,79 @@ def test_two_hour_source_bar_close_time_is_explicit():
         "time": "2026-09-22T08:00:00Z",
     }
     assert source_bar_close_time(payload).isoformat() == "2026-09-22T10:00:00+00:00"
+
+
+
+def _fresh_revalidation_current(envelope: dict, score: float) -> dict:
+    return {
+        "current_price": float(envelope["reference_price"]),
+        "current_signal_score": score,
+        "current_market_state_hash": envelope["market_state_hash"],
+        "current_rule_version": envelope["rule_version"],
+        "news_block": False,
+        "volatility_ratio": 1.0,
+        "quote_freshness_verified": True,
+        "market_open_verified": True,
+        "kill_switch": False,
+        "safe_mode": False,
+    }
+
+
+def test_revalidation_score_drop_is_direction_normalized_for_short():
+    p = {
+        "competition_id": "c",
+        "symbol": "s",
+        "timeframe": "15m",
+        "close": 100,
+        "atr14": 1,
+        "ema20": 99,
+        "ema50": 101,
+        "rsi14": 45,
+        "macd": -1,
+        "macd_signal": -0.5,
+    }
+    envelope = build_approval_envelope(p, -0.60)
+
+    strengthening = revalidate_envelope(
+        envelope, _fresh_revalidation_current(envelope, -0.75)
+    )
+    weakening_within_tolerance = revalidate_envelope(
+        envelope, _fresh_revalidation_current(envelope, -0.50)
+    )
+    weakening_beyond_tolerance = revalidate_envelope(
+        envelope, _fresh_revalidation_current(envelope, -0.44)
+    )
+
+    assert "signal_degraded" not in strengthening["reasons"]
+    assert "signal_degraded" not in weakening_within_tolerance["reasons"]
+    assert "signal_degraded" in weakening_beyond_tolerance["reasons"]
+
+
+def test_revalidation_score_drop_remains_symmetric_for_long():
+    p = {
+        "competition_id": "c",
+        "symbol": "s",
+        "timeframe": "15m",
+        "close": 100,
+        "atr14": 1,
+        "ema20": 101,
+        "ema50": 99,
+        "rsi14": 55,
+        "macd": 1,
+        "macd_signal": 0.5,
+    }
+    envelope = build_approval_envelope(p, 0.60)
+
+    strengthening = revalidate_envelope(
+        envelope, _fresh_revalidation_current(envelope, 0.75)
+    )
+    weakening_within_tolerance = revalidate_envelope(
+        envelope, _fresh_revalidation_current(envelope, 0.50)
+    )
+    weakening_beyond_tolerance = revalidate_envelope(
+        envelope, _fresh_revalidation_current(envelope, 0.44)
+    )
+
+    assert "signal_degraded" not in strengthening["reasons"]
+    assert "signal_degraded" not in weakening_within_tolerance["reasons"]
+    assert "signal_degraded" in weakening_beyond_tolerance["reasons"]
