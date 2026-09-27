@@ -1,2 +1,2 @@
-2026-09-27T16:44:00+03:00
-Deploy STC-R3a single-TP Python/PHP parity and 192-record operator management history; critical CI 205 passed.
+2026-09-27T21:27:00+03:00
+Deploy verified main: R5/R6 diagnostics + paused new-entry alerts + R3b stale-management fail-closed controls.
