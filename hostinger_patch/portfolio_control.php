@@ -732,8 +732,9 @@ function stc_propose_position_size(
     $totalRisk = $stopRisk + $commission;
 
     $configuredBudget = $equity * $riskFraction;
-    $portfolioCap = $equity * $riskFraction * $portfolioRiskMultiple;
-    $clusterCap = $equity * $riskFraction * $clusterRiskMultiple;
+    // Keep account heat limits independent of the per-trade risk fraction.
+    $portfolioCap = $equity * 0.03;
+    $clusterCap = $equity * 0.015;
     $remainingPortfolio = max(0.0, $portfolioCap - $portfolioOpenRiskUsd);
     $remainingCluster = max(0.0, $clusterCap - $clusterOpenRiskUsd);
     $budget = min($configuredBudget, $remainingPortfolio, $remainingCluster);
@@ -791,7 +792,7 @@ function stc_propose_position_size(
         'allowed_by_position_limit' => $positionLimitAllowed,
         'allowed_by_risk_policy' => $riskPolicyAllowed,
         'provisional_risk_setting' => true,
-        'note' => 'STC sizing proposal only. Portfolio and correlation-cluster caps are STC risk controls, not official competition limits. Human approval and manual order entry required.',
+        'note' => 'STC sizing proposal only. Fixed portfolio and correlation-cluster caps are STC risk controls, not official competition limits. Human approval and manual order entry required.',
     ];
 }
 
