@@ -183,3 +183,12 @@ Decision: preserve unfavorable empirical findings; do not substitute a tighter t
 - Forward boundary is2026-09-28T12:00:00Z. Do not retune frozen parameters on forward observations.
 - Candidate remains research_only=true, live_authorized=false, execution=none. Promotion requires prospective, symbol-stratified, cost-aware evidence and full CI/parity.
 - Owner requires zero new paid infrastructure; strategy research must not depend on purchasing VPS, browser automation or a higher TradingView tier.
+
+
+## 2026-09-28 — PR196 acceptance and frozen-forward decision
+- Accept PR196 only against exact tested head `6b3061caffb29b5216fee18b3dcc21b88c23a7cf`; STC CI 36391662171 / #824 had both critical and full jobs successful before merge.
+- Accepted squash merge commit: `c760a937cfe0a8b4127da32ffee42d9efaecbe66`.
+- Treat PR196 as research-only prospective shadow-ledger/review-gate infrastructure, not a live strategy promotion and not proof of profitability.
+- Preserve frozen forward boundaries: MTF from 2026-09-28T07:00:00Z after PR195 merge; session/regime from 2026-09-28T12:00:00Z.
+- Enforce no-retuning: do not adjust the frozen candidate from forward observations and do not move the boundary after inspecting forward results.
+- No live strategy/risk/execution, broker/account/position, quantity, approval, stop/target, or notification-setting change is authorized by this decision.
