@@ -1,3 +1,7 @@
+
+
+## Persistent runtime direction - 2026-09-28
+Owner does not want Work or Opera as runtime dependencies. Continue with R10-PERSISTENT-BRIDGE: STC as an owner-controlled always-on service; TradingView server-side alert webhooks for signal ingress; durable queue/database and Telegram/manual approval; official broker/feed API adapters where available; and a self-hosted persistent Playwright/Chromium collector only as a fail-closed reconciliation fallback when no account API exists. Do not depend on ChatGPT session lifetime. Do not auto-trade. Preserve adapter separation and health monitoring.
 # STC latest checkpoint - R9
 
 ## R9 accepted evidence checkpoint - 2026-09-27T20:30:40.269361+00:00
