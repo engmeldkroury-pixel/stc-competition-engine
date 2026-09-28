@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "status": "SHADOW_ONLY",
+  "frozen_at": "2026-09-28",
+  "selection_cost_bps": 2,
+  "base_timeframe": "15m",
+  "higher_timeframes": [
+    "1h",
+    "4h"
+  ],
+  "causal_htf_closed_only": true,
+  "candidates": {
+    "CAPITALCOM:ETHUSD": {
+      "family": "pullback",
+      "mtf": "vote",
+      "session": "all",
+      "stop_atr": 1.5,
+      "target_r": 1.5,
+      "max_entry_gap_atr": 0.25
+    },
+    "CAPITALCOM:DOGEUSD": {
+      "family": "pullback",
+      "mtf": "1h",
+      "session_utc": "07:00-20:00",
+      "stop_atr": 1.2,
+      "target_r": 2.5,
+      "max_entry_gap_atr": 0.25
+    }
+  },
+  "authority": {
+    "live": false,
+    "auto_execute": false,
+    "retune_on_forward": false,
+    "risk_change": false
+  }
+}

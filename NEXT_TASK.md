@@ -1,3 +1,11 @@
+
+
+## R10 next after historical MTF screen
+1. Accumulate independent forward-shadow outcomes for frozen ETHUSD/DOGEUSD contracts without retuning.
+2. Record exact cost/slippage, MFE/MAE, gap behavior and source integrity for each natural candidate.
+3. Continue source-fidelity work (especially MNQ discrepancies) separately; do not contaminate Capital shadow evidence.
+4. Revisit promotion only after a meaningful independent forward sample; otherwise reject/research a new family without re-labeling seen history as holdout.
+5. Keep current live strategy/risk unchanged until evidence supports promotion.
 ## R10 frozen-shadow next task - 2026-09-28
 1. Run full PR CI for the research-only frozen classifier and boundary tests.
 2. From 2026-09-28T12:00:00Z onward, score new 15m observations with the frozen protocol without retuning.

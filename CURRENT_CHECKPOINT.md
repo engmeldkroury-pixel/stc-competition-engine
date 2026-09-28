@@ -1,3 +1,7 @@
+
+
+## R10 causal MTF shadow checkpoint - 2026-09-28
+Single-timeframe and asset-agnostic variants failed robustness tests; several train/validation winners failed untouched holdout, so they were rejected. Causal MTF testing used 15m entries with only fully closed 1h/4h context, chronological 60/20/20 selection, gap-aware entries and a 2bps selection-cost proxy. Only ETHUSD and DOGEUSD survived the historical holdout and additional cost/horizon/fold stress. They are frozen in research_inputs/R10_MTF_SHADOW_CANDIDATES.json as SHADOW_ONLY; no live promotion, auto-execution, risk increase or forward retuning is authorized. Details: docs/R10_MTF_SHADOW_CANDIDATES_2026-09-28.md. Hourly forward condition-watch is active for material evidence only.
 ## R10 strategy-shadow checkpoint - 2026-09-28
 Owner reports all executed competition trades losing so far. R10 tested stop/target-only fixes, uniform trend/chase, pullback/reclaim/breakout, mean reversion, per-asset/timeframe static selection and naive walk-forward switching. These were NOT robust and are rejected for live promotion. Do not restart these searches blindly.
 Historical accepted directional cases were materially more extended than rejected cases, supporting a late/chasing-entry hypothesis but not proving gate causality. Stop widening did not solve the accepted-plan problem.

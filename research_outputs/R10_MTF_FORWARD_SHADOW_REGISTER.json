@@ -1,0 +1,106 @@
+{
+  "schema_version": 1,
+  "purpose": "Append-only governance register for independent forward-shadow evidence of the frozen R10 ETHUSD/DOGEUSD MTF candidates. No live authority.",
+  "candidate_contract": {
+    "branch": "research/r10-mtf-shadow-20260928",
+    "contract_path": "research_inputs/R10_MTF_SHADOW_CANDIDATES.json",
+    "contract_blob_sha": "0eb29de0f0098c8bd3039c4b99e47fc371385b87",
+    "evaluator_path": "app/mtf_shadow.py",
+    "evaluator_blob_sha": "6404baa3f1677e6a3700d2c3ce3105e8feb78630",
+    "observed_branch_head": "b11304f2278a5f84636a966c2c484929a4e9ffd8"
+  },
+  "checks": [
+    {
+      "checked_at_utc": "2026-09-28T06:17:24Z",
+      "previous_check_utc": null,
+      "status": "DATA_INTEGRITY_BLOCK",
+      "admitted_forward_signals": [],
+      "outcomes": [],
+      "cost_observations": [],
+      "gap_observations": [
+        {
+          "symbol": "CAPITALCOM:ETHUSD",
+          "timeframe": "15m",
+          "previous_bar_open_utc": "2026-09-26T04:45:00Z",
+          "next_bar_open_utc": "2026-09-26T07:00:00Z",
+          "step_seconds": 8100,
+          "classification": "unclassified_source_or_session_gap"
+        },
+        {
+          "symbol": "CAPITALCOM:DOGEUSD",
+          "timeframe": "15m",
+          "previous_bar_open_utc": "2026-09-26T04:45:00Z",
+          "next_bar_open_utc": "2026-09-26T07:00:00Z",
+          "step_seconds": 8100,
+          "classification": "unclassified_source_or_session_gap"
+        },
+        {
+          "symbol": "CAPITALCOM:ETHUSD",
+          "timeframe": "1h",
+          "occurrences_utc": [
+            [
+              "2026-09-19T04:00:00Z",
+              "2026-09-19T07:00:00Z"
+            ],
+            [
+              "2026-09-26T04:00:00Z",
+              "2026-09-26T07:00:00Z"
+            ]
+          ],
+          "step_seconds": 10800,
+          "classification": "unclassified_source_or_session_gap"
+        },
+        {
+          "symbol": "CAPITALCOM:DOGEUSD",
+          "timeframe": "1h",
+          "occurrences_utc": [
+            [
+              "2026-09-19T04:00:00Z",
+              "2026-09-19T07:00:00Z"
+            ],
+            [
+              "2026-09-26T04:00:00Z",
+              "2026-09-26T07:00:00Z"
+            ]
+          ],
+          "step_seconds": 10800,
+          "classification": "unclassified_source_or_session_gap"
+        }
+      ],
+      "mfe_mae": [],
+      "stop_target_paths": [],
+      "source_snapshot": {
+        "source": "TradingView official connector OHLCV",
+        "CAPITALCOM:ETHUSD": {
+          "15m_last_open_utc": "2026-09-28T06:15:00Z",
+          "1h_last_open_utc": "2026-09-28T06:00:00Z",
+          "4h_last_open_utc": "2026-09-28T05:00:00Z"
+        },
+        "CAPITALCOM:DOGEUSD": {
+          "15m_last_open_utc": "2026-09-28T06:15:00Z",
+          "1h_last_open_utc": "2026-09-28T06:00:00Z",
+          "4h_last_open_utc": "2026-09-28T05:00:00Z"
+        },
+        "provider_notice": "OHLCV bars are delayed 15+ minutes depending on exchange; the last bar is not a live price and may still change."
+      },
+      "issues": [
+        {
+          "id": "MTF_FORWARD_BOUNDARY_MISSING",
+          "severity": "BLOCKER",
+          "detail": "The frozen candidate contract records frozen_at only as 2026-09-28 and app/mtf_shadow.py has no immutable not_before_utc / forward-eligibility check. Therefore pre-freeze bars can be evaluated by the same code and cannot be distinguished from independent prospective evidence. No MTF observation is admitted as forward evidence until an exact immutable boundary is registered."
+        },
+        {
+          "id": "TV_LAST_BAR_MUTABLE",
+          "severity": "WARNING",
+          "detail": "The official OHLCV source states that the last returned bar may still change and is delayed. Last-bar data must not be treated as a closed causal signal/receipt."
+        },
+        {
+          "id": "SOURCE_SESSION_GAPS_UNCLASSIFIED",
+          "severity": "WARNING",
+          "detail": "Matching ETH/DOGE gaps were observed in 15m and 1h streams around Saturday 04:45/04:00 to 07:00 UTC. They may be scheduled provider/session maintenance, but the MTF forward contract currently has no session-calendar receipt that classifies them."
+        }
+      ],
+      "decision": "Do not retune, promote, execute, or count any ETHUSD/DOGEUSD MTF forward outcome from this check. Preserve the frozen parameters and require an exact immutable forward boundary plus closed-bar/source receipts before admission."
+    }
+  ]
+}

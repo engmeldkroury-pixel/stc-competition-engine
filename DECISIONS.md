@@ -1,3 +1,11 @@
+
+
+## 2026-09-28 — R10 MTF evidence decision
+- Reject the broad chase/pullback/reclaim/breakout variants that failed robust train/validation/holdout evidence after costs.
+- Reject asset-specific candidates that appeared positive on train+validation but failed the untouched historical holdout; do not hide this as optimization noise.
+- Freeze ETHUSD and DOGEUSD causal MTF pullback configurations as SHADOW_ONLY because they remained positive on the current historical holdout and cost/horizon stress tests.
+- Do not promote them live yet: holdout counts are small (ETH 8; DOGE 10), historical selection bias remains, and forward independent evidence is still missing.
+- Forward data may evaluate the frozen contracts but must not retune them. Manual execution remains mandatory and risk is unchanged.
 # STC DECISIONS
 
 ## 2026-09-24 — Capital competition acceleration
