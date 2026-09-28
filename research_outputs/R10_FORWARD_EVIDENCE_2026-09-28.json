@@ -7,14 +7,68 @@
       "source_open_utc": "2026-09-28T07:00:00Z",
       "evidence_sha256": "4f6579a66f85bb782479d86e6b75530bf0e072018a80f63bfad1d741fde468d3",
       "evidence": {
-        "provenance": {"production_alert_name":"STC CAPITAL MTF A v1.1 PROD","tv_alert_id":5677111254,"fire_id":57474948584,"fired_at":"2026-09-28T07:15:00Z","webhook_http_code":200,"source_contract":"production_v1.1_current_remote","four_hour_source":"TradingView Official OHLCV frozen during first forward evaluation"},
-        "source": {"time":"2026-09-28T07:00:00Z","open":2648.01,"high":2654.32,"low":2645.09,"close":2646.17,"volume":4806,"ema20":2653.4836839716,"ema50":2665.5872927299,"rsi14":39.2647621515,"atr14":8.5864268707},
-        "ema20_four_bars_back": {"time":"2026-09-28T06:00:00Z","ema20":2656.5564578425},
-        "confirm_1h": {"time":"2026-09-28T06:00:00Z","ema20":2672.7941193943,"ema50":2683.2205773452},
-        "confirm_4h_frozen": {"time":"2026-09-28T01:00:00Z","close":2657.27,"ema20":2686.133296334895,"ema50":2667.472623282511},
-        "next_bar_observation": {"time":"2026-09-28T07:15:00Z","open":2646.24},
-        "derived": {"local_trend":-1,"trend_1h":-1,"trend_4h":1,"vote":-1,"distance_atr":-0.8517726968078885,"slope_atr":-0.35786409378103273},
-        "decision": {"decision":"WAIT","reason":"mtf_vote_neutral"}
+        "provenance": {
+          "production_alert_name": "STC CAPITAL MTF A v1.1 PROD",
+          "tv_alert_id": 5677111254,
+          "fire_id": 57474948584,
+          "fired_at": "2026-09-28T07:15:00Z",
+          "webhook_http_code": 200,
+          "source_contract": "production_v1.1_current_remote",
+          "four_hour_source": "TradingView Official OHLCV frozen during first forward evaluation"
+        },
+        "source": {
+          "time": "2026-09-28T07:00:00Z",
+          "open": 2648.01,
+          "high": 2654.32,
+          "low": 2645.09,
+          "close": 2646.17,
+          "volume": 4806,
+          "ema20": 2653.4836839716,
+          "ema50": 2665.5872927299,
+          "rsi14": 39.2647621515,
+          "atr14": 8.5864268707
+        },
+        "ema20_four_bars_back": {
+          "time": "2026-09-28T06:00:00Z",
+          "ema20": 2656.5564578425
+        },
+        "confirm_1h": {
+          "time": "2026-09-28T06:00:00Z",
+          "ema20": 2672.7941193943,
+          "ema50": 2683.2205773452
+        },
+        "confirm_4h_frozen": {
+          "time": "2026-09-28T01:00:00Z",
+          "close": 2657.27,
+          "ema20": 2686.133296334895,
+          "ema50": 2667.472623282511
+        },
+        "next_bar_observation": {
+          "time": "2026-09-28T07:15:00Z",
+          "open": 2646.24
+        },
+        "derived": {
+          "local_trend": -1,
+          "trend_1h": -1,
+          "trend_4h": 1,
+          "vote": -1,
+          "distance_atr": -0.8517726968078885,
+          "slope_atr": -0.35786409378103273
+        },
+        "decision": {
+          "decision": "WAIT",
+          "reason": "mtf_vote_neutral"
+        }
+      },
+      "candidate_sha256": "2d1406da93b44d8ec1cf15d47b5e8664abcaf5809515e0c0382286917d4784d9",
+      "retrospective_check": {
+        "checked_after_decision": true,
+        "later_history_close": 2646.17,
+        "later_history_volume": 4806,
+        "alert_time_close": 2646.17,
+        "alert_time_volume": 4806,
+        "exact_ohlcv_match_at_check": true,
+        "excluded_from_original_evidence_sha256": true
       }
     },
     {
@@ -22,18 +76,72 @@
       "source_open_utc": "2026-09-28T07:00:00Z",
       "evidence_sha256": "f0a01d5502e94985c54e6e9afb931a00dd30af8293d5b50c2fbdf0bab7ff5eda",
       "evidence": {
-        "provenance": {"production_alert_name":"STC CAPITAL MTF A v1.1 PROD","tv_alert_id":5677111254,"fire_id":57474947548,"fired_at":"2026-09-28T07:15:00Z","webhook_http_code":200,"source_contract":"production_v1.1_current_remote","four_hour_source":"TradingView Official OHLCV frozen during first forward evaluation"},
-        "source": {"time":"2026-09-28T07:00:00Z","open":0.092703,"high":0.0931479,"low":0.0925273,"close":0.0926089,"volume":3561,"ema20":0.0937382572,"ema50":0.0948879122,"rsi14":32.7984268244,"atr14":0.0006766098},
-        "ema20_four_bars_back": {"time":"2026-09-28T06:00:00Z","ema20":0.0942444649},
-        "confirm_1h": {"time":"2026-09-28T06:00:00Z","ema20":0.0954071533,"ema50":0.0961621819},
-        "confirm_4h_frozen": {"time":"2026-09-28T01:00:00Z","close":0.0941396,"ema20":0.0962999463084294,"ema50":0.09450203127421453},
-        "next_bar_observation": {"time":"2026-09-28T07:15:00Z","open":0.0926178},
-        "derived": {"local_trend":-1,"trend_1h":-1,"trend_4h":1,"distance_atr":-1.66914106180549,"slope_atr":-0.7481530713862125},
-        "decision": {"decision":"WAIT","reason":"pullback_conditions_not_met:anti_chase_distance"}
+        "provenance": {
+          "production_alert_name": "STC CAPITAL MTF A v1.1 PROD",
+          "tv_alert_id": 5677111254,
+          "fire_id": 57474947548,
+          "fired_at": "2026-09-28T07:15:00Z",
+          "webhook_http_code": 200,
+          "source_contract": "production_v1.1_current_remote",
+          "four_hour_source": "TradingView Official OHLCV frozen during first forward evaluation"
+        },
+        "source": {
+          "time": "2026-09-28T07:00:00Z",
+          "open": 0.092703,
+          "high": 0.0931479,
+          "low": 0.0925273,
+          "close": 0.0926089,
+          "volume": 3561,
+          "ema20": 0.0937382572,
+          "ema50": 0.0948879122,
+          "rsi14": 32.7984268244,
+          "atr14": 0.0006766098
+        },
+        "ema20_four_bars_back": {
+          "time": "2026-09-28T06:00:00Z",
+          "ema20": 0.0942444649
+        },
+        "confirm_1h": {
+          "time": "2026-09-28T06:00:00Z",
+          "ema20": 0.0954071533,
+          "ema50": 0.0961621819
+        },
+        "confirm_4h_frozen": {
+          "time": "2026-09-28T01:00:00Z",
+          "close": 0.0941396,
+          "ema20": 0.0962999463084294,
+          "ema50": 0.09450203127421453
+        },
+        "next_bar_observation": {
+          "time": "2026-09-28T07:15:00Z",
+          "open": 0.0926178
+        },
+        "derived": {
+          "local_trend": -1,
+          "trend_1h": -1,
+          "trend_4h": 1,
+          "distance_atr": -1.66914106180549,
+          "slope_atr": -0.7481530713862125
+        },
+        "decision": {
+          "decision": "WAIT",
+          "reason": "pullback_conditions_not_met:anti_chase_distance"
+        }
+      },
+      "candidate_sha256": "e22c97ad3e915bf4032afececa7c5d463a7250850ac76627f5ed11ad8ad44d98",
+      "retrospective_check": {
+        "checked_after_decision": true,
+        "later_history_close": 0.0926177,
+        "later_history_volume": 3590,
+        "alert_time_close": 0.0926089,
+        "alert_time_volume": 3561,
+        "ohl_unchanged": true,
+        "excluded_from_original_evidence_sha256": true
       }
     }
   ],
   "valued_directional_trades": 0,
   "review_state": "COLLECTING",
-  "note": "WAIT observations are prospective evidence but make no P/L claim."
+  "note": "WAIT observations are prospective evidence but make no P/L claim.",
+  "protocol_sha256": "beeb4883b7e01afa19bf6c70b25d2caa337c7d632c25d126bae2458217a96eb2"
 }
