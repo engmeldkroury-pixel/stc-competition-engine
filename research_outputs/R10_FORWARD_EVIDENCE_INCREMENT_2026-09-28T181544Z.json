@@ -1,0 +1,2000 @@
+{
+  "schema_version": 1,
+  "registry_id": "R10-FORWARD-SHADOW-REGISTRY-V1",
+  "captured_at_utc": "2026-09-28T18:15:44Z",
+  "previous_completed_mtf_source_open_utc": "2026-09-28T16:30:00Z",
+  "new_completed_mtf_source_open_utc": [
+    "2026-09-28T16:45:00Z",
+    "2026-09-28T17:00:00Z",
+    "2026-09-28T17:15:00Z",
+    "2026-09-28T17:30:00Z",
+    "2026-09-28T17:45:00Z"
+  ],
+  "pending_mtf_source_open_utc": "2026-09-28T18:00:00Z",
+  "mtf_observations": [
+    {
+      "t": "2026-09-28T16:45:00Z",
+      "s": "CAPITALCOM:ETHUSD",
+      "cand": "2d1406da93b44d8ec1cf15d47b5e8664abcaf5809515e0c0382286917d4784d9",
+      "sha": "4258b31f62825a5b3b05946502b29a9f908551bd33af33ebb73b6eb23ece2c99",
+      "decision": "WAIT",
+      "reason": "mtf_vote_invariant_wait_local_plus1_1h_minus1_exact_4h_missing",
+      "source": {
+        "event_id": "capital-africa-sep-2026|CAPITALCOM:ETHUSD|15|1790613900000",
+        "event": "bar_close",
+        "competition_id": "capital-africa-sep-2026",
+        "symbol": "CAPITALCOM:ETHUSD",
+        "timeframe": "15",
+        "time": "2026-09-28T16:45:00Z",
+        "open": 2682.2,
+        "high": 2686.58,
+        "low": 2677.77,
+        "close": 2685.15,
+        "volume": 5100,
+        "ema20": 2674.824481907,
+        "ema50": 2669.0489016575,
+        "rsi14": 57.5382809485,
+        "atr14": 13.3585786059,
+        "macd": 5.0186376002,
+        "macd_signal": 4.6268679577,
+        "volume_ratio": 0.8832468848,
+        "family_trend": 0.5,
+        "family_momentum": 0.3038075238,
+        "family_volatility": 0.6,
+        "family_volume": 0.1832468848,
+        "family_vwap": 1,
+        "family_market_structure": 0.35,
+        "family_smc_liquidity": 0,
+        "family_price_action": 0.3039160045,
+        "family_microstructure": 0.274206813,
+        "confirm_timeframe": "60",
+        "confirm_time": "2026-09-28T15:00:00Z",
+        "confirm_close": 2676.14,
+        "confirm_ema20": 2669.3143542129,
+        "confirm_ema50": 2677.6932258689,
+        "confirm_ema200": 2664.954003762,
+        "confirm_rsi14": 51.847764404,
+        "confirm_atr14": 18.4562578623,
+        "confirm_macd": -3.4195033616,
+        "confirm_macd_signal": -7.2666109428,
+        "confirm_volume_ratio": 1.3572535728,
+        "trend_2h_time": "2026-09-28T13:00:00Z",
+        "trend_2h_score": -0.6,
+        "trend_4h_time": "2026-09-28T09:00:00Z",
+        "trend_4h_score": 0.45,
+        "trend_1m_time": "2026-07-31T21:00:00Z",
+        "trend_1m_score": -0.05,
+        "history_timeframe": "1D",
+        "history_time": "2026-09-26T21:00:00Z",
+        "history_close": 2685.04,
+        "history_ema50": 2416.0569275778,
+        "history_ema200": 2254.2425021518,
+        "history_rsi14": 62.3626243577,
+        "history_atr14": 95.947220306,
+        "history_high_252": 3353.92,
+        "history_low_252": 1509.17,
+        "history_momentum_20": 0.0768373138,
+        "history_momentum_63": 0.4048459925,
+        "history_momentum_126": 0.2851201103,
+        "history_momentum_252": -0.1959513685,
+        "history_volatility_20": 0.0352276874
+      },
+      "h1": {
+        "time": "2026-09-28T15:00:00Z",
+        "close": 2676.14,
+        "ema20": 2669.3143542129,
+        "ema50": 2677.6932258689,
+        "ema200": 2664.954003762,
+        "rsi14": 51.847764404,
+        "atr14": 18.4562578623,
+        "macd": -3.4195033616,
+        "macd_signal": -7.2666109428,
+        "volume_ratio": 1.3572535728
+      },
+      "h4": {
+        "time": "2026-09-28T09:00:00Z",
+        "trend_score_only": 0.45,
+        "ema20": null,
+        "ema50": null,
+        "exact_pair_capture": "MISSING"
+      },
+      "next": {
+        "time": "2026-09-28T17:00:00Z",
+        "open": 2685.64,
+        "fire_id": 57508599127,
+        "http": 200,
+        "gap_atr": 0.03668054921527104
+      },
+      "derived": {
+        "local_trend": 1,
+        "trend_1h": -1,
+        "distance_atr": 0.7729503562931179,
+        "slope_atr": 0.3164391417461891
+      },
+      "receipt": {
+        "fire_id": 57507501952,
+        "http": 200
+      },
+      "revision": {
+        "checked_after_decision": true,
+        "later_o": 2682.2,
+        "later_h": 2686.58,
+        "later_l": 2677.77,
+        "later_c": 2685.71,
+        "later_v": 5125,
+        "revised": true,
+        "excluded_from_canonical_evidence_sha256": true
+      },
+      "protocol_sha256": "beeb4883b7e01afa19bf6c70b25d2caa337c7d632c25d126bae2458217a96eb2",
+      "eligible_4h_exact_capture": "MISSING",
+      "costs_bps_1_2_3_5": null,
+      "mfe_r": null,
+      "mae_r": null,
+      "stop_target_horizon": null,
+      "review_counted": false
+    },
+    {
+      "t": "2026-09-28T16:45:00Z",
+      "s": "CAPITALCOM:DOGEUSD",
+      "cand": "e22c97ad3e915bf4032afececa7c5d463a7250850ac76627f5ed11ad8ad44d98",
+      "sha": "040d530f43e828b851311e0724b6853e95f942fe76a567bda5ffd38ceb3dca07",
+      "decision": "WAIT",
+      "reason": "short_pullback_failed_close_below_ema20_bearish_source_candle_distance_slope_rsi",
+      "source": {
+        "event_id": "capital-africa-sep-2026|CAPITALCOM:DOGEUSD|15|1790613900000",
+        "event": "bar_close",
+        "competition_id": "capital-africa-sep-2026",
+        "symbol": "CAPITALCOM:DOGEUSD",
+        "timeframe": "15",
+        "time": "2026-09-28T16:45:00Z",
+        "open": 0.09395,
+        "high": 0.0941125,
+        "low": 0.0936515,
+        "close": 0.0940905,
+        "volume": 3343,
+        "ema20": 0.093270924,
+        "ema50": 0.0934873546,
+        "rsi14": 58.4531638301,
+        "atr14": 0.0007554323,
+        "macd": 0.0001406819,
+        "macd_signal": -0.0000242463,
+        "volume_ratio": 0.7442616381,
+        "family_trend": 0.115,
+        "family_momentum": 0.5306843421,
+        "family_volatility": 0.18,
+        "family_volume": 0.0442616381,
+        "family_vwap": 0.180845355,
+        "family_market_structure": 0.105,
+        "family_smc_liquidity": 0,
+        "family_price_action": 0.4070498915,
+        "family_microstructure": 0.2005679958,
+        "confirm_timeframe": "60",
+        "confirm_time": "2026-09-28T15:00:00Z",
+        "confirm_close": 0.0930714,
+        "confirm_ema20": 0.0939387166,
+        "confirm_ema50": 0.0951763564,
+        "confirm_ema200": 0.0942153627,
+        "confirm_rsi14": 43.0106672451,
+        "confirm_atr14": 0.0012213098,
+        "confirm_macd": -0.0009412243,
+        "confirm_macd_signal": -0.0009497454,
+        "confirm_volume_ratio": 1.4027968559,
+        "trend_2h_time": "2026-09-28T13:00:00Z",
+        "trend_2h_score": -0.6,
+        "trend_4h_time": "2026-09-28T09:00:00Z",
+        "trend_4h_score": 0,
+        "trend_1m_time": "2026-07-31T21:00:00Z",
+        "trend_1m_score": -1,
+        "history_timeframe": "1D",
+        "history_time": "2026-09-26T21:00:00Z",
+        "history_close": 0.0967038,
+        "history_ema50": 0.0857535143,
+        "history_ema200": 0.0930439201,
+        "history_rsi14": 60.3482500499,
+        "history_atr14": 0.0056381457,
+        "history_high_252": 0.1375791,
+        "history_low_252": 0.0674598,
+        "history_momentum_20": 0.0704143348,
+        "history_momentum_63": 0.3367513381,
+        "history_momentum_126": -0.0463192525,
+        "history_momentum_252": -0.2933503741,
+        "history_volatility_20": 0.0547376926
+      },
+      "h1": {
+        "time": "2026-09-28T15:00:00Z",
+        "close": 0.0930714,
+        "ema20": 0.0939387166,
+        "ema50": 0.0951763564,
+        "ema200": 0.0942153627,
+        "rsi14": 43.0106672451,
+        "atr14": 0.0012213098,
+        "macd": -0.0009412243,
+        "macd_signal": -0.0009497454,
+        "volume_ratio": 1.4027968559
+      },
+      "h4": {
+        "time": "2026-09-28T09:00:00Z",
+        "trend_score_only": 0,
+        "ema20": null,
+        "ema50": null,
+        "exact_pair_capture": "MISSING"
+      },
+      "next": {
+        "time": "2026-09-28T17:00:00Z",
+        "open": 0.0941227,
+        "fire_id": 57508593190,
+        "http": 200,
+        "gap_atr": 0.04262460051021117
+      },
+      "derived": {
+        "local_trend": -1,
+        "trend_1h": -1,
+        "distance_atr": 1.0849099250852638,
+        "slope_atr": 0.47316854203878767
+      },
+      "receipt": {
+        "fire_id": 57507504143,
+        "http": 200
+      },
+      "revision": {
+        "checked_after_decision": true,
+        "later_o": 0.09395,
+        "later_h": 0.0941276,
+        "later_l": 0.0936515,
+        "later_c": 0.0941276,
+        "later_v": 3364,
+        "revised": true,
+        "excluded_from_canonical_evidence_sha256": true
+      },
+      "protocol_sha256": "beeb4883b7e01afa19bf6c70b25d2caa337c7d632c25d126bae2458217a96eb2",
+      "eligible_4h_exact_capture": "MISSING",
+      "costs_bps_1_2_3_5": null,
+      "mfe_r": null,
+      "mae_r": null,
+      "stop_target_horizon": null,
+      "review_counted": false
+    },
+    {
+      "t": "2026-09-28T17:00:00Z",
+      "s": "CAPITALCOM:ETHUSD",
+      "cand": "2d1406da93b44d8ec1cf15d47b5e8664abcaf5809515e0c0382286917d4784d9",
+      "sha": "5f8b30683cf85e889b63519138275f1793ff5722f4abe8d45a9c2140a24e7339",
+      "decision": "WAIT",
+      "reason": "mtf_vote_invariant_wait_local_plus1_1h_minus1_exact_4h_missing",
+      "source": {
+        "event_id": "capital-africa-sep-2026|CAPITALCOM:ETHUSD|15|1790614800000",
+        "event": "bar_close",
+        "competition_id": "capital-africa-sep-2026",
+        "symbol": "CAPITALCOM:ETHUSD",
+        "timeframe": "15",
+        "time": "2026-09-28T17:00:00Z",
+        "open": 2685.64,
+        "high": 2718.4,
+        "low": 2680.11,
+        "close": 2718.25,
+        "volume": 5612,
+        "ema20": 2679.0084995031,
+        "ema50": 2670.9994560716,
+        "rsi14": 69.5506709157,
+        "atr14": 15.1393944198,
+        "macd": 7.9057191366,
+        "macd_signal": 5.2897857718,
+        "volume_ratio": 0.9745255005,
+        "family_trend": 0.5,
+        "family_momentum": 0.7356005631,
+        "family_volatility": -0.2,
+        "family_volume": 0.2745255005,
+        "family_vwap": 1,
+        "family_market_structure": 1,
+        "family_smc_liquidity": 0.3,
+        "family_price_action": 0.4464742753,
+        "family_microstructure": 0.6208052381,
+        "confirm_timeframe": "60",
+        "confirm_time": "2026-09-28T16:00:00Z",
+        "confirm_close": 2685.71,
+        "confirm_ema20": 2670.8758442879,
+        "confirm_ema50": 2678.0076091681,
+        "confirm_ema200": 2665.1605310877,
+        "confirm_rsi14": 55.4056258792,
+        "confirm_atr14": 19.1129537292,
+        "confirm_macd": -1.7492221742,
+        "confirm_macd_signal": -6.1631331891,
+        "confirm_volume_ratio": 1.2262848721,
+        "trend_2h_time": "2026-09-28T15:00:00Z",
+        "trend_2h_score": 0.7,
+        "trend_4h_time": "2026-09-28T13:00:00Z",
+        "trend_4h_score": 0.15,
+        "trend_1m_time": "2026-07-31T21:00:00Z",
+        "trend_1m_score": -0.05,
+        "history_timeframe": "1D",
+        "history_time": "2026-09-26T21:00:00Z",
+        "history_close": 2685.04,
+        "history_ema50": 2416.0569275778,
+        "history_ema200": 2254.2425021518,
+        "history_rsi14": 62.3626243577,
+        "history_atr14": 95.947220306,
+        "history_high_252": 3353.92,
+        "history_low_252": 1509.17,
+        "history_momentum_20": 0.0768373138,
+        "history_momentum_63": 0.4048459925,
+        "history_momentum_126": 0.2851201103,
+        "history_momentum_252": -0.1959513685,
+        "history_volatility_20": 0.0352276874
+      },
+      "h1": {
+        "time": "2026-09-28T16:00:00Z",
+        "close": 2685.71,
+        "ema20": 2670.8758442879,
+        "ema50": 2678.0076091681,
+        "ema200": 2665.1605310877,
+        "rsi14": 55.4056258792,
+        "atr14": 19.1129537292,
+        "macd": -1.7492221742,
+        "macd_signal": -6.1631331891,
+        "volume_ratio": 1.2262848721
+      },
+      "h4": {
+        "time": "2026-09-28T13:00:00Z",
+        "trend_score_only": 0.15,
+        "ema20": null,
+        "ema50": null,
+        "exact_pair_capture": "MISSING"
+      },
+      "next": {
+        "time": "2026-09-28T17:15:00Z",
+        "open": 2718.2,
+        "fire_id": 57509496755,
+        "http": 200,
+        "gap_atr": 0.003302642008902918
+      },
+      "derived": {
+        "local_trend": 1,
+        "trend_1h": -1,
+        "distance_atr": 2.59201256065949,
+        "slope_atr": 0.5473224733654608
+      },
+      "receipt": {
+        "fire_id": 57508599127,
+        "http": 200
+      },
+      "revision": {
+        "checked_after_decision": true,
+        "later_o": 2685.64,
+        "later_h": 2718.4,
+        "later_l": 2680.11,
+        "later_c": 2718.25,
+        "later_v": 5612,
+        "revised": false,
+        "excluded_from_canonical_evidence_sha256": true
+      },
+      "protocol_sha256": "beeb4883b7e01afa19bf6c70b25d2caa337c7d632c25d126bae2458217a96eb2",
+      "eligible_4h_exact_capture": "MISSING",
+      "costs_bps_1_2_3_5": null,
+      "mfe_r": null,
+      "mae_r": null,
+      "stop_target_horizon": null,
+      "review_counted": false
+    },
+    {
+      "t": "2026-09-28T17:00:00Z",
+      "s": "CAPITALCOM:DOGEUSD",
+      "cand": "e22c97ad3e915bf4032afececa7c5d463a7250850ac76627f5ed11ad8ad44d98",
+      "sha": "467189bcbd3139bf77d5b90a694b65628bbc92075d383831e0adb26d78e9fb3f",
+      "decision": "WAIT",
+      "reason": "short_pullback_failed_close_below_ema20_bearish_source_candle_distance_slope_rsi",
+      "source": {
+        "event_id": "capital-africa-sep-2026|CAPITALCOM:DOGEUSD|15|1790614800000",
+        "event": "bar_close",
+        "competition_id": "capital-africa-sep-2026",
+        "symbol": "CAPITALCOM:DOGEUSD",
+        "timeframe": "15",
+        "time": "2026-09-28T17:00:00Z",
+        "open": 0.0941227,
+        "high": 0.0950558,
+        "low": 0.0933957,
+        "close": 0.0950526,
+        "volume": 4217,
+        "ema20": 0.0934438043,
+        "ema50": 0.0935501346,
+        "rsi14": 65.1949968281,
+        "atr14": 0.0008210529,
+        "macd": 0.0002649675,
+        "macd_signal": 0.00003407,
+        "volume_ratio": 0.9453037436,
+        "family_trend": 0.115,
+        "family_momentum": 0.7743412062,
+        "family_volatility": 0.06,
+        "family_volume": 0.2453037436,
+        "family_vwap": 1,
+        "family_market_structure": 0.755,
+        "family_smc_liquidity": 0,
+        "family_price_action": 0.4482651647,
+        "family_microstructure": 0.4342096849,
+        "confirm_timeframe": "60",
+        "confirm_time": "2026-09-28T16:00:00Z",
+        "confirm_close": 0.0941276,
+        "confirm_ema20": 0.0939567055,
+        "confirm_ema50": 0.0951352287,
+        "confirm_ema200": 0.0942144894,
+        "confirm_rsi14": 48.8721051773,
+        "confirm_atr14": 0.0012899377,
+        "confirm_macd": -0.0008105836,
+        "confirm_macd_signal": -0.0009219131,
+        "confirm_volume_ratio": 1.1907720492,
+        "trend_2h_time": "2026-09-28T15:00:00Z",
+        "trend_2h_score": -0.3,
+        "trend_4h_time": "2026-09-28T13:00:00Z",
+        "trend_4h_score": -0.3,
+        "trend_1m_time": "2026-07-31T21:00:00Z",
+        "trend_1m_score": -1,
+        "history_timeframe": "1D",
+        "history_time": "2026-09-26T21:00:00Z",
+        "history_close": 0.0967038,
+        "history_ema50": 0.0857535143,
+        "history_ema200": 0.0930439201,
+        "history_rsi14": 60.3482500499,
+        "history_atr14": 0.0056381457,
+        "history_high_252": 0.1375791,
+        "history_low_252": 0.0674598,
+        "history_momentum_20": 0.0704143348,
+        "history_momentum_63": 0.3367513381,
+        "history_momentum_126": -0.0463192525,
+        "history_momentum_252": -0.2933503741,
+        "history_volatility_20": 0.0547376926
+      },
+      "h1": {
+        "time": "2026-09-28T16:00:00Z",
+        "close": 0.0941276,
+        "ema20": 0.0939567055,
+        "ema50": 0.0951352287,
+        "ema200": 0.0942144894,
+        "rsi14": 48.8721051773,
+        "atr14": 0.0012899377,
+        "macd": -0.0008105836,
+        "macd_signal": -0.0009219131,
+        "volume_ratio": 1.1907720492
+      },
+      "h4": {
+        "time": "2026-09-28T13:00:00Z",
+        "trend_score_only": -0.3,
+        "ema20": null,
+        "ema50": null,
+        "exact_pair_capture": "MISSING"
+      },
+      "next": {
+        "time": "2026-09-28T17:15:00Z",
+        "open": 0.0950524,
+        "fire_id": 57509502412,
+        "http": 200,
+        "gap_atr": 0.0002435896639616657
+      },
+      "derived": {
+        "local_trend": -1,
+        "trend_1h": -1,
+        "distance_atr": 1.9594300196735175,
+        "slope_atr": 0.6101239031005227
+      },
+      "receipt": {
+        "fire_id": 57508593190,
+        "http": 200
+      },
+      "revision": {
+        "checked_after_decision": true,
+        "later_o": 0.0941227,
+        "later_h": 0.0950558,
+        "later_l": 0.0933957,
+        "later_c": 0.0950526,
+        "later_v": 4217,
+        "revised": false,
+        "excluded_from_canonical_evidence_sha256": true
+      },
+      "protocol_sha256": "beeb4883b7e01afa19bf6c70b25d2caa337c7d632c25d126bae2458217a96eb2",
+      "eligible_4h_exact_capture": "MISSING",
+      "costs_bps_1_2_3_5": null,
+      "mfe_r": null,
+      "mae_r": null,
+      "stop_target_horizon": null,
+      "review_counted": false
+    },
+    {
+      "t": "2026-09-28T17:15:00Z",
+      "s": "CAPITALCOM:ETHUSD",
+      "cand": "2d1406da93b44d8ec1cf15d47b5e8664abcaf5809515e0c0382286917d4784d9",
+      "sha": "3c34b95ed27f2e98d0d50fbc8c5fd715c53eaefe3d2758e50d076f066091a9d3",
+      "decision": "WAIT",
+      "reason": "mtf_vote_invariant_wait_local_plus1_1h_minus1_exact_4h_missing",
+      "source": {
+        "event_id": "capital-africa-sep-2026|CAPITALCOM:ETHUSD|15|1790615700000",
+        "event": "bar_close",
+        "competition_id": "capital-africa-sep-2026",
+        "symbol": "CAPITALCOM:ETHUSD",
+        "timeframe": "15",
+        "time": "2026-09-28T17:15:00Z",
+        "open": 2718.2,
+        "high": 2718.59,
+        "low": 2696.79,
+        "close": 2697.28,
+        "volume": 6531,
+        "ema20": 2680.7486424076,
+        "ema50": 2672.0300656374,
+        "rsi14": 58.2869160091,
+        "atr14": 15.6151519612,
+        "macd": 8.3697637111,
+        "macd_signal": 5.9057813597,
+        "volume_ratio": 1.1179007908,
+        "family_trend": 0.5,
+        "family_momentum": 0.4075667519,
+        "family_volatility": 0.6,
+        "family_volume": -0.4179007908,
+        "family_vwap": 1,
+        "family_market_structure": 0.35,
+        "family_smc_liquidity": -0.6,
+        "family_price_action": -0.4297706422,
+        "family_microstructure": -0.7429401328,
+        "confirm_timeframe": "60",
+        "confirm_time": "2026-09-28T16:00:00Z",
+        "confirm_close": 2685.71,
+        "confirm_ema20": 2670.8758442879,
+        "confirm_ema50": 2678.0076091681,
+        "confirm_ema200": 2665.1605310877,
+        "confirm_rsi14": 55.4056258792,
+        "confirm_atr14": 19.1129537292,
+        "confirm_macd": -1.7492221742,
+        "confirm_macd_signal": -6.1631331891,
+        "confirm_volume_ratio": 1.2262848721,
+        "trend_2h_time": "2026-09-28T15:00:00Z",
+        "trend_2h_score": 0.7,
+        "trend_4h_time": "2026-09-28T13:00:00Z",
+        "trend_4h_score": 0.15,
+        "trend_1m_time": "2026-07-31T21:00:00Z",
+        "trend_1m_score": -0.05,
+        "history_timeframe": "1D",
+        "history_time": "2026-09-26T21:00:00Z",
+        "history_close": 2685.04,
+        "history_ema50": 2416.0569275778,
+        "history_ema200": 2254.2425021518,
+        "history_rsi14": 62.3626243577,
+        "history_atr14": 95.947220306,
+        "history_high_252": 3353.92,
+        "history_low_252": 1509.17,
+        "history_momentum_20": 0.0768373138,
+        "history_momentum_63": 0.4048459925,
+        "history_momentum_126": 0.2851201103,
+        "history_momentum_252": -0.1959513685,
+        "history_volatility_20": 0.0352276874
+      },
+      "h1": {
+        "time": "2026-09-28T16:00:00Z",
+        "close": 2685.71,
+        "ema20": 2670.8758442879,
+        "ema50": 2678.0076091681,
+        "ema200": 2665.1605310877,
+        "rsi14": 55.4056258792,
+        "atr14": 19.1129537292,
+        "macd": -1.7492221742,
+        "macd_signal": -6.1631331891,
+        "volume_ratio": 1.2262848721
+      },
+      "h4": {
+        "time": "2026-09-28T13:00:00Z",
+        "trend_score_only": 0.15,
+        "ema20": null,
+        "ema50": null,
+        "exact_pair_capture": "MISSING"
+      },
+      "next": {
+        "time": "2026-09-28T17:30:00Z",
+        "open": 2697.31,
+        "fire_id": 57510315327,
+        "http": 200,
+        "gap_atr": 0.001921210890184631
+      },
+      "derived": {
+        "local_trend": 1,
+        "trend_1h": -1,
+        "distance_atr": 1.058674141210837,
+        "slope_atr": 0.5130440753446436
+      },
+      "receipt": {
+        "fire_id": 57509496755,
+        "http": 200
+      },
+      "revision": {
+        "checked_after_decision": true,
+        "later_o": 2718.2,
+        "later_h": 2718.59,
+        "later_l": 2696.79,
+        "later_c": 2697.28,
+        "later_v": 6531,
+        "revised": false,
+        "excluded_from_canonical_evidence_sha256": true
+      },
+      "protocol_sha256": "beeb4883b7e01afa19bf6c70b25d2caa337c7d632c25d126bae2458217a96eb2",
+      "eligible_4h_exact_capture": "MISSING",
+      "costs_bps_1_2_3_5": null,
+      "mfe_r": null,
+      "mae_r": null,
+      "stop_target_horizon": null,
+      "review_counted": false
+    },
+    {
+      "t": "2026-09-28T17:15:00Z",
+      "s": "CAPITALCOM:DOGEUSD",
+      "cand": "e22c97ad3e915bf4032afececa7c5d463a7250850ac76627f5ed11ad8ad44d98",
+      "sha": "5c9b85c1e641c6c939e876d7cd2b4d86347f6d193cfeb91df52096ab6e2a4f68",
+      "decision": "WAIT",
+      "reason": "short_pullback_failed_close_below_ema20_distance_slope_rsi",
+      "source": {
+        "event_id": "capital-africa-sep-2026|CAPITALCOM:DOGEUSD|15|1790615700000",
+        "event": "bar_close",
+        "competition_id": "capital-africa-sep-2026",
+        "symbol": "CAPITALCOM:DOGEUSD",
+        "timeframe": "15",
+        "time": "2026-09-28T17:15:00Z",
+        "open": 0.0950524,
+        "high": 0.0951751,
+        "low": 0.0941797,
+        "close": 0.0942623,
+        "volume": 4783,
+        "ema20": 0.0935217563,
+        "ema50": 0.0935780627,
+        "rsi14": 56.991410433,
+        "atr14": 0.0008335063,
+        "macd": 0.0002939602,
+        "macd_signal": 0.000086048,
+        "volume_ratio": 1.064533001,
+        "family_trend": 0.115,
+        "family_momentum": 0.525442421,
+        "family_volatility": 0.18,
+        "family_volume": -0.364533001,
+        "family_vwap": 0.3486997914,
+        "family_market_structure": 0.105,
+        "family_smc_liquidity": -0.3,
+        "family_price_action": -0.3753164557,
+        "family_microstructure": -0.6220639539,
+        "confirm_timeframe": "60",
+        "confirm_time": "2026-09-28T16:00:00Z",
+        "confirm_close": 0.0941276,
+        "confirm_ema20": 0.0939567055,
+        "confirm_ema50": 0.0951352287,
+        "confirm_ema200": 0.0942144894,
+        "confirm_rsi14": 48.8721051773,
+        "confirm_atr14": 0.0012899377,
+        "confirm_macd": -0.0008105836,
+        "confirm_macd_signal": -0.0009219131,
+        "confirm_volume_ratio": 1.1907720492,
+        "trend_2h_time": "2026-09-28T15:00:00Z",
+        "trend_2h_score": -0.3,
+        "trend_4h_time": "2026-09-28T13:00:00Z",
+        "trend_4h_score": -0.3,
+        "trend_1m_time": "2026-07-31T21:00:00Z",
+        "trend_1m_score": -1,
+        "history_timeframe": "1D",
+        "history_time": "2026-09-26T21:00:00Z",
+        "history_close": 0.0967038,
+        "history_ema50": 0.0857535143,
+        "history_ema200": 0.0930439201,
+        "history_rsi14": 60.3482500499,
+        "history_atr14": 0.0056381457,
+        "history_high_252": 0.1375791,
+        "history_low_252": 0.0674598,
+        "history_momentum_20": 0.0704143348,
+        "history_momentum_63": 0.3367513381,
+        "history_momentum_126": -0.0463192525,
+        "history_momentum_252": -0.2933503741,
+        "history_volatility_20": 0.0547376926
+      },
+      "h1": {
+        "time": "2026-09-28T16:00:00Z",
+        "close": 0.0941276,
+        "ema20": 0.0939567055,
+        "ema50": 0.0951352287,
+        "ema200": 0.0942144894,
+        "rsi14": 48.8721051773,
+        "atr14": 0.0012899377,
+        "macd": -0.0008105836,
+        "macd_signal": -0.0009219131,
+        "volume_ratio": 1.1907720492
+      },
+      "h4": {
+        "time": "2026-09-28T13:00:00Z",
+        "trend_score_only": -0.3,
+        "ema20": null,
+        "ema50": null,
+        "exact_pair_capture": "MISSING"
+      },
+      "next": {
+        "time": "2026-09-28T17:30:00Z",
+        "open": 0.0942624,
+        "fire_id": 57510319876,
+        "http": 200,
+        "gap_atr": 0.00011997509797211558
+      },
+      "derived": {
+        "local_trend": -1,
+        "trend_1h": -1,
+        "distance_atr": 0.8884680295757796,
+        "slope_atr": 0.5046676911740208
+      },
+      "receipt": {
+        "fire_id": 57509502412,
+        "http": 200
+      },
+      "revision": {
+        "checked_after_decision": true,
+        "later_o": 0.0950524,
+        "later_h": 0.0951751,
+        "later_l": 0.0941797,
+        "later_c": 0.0942623,
+        "later_v": 4783,
+        "revised": false,
+        "excluded_from_canonical_evidence_sha256": true
+      },
+      "protocol_sha256": "beeb4883b7e01afa19bf6c70b25d2caa337c7d632c25d126bae2458217a96eb2",
+      "eligible_4h_exact_capture": "MISSING",
+      "costs_bps_1_2_3_5": null,
+      "mfe_r": null,
+      "mae_r": null,
+      "stop_target_horizon": null,
+      "review_counted": false
+    },
+    {
+      "t": "2026-09-28T17:30:00Z",
+      "s": "CAPITALCOM:ETHUSD",
+      "cand": "2d1406da93b44d8ec1cf15d47b5e8664abcaf5809515e0c0382286917d4784d9",
+      "sha": "69586f367412e2e91948264cf263bcf64a8586007efbf019c03f1c419f87db55",
+      "decision": "WAIT",
+      "reason": "mtf_vote_invariant_wait_local_plus1_1h_minus1_exact_4h_missing",
+      "source": {
+        "event_id": "capital-africa-sep-2026|CAPITALCOM:ETHUSD|15|1790616600000",
+        "event": "bar_close",
+        "competition_id": "capital-africa-sep-2026",
+        "symbol": "CAPITALCOM:ETHUSD",
+        "timeframe": "15",
+        "time": "2026-09-28T17:30:00Z",
+        "open": 2697.31,
+        "high": 2703,
+        "low": 2693.62,
+        "close": 2699.8,
+        "volume": 5326,
+        "ema20": 2682.5630574164,
+        "ema50": 2673.1190826712,
+        "rsi14": 59.1432293275,
+        "atr14": 15.169783964,
+        "macd": 8.8389751162,
+        "macd_signal": 6.492420111,
+        "volume_ratio": 0.9029031574,
+        "family_trend": 0.5,
+        "family_momentum": 0.4412567879,
+        "family_volatility": 0.6,
+        "family_volume": 0.2029031574,
+        "family_vwap": 1,
+        "family_market_structure": 0.35,
+        "family_smc_liquidity": 0,
+        "family_price_action": 0.1429637527,
+        "family_microstructure": 0.2404363163,
+        "confirm_timeframe": "60",
+        "confirm_time": "2026-09-28T16:00:00Z",
+        "confirm_close": 2685.71,
+        "confirm_ema20": 2670.8758442879,
+        "confirm_ema50": 2678.0076091681,
+        "confirm_ema200": 2665.1605310877,
+        "confirm_rsi14": 55.4056258792,
+        "confirm_atr14": 19.1129537292,
+        "confirm_macd": -1.7492221742,
+        "confirm_macd_signal": -6.1631331891,
+        "confirm_volume_ratio": 1.2262848721,
+        "trend_2h_time": "2026-09-28T15:00:00Z",
+        "trend_2h_score": 0.7,
+        "trend_4h_time": "2026-09-28T13:00:00Z",
+        "trend_4h_score": 0.15,
+        "trend_1m_time": "2026-07-31T21:00:00Z",
+        "trend_1m_score": -0.05,
+        "history_timeframe": "1D",
+        "history_time": "2026-09-26T21:00:00Z",
+        "history_close": 2685.04,
+        "history_ema50": 2416.0569275778,
+        "history_ema200": 2254.2425021518,
+        "history_rsi14": 62.3626243577,
+        "history_atr14": 95.947220306,
+        "history_high_252": 3353.92,
+        "history_low_252": 1509.17,
+        "history_momentum_20": 0.0768373138,
+        "history_momentum_63": 0.4048459925,
+        "history_momentum_126": 0.2851201103,
+        "history_momentum_252": -0.1959513685,
+        "history_volatility_20": 0.0352276874
+      },
+      "h1": {
+        "time": "2026-09-28T16:00:00Z",
+        "close": 2685.71,
+        "ema20": 2670.8758442879,
+        "ema50": 2678.0076091681,
+        "ema200": 2665.1605310877,
+        "rsi14": 55.4056258792,
+        "atr14": 19.1129537292,
+        "macd": -1.7492221742,
+        "macd_signal": -6.1631331891,
+        "volume_ratio": 1.2262848721
+      },
+      "h4": {
+        "time": "2026-09-28T13:00:00Z",
+        "trend_score_only": 0.15,
+        "ema20": null,
+        "ema50": null,
+        "exact_pair_capture": "MISSING"
+      },
+      "next": {
+        "time": "2026-09-28T17:45:00Z",
+        "open": 2699.72,
+        "fire_id": 57511061222,
+        "http": 200,
+        "gap_atr": 0.005273641351138096
+      },
+      "derived": {
+        "local_trend": 1,
+        "trend_1h": -1,
+        "distance_atr": 1.1362681646954014,
+        "slope_atr": 0.5817796859694372
+      },
+      "receipt": {
+        "fire_id": 57510315327,
+        "http": 200
+      },
+      "revision": {
+        "checked_after_decision": true,
+        "later_o": 2697.31,
+        "later_h": 2703,
+        "later_l": 2693.62,
+        "later_c": 2699.74,
+        "later_v": 5351,
+        "revised": true,
+        "excluded_from_canonical_evidence_sha256": true
+      },
+      "protocol_sha256": "beeb4883b7e01afa19bf6c70b25d2caa337c7d632c25d126bae2458217a96eb2",
+      "eligible_4h_exact_capture": "MISSING",
+      "costs_bps_1_2_3_5": null,
+      "mfe_r": null,
+      "mae_r": null,
+      "stop_target_horizon": null,
+      "review_counted": false
+    },
+    {
+      "t": "2026-09-28T17:30:00Z",
+      "s": "CAPITALCOM:DOGEUSD",
+      "cand": "e22c97ad3e915bf4032afececa7c5d463a7250850ac76627f5ed11ad8ad44d98",
+      "sha": "12f92fa150c898d6abf6384465523ea267dbedb2697bc0202ea0ed82334d081d",
+      "decision": "WAIT",
+      "reason": "short_pullback_failed_close_below_ema20_bearish_source_candle_distance_slope_rsi",
+      "source": {
+        "event_id": "capital-africa-sep-2026|CAPITALCOM:DOGEUSD|15|1790616600000",
+        "event": "bar_close",
+        "competition_id": "capital-africa-sep-2026",
+        "symbol": "CAPITALCOM:DOGEUSD",
+        "timeframe": "15",
+        "time": "2026-09-28T17:30:00Z",
+        "open": 0.0942624,
+        "high": 0.0946508,
+        "low": 0.0941865,
+        "close": 0.0945285,
+        "volume": 3216,
+        "ema20": 0.0936176366,
+        "ema50": 0.0936153347,
+        "rsi14": 58.8688298502,
+        "atr14": 0.0008071344,
+        "macd": 0.0003345605,
+        "macd_signal": 0.0001357505,
+        "volume_ratio": 0.7136754508,
+        "family_trend": 0.5,
+        "family_momentum": 0.5956213117,
+        "family_volatility": 0.6,
+        "family_volume": 0.0136754508,
+        "family_vwap": 0.6833449657,
+        "family_market_structure": 0.35,
+        "family_smc_liquidity": 0,
+        "family_price_action": 0.2129334482,
+        "family_microstructure": 0.3493426765,
+        "confirm_timeframe": "60",
+        "confirm_time": "2026-09-28T16:00:00Z",
+        "confirm_close": 0.0941276,
+        "confirm_ema20": 0.0939567055,
+        "confirm_ema50": 0.0951352287,
+        "confirm_ema200": 0.0942144894,
+        "confirm_rsi14": 48.8721051773,
+        "confirm_atr14": 0.0012899377,
+        "confirm_macd": -0.0008105836,
+        "confirm_macd_signal": -0.0009219131,
+        "confirm_volume_ratio": 1.1907720492,
+        "trend_2h_time": "2026-09-28T15:00:00Z",
+        "trend_2h_score": -0.3,
+        "trend_4h_time": "2026-09-28T13:00:00Z",
+        "trend_4h_score": -0.3,
+        "trend_1m_time": "2026-07-31T21:00:00Z",
+        "trend_1m_score": -1,
+        "history_timeframe": "1D",
+        "history_time": "2026-09-26T21:00:00Z",
+        "history_close": 0.0967038,
+        "history_ema50": 0.0857535143,
+        "history_ema200": 0.0930439201,
+        "history_rsi14": 60.3482500499,
+        "history_atr14": 0.0056381457,
+        "history_high_252": 0.1375791,
+        "history_low_252": 0.0674598,
+        "history_momentum_20": 0.0704143348,
+        "history_momentum_63": 0.3367513381,
+        "history_momentum_126": -0.0463192525,
+        "history_momentum_252": -0.2933503741,
+        "history_volatility_20": 0.0547376926
+      },
+      "h1": {
+        "time": "2026-09-28T16:00:00Z",
+        "close": 0.0941276,
+        "ema20": 0.0939567055,
+        "ema50": 0.0951352287,
+        "ema200": 0.0942144894,
+        "rsi14": 48.8721051773,
+        "atr14": 0.0012899377,
+        "macd": -0.0008105836,
+        "macd_signal": -0.0009219131,
+        "volume_ratio": 1.1907720492
+      },
+      "h4": {
+        "time": "2026-09-28T13:00:00Z",
+        "trend_score_only": -0.3,
+        "ema20": null,
+        "ema50": null,
+        "exact_pair_capture": "MISSING"
+      },
+      "next": {
+        "time": "2026-09-28T17:45:00Z",
+        "open": 0.094523,
+        "fire_id": 57511066894,
+        "http": 200,
+        "gap_atr": 0.00681423069070715
+      },
+      "derived": {
+        "local_trend": 1,
+        "trend_1h": -1,
+        "distance_atr": 1.1285151518755776,
+        "slope_atr": 0.5361623789049275
+      },
+      "receipt": {
+        "fire_id": 57510319876,
+        "http": 200
+      },
+      "revision": {
+        "checked_after_decision": true,
+        "later_o": 0.0942624,
+        "later_h": 0.0946508,
+        "later_l": 0.0941865,
+        "later_c": 0.0945229,
+        "later_v": 3226,
+        "revised": true,
+        "excluded_from_canonical_evidence_sha256": true
+      },
+      "protocol_sha256": "beeb4883b7e01afa19bf6c70b25d2caa337c7d632c25d126bae2458217a96eb2",
+      "eligible_4h_exact_capture": "MISSING",
+      "costs_bps_1_2_3_5": null,
+      "mfe_r": null,
+      "mae_r": null,
+      "stop_target_horizon": null,
+      "review_counted": false
+    },
+    {
+      "t": "2026-09-28T17:45:00Z",
+      "s": "CAPITALCOM:ETHUSD",
+      "cand": "2d1406da93b44d8ec1cf15d47b5e8664abcaf5809515e0c0382286917d4784d9",
+      "sha": "128e607c04880e8a3f8baa6eca9f2f1a60f426bd62ad1a3887e4e3969fd95c88",
+      "decision": "WAIT",
+      "reason": "mtf_vote_invariant_wait_local_plus1_1h_minus1_exact_4h_missing",
+      "source": {
+        "event_id": "capital-africa-sep-2026|CAPITALCOM:ETHUSD|15|1790617500000",
+        "event": "bar_close",
+        "competition_id": "capital-africa-sep-2026",
+        "symbol": "CAPITALCOM:ETHUSD",
+        "timeframe": "15",
+        "time": "2026-09-28T17:45:00Z",
+        "open": 2699.72,
+        "high": 2701.01,
+        "low": 2690.61,
+        "close": 2694.07,
+        "volume": 4545,
+        "ema20": 2683.653786642,
+        "ema50": 2673.9384266034,
+        "rsi14": 56.3203640535,
+        "atr14": 14.8290851094,
+        "macd": 8.6450723865,
+        "macd_signal": 6.9221847541,
+        "volume_ratio": 0.7739661294,
+        "family_trend": 0.5,
+        "family_momentum": 0.3050691295,
+        "family_volatility": 0.6,
+        "family_volume": -0.0739661294,
+        "family_vwap": 1,
+        "family_market_structure": 0.35,
+        "family_smc_liquidity": 0,
+        "family_price_action": -0.1505769231,
+        "family_microstructure": -0.3555479902,
+        "confirm_timeframe": "60",
+        "confirm_time": "2026-09-28T16:00:00Z",
+        "confirm_close": 2685.71,
+        "confirm_ema20": 2670.8758442879,
+        "confirm_ema50": 2678.0076091681,
+        "confirm_ema200": 2665.1605310877,
+        "confirm_rsi14": 55.4056258792,
+        "confirm_atr14": 19.1129537292,
+        "confirm_macd": -1.7492221742,
+        "confirm_macd_signal": -6.1631331891,
+        "confirm_volume_ratio": 1.2262848721,
+        "trend_2h_time": "2026-09-28T15:00:00Z",
+        "trend_2h_score": 0.7,
+        "trend_4h_time": "2026-09-28T13:00:00Z",
+        "trend_4h_score": 0.15,
+        "trend_1m_time": "2026-07-31T21:00:00Z",
+        "trend_1m_score": -0.05,
+        "history_timeframe": "1D",
+        "history_time": "2026-09-26T21:00:00Z",
+        "history_close": 2685.04,
+        "history_ema50": 2416.0569275778,
+        "history_ema200": 2254.2425021518,
+        "history_rsi14": 62.3626243577,
+        "history_atr14": 95.947220306,
+        "history_high_252": 3353.92,
+        "history_low_252": 1509.17,
+        "history_momentum_20": 0.0768373138,
+        "history_momentum_63": 0.4048459925,
+        "history_momentum_126": 0.2851201103,
+        "history_momentum_252": -0.1959513685,
+        "history_volatility_20": 0.0352276874
+      },
+      "h1": {
+        "time": "2026-09-28T16:00:00Z",
+        "close": 2685.71,
+        "ema20": 2670.8758442879,
+        "ema50": 2678.0076091681,
+        "ema200": 2665.1605310877,
+        "rsi14": 55.4056258792,
+        "atr14": 19.1129537292,
+        "macd": -1.7492221742,
+        "macd_signal": -6.1631331891,
+        "volume_ratio": 1.2262848721
+      },
+      "h4": {
+        "time": "2026-09-28T13:00:00Z",
+        "trend_score_only": 0.15,
+        "ema20": null,
+        "ema50": null,
+        "exact_pair_capture": "MISSING"
+      },
+      "next": {
+        "time": "2026-09-28T18:00:00Z",
+        "open": 2693.71,
+        "fire_id": 57511901163,
+        "http": 200,
+        "gap_atr": 0.0242766156741475
+      },
+      "derived": {
+        "local_trend": 1,
+        "trend_1h": -1,
+        "distance_atr": 0.7024178013111241,
+        "slope_atr": 0.5954045492262379
+      },
+      "receipt": {
+        "fire_id": 57511061222,
+        "http": 200
+      },
+      "revision": {
+        "checked_after_decision": true,
+        "later_o": 2699.72,
+        "later_h": 2701.01,
+        "later_l": 2690.61,
+        "later_c": 2693.72,
+        "later_v": 4574,
+        "revised": true,
+        "excluded_from_canonical_evidence_sha256": true
+      },
+      "protocol_sha256": "beeb4883b7e01afa19bf6c70b25d2caa337c7d632c25d126bae2458217a96eb2",
+      "eligible_4h_exact_capture": "MISSING",
+      "costs_bps_1_2_3_5": null,
+      "mfe_r": null,
+      "mae_r": null,
+      "stop_target_horizon": null,
+      "review_counted": false
+    },
+    {
+      "t": "2026-09-28T17:45:00Z",
+      "s": "CAPITALCOM:DOGEUSD",
+      "cand": "e22c97ad3e915bf4032afececa7c5d463a7250850ac76627f5ed11ad8ad44d98",
+      "sha": "ee3b326f88cd1034529217d2d58fe66f6b35c92afdac059564b8ac6b0058af0d",
+      "decision": "WAIT",
+      "reason": "short_pullback_failed_close_below_ema20_distance_slope_rsi",
+      "source": {
+        "event_id": "capital-africa-sep-2026|CAPITALCOM:DOGEUSD|15|1790617500000",
+        "event": "bar_close",
+        "competition_id": "capital-africa-sep-2026",
+        "symbol": "CAPITALCOM:DOGEUSD",
+        "timeframe": "15",
+        "time": "2026-09-28T17:45:00Z",
+        "open": 0.094523,
+        "high": 0.094608,
+        "low": 0.0941473,
+        "close": 0.094334,
+        "volume": 2896,
+        "ema20": 0.0936853792,
+        "ema50": 0.0936433067,
+        "rsi14": 56.9301388488,
+        "atr14": 0.0007823891,
+        "macd": 0.0003466967,
+        "macd_signal": 0.0001778683,
+        "volume_ratio": 0.6484622533,
+        "family_trend": 0.5,
+        "family_momentum": 0.5024588885,
+        "family_volatility": 0.6,
+        "family_volume": 0,
+        "family_vwap": 0.4515495263,
+        "family_market_structure": 0.35,
+        "family_smc_liquidity": 0,
+        "family_price_action": -0.0852724115,
+        "family_microstructure": -0.2461471674,
+        "confirm_timeframe": "60",
+        "confirm_time": "2026-09-28T16:00:00Z",
+        "confirm_close": 0.0941276,
+        "confirm_ema20": 0.0939567055,
+        "confirm_ema50": 0.0951352287,
+        "confirm_ema200": 0.0942144894,
+        "confirm_rsi14": 48.8721051773,
+        "confirm_atr14": 0.0012899377,
+        "confirm_macd": -0.0008105836,
+        "confirm_macd_signal": -0.0009219131,
+        "confirm_volume_ratio": 1.1907720492,
+        "trend_2h_time": "2026-09-28T15:00:00Z",
+        "trend_2h_score": -0.3,
+        "trend_4h_time": "2026-09-28T13:00:00Z",
+        "trend_4h_score": -0.3,
+        "trend_1m_time": "2026-07-31T21:00:00Z",
+        "trend_1m_score": -1,
+        "history_timeframe": "1D",
+        "history_time": "2026-09-26T21:00:00Z",
+        "history_close": 0.0967038,
+        "history_ema50": 0.0857535143,
+        "history_ema200": 0.0930439201,
+        "history_rsi14": 60.3482500499,
+        "history_atr14": 0.0056381457,
+        "history_high_252": 0.1375791,
+        "history_low_252": 0.0674598,
+        "history_momentum_20": 0.0704143348,
+        "history_momentum_63": 0.3367513381,
+        "history_momentum_126": -0.0463192525,
+        "history_momentum_252": -0.2933503741,
+        "history_volatility_20": 0.0547376926
+      },
+      "h1": {
+        "time": "2026-09-28T16:00:00Z",
+        "close": 0.0941276,
+        "ema20": 0.0939567055,
+        "ema50": 0.0951352287,
+        "ema200": 0.0942144894,
+        "rsi14": 48.8721051773,
+        "atr14": 0.0012899377,
+        "macd": -0.0008105836,
+        "macd_signal": -0.0009219131,
+        "volume_ratio": 1.1907720492
+      },
+      "h4": {
+        "time": "2026-09-28T13:00:00Z",
+        "trend_score_only": -0.3,
+        "ema20": null,
+        "ema50": null,
+        "exact_pair_capture": "MISSING"
+      },
+      "next": {
+        "time": "2026-09-28T18:00:00Z",
+        "open": 0.094329,
+        "fire_id": 57511897013,
+        "http": 200,
+        "gap_atr": 0.006390682078782795
+      },
+      "derived": {
+        "local_trend": 1,
+        "trend_1h": -1,
+        "distance_atr": 0.829025864496322,
+        "slope_atr": 0.529730283819134
+      },
+      "receipt": {
+        "fire_id": 57511066894,
+        "http": 200
+      },
+      "revision": {
+        "checked_after_decision": true,
+        "later_o": 0.094523,
+        "later_h": 0.094608,
+        "later_l": 0.0941473,
+        "later_c": 0.0943287,
+        "later_v": 2908,
+        "revised": true,
+        "excluded_from_canonical_evidence_sha256": true
+      },
+      "protocol_sha256": "beeb4883b7e01afa19bf6c70b25d2caa337c7d632c25d126bae2458217a96eb2",
+      "eligible_4h_exact_capture": "MISSING",
+      "costs_bps_1_2_3_5": null,
+      "mfe_r": null,
+      "mae_r": null,
+      "stop_target_horizon": null,
+      "review_counted": false
+    }
+  ],
+  "regime_session": {
+    "protocol_id": "R10-REGIME-SESSION-SHADOW-V1",
+    "protocol_sha256": "96e94a305c0a6eb22f92f495560f1e0c66dc60d7395608c140da1e5b6e0def97",
+    "source_times": [
+      "2026-09-28T16:45:00Z",
+      "2026-09-28T17:00:00Z",
+      "2026-09-28T17:15:00Z",
+      "2026-09-28T17:30:00Z",
+      "2026-09-28T17:45:00Z",
+      "2026-09-28T18:00:00Z"
+    ],
+    "observed_rows": 60,
+    "censored_rows": 60,
+    "missing_decision_time_features": [
+      "ema200",
+      "adx14",
+      "zscore20"
+    ],
+    "webhook_failures": [
+      {
+        "time": "2026-09-28T17:30:00Z",
+        "symbol": "CAPITALCOM:BTCUSD",
+        "fire_id": 57510319864,
+        "http": {
+          "error": "request took too long and timed out"
+        },
+        "missing": [
+          "ema200",
+          "adx14",
+          "zscore20"
+        ]
+      },
+      {
+        "time": "2026-09-28T17:30:00Z",
+        "symbol": "CAPITALCOM:NAS100",
+        "fire_id": 57510318835,
+        "http": {
+          "error": "request took too long and timed out"
+        },
+        "missing": [
+          "ema200",
+          "adx14",
+          "zscore20"
+        ]
+      },
+      {
+        "time": "2026-09-28T17:30:00Z",
+        "symbol": "CAPITALCOM:USDZAR",
+        "fire_id": 57510313720,
+        "http": {
+          "error": "request took too long and timed out"
+        },
+        "missing": [
+          "ema200",
+          "adx14",
+          "zscore20"
+        ]
+      },
+      {
+        "time": "2026-09-28T17:45:00Z",
+        "symbol": "CAPITALCOM:EURUSD",
+        "fire_id": 57511067580,
+        "http": {
+          "error": "request took too long and timed out"
+        },
+        "missing": [
+          "ema200",
+          "adx14",
+          "zscore20"
+        ]
+      }
+    ],
+    "rows": [
+      {
+        "time": "2026-09-28T16:45:00Z",
+        "symbol": "CAPITALCOM:AUDUSD",
+        "fire_id": 57507502641,
+        "http": 200,
+        "missing": [
+          "ema200",
+          "adx14",
+          "zscore20"
+        ]
+      },
+      {
+        "time": "2026-09-28T16:45:00Z",
+        "symbol": "CAPITALCOM:BTCUSD",
+        "fire_id": 57507506616,
+        "http": 200,
+        "missing": [
+          "ema200",
+          "adx14",
+          "zscore20"
+        ]
+      },
+      {
+        "time": "2026-09-28T16:45:00Z",
+        "symbol": "CAPITALCOM:DOGEUSD",
+        "fire_id": 57507504143,
+        "http": 200,
+        "missing": [
+          "ema200",
+          "adx14",
+          "zscore20"
+        ]
+      },
+      {
+        "time": "2026-09-28T16:45:00Z",
+        "symbol": "CAPITALCOM:ETHUSD",
+        "fire_id": 57507501952,
+        "http": 200,
+        "missing": [
+          "ema200",
+          "adx14",
+          "zscore20"
+        ]
+      },
+      {
+        "time": "2026-09-28T16:45:00Z",
+        "symbol": "CAPITALCOM:EURUSD",
+        "fire_id": 57507506623,
+        "http": 200,
+        "missing": [
+          "ema200",
+          "adx14",
+          "zscore20"
+        ]
+      },
+      {
+        "time": "2026-09-28T16:45:00Z",
+        "symbol": "CAPITALCOM:NAS100",
+        "fire_id": 57507507399,
+        "http": 200,
+        "missing": [
+          "ema200",
+          "adx14",
+          "zscore20"
+        ]
+      },
+      {
+        "time": "2026-09-28T16:45:00Z",
+        "symbol": "CAPITALCOM:SPX500",
+        "fire_id": 57507511136,
+        "http": 200,
+        "missing": [
+          "ema200",
+          "adx14",
+          "zscore20"
+        ]
+      },
+      {
+        "time": "2026-09-28T16:45:00Z",
+        "symbol": "CAPITALCOM:USDZAR",
+        "fire_id": 57507509787,
+        "http": 200,
+        "missing": [
+          "ema200",
+          "adx14",
+          "zscore20"
+        ]
+      },
+      {
+        "time": "2026-09-28T16:45:00Z",
+        "symbol": "CAPITALCOM:XAGUSD",
+        "fire_id": 57507516487,
+        "http": 200,
+        "missing": [
+          "ema200",
+          "adx14",
+          "zscore20"
+        ]
+      },
+      {
+        "time": "2026-09-28T16:45:00Z",
+        "symbol": "CAPITALCOM:XAUUSD",
+        "fire_id": 57507506481,
+        "http": 200,
+        "missing": [
+          "ema200",
+          "adx14",
+          "zscore20"
+        ]
+      },
+      {
+        "time": "2026-09-28T17:00:00Z",
+        "symbol": "CAPITALCOM:AUDUSD",
+        "fire_id": 57508599135,
+        "http": 200,
+        "missing": [
+          "ema200",
+          "adx14",
+          "zscore20"
+        ]
+      },
+      {
+        "time": "2026-09-28T17:00:00Z",
+        "symbol": "CAPITALCOM:BTCUSD",
+        "fire_id": 57508611932,
+        "http": 200,
+        "missing": [
+          "ema200",
+          "adx14",
+          "zscore20"
+        ]
+      },
+      {
+        "time": "2026-09-28T17:00:00Z",
+        "symbol": "CAPITALCOM:DOGEUSD",
+        "fire_id": 57508593190,
+        "http": 200,
+        "missing": [
+          "ema200",
+          "adx14",
+          "zscore20"
+        ]
+      },
+      {
+        "time": "2026-09-28T17:00:00Z",
+        "symbol": "CAPITALCOM:ETHUSD",
+        "fire_id": 57508599127,
+        "http": 200,
+        "missing": [
+          "ema200",
+          "adx14",
+          "zscore20"
+        ]
+      },
+      {
+        "time": "2026-09-28T17:00:00Z",
+        "symbol": "CAPITALCOM:EURUSD",
+        "fire_id": 57508611969,
+        "http": 200,
+        "missing": [
+          "ema200",
+          "adx14",
+          "zscore20"
+        ]
+      },
+      {
+        "time": "2026-09-28T17:00:00Z",
+        "symbol": "CAPITALCOM:NAS100",
+        "fire_id": 57508624334,
+        "http": 200,
+        "missing": [
+          "ema200",
+          "adx14",
+          "zscore20"
+        ]
+      },
+      {
+        "time": "2026-09-28T17:00:00Z",
+        "symbol": "CAPITALCOM:SPX500",
+        "fire_id": 57508622790,
+        "http": 200,
+        "missing": [
+          "ema200",
+          "adx14",
+          "zscore20"
+        ]
+      },
+      {
+        "time": "2026-09-28T17:00:00Z",
+        "symbol": "CAPITALCOM:USDZAR",
+        "fire_id": 57508622565,
+        "http": 200,
+        "missing": [
+          "ema200",
+          "adx14",
+          "zscore20"
+        ]
+      },
+      {
+        "time": "2026-09-28T17:00:00Z",
+        "symbol": "CAPITALCOM:XAGUSD",
+        "fire_id": 57508620970,
+        "http": 200,
+        "missing": [
+          "ema200",
+          "adx14",
+          "zscore20"
+        ]
+      },
+      {
+        "time": "2026-09-28T17:00:00Z",
+        "symbol": "CAPITALCOM:XAUUSD",
+        "fire_id": 57508624300,
+        "http": 200,
+        "missing": [
+          "ema200",
+          "adx14",
+          "zscore20"
+        ]
+      },
+      {
+        "time": "2026-09-28T17:15:00Z",
+        "symbol": "CAPITALCOM:AUDUSD",
+        "fire_id": 57509496867,
+        "http": 200,
+        "missing": [
+          "ema200",
+          "adx14",
+          "zscore20"
+        ]
+      },
+      {
+        "time": "2026-09-28T17:15:00Z",
+        "symbol": "CAPITALCOM:BTCUSD",
+        "fire_id": 57509499610,
+        "http": 200,
+        "missing": [
+          "ema200",
+          "adx14",
+          "zscore20"
+        ]
+      },
+      {
+        "time": "2026-09-28T17:15:00Z",
+        "symbol": "CAPITALCOM:DOGEUSD",
+        "fire_id": 57509502412,
+        "http": 200,
+        "missing": [
+          "ema200",
+          "adx14",
+          "zscore20"
+        ]
+      },
+      {
+        "time": "2026-09-28T17:15:00Z",
+        "symbol": "CAPITALCOM:ETHUSD",
+        "fire_id": 57509496755,
+        "http": 200,
+        "missing": [
+          "ema200",
+          "adx14",
+          "zscore20"
+        ]
+      },
+      {
+        "time": "2026-09-28T17:15:00Z",
+        "symbol": "CAPITALCOM:EURUSD",
+        "fire_id": 57509499736,
+        "http": 200,
+        "missing": [
+          "ema200",
+          "adx14",
+          "zscore20"
+        ]
+      },
+      {
+        "time": "2026-09-28T17:15:00Z",
+        "symbol": "CAPITALCOM:NAS100",
+        "fire_id": 57509503321,
+        "http": 200,
+        "missing": [
+          "ema200",
+          "adx14",
+          "zscore20"
+        ]
+      },
+      {
+        "time": "2026-09-28T17:15:00Z",
+        "symbol": "CAPITALCOM:SPX500",
+        "fire_id": 57509501910,
+        "http": 200,
+        "missing": [
+          "ema200",
+          "adx14",
+          "zscore20"
+        ]
+      },
+      {
+        "time": "2026-09-28T17:15:00Z",
+        "symbol": "CAPITALCOM:USDZAR",
+        "fire_id": 57509501938,
+        "http": 200,
+        "missing": [
+          "ema200",
+          "adx14",
+          "zscore20"
+        ]
+      },
+      {
+        "time": "2026-09-28T17:15:00Z",
+        "symbol": "CAPITALCOM:XAGUSD",
+        "fire_id": 57509506088,
+        "http": 200,
+        "missing": [
+          "ema200",
+          "adx14",
+          "zscore20"
+        ]
+      },
+      {
+        "time": "2026-09-28T17:15:00Z",
+        "symbol": "CAPITALCOM:XAUUSD",
+        "fire_id": 57509503311,
+        "http": 200,
+        "missing": [
+          "ema200",
+          "adx14",
+          "zscore20"
+        ]
+      },
+      {
+        "time": "2026-09-28T17:30:00Z",
+        "symbol": "CAPITALCOM:AUDUSD",
+        "fire_id": 57510315255,
+        "http": 200,
+        "missing": [
+          "ema200",
+          "adx14",
+          "zscore20"
+        ]
+      },
+      {
+        "time": "2026-09-28T17:30:00Z",
+        "symbol": "CAPITALCOM:BTCUSD",
+        "fire_id": 57510319864,
+        "http": {
+          "error": "request took too long and timed out"
+        },
+        "missing": [
+          "ema200",
+          "adx14",
+          "zscore20"
+        ]
+      },
+      {
+        "time": "2026-09-28T17:30:00Z",
+        "symbol": "CAPITALCOM:DOGEUSD",
+        "fire_id": 57510319876,
+        "http": 200,
+        "missing": [
+          "ema200",
+          "adx14",
+          "zscore20"
+        ]
+      },
+      {
+        "time": "2026-09-28T17:30:00Z",
+        "symbol": "CAPITALCOM:ETHUSD",
+        "fire_id": 57510315327,
+        "http": 200,
+        "missing": [
+          "ema200",
+          "adx14",
+          "zscore20"
+        ]
+      },
+      {
+        "time": "2026-09-28T17:30:00Z",
+        "symbol": "CAPITALCOM:EURUSD",
+        "fire_id": 57510312938,
+        "http": 200,
+        "missing": [
+          "ema200",
+          "adx14",
+          "zscore20"
+        ]
+      },
+      {
+        "time": "2026-09-28T17:30:00Z",
+        "symbol": "CAPITALCOM:NAS100",
+        "fire_id": 57510318835,
+        "http": {
+          "error": "request took too long and timed out"
+        },
+        "missing": [
+          "ema200",
+          "adx14",
+          "zscore20"
+        ]
+      },
+      {
+        "time": "2026-09-28T17:30:00Z",
+        "symbol": "CAPITALCOM:SPX500",
+        "fire_id": 57510313657,
+        "http": 200,
+        "missing": [
+          "ema200",
+          "adx14",
+          "zscore20"
+        ]
+      },
+      {
+        "time": "2026-09-28T17:30:00Z",
+        "symbol": "CAPITALCOM:USDZAR",
+        "fire_id": 57510313720,
+        "http": {
+          "error": "request took too long and timed out"
+        },
+        "missing": [
+          "ema200",
+          "adx14",
+          "zscore20"
+        ]
+      },
+      {
+        "time": "2026-09-28T17:30:00Z",
+        "symbol": "CAPITALCOM:XAGUSD",
+        "fire_id": 57510315657,
+        "http": 200,
+        "missing": [
+          "ema200",
+          "adx14",
+          "zscore20"
+        ]
+      },
+      {
+        "time": "2026-09-28T17:30:00Z",
+        "symbol": "CAPITALCOM:XAUUSD",
+        "fire_id": 57510317871,
+        "http": 200,
+        "missing": [
+          "ema200",
+          "adx14",
+          "zscore20"
+        ]
+      },
+      {
+        "time": "2026-09-28T17:45:00Z",
+        "symbol": "CAPITALCOM:AUDUSD",
+        "fire_id": 57511061989,
+        "http": 200,
+        "missing": [
+          "ema200",
+          "adx14",
+          "zscore20"
+        ]
+      },
+      {
+        "time": "2026-09-28T17:45:00Z",
+        "symbol": "CAPITALCOM:BTCUSD",
+        "fire_id": 57511064306,
+        "http": 200,
+        "missing": [
+          "ema200",
+          "adx14",
+          "zscore20"
+        ]
+      },
+      {
+        "time": "2026-09-28T17:45:00Z",
+        "symbol": "CAPITALCOM:DOGEUSD",
+        "fire_id": 57511066894,
+        "http": 200,
+        "missing": [
+          "ema200",
+          "adx14",
+          "zscore20"
+        ]
+      },
+      {
+        "time": "2026-09-28T17:45:00Z",
+        "symbol": "CAPITALCOM:ETHUSD",
+        "fire_id": 57511061222,
+        "http": 200,
+        "missing": [
+          "ema200",
+          "adx14",
+          "zscore20"
+        ]
+      },
+      {
+        "time": "2026-09-28T17:45:00Z",
+        "symbol": "CAPITALCOM:EURUSD",
+        "fire_id": 57511067580,
+        "http": {
+          "error": "request took too long and timed out"
+        },
+        "missing": [
+          "ema200",
+          "adx14",
+          "zscore20"
+        ]
+      },
+      {
+        "time": "2026-09-28T17:45:00Z",
+        "symbol": "CAPITALCOM:NAS100",
+        "fire_id": 57511081552,
+        "http": 200,
+        "missing": [
+          "ema200",
+          "adx14",
+          "zscore20"
+        ]
+      },
+      {
+        "time": "2026-09-28T17:45:00Z",
+        "symbol": "CAPITALCOM:SPX500",
+        "fire_id": 57511076201,
+        "http": 200,
+        "missing": [
+          "ema200",
+          "adx14",
+          "zscore20"
+        ]
+      },
+      {
+        "time": "2026-09-28T17:45:00Z",
+        "symbol": "CAPITALCOM:USDZAR",
+        "fire_id": 57511076227,
+        "http": 200,
+        "missing": [
+          "ema200",
+          "adx14",
+          "zscore20"
+        ]
+      },
+      {
+        "time": "2026-09-28T17:45:00Z",
+        "symbol": "CAPITALCOM:XAGUSD",
+        "fire_id": 57511073469,
+        "http": 200,
+        "missing": [
+          "ema200",
+          "adx14",
+          "zscore20"
+        ]
+      },
+      {
+        "time": "2026-09-28T17:45:00Z",
+        "symbol": "CAPITALCOM:XAUUSD",
+        "fire_id": 57511081359,
+        "http": 200,
+        "missing": [
+          "ema200",
+          "adx14",
+          "zscore20"
+        ]
+      },
+      {
+        "time": "2026-09-28T18:00:00Z",
+        "symbol": "CAPITALCOM:AUDUSD",
+        "fire_id": 57511901184,
+        "http": 200,
+        "missing": [
+          "ema200",
+          "adx14",
+          "zscore20"
+        ]
+      },
+      {
+        "time": "2026-09-28T18:00:00Z",
+        "symbol": "CAPITALCOM:BTCUSD",
+        "fire_id": 57511892645,
+        "http": 200,
+        "missing": [
+          "ema200",
+          "adx14",
+          "zscore20"
+        ]
+      },
+      {
+        "time": "2026-09-28T18:00:00Z",
+        "symbol": "CAPITALCOM:DOGEUSD",
+        "fire_id": 57511897013,
+        "http": 200,
+        "missing": [
+          "ema200",
+          "adx14",
+          "zscore20"
+        ]
+      },
+      {
+        "time": "2026-09-28T18:00:00Z",
+        "symbol": "CAPITALCOM:ETHUSD",
+        "fire_id": 57511901163,
+        "http": 200,
+        "missing": [
+          "ema200",
+          "adx14",
+          "zscore20"
+        ]
+      },
+      {
+        "time": "2026-09-28T18:00:00Z",
+        "symbol": "CAPITALCOM:EURUSD",
+        "fire_id": 57511892783,
+        "http": 200,
+        "missing": [
+          "ema200",
+          "adx14",
+          "zscore20"
+        ]
+      },
+      {
+        "time": "2026-09-28T18:00:00Z",
+        "symbol": "CAPITALCOM:NAS100",
+        "fire_id": 57511902793,
+        "http": 200,
+        "missing": [
+          "ema200",
+          "adx14",
+          "zscore20"
+        ]
+      },
+      {
+        "time": "2026-09-28T18:00:00Z",
+        "symbol": "CAPITALCOM:SPX500",
+        "fire_id": 57511909112,
+        "http": 200,
+        "missing": [
+          "ema200",
+          "adx14",
+          "zscore20"
+        ]
+      },
+      {
+        "time": "2026-09-28T18:00:00Z",
+        "symbol": "CAPITALCOM:USDZAR",
+        "fire_id": 57511909030,
+        "http": 200,
+        "missing": [
+          "ema200",
+          "adx14",
+          "zscore20"
+        ]
+      },
+      {
+        "time": "2026-09-28T18:00:00Z",
+        "symbol": "CAPITALCOM:XAGUSD",
+        "fire_id": 57511907487,
+        "http": 200,
+        "missing": [
+          "ema200",
+          "adx14",
+          "zscore20"
+        ]
+      },
+      {
+        "time": "2026-09-28T18:00:00Z",
+        "symbol": "CAPITALCOM:XAUUSD",
+        "fire_id": 57511902810,
+        "http": 200,
+        "missing": [
+          "ema200",
+          "adx14",
+          "zscore20"
+        ]
+      }
+    ],
+    "evidence_sha256": "16c0e5176e05be95e3aed58c08aaa9184617ced1e35c8d7df0f046a9f1469ea7"
+  },
+  "pending_receipts": [
+    {
+      "symbol": "CAPITALCOM:ETHUSD",
+      "source_time": "2026-09-28T18:00:00Z",
+      "receipt_sha256": "91142887db34fab0b5ef3554ab39e78c1f3cec257fc42e9911c1028aeb2eadce"
+    },
+    {
+      "symbol": "CAPITALCOM:DOGEUSD",
+      "source_time": "2026-09-28T18:00:00Z",
+      "receipt_sha256": "24a58c163ba00c082f88f8b0e9e8881e6aa9ce9046497311b40da65c246924c8"
+    }
+  ],
+  "portfolio": {
+    "max_open_crypto_shadow_positions": 1,
+    "state": "FLAT",
+    "accepted_entries": [],
+    "rejected_overlaps": []
+  },
+  "review": {
+    "state": "COLLECTING",
+    "valued_forward_trades": 0
+  },
+  "authority": {
+    "retuned": false,
+    "executed": false,
+    "live_risk_changed": false,
+    "broker_state_changed": false,
+    "notification_settings_changed": false
+  },
+  "batch_sha256": "d9c7f028f6f9674052045b50166bddcaf506f788312a5a29e7b460287be57854"
+}
