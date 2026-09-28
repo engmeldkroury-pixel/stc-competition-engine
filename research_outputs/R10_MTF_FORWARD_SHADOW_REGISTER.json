@@ -147,6 +147,52 @@
         }
       ],
       "decision": "No retuning, promotion, execution, live-risk change, broker-state change, or notification-setting change."
+    },
+    {
+      "checked_at_utc": "2026-09-28T21:20:23Z",
+      "previous_check_utc": "2026-09-28T20:20:00Z",
+      "status": "DATA_INTEGRITY_BLOCK",
+      "admitted_forward_signals": [],
+      "outcomes": [],
+      "evidence_increment": {
+        "path": "research_outputs/R10_FORWARD_EVIDENCE_INCREMENT_2026-09-28T212023Z.json",
+        "commit_sha": "b126f3544ff7e0e35814f7aa5cb5a2f77b099383",
+        "batch_sha256": "bc259a67f49b3295638b7c1a9d89d32437dfda07a24881d1259e95327313cb16",
+        "completed_source_times": [
+          "2026-09-28T19:45:00Z",
+          "2026-09-28T20:00:00Z",
+          "2026-09-28T20:15:00Z",
+          "2026-09-28T20:30:00Z",
+          "2026-09-28T20:45:00Z"
+        ],
+        "pending_source_time": "2026-09-28T21:00:00Z"
+      },
+      "review_state": "COLLECTING",
+      "valued_forward_trades": 0,
+      "portfolio_state": "FLAT",
+      "issues": [
+        {
+          "id": "REGIME_DECISION_FEATURES_MISSING",
+          "severity": "BLOCKER",
+          "detail": "R10-REGIME-SESSION-SHADOW-V1 decision-time ema200/adx14/zscore20 remain absent; the new 20:00Z-21:00Z regime window is censored."
+        },
+        {
+          "id": "REGIME_SOURCE_INTERVALS_MISSING_NEW",
+          "severity": "WARNING",
+          "detail": "XAGUSD and XAUUSD have no 21:00Z source interval in the observed alert stream or current OHLC history; both intervals are censored without retrospective substitution."
+        },
+        {
+          "id": "RETROSPECTIVE_REVISIONS_NEW",
+          "severity": "WARNING",
+          "detail": "Later TradingView history revised alert-time ETH/DOGE close/volume on completed 19:45Z/20:00Z/20:30Z observations and on pending 21:00Z receipts. Alert-time values remain authoritative."
+        },
+        {
+          "id": "MTF_EXACT_4H_EMA_PAIR_MISSING",
+          "severity": "WARNING",
+          "detail": "Exact decision-time 4h EMA20/EMA50 remains absent. ETH completed observations are invariant WAITs; DOGE 19:45Z fails frozen pullback geometry and later DOGE bars are outside the frozen 07:00-20:00 UTC session."
+        }
+      ],
+      "decision": "No retuning, promotion, execution, live-risk change, broker-state change, or notification-setting change."
     }
   ]
 }
