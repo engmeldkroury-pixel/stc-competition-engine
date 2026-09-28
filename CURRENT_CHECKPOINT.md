@@ -1,3 +1,12 @@
+## R10 forward/AMP extension checkpoint - 2026-09-28
+Core frozen Capital R10 PR192 merged at f9f04f8022088f9327f5af646891a49eb77dc361 after CI36375341815: full582passed/1warning; critical309passed/1warning. No live strategy promotion.
+Second research batch builds causal forward evaluation with exact protocol identity, gap/conflict fail-closed handling, and a statistical evidence gate that cannot auto-promote.
+Capital frozen rule does NOT transfer robustly to30m/1h and does NOT transfer to the aggregate AMP universe at realistic cost proxies. Do not claim MTF or cross-market edge.
+AMP family audit rejects index/rates/FX/metals/energy under tested rules. Only MBT/MET crypto futures retained a frozen research hypothesis:15m,ADX>=30,EMA20/50/200 anti-chase trend pullback,stop2ATR,target2R,horizon32,not-before2026-09-28T04:15Z. Official competition rules directly allow CME:MBT1! and CME:MET1!, max25 open each.
+Historical AMP-crypto cost stress stays positive0-5bps, but holdout is only14 trades/6 days and already inspected. Day-block bootstrap CI crosses zero. Capital inspected holdout24 trades/8days also has a bootstrap CI crossing zero. Neither candidate is statistically established or live-authorized.
+Forward evidence gate rejects mixed cost scenarios, duplicates and protocol mismatches; CENSORED is never scored as a win/loss; chronology is used for drawdown; even a passing result is human-review-only.
+Second branch: research/r10-forward-amp-crypto-20260928. Local combined R10 tests currently25passed. Full GitHub CI is still required before merge.
+
 ## R10 strategy-shadow checkpoint - 2026-09-28
 Owner reports all executed competition trades losing so far. R10 tested stop/target-only fixes, uniform trend/chase, pullback/reclaim/breakout, mean reversion, per-asset/timeframe static selection and naive walk-forward switching. These were NOT robust and are rejected for live promotion. Do not restart these searches blindly.
 Historical accepted directional cases were materially more extended than rejected cases, supporting a late/chasing-entry hypothesis but not proving gate causality. Stop widening did not solve the accepted-plan problem.
