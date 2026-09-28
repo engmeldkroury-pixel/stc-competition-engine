@@ -26,6 +26,7 @@ def directional_record(direction="LONG"):
         protocol_id="test",
         protocol_sha256="p",
         candidate_sha256="c",
+        evidence_sha256="e" * 64,
         symbol="CAPITALCOM:TEST",
         source_open_utc="2026-09-28T12:00:00Z",
         decision=direction,
@@ -46,9 +47,10 @@ def test_candidate_and_protocol_digests_are_stable_and_symbol_specific():
     assert len(mtf_protocol_sha256()) == 64
 
 
-def test_record_hash_changes_when_geometry_changes():
+def test_record_hash_changes_when_geometry_or_evidence_changes():
     r = directional_record()
     assert record_sha256(r) != record_sha256(replace(r, target=103.0))
+    assert record_sha256(r) != record_sha256(replace(r, evidence_sha256="f" * 64))
 
 
 def test_regime_wait_has_no_trade_geometry():
@@ -83,6 +85,7 @@ def test_regime_directional_geometry_is_next_bar_open_and_research_only():
     assert rec.target == pytest.approx(103.1)
     assert rec.planned_risk == pytest.approx(1.5)
     assert rec.execution == "none"
+    assert len(rec.evidence_sha256) == 64
 
 
 def test_regime_pre_forward_observation_is_rejected():
