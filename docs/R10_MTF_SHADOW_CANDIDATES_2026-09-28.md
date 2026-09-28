@@ -78,3 +78,10 @@ A later human review should require an independent forward sample large enough t
 
 ## Ongoing validation
 An hourly condition-watch has been created to check new naturally frozen signals and forward-shadow evidence without retuning or auto-promotion. It notifies only on material evidence, failures, source-integrity problems, or when enough new independent evidence exists for review.
+
+
+## Parameter-neighborhood stability stress
+The frozen candidates were then perturbed around MTF/session/stop/target/gap settings without selecting a new winner from holdout.
+- ETHUSD: 162 neighbors tested; 135 had minimum sample coverage; 108/135 (80.0%) had positive holdout mean, median holdout +0.342R, holdout range -0.312R to +1.464R. Only 33/135 (24.4%) were positive on train+validation+holdout simultaneously.
+- DOGEUSD: 243 neighbors tested; 225 had minimum coverage; 174/225 (77.3%) had positive holdout mean, median holdout +0.285R, holdout range -0.377R to +1.618R. Only 69/225 (30.7%) were positive on all three periods.
+Interpretation: the holdout success is not a single isolated parameter point, but regime dependence remains substantial. This supports shadow-forward continuation, NOT live promotion.
