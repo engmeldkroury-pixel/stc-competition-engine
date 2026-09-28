@@ -87,3 +87,15 @@ Research-only exporter/cohortdiagnostic code is on `research/r8-history-evidence
 
 ## Owner action / safety
 No upload or account refresh is required to use the accepted engineering update. Do not interpret this checkpoint as a new trade recommendation. Complete broker history or a current owner-confirmed account snapshot may later be needed to reconcile every executed trade and restore eligible sizing; neither is silently inferred from an old screenshot.
+
+
+## R10 PR196 accepted merge checkpoint - 2026-09-28
+- PR #196 was accepted only after verifying the exact PR head `6b3061caffb29b5216fee18b3dcc21b88c23a7cf` remained unchanged and mergeable.
+- STC CI run 36391662171 / #824: completed SUCCESS on that exact head.
+- Required jobs: `critical` = SUCCESS; `full` = SUCCESS.
+- Squash merge commit: `c760a937cfe0a8b4127da32ffee42d9efaecbe66`.
+- Scope is research-only prospective shadow-ledger/review-gate infrastructure.
+- Frozen prospective boundaries remain unchanged: MTF forward evidence begins at 2026-09-28T07:00:00Z after PR195 merge; session/regime candidate forward boundary remains 2026-09-28T12:00:00Z.
+- No-retuning rule: forward/prospective observations may not be used to retune the frozen candidate or rewrite the evaluation boundary.
+- No live strategy, risk, execution, broker/account/position, quantity, approval, stop/target, or notification-setting change was authorized or performed by PR196 or this checkpoint update.
+- Any later promotion requires separate evidence, review, CI/parity, and explicit authorization; this merge is not evidence of profitability.
