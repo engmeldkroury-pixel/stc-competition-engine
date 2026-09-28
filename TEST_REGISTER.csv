@@ -50,3 +50,8 @@ T-STC-R9-RESEARCH,PASS_RESEARCH_ONLY,Protection and supplementary source checks,
 T-STC-R10-UNIT,PASS_LOCAL,"Frozen session/regime research boundary symmetry anti-chase UTC and fail-closed inputs","10 passed"
 T-STC-R10-FOCUSED,PASS_LOCAL,"R10 shadow plus R8 outcome attribution plus trade-plan regression","75 passed in1.89s"
 T-STC-R10-HISTORICAL-STRESS,PASS_WITH_SELECTION_CONTAMINATION,"Parameter neighborhood cost and session sensitivity; descriptive only","36 nearby configs at2bps;33 positive train+validation;18 positive all historical slices; holdout inspected and not reusable as unseen evidence"
+T-STC-R10-XTF,PASS_WITH_FALSIFICATION,"Frozen Capital rule unchanged on30m/1h","30m train/val negative;1h holdout negative; do not claim MTF transfer"
+T-STC-R10-AMP-EXTERNAL,PASS_WITH_FALSIFICATION,"Frozen Capital rule on16 AMP symbols","At2bps validation-0.106R and holdout-0.017R; do not transfer"
+T-STC-R10-AMP-FAMILY,PASS_WITH_LIMITS,"AMP family-specific train/validation then inspected holdout","Index/rates/FX/metals/energy rejected; MBT/MET crypto only retained"
+T-STC-R10-BOOTSTRAP,PASS_WITH_UNCERTAINTY,"Day-cluster bootstrap inspected holdouts","Capital CI[-0.289,1.124]; AMP crypto[-0.357,0.980]; both cross zero"
+T-STC-R10-FORWARD-LOCAL,PASS_LOCAL,"Capital+AMP causal evaluators and evidence gate","25 passed; future mutation causality; mixed costs rejected"
