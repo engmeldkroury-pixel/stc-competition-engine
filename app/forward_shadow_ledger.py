@@ -46,6 +46,7 @@ class ForwardShadowRecord:
     protocol_id: str
     protocol_sha256: str
     candidate_sha256: str | None
+    evidence_sha256: str
     symbol: str
     source_open_utc: str
     decision: Literal["LONG", "SHORT", "WAIT"]
@@ -126,6 +127,13 @@ def mtf_protocol_sha256() -> str:
     })
 
 
+def evidence_sha256(payload: dict[str, Any]) -> str:
+    """Digest the exact as-observed evidence envelope frozen at decision time."""
+    if not isinstance(payload, dict) or not payload:
+        raise ValueError("nonempty_evidence_payload_required")
+    return _canonical_sha(payload)
+
+
 def record_sha256(record: ForwardShadowRecord) -> str:
     return _canonical_sha(asdict(record))
 
@@ -141,6 +149,12 @@ def _validate_record(record: ForwardShadowRecord) -> None:
         raise ValueError("research_boundary_violation")
     if record.execution != "none":
         raise ValueError("execution_boundary_violation")
+    if not isinstance(record.evidence_sha256, str) or len(record.evidence_sha256) != 64:
+        raise ValueError("evidence_sha256_required")
+    try:
+        int(record.evidence_sha256, 16)
+    except ValueError as exc:
+        raise ValueError("evidence_sha256_required") from exc
     if record.decision == "WAIT":
         if any(x is not None for x in (record.entry, record.stop, record.target, record.planned_risk)):
             raise ValueError("wait_must_not_have_trade_geometry")
@@ -160,7 +174,7 @@ def _validate_record(record: ForwardShadowRecord) -> None:
         raise ValueError("invalid_short_geometry")
 
 
-def mtf_record(signal: ShadowSignal) -> ForwardShadowRecord:
+def mtf_record(signal: ShadowSignal, *, evidence_payload: dict[str, Any]) -> ForwardShadowRecord:
     if signal.symbol not in FROZEN_R10_CANDIDATES:
         raise ValueError("unknown_mtf_candidate")
     source_utc = _utc_from_epoch(signal.signal_bar_ts)
@@ -173,6 +187,7 @@ def mtf_record(signal: ShadowSignal) -> ForwardShadowRecord:
         protocol_id="mtf_eth_doge_v1",
         protocol_sha256=mtf_protocol_sha256(),
         candidate_sha256=mtf_candidate_sha256(signal.symbol),
+        evidence_sha256=evidence_sha256(evidence_payload),
         symbol=signal.symbol,
         source_open_utc=source_utc,
         decision=direction,
@@ -211,6 +226,11 @@ def regime_record(
             protocol_id="regime_session_v1",
             protocol_sha256=regime_protocol_sha256(REGIME_PROTOCOL),
             candidate_sha256=None,
+            evidence_sha256=evidence_sha256({
+                "snapshot": snapshot,
+                "decision_result": decision_result,
+                "next_bar": None,
+            }),
             symbol=symbol,
             source_open_utc=source_utc,
             decision="WAIT",
@@ -245,6 +265,11 @@ def regime_record(
         protocol_id="regime_session_v1",
         protocol_sha256=regime_protocol_sha256(REGIME_PROTOCOL),
         candidate_sha256=None,
+        evidence_sha256=evidence_sha256({
+            "snapshot": snapshot,
+            "decision_result": decision_result,
+            "next_bar": asdict(next_bar),
+        }),
         symbol=symbol,
         source_open_utc=source_utc,
         decision=decision,
