@@ -32,3 +32,9 @@ def test_clustered_positive_result_is_not_automatically_promoted():
     got=assess_forward_evidence(rows,expected_protocol_sha256=SHA,min_settled=30,min_days=5,min_symbols=4)
     assert got["settled"]==30 and got["cluster_ci95"][0] is not None
     assert got["live_authorized"] is False and got["auto_promotion"] is False
+
+
+def test_mixed_cost_scenarios_are_rejected_instead_of_double_counted():
+    a=row(0); b=row(1); b["cost_bps"]=5
+    with pytest.raises(ValueError,match="mixed_cost"):
+        assess_forward_evidence([a,b],expected_protocol_sha256=SHA,min_settled=1,min_days=1,min_symbols=1)
