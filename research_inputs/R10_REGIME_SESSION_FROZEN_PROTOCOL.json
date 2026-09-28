@@ -1,0 +1,33 @@
+{
+  "protocol_id": "R10-REGIME-SESSION-SHADOW-V1",
+  "status": "FROZEN_FORWARD_RESEARCH_ONLY",
+  "discovered_from_historical_data": true,
+  "historical_holdout_is_contaminated_for_future_selection": true,
+  "not_before_utc": "2026-09-28T12:00:00Z",
+  "timeframe": "15m",
+  "session_utc": {"start_inclusive": 12, "end_exclusive": 17},
+  "regime": {"trend_adx_min": 30.0, "range_adx_max": 20.0, "neutral_action": "WAIT"},
+  "trend_entry": {
+    "model": "EMA20_50_200 aligned pullback",
+    "extension_atr_long": [-0.25, 0.50],
+    "extension_atr_short": [-0.50, 0.25],
+    "rsi_long": [48.0, 62.0],
+    "rsi_short": [38.0, 52.0],
+    "max_source_range_atr": 1.8,
+    "confirmation": "source candle closes in thesis direction"
+  },
+  "range_entry": {
+    "model": "20-bar z-score extreme fade",
+    "short_min_z": 2.0,
+    "long_max_z": -2.0,
+    "short_min_rsi": 68.0,
+    "long_max_rsi": 32.0,
+    "max_source_range_atr": 2.2
+  },
+  "initial_stop_atr": 1.5,
+  "single_target_r": 2.0,
+  "evaluation_horizon_bars": 32,
+  "cost_sensitivity_bps": [1, 2, 3, 5],
+  "authority": {"research_only": true, "live_authorized": false, "execution": "none"},
+  "promotion_rule": "No retuning on forward observations. Require adequate prospective sample, realistic symbol-specific costs, positive expectancy/PF after costs, drawdown review, and code/production parity before any separate promotion decision."
+}
