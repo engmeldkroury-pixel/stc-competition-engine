@@ -2811,3 +2811,7 @@ Fixed-horizon same-cohort analysis:249selected,73valued/176unknown. Protection r
 Exact BTCprice overlays restored27observed missing candles in research only after35and143zero-disagreement overlap checks. Supplement94781fc1057c4c44b7a6d96df69f517ed1d376d243fe651be85f494d8975a665 has75commonlyvalued/174unknown. MNQarchive112overlaps/27disagreements was NOT merged. Do not average or rank differing cohorts as measured improvement.
 The195.23USD screenshot/ledger delta equals prior documented54.39residual plus visibleBTC140.8432loss to displayed cents. Old residual remains unattributed; no trade imported without exact close time/identity. Closest BTCplan hasTP85189.5655 versus screenshot85500; source linkage is tentative only.
 Details:docs/R9_RESULTS_2026-09-27.md. Additional experiments and price-overlay tooling remain on research/r9-protection-20260927, not live runtime code. Future protocol is registered, not evaluated or scheduled; preserve purge/embargo and no-retuning boundaries.
+
+
+## R10-FROZEN-SHADOW-20260928
+R10 strategy diagnosis found repeated regime instability: simple universal, per-asset static and naive adaptive models failed later historical slices. A more selective session+direct-regime family showed a stable historical neighborhood under cost/session perturbation, but the holdout was inspected during development. The candidate is frozen for prospective shadow evaluation only from2026-09-28T12:00Z. Research module app/r10_regime_session_shadow.py has no live/broker authority. See docs/R10_STRATEGY_DIAGNOSIS_2026-09-28.md.
