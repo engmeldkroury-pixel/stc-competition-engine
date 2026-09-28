@@ -50,3 +50,4 @@ T-STC-R9-RESEARCH,PASS_RESEARCH_ONLY,Protection and supplementary source checks,
 T-STC-R10-UNIT,PASS_LOCAL,"Frozen session/regime research boundary symmetry anti-chase UTC and fail-closed inputs","10 passed"
 T-STC-R10-FOCUSED,PASS_LOCAL,"R10 shadow plus R8 outcome attribution plus trade-plan regression","75 passed in1.89s"
 T-STC-R10-HISTORICAL-STRESS,PASS_WITH_SELECTION_CONTAMINATION,"Parameter neighborhood cost and session sensitivity; descriptive only","36 nearby configs at2bps;33 positive train+validation;18 positive all historical slices; holdout inspected and not reusable as unseen evidence"
+T-STC-R10-PR196-CI,PASS,"Exact PR196 head acceptance before squash merge","head 6b3061caffb29b5216fee18b3dcc21b88c23a7cf; run 36391662171 #824; critical SUCCESS; full SUCCESS; merge c760a937cfe0a8b4127da32ffee42d9efaecbe66; no live strategy/risk/execution change"
