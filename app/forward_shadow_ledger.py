@@ -174,6 +174,41 @@ def _validate_record(record: ForwardShadowRecord) -> None:
         raise ValueError("invalid_short_geometry")
 
 
+def mtf_wait_record(
+    *,
+    symbol: str,
+    source_open_utc: str,
+    reason: str,
+    evidence_payload: dict[str, Any],
+) -> ForwardShadowRecord:
+    """Freeze a prospective MTF WAIT observation without inventing trade geometry."""
+    if symbol not in FROZEN_R10_CANDIDATES:
+        raise ValueError("unknown_mtf_candidate")
+    if _parse_utc(source_open_utc) < _parse_utc(MTF_FORWARD_NOT_BEFORE_UTC):
+        raise ValueError("pre_forward_boundary")
+    if not isinstance(reason, str) or not reason:
+        raise ValueError("wait_reason_required")
+    record = ForwardShadowRecord(
+        registry_id=REGISTRY_ID,
+        protocol_id="mtf_eth_doge_v1",
+        protocol_sha256=mtf_protocol_sha256(),
+        candidate_sha256=mtf_candidate_sha256(symbol),
+        evidence_sha256=evidence_sha256(evidence_payload),
+        symbol=symbol,
+        source_open_utc=source_open_utc,
+        decision="WAIT",
+        reason=reason,
+        entry_bar_ts=None,
+        entry=None,
+        stop=None,
+        target=None,
+        planned_risk=None,
+        evaluation_horizon_bars=DEFAULT_HORIZON_BARS,
+    )
+    _validate_record(record)
+    return record
+
+
 def mtf_record(signal: ShadowSignal, *, evidence_payload: dict[str, Any]) -> ForwardShadowRecord:
     if signal.symbol not in FROZEN_R10_CANDIDATES:
         raise ValueError("unknown_mtf_candidate")
