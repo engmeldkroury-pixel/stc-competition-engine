@@ -57,6 +57,11 @@ jobs:
           tests/test_outcome_attribution.py
           tests/test_r9_data_exit_audit.py
           tests/test_r9_late_decisions.py
+          tests/test_r10_regime_session_shadow.py
+          tests/test_r10_forward_evaluator.py
+          tests/test_r10_amp_crypto_shadow.py
+          tests/test_r10_amp_crypto_evaluator.py
+          tests/test_r10_evidence_gate.py
 
   full:
     runs-on: ubuntu-latest
