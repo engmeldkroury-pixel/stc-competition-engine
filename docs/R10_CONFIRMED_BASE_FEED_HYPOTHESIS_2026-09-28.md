@@ -32,3 +32,16 @@ This contract deliberately introduces one 15-minute bar of remote-source latency
 4. Demonstrate whether v1.2 materially reduces close revisions / decision drift.
 5. Re-run strategy opportunity and outcome analysis with the delayed contract.
 6. Only then consider a separate production PR. No automatic migration or live strategy change is authorized by this research branch.
+
+
+## Historical latency stress before any deployment
+A paired historical stress was run on the already-frozen ETHUSD/DOGEUSD MTF pullback candidates at a 5 bps cost proxy. This is exploratory because later TradingView history can contain close revisions; it is not prospective evidence.
+
+The test compared the normal next-bar entry with an additional one-15m-bar latency, and used the same 0.25 ATR maximum source-close-to-entry-open gap.
+
+- ETHUSD: 91 raw source setups; normal entry eligible 91; delayed entry eligible 33. On the **same 33 delayed-eligible source setups**, normal mean was about +0.253R and delayed mean +0.328R (paired mean difference about +0.075R).
+- DOGEUSD: 102 raw source setups; normal eligible 102; delayed eligible 32. On the **same 32 delayed-eligible source setups**, normal mean was about +0.537R and delayed mean +0.577R (paired difference about +0.040R).
+
+This does **not** establish that latency improves the strategy. The delayed source contract filters out roughly two-thirds of these source setups under the frozen gap rule, creating major opportunity starvation. The common-cohort result only shows that delayed entry did not collapse the small subset that remained eligible.
+
+Decision: keep v1.2 RESEARCH ONLY. The current preferred engineering control is to freeze alert-time/as-observed v1.1 evidence for causal forward validation while testing whether confirmed-base data materially improves source fidelity enough to justify its opportunity cost.
