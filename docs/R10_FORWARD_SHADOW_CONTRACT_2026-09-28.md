@@ -32,3 +32,9 @@ A parameter change creates a new protocol/candidate identity and a new forward e
 
 ## Promotion boundary
 Historical results and early forward wins are insufficient for live promotion. Any later promotion requires a separate evidence review including prospective sample size, expectancy/PF after realistic symbol-specific costs, drawdown and concentration, source integrity, code/production parity and regression CI. Manual execution and current risk controls remain unchanged unless separately approved.
+
+
+## Source-revision protection
+A 20-row overlap check against the immutable R9 capture found close-only retrospective differences in 11/20 ETHUSD rows and 15/20 DOGEUSD rows while open/high/low matched in that sample. See `docs/R10_SOURCE_REVISION_FINDING_2026-09-28.md`.
+
+Therefore each forward record also carries an SHA-256 of the exact as-observed evidence envelope used at decision time. Retrospective vendor history may be compared later, but it may not overwrite the frozen decision evidence.
