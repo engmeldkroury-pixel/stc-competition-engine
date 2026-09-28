@@ -3,6 +3,74 @@
   "captured_from_production_alert_log": true,
   "observations": [
     {
+      "symbol": "CAPITALCOM:DOGEUSD",
+      "source_open_utc": "2026-09-28T07:00:00Z",
+      "evidence_sha256": "f0a01d5502e94985c54e6e9afb931a00dd30af8293d5b50c2fbdf0bab7ff5eda",
+      "evidence": {
+        "provenance": {
+          "production_alert_name": "STC CAPITAL MTF A v1.1 PROD",
+          "tv_alert_id": 5677111254,
+          "fire_id": 57474947548,
+          "fired_at": "2026-09-28T07:15:00Z",
+          "webhook_http_code": 200,
+          "source_contract": "production_v1.1_current_remote",
+          "four_hour_source": "TradingView Official OHLCV frozen during first forward evaluation"
+        },
+        "source": {
+          "time": "2026-09-28T07:00:00Z",
+          "open": 0.092703,
+          "high": 0.0931479,
+          "low": 0.0925273,
+          "close": 0.0926089,
+          "volume": 3561,
+          "ema20": 0.0937382572,
+          "ema50": 0.0948879122,
+          "rsi14": 32.7984268244,
+          "atr14": 0.0006766098
+        },
+        "ema20_four_bars_back": {
+          "time": "2026-09-28T06:00:00Z",
+          "ema20": 0.0942444649
+        },
+        "confirm_1h": {
+          "time": "2026-09-28T06:00:00Z",
+          "ema20": 0.0954071533,
+          "ema50": 0.0961621819
+        },
+        "confirm_4h_frozen": {
+          "time": "2026-09-28T01:00:00Z",
+          "close": 0.0941396,
+          "ema20": 0.0962999463084294,
+          "ema50": 0.09450203127421453
+        },
+        "next_bar_observation": {
+          "time": "2026-09-28T07:15:00Z",
+          "open": 0.0926178
+        },
+        "derived": {
+          "local_trend": -1,
+          "trend_1h": -1,
+          "trend_4h": 1,
+          "distance_atr": -1.66914106180549,
+          "slope_atr": -0.7481530713862125
+        },
+        "decision": {
+          "decision": "WAIT",
+          "reason": "pullback_conditions_not_met:anti_chase_distance"
+        }
+      },
+      "candidate_sha256": "e22c97ad3e915bf4032afececa7c5d463a7250850ac76627f5ed11ad8ad44d98",
+      "retrospective_check": {
+        "checked_after_decision": true,
+        "later_history_close": 0.0926177,
+        "later_history_volume": 3590,
+        "alert_time_close": 0.0926089,
+        "alert_time_volume": 3561,
+        "ohl_unchanged": true,
+        "excluded_from_original_evidence_sha256": true
+      }
+    },
+    {
       "symbol": "CAPITALCOM:ETHUSD",
       "source_open_utc": "2026-09-28T07:00:00Z",
       "evidence_sha256": "4f6579a66f85bb782479d86e6b75530bf0e072018a80f63bfad1d741fde468d3",
@@ -73,55 +141,64 @@
     },
     {
       "symbol": "CAPITALCOM:DOGEUSD",
-      "source_open_utc": "2026-09-28T07:00:00Z",
-      "evidence_sha256": "f0a01d5502e94985c54e6e9afb931a00dd30af8293d5b50c2fbdf0bab7ff5eda",
+      "source_open_utc": "2026-09-28T07:45:00Z",
+      "evidence_sha256": "a56ea7ec859564dd1ba9148fe09d46d97b3a3536bca40bf468f589837af2019e",
       "evidence": {
         "provenance": {
           "production_alert_name": "STC CAPITAL MTF A v1.1 PROD",
           "tv_alert_id": 5677111254,
-          "fire_id": 57474947548,
-          "fired_at": "2026-09-28T07:15:00Z",
-          "webhook_http_code": 200,
+          "fire_id": 57477148380,
+          "fired_at": "2026-09-28T08:00:00Z",
+          "webhook": {
+            "http_code": 200
+          },
           "source_contract": "production_v1.1_current_remote",
-          "four_hour_source": "TradingView Official OHLCV frozen during first forward evaluation"
+          "four_hour_source": "TradingView Official OHLCV captured after decision for candidate-specific EMA20/50 reconstruction",
+          "four_hour_capture_utc": "2026-09-28T09:19:50Z",
+          "four_hour_decision_time_freeze_available": false
         },
         "source": {
-          "time": "2026-09-28T07:00:00Z",
-          "open": 0.092703,
-          "high": 0.0931479,
-          "low": 0.0925273,
-          "close": 0.0926089,
-          "volume": 3561,
-          "ema20": 0.0937382572,
-          "ema50": 0.0948879122,
-          "rsi14": 32.7984268244,
-          "atr14": 0.0006766098
-        },
-        "ema20_four_bars_back": {
-          "time": "2026-09-28T06:00:00Z",
-          "ema20": 0.0942444649
+          "time": "2026-09-28T07:45:00Z",
+          "open": 0.0923969,
+          "high": 0.0926143,
+          "low": 0.0922046,
+          "close": 0.0922477,
+          "volume": 3048,
+          "ema20": 0.0933794589,
+          "ema50": 0.0946019036,
+          "rsi14": 30.0866407435,
+          "atr14": 0.0006382345
         },
         "confirm_1h": {
           "time": "2026-09-28T06:00:00Z",
+          "close": 0.0927032,
           "ema20": 0.0954071533,
           "ema50": 0.0961621819
         },
-        "confirm_4h_frozen": {
+        "confirm_4h_reconstructed": {
           "time": "2026-09-28T01:00:00Z",
+          "open": 0.0963545,
+          "high": 0.096866,
+          "low": 0.0931003,
           "close": 0.0941396,
-          "ema20": 0.0962999463084294,
-          "ema50": 0.09450203127421453
+          "volume": 63890,
+          "ema20": 0.09630041243896914,
+          "ema50": 0.09405923167635824,
+          "trend": 1,
+          "alert_time_trend_4h_time": "2026-09-28T01:00:00Z",
+          "alert_time_trend_4h_score": -0.3
         },
         "next_bar_observation": {
-          "time": "2026-09-28T07:15:00Z",
-          "open": 0.0926178
+          "time": "2026-09-28T08:00:00Z",
+          "open": 0.0922572,
+          "source": "next production alert source open"
         },
         "derived": {
           "local_trend": -1,
           "trend_1h": -1,
-          "trend_4h": 1,
-          "distance_atr": -1.66914106180549,
-          "slope_atr": -0.7481530713862125
+          "trend_4h_reconstructed": 1,
+          "vote": null,
+          "distance_atr": -1.7732649989933196
         },
         "decision": {
           "decision": "WAIT",
@@ -131,17 +208,964 @@
       "candidate_sha256": "e22c97ad3e915bf4032afececa7c5d463a7250850ac76627f5ed11ad8ad44d98",
       "retrospective_check": {
         "checked_after_decision": true,
-        "later_history_close": 0.0926177,
-        "later_history_volume": 3590,
-        "alert_time_close": 0.0926089,
-        "alert_time_volume": 3561,
-        "ohl_unchanged": true,
+        "checked_at_utc": "2026-09-28T09:19:50Z",
+        "later_history": {
+          "open": 0.0923969,
+          "high": 0.0926143,
+          "low": 0.0922046,
+          "close": 0.0922573,
+          "volume": 3069
+        },
+        "alert_time_ohlcv": {
+          "open": 0.0923969,
+          "high": 0.0926143,
+          "low": 0.0922046,
+          "close": 0.0922477,
+          "volume": 3048
+        },
+        "changed_fields": [
+          "close",
+          "volume"
+        ],
+        "exact_ohlcv_match_at_check": false,
+        "excluded_from_original_evidence_sha256": true
+      }
+    },
+    {
+      "symbol": "CAPITALCOM:ETHUSD",
+      "source_open_utc": "2026-09-28T07:45:00Z",
+      "evidence_sha256": "629c47e785bdd780e3c6a4d81cdd66f33f54334db47b198788f5456d1544c499",
+      "evidence": {
+        "provenance": {
+          "production_alert_name": "STC CAPITAL MTF A v1.1 PROD",
+          "tv_alert_id": 5677111254,
+          "fire_id": 57477147227,
+          "fired_at": "2026-09-28T08:00:00Z",
+          "webhook": {
+            "http_code": 200
+          },
+          "source_contract": "production_v1.1_current_remote",
+          "four_hour_source": "TradingView Official OHLCV captured after decision for candidate-specific EMA20/50 reconstruction",
+          "four_hour_capture_utc": "2026-09-28T09:19:50Z",
+          "four_hour_decision_time_freeze_available": false
+        },
+        "source": {
+          "time": "2026-09-28T07:45:00Z",
+          "open": 2641.49,
+          "high": 2646.96,
+          "low": 2641.4,
+          "close": 2641.79,
+          "volume": 3910,
+          "ema20": 2650.4442833778,
+          "ema50": 2662.8936994247,
+          "rsi14": 36.213793262,
+          "atr14": 8.0562280739
+        },
+        "confirm_1h": {
+          "time": "2026-09-28T06:00:00Z",
+          "close": 2648.02,
+          "ema20": 2672.7941193943,
+          "ema50": 2683.2205773452
+        },
+        "confirm_4h_reconstructed": {
+          "time": "2026-09-28T01:00:00Z",
+          "open": 2672.51,
+          "high": 2678.53,
+          "low": 2642.03,
+          "close": 2657.27,
+          "volume": 78559,
+          "ema20": 2686.152636639963,
+          "ema50": 2659.085477837991,
+          "trend": 1,
+          "alert_time_trend_4h_time": "2026-09-28T01:00:00Z",
+          "alert_time_trend_4h_score": -0.3
+        },
+        "next_bar_observation": {
+          "time": "2026-09-28T08:00:00Z",
+          "open": 2641.8,
+          "source": "next production alert source open"
+        },
+        "derived": {
+          "local_trend": -1,
+          "trend_1h": -1,
+          "trend_4h_reconstructed": 1,
+          "vote": -1,
+          "distance_atr": -1.0742351505461214
+        },
+        "decision": {
+          "decision": "WAIT",
+          "reason": "mtf_vote_neutral"
+        }
+      },
+      "candidate_sha256": "2d1406da93b44d8ec1cf15d47b5e8664abcaf5809515e0c0382286917d4784d9",
+      "retrospective_check": {
+        "checked_after_decision": true,
+        "checked_at_utc": "2026-09-28T09:19:50Z",
+        "later_history": {
+          "open": 2641.49,
+          "high": 2646.96,
+          "low": 2641.4,
+          "close": 2641.79,
+          "volume": 3910
+        },
+        "alert_time_ohlcv": {
+          "open": 2641.49,
+          "high": 2646.96,
+          "low": 2641.4,
+          "close": 2641.79,
+          "volume": 3910
+        },
+        "changed_fields": [],
+        "exact_ohlcv_match_at_check": true,
+        "excluded_from_original_evidence_sha256": true
+      }
+    },
+    {
+      "symbol": "CAPITALCOM:DOGEUSD",
+      "source_open_utc": "2026-09-28T08:00:00Z",
+      "evidence_sha256": "b5ded29e49a2b0bee55b01569bc2881170bd0a4a1d7c5b5ba6511eb373e9728f",
+      "evidence": {
+        "provenance": {
+          "production_alert_name": "STC CAPITAL MTF A v1.1 PROD",
+          "tv_alert_id": 5677111254,
+          "fire_id": 57478068106,
+          "fired_at": "2026-09-28T08:15:00Z",
+          "webhook": {
+            "http_code": 200
+          },
+          "source_contract": "production_v1.1_current_remote",
+          "four_hour_source": "TradingView Official OHLCV captured after decision for candidate-specific EMA20/50 reconstruction",
+          "four_hour_capture_utc": "2026-09-28T09:19:50Z",
+          "four_hour_decision_time_freeze_available": false
+        },
+        "source": {
+          "time": "2026-09-28T08:00:00Z",
+          "open": 0.0922572,
+          "high": 0.092886,
+          "low": 0.0921865,
+          "close": 0.0928626,
+          "volume": 4203,
+          "ema20": 0.0933310614,
+          "ema50": 0.0945340573,
+          "rsi14": 39.8613187187,
+          "atr14": 0.0006426106
+        },
+        "confirm_1h": {
+          "time": "2026-09-28T07:00:00Z",
+          "close": 0.0922573,
+          "ema20": 0.0951071673,
+          "ema50": 0.0960090492
+        },
+        "confirm_4h_reconstructed": {
+          "time": "2026-09-28T01:00:00Z",
+          "open": 0.0963545,
+          "high": 0.096866,
+          "low": 0.0931003,
+          "close": 0.0941396,
+          "volume": 63890,
+          "ema20": 0.09630041243896914,
+          "ema50": 0.09405923167635824,
+          "trend": 1,
+          "alert_time_trend_4h_time": "2026-09-28T01:00:00Z",
+          "alert_time_trend_4h_score": -0.3
+        },
+        "next_bar_observation": {
+          "time": "2026-09-28T08:15:00Z",
+          "open": 0.0928642,
+          "source": "next production alert source open"
+        },
+        "derived": {
+          "local_trend": -1,
+          "trend_1h": -1,
+          "trend_4h_reconstructed": 1,
+          "vote": null,
+          "distance_atr": -0.7289973119024099
+        },
+        "decision": {
+          "decision": "WAIT",
+          "reason": "pullback_conditions_not_met:anti_chase_distance"
+        }
+      },
+      "candidate_sha256": "e22c97ad3e915bf4032afececa7c5d463a7250850ac76627f5ed11ad8ad44d98",
+      "retrospective_check": {
+        "checked_after_decision": true,
+        "checked_at_utc": "2026-09-28T09:19:50Z",
+        "later_history": {
+          "open": 0.0922572,
+          "high": 0.092886,
+          "low": 0.0921865,
+          "close": 0.0928626,
+          "volume": 4203
+        },
+        "alert_time_ohlcv": {
+          "open": 0.0922572,
+          "high": 0.092886,
+          "low": 0.0921865,
+          "close": 0.0928626,
+          "volume": 4203
+        },
+        "changed_fields": [],
+        "exact_ohlcv_match_at_check": true,
+        "excluded_from_original_evidence_sha256": true
+      }
+    },
+    {
+      "symbol": "CAPITALCOM:ETHUSD",
+      "source_open_utc": "2026-09-28T08:00:00Z",
+      "evidence_sha256": "1501fe5c8d4bacd64a39d9a9ba16cafdec86a1bd67890aa121855411874cf791",
+      "evidence": {
+        "provenance": {
+          "production_alert_name": "STC CAPITAL MTF A v1.1 PROD",
+          "tv_alert_id": 5677111254,
+          "fire_id": 57478074719,
+          "fired_at": "2026-09-28T08:15:00Z",
+          "webhook": {
+            "http_code": 200
+          },
+          "source_contract": "production_v1.1_current_remote",
+          "four_hour_source": "TradingView Official OHLCV captured after decision for candidate-specific EMA20/50 reconstruction",
+          "four_hour_capture_utc": "2026-09-28T09:19:50Z",
+          "four_hour_decision_time_freeze_available": false
+        },
+        "source": {
+          "time": "2026-09-28T08:00:00Z",
+          "open": 2641.8,
+          "high": 2648.8,
+          "low": 2640.12,
+          "close": 2648.35,
+          "volume": 5398,
+          "ema20": 2650.244827818,
+          "ema50": 2662.3233582708,
+          "rsi14": 44.6487052323,
+          "atr14": 8.1007832115
+        },
+        "confirm_1h": {
+          "time": "2026-09-28T07:00:00Z",
+          "close": 2641.79,
+          "ema20": 2669.8413461186,
+          "ema50": 2681.5958488218
+        },
+        "confirm_4h_reconstructed": {
+          "time": "2026-09-28T01:00:00Z",
+          "open": 2672.51,
+          "high": 2678.53,
+          "low": 2642.03,
+          "close": 2657.27,
+          "volume": 78559,
+          "ema20": 2686.152636639963,
+          "ema50": 2659.085477837991,
+          "trend": 1,
+          "alert_time_trend_4h_time": "2026-09-28T01:00:00Z",
+          "alert_time_trend_4h_score": -0.3
+        },
+        "next_bar_observation": {
+          "time": "2026-09-28T08:15:00Z",
+          "open": 2648.21,
+          "source": "next production alert source open"
+        },
+        "derived": {
+          "local_trend": -1,
+          "trend_1h": -1,
+          "trend_4h_reconstructed": 1,
+          "vote": -1,
+          "distance_atr": -0.23390674315418533
+        },
+        "decision": {
+          "decision": "WAIT",
+          "reason": "mtf_vote_neutral"
+        }
+      },
+      "candidate_sha256": "2d1406da93b44d8ec1cf15d47b5e8664abcaf5809515e0c0382286917d4784d9",
+      "retrospective_check": {
+        "checked_after_decision": true,
+        "checked_at_utc": "2026-09-28T09:19:50Z",
+        "later_history": {
+          "open": 2641.8,
+          "high": 2648.8,
+          "low": 2640.12,
+          "close": 2648.27,
+          "volume": 5422
+        },
+        "alert_time_ohlcv": {
+          "open": 2641.8,
+          "high": 2648.8,
+          "low": 2640.12,
+          "close": 2648.35,
+          "volume": 5398
+        },
+        "changed_fields": [
+          "close",
+          "volume"
+        ],
+        "exact_ohlcv_match_at_check": false,
+        "excluded_from_original_evidence_sha256": true
+      }
+    },
+    {
+      "symbol": "CAPITALCOM:DOGEUSD",
+      "source_open_utc": "2026-09-28T08:15:00Z",
+      "evidence_sha256": "33bb1a957a80efcbff7fdaf11a0bb63c9c4ebcc2a68b63ab5c3771f481881b0c",
+      "evidence": {
+        "provenance": {
+          "production_alert_name": "STC CAPITAL MTF A v1.1 PROD",
+          "tv_alert_id": 5677111254,
+          "fire_id": 57478888890,
+          "fired_at": "2026-09-28T08:30:04Z",
+          "webhook": {
+            "http_code": 200
+          },
+          "source_contract": "production_v1.1_current_remote",
+          "four_hour_source": "TradingView Official OHLCV captured after decision for candidate-specific EMA20/50 reconstruction",
+          "four_hour_capture_utc": "2026-09-28T09:19:50Z",
+          "four_hour_decision_time_freeze_available": false
+        },
+        "source": {
+          "time": "2026-09-28T08:15:00Z",
+          "open": 0.0928642,
+          "high": 0.0929508,
+          "low": 0.0925501,
+          "close": 0.092646,
+          "volume": 2877,
+          "ema20": 0.0932658175,
+          "ema50": 0.0944600158,
+          "rsi14": 37.8356331781,
+          "atr14": 0.0006253313
+        },
+        "confirm_1h": {
+          "time": "2026-09-28T07:00:00Z",
+          "close": 0.0922573,
+          "ema20": 0.0951071673,
+          "ema50": 0.0960090492
+        },
+        "confirm_4h_reconstructed": {
+          "time": "2026-09-28T01:00:00Z",
+          "open": 0.0963545,
+          "high": 0.096866,
+          "low": 0.0931003,
+          "close": 0.0941396,
+          "volume": 63890,
+          "ema20": 0.09630041243896914,
+          "ema50": 0.09405923167635824,
+          "trend": 1,
+          "alert_time_trend_4h_time": "2026-09-28T01:00:00Z",
+          "alert_time_trend_4h_score": -0.3
+        },
+        "next_bar_observation": {
+          "time": "2026-09-28T08:30:00Z",
+          "open": 0.0926536,
+          "source": "next production alert source open"
+        },
+        "derived": {
+          "local_trend": -1,
+          "trend_1h": -1,
+          "trend_4h_reconstructed": 1,
+          "vote": null,
+          "distance_atr": -0.9911825939306004
+        },
+        "decision": {
+          "decision": "WAIT",
+          "reason": "pullback_conditions_not_met:anti_chase_distance"
+        }
+      },
+      "candidate_sha256": "e22c97ad3e915bf4032afececa7c5d463a7250850ac76627f5ed11ad8ad44d98",
+      "retrospective_check": {
+        "checked_after_decision": true,
+        "checked_at_utc": "2026-09-28T09:19:50Z",
+        "later_history": {
+          "open": 0.0928642,
+          "high": 0.0929508,
+          "low": 0.0925501,
+          "close": 0.092646,
+          "volume": 2877
+        },
+        "alert_time_ohlcv": {
+          "open": 0.0928642,
+          "high": 0.0929508,
+          "low": 0.0925501,
+          "close": 0.092646,
+          "volume": 2877
+        },
+        "changed_fields": [],
+        "exact_ohlcv_match_at_check": true,
+        "excluded_from_original_evidence_sha256": true
+      }
+    },
+    {
+      "symbol": "CAPITALCOM:ETHUSD",
+      "source_open_utc": "2026-09-28T08:15:00Z",
+      "evidence_sha256": "076b834bfd70d699f50ffab5253947922d59369c389da50b454a9967bd201841",
+      "evidence": {
+        "provenance": {
+          "production_alert_name": "STC CAPITAL MTF A v1.1 PROD",
+          "tv_alert_id": 5677111254,
+          "fire_id": 57478888991,
+          "fired_at": "2026-09-28T08:30:04Z",
+          "webhook": {
+            "http_code": 200
+          },
+          "source_contract": "production_v1.1_current_remote",
+          "four_hour_source": "TradingView Official OHLCV captured after decision for candidate-specific EMA20/50 reconstruction",
+          "four_hour_capture_utc": "2026-09-28T09:19:50Z",
+          "four_hour_decision_time_freeze_available": false
+        },
+        "source": {
+          "time": "2026-09-28T08:15:00Z",
+          "open": 2648.21,
+          "high": 2650.1,
+          "low": 2640.66,
+          "close": 2643.98,
+          "volume": 4740,
+          "ema20": 2649.6412841256,
+          "ema50": 2661.6009966623,
+          "rsi14": 40.7574099228,
+          "atr14": 8.1964415535
+        },
+        "confirm_1h": {
+          "time": "2026-09-28T07:00:00Z",
+          "close": 2641.79,
+          "ema20": 2669.8413461186,
+          "ema50": 2681.5958488218
+        },
+        "confirm_4h_reconstructed": {
+          "time": "2026-09-28T01:00:00Z",
+          "open": 2672.51,
+          "high": 2678.53,
+          "low": 2642.03,
+          "close": 2657.27,
+          "volume": 78559,
+          "ema20": 2686.152636639963,
+          "ema50": 2659.085477837991,
+          "trend": 1,
+          "alert_time_trend_4h_time": "2026-09-28T01:00:00Z",
+          "alert_time_trend_4h_score": -0.3
+        },
+        "next_bar_observation": {
+          "time": "2026-09-28T08:30:00Z",
+          "open": 2643.99,
+          "source": "next production alert source open"
+        },
+        "derived": {
+          "local_trend": -1,
+          "trend_1h": -1,
+          "trend_4h_reconstructed": 1,
+          "vote": -1,
+          "distance_atr": -0.6907002372490113
+        },
+        "decision": {
+          "decision": "WAIT",
+          "reason": "mtf_vote_neutral"
+        }
+      },
+      "candidate_sha256": "2d1406da93b44d8ec1cf15d47b5e8664abcaf5809515e0c0382286917d4784d9",
+      "retrospective_check": {
+        "checked_after_decision": true,
+        "checked_at_utc": "2026-09-28T09:19:50Z",
+        "later_history": {
+          "open": 2648.21,
+          "high": 2650.1,
+          "low": 2640.66,
+          "close": 2643.98,
+          "volume": 4740
+        },
+        "alert_time_ohlcv": {
+          "open": 2648.21,
+          "high": 2650.1,
+          "low": 2640.66,
+          "close": 2643.98,
+          "volume": 4740
+        },
+        "changed_fields": [],
+        "exact_ohlcv_match_at_check": true,
+        "excluded_from_original_evidence_sha256": true
+      }
+    },
+    {
+      "symbol": "CAPITALCOM:DOGEUSD",
+      "source_open_utc": "2026-09-28T08:30:00Z",
+      "evidence_sha256": "380e51d3cbe0fad4728f13b80da1c4eb35f78422da3e36eeccfd97eca034dd33",
+      "evidence": {
+        "provenance": {
+          "production_alert_name": "STC CAPITAL MTF A v1.1 PROD",
+          "tv_alert_id": 5677111254,
+          "fire_id": 57479583549,
+          "fired_at": "2026-09-28T08:45:00Z",
+          "webhook": {
+            "error": "request took too long and timed out"
+          },
+          "source_contract": "production_v1.1_current_remote",
+          "four_hour_source": "TradingView Official OHLCV captured after decision for candidate-specific EMA20/50 reconstruction",
+          "four_hour_capture_utc": "2026-09-28T09:19:50Z",
+          "four_hour_decision_time_freeze_available": false
+        },
+        "source": {
+          "time": "2026-09-28T08:30:00Z",
+          "open": 0.0926536,
+          "high": 0.092751,
+          "low": 0.0923868,
+          "close": 0.0924885,
+          "volume": 2734,
+          "ema20": 0.0931917873,
+          "ema50": 0.0943827015,
+          "rsi14": 36.3875934125,
+          "atr14": 0.000606679
+        },
+        "confirm_1h": {
+          "time": "2026-09-28T07:00:00Z",
+          "close": 0.0922573,
+          "ema20": 0.0951071673,
+          "ema50": 0.0960090492
+        },
+        "confirm_4h_reconstructed": {
+          "time": "2026-09-28T01:00:00Z",
+          "open": 0.0963545,
+          "high": 0.096866,
+          "low": 0.0931003,
+          "close": 0.0941396,
+          "volume": 63890,
+          "ema20": 0.09630041243896914,
+          "ema50": 0.09405923167635824,
+          "trend": 1,
+          "alert_time_trend_4h_time": "2026-09-28T01:00:00Z",
+          "alert_time_trend_4h_score": -0.3
+        },
+        "next_bar_observation": {
+          "time": "2026-09-28T08:45:00Z",
+          "open": 0.0924877,
+          "source": "next production alert source open"
+        },
+        "derived": {
+          "local_trend": -1,
+          "trend_1h": -1,
+          "trend_4h_reconstructed": 1,
+          "vote": null,
+          "distance_atr": -1.1592412132280727
+        },
+        "decision": {
+          "decision": "WAIT",
+          "reason": "pullback_conditions_not_met:anti_chase_distance"
+        }
+      },
+      "candidate_sha256": "e22c97ad3e915bf4032afececa7c5d463a7250850ac76627f5ed11ad8ad44d98",
+      "retrospective_check": {
+        "checked_after_decision": true,
+        "checked_at_utc": "2026-09-28T09:19:50Z",
+        "later_history": {
+          "open": 0.0926536,
+          "high": 0.092751,
+          "low": 0.0923868,
+          "close": 0.0924885,
+          "volume": 2734
+        },
+        "alert_time_ohlcv": {
+          "open": 0.0926536,
+          "high": 0.092751,
+          "low": 0.0923868,
+          "close": 0.0924885,
+          "volume": 2734
+        },
+        "changed_fields": [],
+        "exact_ohlcv_match_at_check": true,
+        "excluded_from_original_evidence_sha256": true
+      }
+    },
+    {
+      "symbol": "CAPITALCOM:ETHUSD",
+      "source_open_utc": "2026-09-28T08:30:00Z",
+      "evidence_sha256": "5186bb4864cc88295f04cfa4a2055dfdf444c617df0d03f63a1b61ce510508db",
+      "evidence": {
+        "provenance": {
+          "production_alert_name": "STC CAPITAL MTF A v1.1 PROD",
+          "tv_alert_id": 5677111254,
+          "fire_id": 57479579207,
+          "fired_at": "2026-09-28T08:45:00Z",
+          "webhook": {
+            "error": "request took too long and timed out"
+          },
+          "source_contract": "production_v1.1_current_remote",
+          "four_hour_source": "TradingView Official OHLCV captured after decision for candidate-specific EMA20/50 reconstruction",
+          "four_hour_capture_utc": "2026-09-28T09:19:50Z",
+          "four_hour_decision_time_freeze_available": false
+        },
+        "source": {
+          "time": "2026-09-28T08:30:00Z",
+          "open": 2643.99,
+          "high": 2647.6,
+          "low": 2637.63,
+          "close": 2641.59,
+          "volume": 4852,
+          "ema20": 2648.8744951612,
+          "ema50": 2660.8162516951,
+          "rsi14": 38.7726331804,
+          "atr14": 8.3231242997
+        },
+        "confirm_1h": {
+          "time": "2026-09-28T07:00:00Z",
+          "close": 2641.79,
+          "ema20": 2669.8413461186,
+          "ema50": 2681.5958488218
+        },
+        "confirm_4h_reconstructed": {
+          "time": "2026-09-28T01:00:00Z",
+          "open": 2672.51,
+          "high": 2678.53,
+          "low": 2642.03,
+          "close": 2657.27,
+          "volume": 78559,
+          "ema20": 2686.152636639963,
+          "ema50": 2659.085477837991,
+          "trend": 1,
+          "alert_time_trend_4h_time": "2026-09-28T01:00:00Z",
+          "alert_time_trend_4h_score": -0.3
+        },
+        "next_bar_observation": {
+          "time": "2026-09-28T08:45:00Z",
+          "open": 2641.57,
+          "source": "next production alert source open"
+        },
+        "derived": {
+          "local_trend": -1,
+          "trend_1h": -1,
+          "trend_4h_reconstructed": 1,
+          "vote": -1,
+          "distance_atr": -0.875211627136482
+        },
+        "decision": {
+          "decision": "WAIT",
+          "reason": "mtf_vote_neutral"
+        }
+      },
+      "candidate_sha256": "2d1406da93b44d8ec1cf15d47b5e8664abcaf5809515e0c0382286917d4784d9",
+      "retrospective_check": {
+        "checked_after_decision": true,
+        "checked_at_utc": "2026-09-28T09:19:50Z",
+        "later_history": {
+          "open": 2643.99,
+          "high": 2647.6,
+          "low": 2637.63,
+          "close": 2641.59,
+          "volume": 4852
+        },
+        "alert_time_ohlcv": {
+          "open": 2643.99,
+          "high": 2647.6,
+          "low": 2637.63,
+          "close": 2641.59,
+          "volume": 4852
+        },
+        "changed_fields": [],
+        "exact_ohlcv_match_at_check": true,
+        "excluded_from_original_evidence_sha256": true
+      }
+    },
+    {
+      "symbol": "CAPITALCOM:DOGEUSD",
+      "source_open_utc": "2026-09-28T08:45:00Z",
+      "evidence_sha256": "a0f7b04dd2e86c1d7eaa31e3c8f5210fe6a65f5e7b48640967f753573ce67766",
+      "evidence": {
+        "provenance": {
+          "production_alert_name": "STC CAPITAL MTF A v1.1 PROD",
+          "tv_alert_id": 5677111254,
+          "fire_id": 57480277487,
+          "fired_at": "2026-09-28T09:00:00Z",
+          "webhook": {
+            "http_code": 200
+          },
+          "source_contract": "production_v1.1_current_remote",
+          "four_hour_source": "TradingView Official OHLCV captured after decision for candidate-specific EMA20/50 reconstruction",
+          "four_hour_capture_utc": "2026-09-28T09:19:50Z",
+          "four_hour_decision_time_freeze_available": false
+        },
+        "source": {
+          "time": "2026-09-28T08:45:00Z",
+          "open": 0.0924877,
+          "high": 0.092942,
+          "low": 0.0924435,
+          "close": 0.09275,
+          "volume": 1807,
+          "ema20": 0.0931497123,
+          "ema50": 0.094318674,
+          "rsi14": 40.461869845,
+          "atr14": 0.0005989519
+        },
+        "confirm_1h": {
+          "time": "2026-09-28T07:00:00Z",
+          "close": 0.0922573,
+          "ema20": 0.0951071673,
+          "ema50": 0.0960090492
+        },
+        "confirm_4h_reconstructed": {
+          "time": "2026-09-28T05:00:00Z",
+          "open": 0.0941397,
+          "high": 0.0944332,
+          "low": 0.0921842,
+          "close": 0.0927376,
+          "volume": 51290,
+          "ema20": 0.09596109696859112,
+          "ema50": 0.09400740298316772,
+          "trend": 1,
+          "alert_time_trend_4h_time": "2026-09-28T01:00:00Z",
+          "alert_time_trend_4h_score": -0.3
+        },
+        "next_bar_observation": {
+          "time": "2026-09-28T09:00:00Z",
+          "open": 0.0927327,
+          "source": "next production alert source open"
+        },
+        "derived": {
+          "local_trend": -1,
+          "trend_1h": -1,
+          "trend_4h_reconstructed": 1,
+          "vote": null,
+          "distance_atr": -0.6673529209941691
+        },
+        "decision": {
+          "decision": "WAIT",
+          "reason": "pullback_conditions_not_met:anti_chase_distance"
+        }
+      },
+      "candidate_sha256": "e22c97ad3e915bf4032afececa7c5d463a7250850ac76627f5ed11ad8ad44d98",
+      "retrospective_check": {
+        "checked_after_decision": true,
+        "checked_at_utc": "2026-09-28T09:19:50Z",
+        "later_history": {
+          "open": 0.0924877,
+          "high": 0.092942,
+          "low": 0.0924435,
+          "close": 0.0927376,
+          "volume": 1809
+        },
+        "alert_time_ohlcv": {
+          "open": 0.0924877,
+          "high": 0.092942,
+          "low": 0.0924435,
+          "close": 0.09275,
+          "volume": 1807
+        },
+        "changed_fields": [
+          "close",
+          "volume"
+        ],
+        "exact_ohlcv_match_at_check": false,
+        "excluded_from_original_evidence_sha256": true
+      }
+    },
+    {
+      "symbol": "CAPITALCOM:ETHUSD",
+      "source_open_utc": "2026-09-28T08:45:00Z",
+      "evidence_sha256": "4867cb678cef0e5b176e7f839a2ea4576195a6e5961d0b4d16625a027dd5804b",
+      "evidence": {
+        "provenance": {
+          "production_alert_name": "STC CAPITAL MTF A v1.1 PROD",
+          "tv_alert_id": 5677111254,
+          "fire_id": 57480281775,
+          "fired_at": "2026-09-28T09:00:00Z",
+          "webhook": {
+            "error": "request took too long and timed out"
+          },
+          "source_contract": "production_v1.1_current_remote",
+          "four_hour_source": "TradingView Official OHLCV captured after decision for candidate-specific EMA20/50 reconstruction",
+          "four_hour_capture_utc": "2026-09-28T09:19:50Z",
+          "four_hour_decision_time_freeze_available": false
+        },
+        "source": {
+          "time": "2026-09-28T08:45:00Z",
+          "open": 2641.57,
+          "high": 2650.41,
+          "low": 2641.15,
+          "close": 2648.69,
+          "volume": 4234,
+          "ema20": 2648.8569241935,
+          "ema50": 2660.340712413,
+          "rsi14": 47.0257013373,
+          "atr14": 8.3900439926
+        },
+        "confirm_1h": {
+          "time": "2026-09-28T07:00:00Z",
+          "close": 2641.79,
+          "ema20": 2669.8413461186,
+          "ema50": 2681.5958488218
+        },
+        "confirm_4h_reconstructed": {
+          "time": "2026-09-28T05:00:00Z",
+          "open": 2657.29,
+          "high": 2659.35,
+          "low": 2634.34,
+          "close": 2648.69,
+          "volume": 73217,
+          "ema20": 2682.584766483776,
+          "ema50": 2658.6778120404233,
+          "trend": 1,
+          "alert_time_trend_4h_time": "2026-09-28T01:00:00Z",
+          "alert_time_trend_4h_score": -0.3
+        },
+        "next_bar_observation": {
+          "time": "2026-09-28T09:00:00Z",
+          "open": 2648.67,
+          "source": "next production alert source open"
+        },
+        "derived": {
+          "local_trend": -1,
+          "trend_1h": -1,
+          "trend_4h_reconstructed": 1,
+          "vote": -1,
+          "distance_atr": -0.0198955087300299
+        },
+        "decision": {
+          "decision": "WAIT",
+          "reason": "mtf_vote_neutral"
+        }
+      },
+      "candidate_sha256": "2d1406da93b44d8ec1cf15d47b5e8664abcaf5809515e0c0382286917d4784d9",
+      "retrospective_check": {
+        "checked_after_decision": true,
+        "checked_at_utc": "2026-09-28T09:19:50Z",
+        "later_history": {
+          "open": 2641.57,
+          "high": 2650.41,
+          "low": 2641.15,
+          "close": 2648.69,
+          "volume": 4253
+        },
+        "alert_time_ohlcv": {
+          "open": 2641.57,
+          "high": 2650.41,
+          "low": 2641.15,
+          "close": 2648.69,
+          "volume": 4234
+        },
+        "changed_fields": [
+          "volume"
+        ],
+        "exact_ohlcv_match_at_check": false,
         "excluded_from_original_evidence_sha256": true
       }
     }
   ],
   "valued_directional_trades": 0,
   "review_state": "COLLECTING",
-  "note": "WAIT observations are prospective evidence but make no P/L claim.",
-  "protocol_sha256": "beeb4883b7e01afa19bf6c70b25d2caa337c7d632c25d126bae2458217a96eb2"
+  "note": "WAIT observations are prospective evidence but make no P/L claim. Alert-time payloads remain authoritative for source/features; later history is reconciliation only. Candidate-specific 4h EMA reconstruction in this batch was captured after decision time and is explicitly marked as such.",
+  "protocol_sha256": "beeb4883b7e01afa19bf6c70b25d2caa337c7d632c25d126bae2458217a96eb2",
+  "last_complete_source_open_utc": "2026-09-28T08:45:00Z",
+  "next_pending_source_open_utc": "2026-09-28T09:00:00Z",
+  "portfolio_variant": {
+    "status": "FLAT",
+    "open_shadow_positions": 0,
+    "valued_trades": 0,
+    "rule": "at_most_one_ETH_DOGE_position_chronological_first"
+  },
+  "source_integrity_events": [
+    {
+      "type": "RETROSPECTIVE_SOURCE_REVISION",
+      "symbol": "CAPITALCOM:ETHUSD",
+      "source_open_utc": "2026-09-28T08:00:00Z",
+      "changed_fields": [
+        "close",
+        "volume"
+      ],
+      "alert_time": {
+        "open": 2641.8,
+        "high": 2648.8,
+        "low": 2640.12,
+        "close": 2648.35,
+        "volume": 5398
+      },
+      "later_history": {
+        "open": 2641.8,
+        "high": 2648.8,
+        "low": 2640.12,
+        "close": 2648.27,
+        "volume": 5422
+      }
+    },
+    {
+      "type": "WEBHOOK_RECEIPT_FAILURE",
+      "symbol": "CAPITALCOM:ETHUSD",
+      "source_open_utc": "2026-09-28T08:30:00Z",
+      "fire_id": 57479579207,
+      "error": "request took too long and timed out"
+    },
+    {
+      "type": "RETROSPECTIVE_SOURCE_REVISION",
+      "symbol": "CAPITALCOM:ETHUSD",
+      "source_open_utc": "2026-09-28T08:45:00Z",
+      "changed_fields": [
+        "volume"
+      ],
+      "alert_time": {
+        "open": 2641.57,
+        "high": 2650.41,
+        "low": 2641.15,
+        "close": 2648.69,
+        "volume": 4234
+      },
+      "later_history": {
+        "open": 2641.57,
+        "high": 2650.41,
+        "low": 2641.15,
+        "close": 2648.69,
+        "volume": 4253
+      }
+    },
+    {
+      "type": "WEBHOOK_RECEIPT_FAILURE",
+      "symbol": "CAPITALCOM:ETHUSD",
+      "source_open_utc": "2026-09-28T08:45:00Z",
+      "fire_id": 57480281775,
+      "error": "request took too long and timed out"
+    },
+    {
+      "type": "RETROSPECTIVE_SOURCE_REVISION",
+      "symbol": "CAPITALCOM:DOGEUSD",
+      "source_open_utc": "2026-09-28T07:45:00Z",
+      "changed_fields": [
+        "close",
+        "volume"
+      ],
+      "alert_time": {
+        "open": 0.0923969,
+        "high": 0.0926143,
+        "low": 0.0922046,
+        "close": 0.0922477,
+        "volume": 3048
+      },
+      "later_history": {
+        "open": 0.0923969,
+        "high": 0.0926143,
+        "low": 0.0922046,
+        "close": 0.0922573,
+        "volume": 3069
+      }
+    },
+    {
+      "type": "WEBHOOK_RECEIPT_FAILURE",
+      "symbol": "CAPITALCOM:DOGEUSD",
+      "source_open_utc": "2026-09-28T08:30:00Z",
+      "fire_id": 57479583549,
+      "error": "request took too long and timed out"
+    },
+    {
+      "type": "RETROSPECTIVE_SOURCE_REVISION",
+      "symbol": "CAPITALCOM:DOGEUSD",
+      "source_open_utc": "2026-09-28T08:45:00Z",
+      "changed_fields": [
+        "close",
+        "volume"
+      ],
+      "alert_time": {
+        "open": 0.0924877,
+        "high": 0.092942,
+        "low": 0.0924435,
+        "close": 0.09275,
+        "volume": 1807
+      },
+      "later_history": {
+        "open": 0.0924877,
+        "high": 0.092942,
+        "low": 0.0924435,
+        "close": 0.0927376,
+        "volume": 1809
+      }
+    }
+  ],
+  "last_capture_utc": "2026-09-28T09:19:50Z"
 }
