@@ -154,3 +154,14 @@ The195.23USD screenshot/ledger delta equals prior documented54.39residual plus v
 Details:docs/R9_RESULTS_2026-09-27.md. Additional experiments and price-overlay tooling remain on research/r9-protection-20260927, not live runtime code. Future protocol is registered, not evaluated or scheduled; preserve purge/embargo and no-retuning boundaries.
 
 Decision: preserve unfavorable empirical findings; do not substitute a tighter target or wider stop for evidence. Late entry expiry and valid historical candle retention are different contracts.
+
+
+## 2026-09-28 — Persistent integration architecture (no Work / no Opera dependency)
+- Owner rejected ChatGPT Work and Opera Browser Connector as primary dependencies because sessions/connectors can expire or be unstable.
+- STC core must run as an always-on owner-controlled service, not inside a browser or ChatGPT session.
+- Primary signal path: TradingView server-side alerts -> authenticated HTTPS webhook on STC -> durable queue/database -> strategy/risk engine -> Telegram/manual approval. TradingView documents that alerts run server-side and can POST to webhooks; use open-ended alerts where the account plan supports them.
+- Account/execution truth must come from an official broker/feed API when the competition account exposes one. TradingView does not provide a general public user API for chart/account data; its REST API is for broker integrations. Therefore STC must not assume browser scraping can be replaced by a TradingView account API.
+- If a competition exposes no account API, use a self-hosted persistent Playwright/Chromium collector on an owner-controlled VPS only as a secondary reconciliation adapter, with durable cookies/session, health checks, automatic restart, re-login alert, DOM-contract tests, screenshots on failure, and fail-closed behavior. Browser automation must never be the source of strategy signals or unattended trading authority.
+- Keep TradingView/market-data source adapters independent from execution/account adapters so any one provider can be replaced without changing strategy logic.
+- Telegram remains the user notification/approval surface; email remains disabled unless explicitly re-enabled.
+- Next implementation batch: R10-PERSISTENT-BRIDGE — webhook ingress, durable event queue/idempotency, adapter health monitor, VPS service packaging, and browser fallback contract. No live auto-execution is authorized.
