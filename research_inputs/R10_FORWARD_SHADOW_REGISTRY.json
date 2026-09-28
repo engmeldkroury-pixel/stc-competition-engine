@@ -16,7 +16,10 @@
       "forward_not_before_utc": "2026-09-28T07:00:00Z",
       "evaluation_horizon_bars": 32,
       "base_timeframe_minutes": 15,
-      "symbols": ["CAPITALCOM:ETHUSD", "CAPITALCOM:DOGEUSD"]
+      "symbols": [
+        "CAPITALCOM:ETHUSD",
+        "CAPITALCOM:DOGEUSD"
+      ]
     },
     "regime_session_v1": {
       "source_file": "research_inputs/R10_REGIME_SESSION_FROZEN_PROTOCOL.json",
@@ -31,6 +34,7 @@
   "rules": [
     "Forward observations at or after a protocol boundary must never be used to retune that same protocol version.",
     "Every directional observation must carry the frozen protocol/candidate digest used at decision time.",
+    "Freeze a SHA-256 of the exact as-observed source/feature/HTF/next-open evidence at decision time; retrospective vendor bar revisions may not replace it.",
     "Missing price intervals are censored; they are never interpolated into a win or loss.",
     "Same-bar stop-and-target ambiguity is scored stop-first.",
     "No record produced by this registry has broker, quantity, approval, notification, account or live-strategy authority."
