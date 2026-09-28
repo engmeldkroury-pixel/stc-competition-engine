@@ -23,6 +23,8 @@ jobs:
       STC_OWNER_TOKEN: ${{ secrets.STC_OWNER_TOKEN }}
     steps:
       - name: Read sanitized production snapshot
+        id: snapshot
+        continue-on-error: true
         shell: bash
         run: |
           set -euo pipefail
@@ -243,3 +245,17 @@ jobs:
               )
           )
           PY
+
+
+      - name: Record non-critical readback failure without failing workflow
+        if: always() && steps.snapshot.outcome == 'failure'
+        shell: bash
+        run: |
+          echo "::warning title=STC Live Readback unavailable::The diagnostic readback could not complete. No trading/account/position write was attempted. Inspect the failed snapshot step logs. This workflow remains successful so transient readback outages do not generate GitHub Actions failure emails."
+          {
+            echo "## STC Live Readback"
+            echo ""
+            echo "Diagnostic snapshot was unavailable in this run."
+            echo "No broker/account/position/approval/notification write was attempted."
+            echo "Review the snapshot step logs for the exact transport/auth/parser failure."
+          } >> "$GITHUB_STEP_SUMMARY"
