@@ -1,3 +1,12 @@
+## R10 strategy-shadow checkpoint - 2026-09-28
+Owner reports all executed competition trades losing so far. R10 tested stop/target-only fixes, uniform trend/chase, pullback/reclaim/breakout, mean reversion, per-asset/timeframe static selection and naive walk-forward switching. These were NOT robust and are rejected for live promotion. Do not restart these searches blindly.
+Historical accepted directional cases were materially more extended than rejected cases, supporting a late/chasing-entry hypothesis but not proving gate causality. Stop widening did not solve the accepted-plan problem.
+The first historically stable parameter region found uses a direct session/regime model: 15m, London/New York overlap, ADX trend vs range separation, anti-chase pullback in trend and z-score extreme fade in range. Neighborhood/cost/session stress was materially more stable than prior families, but the historical holdout was inspected during development and is now contaminated for further selection.
+Frozen forward candidate: research_inputs/R10_REGIME_SESSION_FROZEN_PROTOCOL.json; no earlier than 2026-09-28T12:00:00Z; session12-17UTC; trendADX>=30; rangeADX<=20; neutral=>WAIT; initial stop1.5ATR; single target2R;32-bar horizon. It is RESEARCH ONLY, live_authorized=false, execution=none.
+Historical stress for frozen candidate, 12-17UTC: at2bps train n68 mean+0.227R PF1.451; validation n27 +0.209R PF1.378; already-inspected holdout n24 +0.379R PF1.744. At5bps these were +0.063/+0.093/+0.205R. Nearby session windows remained positive historically. These are hypothesis-generation results, NOT a promised or independently forward-validated edge.
+Local verification: R10-only10passed; focused R10+R8-outcome+trade-plan75passed. Branch research/r10-regime-session-shadow-20260928. Live84/Boolean/monthly/risk0.005/current open stops and manual execution unchanged.
+Next: full GitHub CI, then collect prospective frozen signals without retuning; stratify by symbol/day and use realistic costs. No live promotion until prospective evidence supports it. Zero additional paid infrastructure remains a hard constraint.
+
 
 
 ## Persistent runtime direction - 2026-09-28

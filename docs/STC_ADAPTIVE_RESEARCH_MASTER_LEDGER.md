@@ -1195,3 +1195,13 @@ Read the latest CURRENT_CHECKPOINT first; do not restart R1-R9.
 4. Complete execution-to-plan reconciliation only with exact fill/close identifiers and timestamps. Opera browser read failed as disconnected in this session. No Capital.com API account is required; previous project history parks that optional route.
 5. For prospective protocol evidence from2026-09-28T00:00Z, purge training windows overlapping evaluation and apply a horizon-sized embargo when fitting/tuning. Do not retune on the evaluation data. No automated promotion or win probability.
 No owner upload or account refresh is needed to use this engineering update. No fresh trade recommendation is issued.
+
+
+## R10 2026-09-28 — losing-trade diagnosis and frozen regime/session shadow
+- Problem: executed competition trades have produced a loss sequence; avoid post-loss reactive stop widening or target cherry-picking.
+- Rejected after chronological tests: uniform chase, simple pullback/reclaim/breakout/mean-pull, standalone Bollinger fade, per-asset/timeframe static winners, naive performance-switching walk-forward.
+- Overextension evidence: accepted historical directional cases were farther from20-bar mean and had stronger recent thesis momentum than rejected cases; late-entry hypothesis opened.
+- First stable historical region: direct ADX regime + London/NY overlap + anti-chase trend pullback/range extreme fade.
+- Frozen prospective hypothesis after historical search:15m,12-17UTC,ADXtrend30,ADXrange20,stop1.5ATR,target2R,horizon32; no retuning after2026-09-28T12:00Z.
+- Historical neighborhood/cost/session stability is encouraging but no longer unseen. Forward evidence is mandatory.
+- No live promotion; zero new spend; manual execution remains.

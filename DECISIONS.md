@@ -165,3 +165,13 @@ Decision: preserve unfavorable empirical findings; do not substitute a tighter t
 - Keep TradingView/market-data source adapters independent from execution/account adapters so any one provider can be replaced without changing strategy logic.
 - Telegram remains the user notification/approval surface; email remains disabled unless explicitly re-enabled.
 - Next implementation batch: R10-PERSISTENT-BRIDGE — webhook ingress, durable event queue/idempotency, adapter health monitor, VPS service packaging, and browser fallback contract. No live auto-execution is authorized.
+
+## 2026-09-28 — R10 strategy search and frozen forward candidate
+- Preserve all negative R10 results. Uniform trend/chase, simple pullback/reclaim/breakout, standalone mean reversion, static per-asset/timeframe selection and naive recent-performance walk-forward are not approved for live use.
+- Evidence indicates current accepted historical setups were more extended than rejected directional setups; treat this as a late-entry hypothesis, not a causal verdict on the live gate.
+- Do not widen stops to recover losses. No universal smaller target is approved.
+- Freeze the session/regime hypothesis before prospective evaluation:15m,12-17UTC,ADXtrend>=30,ADXrange<=20,neutral WAIT, trend anti-chase pullback/range extreme fade,stop1.5ATR,target2R,horizon32.
+- All historical holdouts inspected during R10 development are now contaminated for selection. They may be reported descriptively but cannot be relabeled as unseen evidence.
+- Forward boundary is2026-09-28T12:00:00Z. Do not retune frozen parameters on forward observations.
+- Candidate remains research_only=true, live_authorized=false, execution=none. Promotion requires prospective, symbol-stratified, cost-aware evidence and full CI/parity.
+- Owner requires zero new paid infrastructure; strategy research must not depend on purchasing VPS, browser automation or a higher TradingView tier.

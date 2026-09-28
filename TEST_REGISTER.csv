@@ -47,3 +47,6 @@ T-STC-R8-READBACK-20260927,PASS_STALE_DATA_RETAINED,Post-merge recorded position
 T-STC-R9-FULL,PASS,Critical and full exact PRhead tests,CI36347047903 head0c38010df68ff6076af0a723e8c9caff45e5912c
 T-STC-R9-READ,PASS,Late expiry and dataset receipt/source consistency,Read36347045013;9639rows;206late;0quarantine;3frozen
 T-STC-R9-RESEARCH,PASS_RESEARCH_ONLY,Protection and supplementary source checks,Research36347455391;109focused remote;17protection/supplement local
+T-STC-R10-UNIT,PASS_LOCAL,"Frozen session/regime research boundary symmetry anti-chase UTC and fail-closed inputs","10 passed"
+T-STC-R10-FOCUSED,PASS_LOCAL,"R10 shadow plus R8 outcome attribution plus trade-plan regression","75 passed in1.89s"
+T-STC-R10-HISTORICAL-STRESS,PASS_WITH_SELECTION_CONTAMINATION,"Parameter neighborhood cost and session sensitivity; descriptive only","36 nearby configs at2bps;33 positive train+validation;18 positive all historical slices; holdout inspected and not reusable as unseen evidence"
