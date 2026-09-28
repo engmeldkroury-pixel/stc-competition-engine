@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "registry_id": "R10-FORWARD-SHADOW-REGISTRY-V1",
+  "created_utc": "2026-09-28T06:49:00Z",
+  "authority": {
+    "research_only": true,
+    "live_authorized": false,
+    "auto_execute": false,
+    "retune_on_forward": false
+  },
+  "protocols": {
+    "mtf_eth_doge_v1": {
+      "source_file": "research_inputs/R10_MTF_SHADOW_CANDIDATES.json",
+      "source_blob_sha": "0eb29de0f0098c8bd3039c4b99e47fc371385b87",
+      "accepted_merge_commit": "4b0de3b0b3497cff0946f63ba6581a8a4e2d37b4",
+      "forward_not_before_utc": "2026-09-28T07:00:00Z",
+      "evaluation_horizon_bars": 32,
+      "base_timeframe_minutes": 15,
+      "symbols": [
+        "CAPITALCOM:ETHUSD",
+        "CAPITALCOM:DOGEUSD"
+      ]
+    },
+    "regime_session_v1": {
+      "source_file": "research_inputs/R10_REGIME_SESSION_FROZEN_PROTOCOL.json",
+      "source_blob_sha": "7ea7abb7cbdfced80527e068b6347890739cf8de",
+      "accepted_merge_commit": "f9f04f8022088f9327f5af646891a49eb77dc361",
+      "forward_not_before_utc": "2026-09-28T12:00:00Z",
+      "evaluation_horizon_bars": 32,
+      "base_timeframe_minutes": 15,
+      "symbols": "all_capital_research_symbols"
+    }
+  },
+  "rules": [
+    "Forward observations at or after a protocol boundary must never be used to retune that same protocol version.",
+    "Every directional observation must carry the frozen protocol/candidate digest used at decision time.",
+    "Freeze a SHA-256 of the exact as-observed source/feature/HTF/next-open evidence at decision time; retrospective vendor bar revisions may not replace it.",
+    "Missing price intervals are censored; they are never interpolated into a win or loss.",
+    "Same-bar stop-and-target ambiguity is scored stop-first.",
+    "No record produced by this registry has broker, quantity, approval, notification, account or live-strategy authority."
+  ]
+}
