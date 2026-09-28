@@ -1,3 +1,10 @@
+## R10 forward evidence next task - 2026-09-28
+1. Run focused and full CI on the forward/AMP branch; do not merge on failure.
+2. After merge, collect only genuinely new closed15m bars after each frozen boundary. Never retune the frozen Capital or AMP-crypto parameters on those observations.
+3. Assess Capital and AMP crypto separately and one cost scenario at a time. Track symbol/day/regime concentration, PF, drawdown, day-cluster CI and censored/source-conflict cases.
+4. Capital remains15m-only research; AMP crypto remains MBT/MET-only research. Do not infer transfer to other timeframes/families.
+5. If forward evidence stays insufficient before competition end, record INSUFFICIENT_EVIDENCE rather than forcing a live promotion.
+6. Keep manual execution,risk0.005,existing open stops,Telegram-only and zero-new-paid-infrastructure constraints unchanged.
 ## R10 frozen-shadow next task - 2026-09-28
 1. Run full PR CI for the research-only frozen classifier and boundary tests.
 2. From 2026-09-28T12:00:00Z onward, score new 15m observations with the frozen protocol without retuning.

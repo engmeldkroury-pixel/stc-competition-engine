@@ -1,0 +1,14 @@
+{
+  "protocol_id":"R10-AMP-CRYPTO-SHADOW-V1",
+  "status":"FROZEN_FORWARD_RESEARCH_ONLY",
+  "symbols":["CME:MBT1!","CME:MET1!"],
+  "not_before_utc":"2026-09-28T04:15:00Z",
+  "timeframe":"15m",
+  "entry":"EMA20_50_200 aligned trend pullback; ADX>=30; ATR-extension and RSI anti-chase bands; source candle confirms direction",
+  "initial_stop_atr":2.0,
+  "single_target_r":2.0,
+  "horizon_bars":32,
+  "historical_selection_warning":"Selected using train+validation and inspected holdout; no historical slice is now unseen for further tuning.",
+  "cost_stress_bps":[0,1,2,3,5],
+  "authority":{"research_only":true,"live_authorized":false,"execution":"none"}
+}

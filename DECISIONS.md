@@ -175,3 +175,15 @@ Decision: preserve unfavorable empirical findings; do not substitute a tighter t
 - Forward boundary is2026-09-28T12:00:00Z. Do not retune frozen parameters on forward observations.
 - Candidate remains research_only=true, live_authorized=false, execution=none. Promotion requires prospective, symbol-stratified, cost-aware evidence and full CI/parity.
 - Owner requires zero new paid infrastructure; strategy research must not depend on purchasing VPS, browser automation or a higher TradingView tier.
+
+## 2026-09-28 — R10 forward evaluator and AMP family decision
+- Accept PR192 only as frozen research infrastructure after582 full tests; no live promotion.
+- Do not generalize the Capital15m candidate to30m/1h; fixed-rule cross-timeframe results are inconsistent.
+- Do not copy Capital strategy to AMP; external-universe cost-aware test is not robust.
+- AMP family audit rejects index,rates,FX,metals and energy candidates tested. Freeze only MBT/MET crypto hypothesis for prospective research.
+- Exact AMP crypto frozen geometry:15m,ADX>=30,EMA20/50/200 aligned anti-chase pullback,stop2ATR,target2R,horizon32,not-before2026-09-28T04:15Z.
+- Official competition symbols MBT1!/MET1! are valid and max25 contracts each; exact competition commissions remain unverified, so bps values remain sensitivity proxies.
+- Historical positive means are not sufficient: day-cluster bootstrap95% intervals cross zero for both Capital and AMP crypto inspected holdouts.
+- Use one cost scenario per evidence assessment; mixed costs may not multiply sample size. Censored outcomes remain censored.
+- Evidence gate can only return human-review eligibility; auto-promotion/live authority remain false.
+

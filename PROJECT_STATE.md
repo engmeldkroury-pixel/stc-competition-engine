@@ -2815,3 +2815,7 @@ Details:docs/R9_RESULTS_2026-09-27.md. Additional experiments and price-overlay 
 
 ## R10-FROZEN-SHADOW-20260928
 R10 strategy diagnosis found repeated regime instability: simple universal, per-asset static and naive adaptive models failed later historical slices. A more selective session+direct-regime family showed a stable historical neighborhood under cost/session perturbation, but the holdout was inspected during development. The candidate is frozen for prospective shadow evaluation only from2026-09-28T12:00Z. Research module app/r10_regime_session_shadow.py has no live/broker authority. See docs/R10_STRATEGY_DIAGNOSIS_2026-09-28.md.
+
+## R10-FORWARD-AMP-EXTENSION-20260928
+PR192 is accepted research infrastructure (582 full tests). A second research batch adds causal forward evaluators,evidence governance and an AMP-crypto-specific frozen candidate after cross-timeframe/cross-market falsification. Historical bootstrap uncertainty still crosses zero; no live edge is claimed. See docs/R10_ROBUSTNESS_EXTENSION_2026-09-28.md.
+

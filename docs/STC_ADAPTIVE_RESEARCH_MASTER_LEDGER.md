@@ -1205,3 +1205,12 @@ No owner upload or account refresh is needed to use this engineering update. No 
 - Frozen prospective hypothesis after historical search:15m,12-17UTC,ADXtrend30,ADXrange20,stop1.5ATR,target2R,horizon32; no retuning after2026-09-28T12:00Z.
 - Historical neighborhood/cost/session stability is encouraging but no longer unseen. Forward evidence is mandatory.
 - No live promotion; zero new spend; manual execution remains.
+
+## R10 forward evidence and AMP family extension - 2026-09-28
+- Capital candidate failed unchanged transfer to30m/1h and to aggregate AMP under cost stress; preserve as15m Capital-specific shadow hypothesis.
+- AMP family research rejected index/rates/FX/metals/energy candidates tested; only CME:MBT1!/MET1! crypto family retained a frozen prospective hypothesis.
+- AMP crypto historical candidate:ADX30 trend pullback,stop2ATR,target2R;14 inspected holdout trades split7/7 across MBT/MET; positive through5bps proxy but historical sample is small/seen.
+- Day-block bootstrap intervals cross zero for both Capital and AMP crypto inspected holdouts. Prospective evidence is mandatory.
+- Causal forward evaluators share the same indicator engine; future mutation cannot change historical decisions. Missing/conflicting bars fail closed.
+- Evidence gate rejects mixed costs and duplicate observations and has no auto-promotion authority.
+
