@@ -9,6 +9,7 @@ from app.forward_shadow_ledger import (
     evaluate_outcome,
     mtf_candidate_sha256,
     mtf_protocol_sha256,
+    mtf_wait_record,
     record_sha256,
     regime_record,
 )
@@ -157,3 +158,28 @@ def test_wait_outcome_has_no_profit_claim():
     out = evaluate_outcome(r, [])
     assert out.status == "WAIT"
     assert out.net_planned_r is None
+
+
+def test_mtf_wait_record_freezes_reason_and_evidence_without_geometry():
+    evidence = {"source": {"time": "2026-09-28T07:00:00Z", "close": 1.0}, "reason": "mtf_vote_neutral"}
+    rec = mtf_wait_record(
+        symbol="CAPITALCOM:ETHUSD",
+        source_open_utc="2026-09-28T07:00:00Z",
+        reason="mtf_vote_neutral",
+        evidence_payload=evidence,
+    )
+    assert rec.decision == "WAIT"
+    assert rec.reason == "mtf_vote_neutral"
+    assert rec.entry is rec.stop is rec.target is None
+    assert len(rec.evidence_sha256) == 64
+    assert rec.research_only is True and rec.live_authorized is False
+
+
+def test_mtf_wait_record_rejects_pre_forward_boundary():
+    with pytest.raises(ValueError, match="pre_forward_boundary"):
+        mtf_wait_record(
+            symbol="CAPITALCOM:DOGEUSD",
+            source_open_utc="2026-09-28T06:45:00Z",
+            reason="test",
+            evidence_payload={"x": 1},
+        )
