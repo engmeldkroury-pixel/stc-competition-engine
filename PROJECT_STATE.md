@@ -2815,3 +2815,11 @@ Details:docs/R9_RESULTS_2026-09-27.md. Additional experiments and price-overlay 
 
 ## R10-FROZEN-SHADOW-20260928
 R10 strategy diagnosis found repeated regime instability: simple universal, per-asset static and naive adaptive models failed later historical slices. A more selective session+direct-regime family showed a stable historical neighborhood under cost/session perturbation, but the holdout was inspected during development. The candidate is frozen for prospective shadow evaluation only from2026-09-28T12:00Z. Research module app/r10_regime_session_shadow.py has no live/broker authority. See docs/R10_STRATEGY_DIAGNOSIS_2026-09-28.md.
+
+
+## 2026-09-28 — R10 PR196 tested-head merge acceptance
+PR196 merged by squash only after exact-head acceptance. Tested PR head: 6b3061caffb29b5216fee18b3dcc21b88c23a7cf. STC CI run 36391662171 (#824) completed successfully with both critical and full jobs successful. Merge commit: c760a937cfe0a8b4127da32ffee42d9efaecbe66.
+
+PR196 remains strictly research-only prospective shadow-ledger/review-gate infrastructure. Frozen forward boundaries are preserved: MTF evidence from 2026-09-28T07:00:00Z after PR195 merge; session/regime candidate from 2026-09-28T12:00:00Z. Do not retune using prospective observations, do not move these boundaries after seeing results, and do not treat the merge as strategy promotion.
+
+No live strategy parameter, risk setting, broker/account state, position, execution rule, order quantity, approval state, stop/target, or notification setting changed as part of this acceptance.
