@@ -1,3 +1,11 @@
+## R10 frozen-shadow next task - 2026-09-28
+1. Run full PR CI for the research-only frozen classifier and boundary tests.
+2. From 2026-09-28T12:00:00Z onward, score new 15m observations with the frozen protocol without retuning.
+3. Report results by symbol, day, regime and cost1/2/3/5bps; flag concentration and missing/source-disagreement cases.
+4. Require enough prospective observations before any live promotion. The already-inspected historical holdout is not reusable as unseen validation.
+5. Continue source-fidelity/MNQ investigation separately. Do not blend source repair with strategy selection.
+6. Keep live risk0.005, manual execution, existing open stops, Telegram-only notification and zero-paid-infrastructure constraints unchanged.
+
 # Resume here - R8 accepted 2026-09-27
 
 Authoritative latest handoff: `CURRENT_CHECKPOINT.md`. Do not restart R1-R7 or reimplement R8. Core R8 PR190 is merged with 536 passing tests. Next batch is **R9: source continuity and actual-fill reconciliation before exit/ATR selection**. Earlier task sections below are preserved history.
