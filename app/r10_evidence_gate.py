@@ -52,22 +52,27 @@ def assess_forward_evidence(
     min_settled: int, min_days: int, min_symbols: int,
 ) -> dict[str, Any]:
     """Validate and summarize settled forward observations without auto-promotion."""
-    seen=set(); settled=[]
+    seen=set(); settled=[]; costs=set()
     for row in rows:
         if row.get("protocol_sha256") != expected_protocol_sha256:
             raise ValueError("protocol_sha_mismatch")
-        key=(row.get("symbol"),row.get("source_open_utc"),row.get("cost_bps"))
+        cost_bps=_finite(row.get("cost_bps"))
+        costs.add(cost_bps)
+        if len(costs) > 1:
+            raise ValueError("mixed_cost_scenarios")
+        key=(row.get("symbol"),row.get("source_open_utc"),cost_bps)
         if key in seen:
             raise ValueError("duplicate_observation")
         seen.add(key)
         if row.get("status") != "SETTLED":
             continue
         net_r=_finite(row.get("net_r"))
-        symbol=row.get("symbol"); day=row.get("day")
-        if not isinstance(symbol,str) or not symbol or not isinstance(day,str) or not day:
+        symbol=row.get("symbol"); day=row.get("day"); source=row.get("source_open_utc")
+        if not isinstance(symbol,str) or not symbol or not isinstance(day,str) or not day or not isinstance(source,str) or not source:
             raise ValueError("settled_identity_required")
-        settled.append({"symbol":symbol,"day":day,"net_r":net_r})
+        settled.append({"symbol":symbol,"day":day,"source_open_utc":source,"net_r":net_r})
 
+    settled.sort(key=lambda x: (x["source_open_utc"], x["symbol"]))
     symbols=sorted({x["symbol"] for x in settled})
     days=sorted({x["day"] for x in settled})
     gross_profit=sum(max(x["net_r"],0.0) for x in settled)
@@ -107,6 +112,7 @@ def assess_forward_evidence(
     return {
         "status":status,
         "settled":len(settled),"days":len(days),"symbols":symbols,
+        "cost_bps":next(iter(costs)) if costs else None,
         "mean_r":mean,"profit_factor":pf,"max_drawdown_r":max_drawdown,
         "day_concentration":concentration,"cluster_ci95":[ci_lo,ci_hi],
         "bootstrap_p_mean_le_zero":p_nonpositive,"reasons":reasons,
