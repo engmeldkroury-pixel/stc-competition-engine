@@ -101,6 +101,52 @@
         }
       ],
       "decision": "Do not retune, promote, execute, or count any ETHUSD/DOGEUSD MTF forward outcome from this check. Preserve the frozen parameters and require an exact immutable forward boundary plus closed-bar/source receipts before admission."
+    },
+    {
+      "checked_at_utc": "2026-09-28T18:15:44Z",
+      "previous_check_utc": "2026-09-28T16:45:35Z",
+      "status": "DATA_INTEGRITY_BLOCK",
+      "admitted_forward_signals": [],
+      "outcomes": [],
+      "evidence_increment": {
+        "path": "research_outputs/R10_FORWARD_EVIDENCE_INCREMENT_2026-09-28T181544Z.json",
+        "commit_sha": "f718900757e6d70329c5e924a62401f3823fc973",
+        "batch_sha256": "d9c7f028f6f9674052045b50166bddcaf506f788312a5a29e7b460287be57854",
+        "completed_source_times": [
+          "2026-09-28T16:45:00Z",
+          "2026-09-28T17:00:00Z",
+          "2026-09-28T17:15:00Z",
+          "2026-09-28T17:30:00Z",
+          "2026-09-28T17:45:00Z"
+        ],
+        "pending_source_time": "2026-09-28T18:00:00Z"
+      },
+      "review_state": "COLLECTING",
+      "valued_forward_trades": 0,
+      "portfolio_state": "FLAT",
+      "issues": [
+        {
+          "id": "REGIME_DECISION_FEATURES_MISSING",
+          "severity": "BLOCKER",
+          "detail": "R10-REGIME-SESSION-SHADOW-V1 production payloads still omit exact decision-time ema200, adx14, and zscore20; 60/60 inspected rows from 16:45Z through 18:00Z are censored."
+        },
+        {
+          "id": "WEBHOOK_TIMEOUTS_NEW",
+          "severity": "WARNING",
+          "detail": "New timeouts: BTCUSD/NAS100/USDZAR at 17:30Z and EURUSD at 17:45Z."
+        },
+        {
+          "id": "RETROSPECTIVE_REVISIONS_NEW",
+          "severity": "WARNING",
+          "detail": "Later TradingView history revised ETHUSD and DOGEUSD alert-time close/volume at 17:30Z and 17:45Z; alert-time values remain authoritative. DOGEUSD 16:45Z prior high/close revision remains preserved."
+        },
+        {
+          "id": "MTF_EXACT_4H_EMA_PAIR_MISSING",
+          "severity": "WARNING",
+          "detail": "Exact decision-time 4h EMA20/EMA50 pair is still not present in production payloads. Newly completed ETH/DOGE observations are WAITs invariant to the missing 4h pair and therefore make no P/L claim."
+        }
+      ],
+      "decision": "No retuning, promotion, execution, live-risk change, broker-state change, or notification-setting change."
     }
   ]
 }
