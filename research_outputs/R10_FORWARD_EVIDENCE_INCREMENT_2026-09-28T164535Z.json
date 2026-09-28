@@ -1,0 +1,519 @@
+{
+  "schema_version": 1,
+  "registry_id": "R10-FORWARD-SHADOW-REGISTRY-V1",
+  "captured_at_utc": "2026-09-28T16:45:35Z",
+  "batch_sha256": "46fcc6fc2b785506a19c7e3710edd24c5681d60bf3b2dd7087b91f45bd35b71f",
+  "previous_completed_mtf_source_open_utc": "2026-09-28T15:15:00Z",
+  "new_completed_mtf_source_open_utc": [
+    "2026-09-28T15:30:00Z",
+    "2026-09-28T15:45:00Z",
+    "2026-09-28T16:00:00Z",
+    "2026-09-28T16:15:00Z"
+  ],
+  "pending_mtf_source_open_utc": "2026-09-28T16:30:00Z",
+  "mtf_observations": [
+    {
+      "t": "2026-09-28T15:30:00Z",
+      "s": "CAPITALCOM:ETHUSD",
+      "cand": "2d1406da93b44d8ec1cf15d47b5e8664abcaf5809515e0c0382286917d4784d9",
+      "sha": "5d04997b9327fc8f05f4834192cd0968850360addd4602a333b822eebb89485c",
+      "decision": "WAIT",
+      "reason": "mtf_vote_invariant_wait_local_plus1_1h_minus1_exact_4h_missing",
+      "source": {
+        "o": 2666.77,
+        "h": 2678.9,
+        "l": 2663.94,
+        "c": 2673.18,
+        "v": 5968,
+        "ema20": 2669.9331112739,
+        "ema50": 2666.1714864821,
+        "rsi14": 53.4215534474,
+        "atr14": 13.249293631
+      },
+      "h1": {
+        "time": "2026-09-28T14:00:00Z",
+        "close": 2665.61,
+        "ema20": 2668.5958651827,
+        "ema50": 2677.7566228431
+      },
+      "h4": {
+        "time": "2026-09-28T09:00:00Z",
+        "ema20": null,
+        "ema50": null,
+        "trend_score_only": 0.45
+      },
+      "next": {
+        "time": "2026-09-28T15:45:00Z",
+        "open": 2673.19,
+        "gap_atr": 0.0007547572179109084,
+        "http": 200
+      },
+      "receipt": {
+        "fire_id": 57502722644,
+        "http": 200
+      },
+      "revision": {
+        "later_c": 2673.21,
+        "later_v": 5986,
+        "revised": true
+      },
+      "protocol_sha256": "beeb4883b7e01afa19bf6c70b25d2caa337c7d632c25d126bae2458217a96eb2",
+      "eligible_4h_exact_capture": "MISSING",
+      "costs_bps_1_2_3_5": null,
+      "mfe_r": null,
+      "mae_r": null,
+      "stop_target_horizon": null,
+      "review_counted": false
+    },
+    {
+      "t": "2026-09-28T15:30:00Z",
+      "s": "CAPITALCOM:DOGEUSD",
+      "cand": "e22c97ad3e915bf4032afececa7c5d463a7250850ac76627f5ed11ad8ad44d98",
+      "sha": "a3bf87d4418b6c67474e4f69da03fc5ca417cc443f44d0a71f1c791d2acc8e4f",
+      "decision": "WAIT",
+      "reason": "short_pullback_failed_bearish_source_candle",
+      "source": {
+        "o": 0.0924842,
+        "h": 0.0930431,
+        "l": 0.0923123,
+        "c": 0.0927981,
+        "v": 4180,
+        "ema20": 0.0928969108,
+        "ema50": 0.093414582,
+        "rsi14": 47.657258949,
+        "atr14": 0.0007347911
+      },
+      "derived": {
+        "distance_atr": -0.13447468266831422,
+        "slope_atr": -0.3379817746840026
+      },
+      "h1": {
+        "time": "2026-09-28T14:00:00Z",
+        "close": 0.0920559,
+        "ema20": 0.0940300131,
+        "ema50": 0.095262273
+      },
+      "h4": {
+        "time": "2026-09-28T09:00:00Z",
+        "ema20": null,
+        "ema50": null,
+        "trend_score_only": 0
+      },
+      "next": {
+        "time": "2026-09-28T15:45:00Z",
+        "open": 0.0928056,
+        "gap_atr": 0.010206982637660556,
+        "http": 200
+      },
+      "receipt": {
+        "fire_id": 57502724132,
+        "http": 200
+      },
+      "revision": {
+        "later_c": 0.0927975,
+        "later_v": 4190,
+        "revised": true
+      },
+      "protocol_sha256": "beeb4883b7e01afa19bf6c70b25d2caa337c7d632c25d126bae2458217a96eb2",
+      "eligible_4h_exact_capture": "MISSING",
+      "costs_bps_1_2_3_5": null,
+      "mfe_r": null,
+      "mae_r": null,
+      "stop_target_horizon": null,
+      "review_counted": false
+    },
+    {
+      "t": "2026-09-28T15:45:00Z",
+      "s": "CAPITALCOM:ETHUSD",
+      "cand": "2d1406da93b44d8ec1cf15d47b5e8664abcaf5809515e0c0382286917d4784d9",
+      "sha": "9873ec14914ffe04262d3e1459498dc7e7660d34cdff0955a3071681246dd46b",
+      "decision": "WAIT",
+      "reason": "mtf_vote_invariant_wait_local_plus1_1h_minus1_exact_4h_missing",
+      "source": {
+        "o": 2673.19,
+        "h": 2679,
+        "l": 2671.5,
+        "c": 2676.88,
+        "v": 5635,
+        "ema20": 2670.597304758,
+        "ema50": 2666.5925585231,
+        "rsi14": 55.6575035941,
+        "atr14": 12.8386298002
+      },
+      "h1": {
+        "time": "2026-09-28T14:00:00Z",
+        "close": 2665.61,
+        "ema20": 2668.5958651827,
+        "ema50": 2677.7566228431
+      },
+      "h4": {
+        "time": "2026-09-28T09:00:00Z",
+        "ema20": null,
+        "ema50": null,
+        "trend_score_only": 0.45
+      },
+      "next": {
+        "time": "2026-09-28T16:00:00Z",
+        "open": 2676.16,
+        "gap_atr": 0.056080750921647306,
+        "http": 200
+      },
+      "receipt": {
+        "fire_id": 57503546681,
+        "http": 200
+      },
+      "revision": {
+        "later_c": 2676.14,
+        "later_v": 5668,
+        "revised": true
+      },
+      "protocol_sha256": "beeb4883b7e01afa19bf6c70b25d2caa337c7d632c25d126bae2458217a96eb2",
+      "eligible_4h_exact_capture": "MISSING",
+      "costs_bps_1_2_3_5": null,
+      "mfe_r": null,
+      "mae_r": null,
+      "stop_target_horizon": null,
+      "review_counted": false
+    },
+    {
+      "t": "2026-09-28T15:45:00Z",
+      "s": "CAPITALCOM:DOGEUSD",
+      "cand": "e22c97ad3e915bf4032afececa7c5d463a7250850ac76627f5ed11ad8ad44d98",
+      "sha": "a026aef98d56e54d2bb9a6f8ec5b11b108e1c6a41c64b1099376923d7b8807d5",
+      "decision": "WAIT",
+      "reason": "short_pullback_failed_close_below_ema20_and_bearish_source_candle",
+      "source": {
+        "o": 0.0928056,
+        "h": 0.0932189,
+        "l": 0.0927724,
+        "c": 0.0930714,
+        "v": 3937,
+        "ema20": 0.0929134772,
+        "ema50": 0.0934011013,
+        "rsi14": 50.8899383566,
+        "atr14": 0.0007141989
+      },
+      "derived": {
+        "distance_atr": 0.22111879477831958,
+        "slope_atr": -0.17447842610791914
+      },
+      "h1": {
+        "time": "2026-09-28T14:00:00Z",
+        "close": 0.0920559,
+        "ema20": 0.0940300131,
+        "ema50": 0.095262273
+      },
+      "h4": {
+        "time": "2026-09-28T09:00:00Z",
+        "ema20": null,
+        "ema50": null,
+        "trend_score_only": 0
+      },
+      "next": {
+        "time": "2026-09-28T16:00:00Z",
+        "open": 0.0930726,
+        "gap_atr": 0.001680204212029382,
+        "http": "request took too long and timed out"
+      },
+      "receipt": {
+        "fire_id": 57503535503,
+        "http": 200
+      },
+      "revision": {
+        "later_c": 0.0930714,
+        "later_v": 3937,
+        "revised": false
+      },
+      "protocol_sha256": "beeb4883b7e01afa19bf6c70b25d2caa337c7d632c25d126bae2458217a96eb2",
+      "eligible_4h_exact_capture": "MISSING",
+      "costs_bps_1_2_3_5": null,
+      "mfe_r": null,
+      "mae_r": null,
+      "stop_target_horizon": null,
+      "review_counted": false
+    },
+    {
+      "t": "2026-09-28T16:00:00Z",
+      "s": "CAPITALCOM:ETHUSD",
+      "cand": "2d1406da93b44d8ec1cf15d47b5e8664abcaf5809515e0c0382286917d4784d9",
+      "sha": "422f3bd5afc9a394c7511ec46d06295c6c3604647a21f991a3e8eea957cc67d6",
+      "decision": "WAIT",
+      "reason": "mtf_vote_invariant_wait_local_plus1_1h_minus1_exact_4h_missing",
+      "source": {
+        "o": 2676.16,
+        "h": 2678.03,
+        "l": 2669.32,
+        "c": 2672.58,
+        "v": 5755,
+        "ema20": 2670.722368704,
+        "ema50": 2666.7994785657,
+        "rsi14": 52.5849026462,
+        "atr14": 12.5437276716
+      },
+      "h1": {
+        "time": "2026-09-28T15:00:00Z",
+        "close": 2676.14,
+        "ema20": 2669.3143542129,
+        "ema50": 2677.6932258689
+      },
+      "h4": {
+        "time": "2026-09-28T09:00:00Z",
+        "ema20": null,
+        "ema50": null,
+        "trend_score_only": 0.45
+      },
+      "next": {
+        "time": "2026-09-28T16:15:00Z",
+        "open": 2672.56,
+        "gap_atr": 0.001594422369776363,
+        "http": 200
+      },
+      "receipt": {
+        "fire_id": 57504454451,
+        "http": 200
+      },
+      "revision": {
+        "later_c": 2672.58,
+        "later_v": 5755,
+        "revised": false
+      },
+      "protocol_sha256": "beeb4883b7e01afa19bf6c70b25d2caa337c7d632c25d126bae2458217a96eb2",
+      "eligible_4h_exact_capture": "MISSING",
+      "costs_bps_1_2_3_5": null,
+      "mfe_r": null,
+      "mae_r": null,
+      "stop_target_horizon": null,
+      "review_counted": false
+    },
+    {
+      "t": "2026-09-28T16:00:00Z",
+      "s": "CAPITALCOM:DOGEUSD",
+      "cand": "e22c97ad3e915bf4032afececa7c5d463a7250850ac76627f5ed11ad8ad44d98",
+      "sha": "9599d49fd17b2d6fb1d61b9107f9146f18b67b781a2ad93ac11b0f5ca1a3af20",
+      "decision": "WAIT",
+      "reason": "short_pullback_failed_close_below_ema20_and_bearish_source_candle",
+      "source": {
+        "o": 0.0930726,
+        "h": 0.0933557,
+        "l": 0.0926718,
+        "c": 0.093222,
+        "v": 4153,
+        "ema20": 0.0929428603,
+        "ema50": 0.0933940777,
+        "rsi14": 52.6259345029,
+        "atr14": 0.0007120347
+      },
+      "derived": {
+        "distance_atr": 0.39203103444256315,
+        "slope_atr": -0.012492509143168379
+      },
+      "h1": {
+        "time": "2026-09-28T15:00:00Z",
+        "close": 0.0930714,
+        "ema20": 0.0939387166,
+        "ema50": 0.0951763564
+      },
+      "h4": {
+        "time": "2026-09-28T09:00:00Z",
+        "ema20": null,
+        "ema50": null,
+        "trend_score_only": 0
+      },
+      "next": {
+        "time": "2026-09-28T16:15:00Z",
+        "open": 0.0932596,
+        "gap_atr": 0.05280641519296566,
+        "http": 200
+      },
+      "receipt": {
+        "fire_id": 57504451489,
+        "http": "request took too long and timed out"
+      },
+      "revision": {
+        "later_c": 0.0932597,
+        "later_v": 4177,
+        "revised": true
+      },
+      "protocol_sha256": "beeb4883b7e01afa19bf6c70b25d2caa337c7d632c25d126bae2458217a96eb2",
+      "eligible_4h_exact_capture": "MISSING",
+      "costs_bps_1_2_3_5": null,
+      "mfe_r": null,
+      "mae_r": null,
+      "stop_target_horizon": null,
+      "review_counted": false
+    },
+    {
+      "t": "2026-09-28T16:15:00Z",
+      "s": "CAPITALCOM:ETHUSD",
+      "cand": "2d1406da93b44d8ec1cf15d47b5e8664abcaf5809515e0c0382286917d4784d9",
+      "sha": "40f7642a03e193bfb23ca18f1e4e853729dea0ae68176b7fe1c08a488383c91f",
+      "decision": "WAIT",
+      "reason": "mtf_vote_invariant_wait_local_plus1_1h_minus1_exact_4h_missing",
+      "source": {
+        "o": 2672.56,
+        "h": 2696.97,
+        "l": 2670.2,
+        "c": 2691.88,
+        "v": 6611,
+        "ema20": 2672.7373812083,
+        "ema50": 2667.7830284259,
+        "rsi14": 62.9382018449,
+        "atr14": 13.5598899808
+      },
+      "h1": {
+        "time": "2026-09-28T15:00:00Z",
+        "close": 2676.14,
+        "ema20": 2669.3143542129,
+        "ema50": 2677.6932258689
+      },
+      "h4": {
+        "time": "2026-09-28T09:00:00Z",
+        "ema20": null,
+        "ema50": null,
+        "trend_score_only": 0.45
+      },
+      "next": {
+        "time": "2026-09-28T16:30:00Z",
+        "open": 2693.06,
+        "gap_atr": 0.08702135501620192,
+        "http": 200
+      },
+      "receipt": {
+        "fire_id": 57505736180,
+        "http": 200
+      },
+      "revision": {
+        "later_c": 2693.04,
+        "later_v": 6658,
+        "revised": true
+      },
+      "protocol_sha256": "beeb4883b7e01afa19bf6c70b25d2caa337c7d632c25d126bae2458217a96eb2",
+      "eligible_4h_exact_capture": "MISSING",
+      "costs_bps_1_2_3_5": null,
+      "mfe_r": null,
+      "mae_r": null,
+      "stop_target_horizon": null,
+      "review_counted": false
+    },
+    {
+      "t": "2026-09-28T16:15:00Z",
+      "s": "CAPITALCOM:DOGEUSD",
+      "cand": "e22c97ad3e915bf4032afececa7c5d463a7250850ac76627f5ed11ad8ad44d98",
+      "sha": "cfe7a402a1d12cc1b20e9a016d719a7f008849b557ec5b3686be9ebbdc60bd62",
+      "decision": "WAIT",
+      "reason": "short_pullback_failed_distance_close_candle_slope_rsi",
+      "source": {
+        "o": 0.0932596,
+        "h": 0.0948539,
+        "l": 0.0932461,
+        "c": 0.0945704,
+        "v": 4725,
+        "ema20": 0.0931011126,
+        "ema50": 0.0934416284,
+        "rsi14": 64.6505501964,
+        "atr14": 0.0007760179
+      },
+      "derived": {
+        "distance_atr": 1.8933679236007377,
+        "slope_atr": 0.25473226841802316
+      },
+      "h1": {
+        "time": "2026-09-28T15:00:00Z",
+        "close": 0.0930714,
+        "ema20": 0.0939387166,
+        "ema50": 0.0951763564
+      },
+      "h4": {
+        "time": "2026-09-28T09:00:00Z",
+        "ema20": null,
+        "ema50": null,
+        "trend_score_only": 0
+      },
+      "next": {
+        "time": "2026-09-28T16:30:00Z",
+        "open": 0.0945998,
+        "gap_atr": 0.037885724027756154,
+        "http": 200
+      },
+      "receipt": {
+        "fire_id": 57505736184,
+        "http": 200
+      },
+      "revision": {
+        "later_c": 0.0945989,
+        "later_v": 4761,
+        "revised": true
+      },
+      "protocol_sha256": "beeb4883b7e01afa19bf6c70b25d2caa337c7d632c25d126bae2458217a96eb2",
+      "eligible_4h_exact_capture": "MISSING",
+      "costs_bps_1_2_3_5": null,
+      "mfe_r": null,
+      "mae_r": null,
+      "stop_target_horizon": null,
+      "review_counted": false
+    }
+  ],
+  "regime_session": {
+    "protocol_id": "R10-REGIME-SESSION-SHADOW-V1",
+    "protocol_sha256": "96e94a305c0a6eb22f92f495560f1e0c66dc60d7395608c140da1e5b6e0def97",
+    "source_times": [
+      "2026-09-28T15:30:00Z",
+      "2026-09-28T15:45:00Z",
+      "2026-09-28T16:00:00Z",
+      "2026-09-28T16:15:00Z",
+      "2026-09-28T16:30:00Z"
+    ],
+    "observed_rows": 50,
+    "censored_rows": 50,
+    "missing_decision_time_features": [
+      "ema200",
+      "adx14",
+      "zscore20"
+    ],
+    "evidence_sha256": "b5c24a234e15143ba1b7b35aa2c04fa44e89fcab7bb36209ad7ab2f7a7f7245f",
+    "webhook_failures": [
+      {
+        "symbol": "CAPITALCOM:NAS100",
+        "fire_id": 57504466023,
+        "time": "2026-09-28T16:00:00Z"
+      },
+      {
+        "symbol": "CAPITALCOM:USDZAR",
+        "fire_id": 57504460955,
+        "time": "2026-09-28T16:00:00Z"
+      },
+      {
+        "symbol": "CAPITALCOM:EURUSD",
+        "fire_id": 57504459016,
+        "time": "2026-09-28T16:00:00Z"
+      },
+      {
+        "symbol": "CAPITALCOM:XAGUSD",
+        "fire_id": 57504452663,
+        "time": "2026-09-28T16:00:00Z"
+      },
+      {
+        "symbol": "CAPITALCOM:DOGEUSD",
+        "fire_id": 57504451489,
+        "time": "2026-09-28T16:00:00Z"
+      }
+    ]
+  },
+  "portfolio": {
+    "max_open_crypto_shadow_positions": 1,
+    "state": "FLAT",
+    "accepted_entries": [],
+    "rejected_overlaps": []
+  },
+  "review": {
+    "state": "COLLECTING",
+    "valued_forward_trades": 0
+  },
+  "authority": {
+    "retuned": false,
+    "executed": false,
+    "live_risk_changed": false,
+    "broker_state_changed": false,
+    "notification_settings_changed": false
+  }
+}
