@@ -8,7 +8,7 @@ from app.forward_shadow_review import ValuedForwardTrade, review_forward_trades
 def rows(values, days=6):
     out = []
     for i, value in enumerate(values):
-        day = 28 + (i % days)
+        day = 20 + (i % days)
         out.append(ValuedForwardTrade(
             source_open_utc=f"2026-09-{day:02d}T12:00:00Z",
             net_r=value,
