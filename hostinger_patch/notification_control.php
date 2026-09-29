@@ -541,6 +541,61 @@ function stc_set_state_hash(PDO $pdo, string $stateKey, string $hash): void {
     $stmt->execute([$stateKey, $hash]);
 }
 
+function stc_maybe_notify_system_heartbeat(PDO $pdo, array $config): ?array {
+    $lastStmt = $pdo->query(
+        "SELECT MAX(created_at_utc) FROM stc_notification_events WHERE event_type = 'SYSTEM_HEARTBEAT'"
+    );
+    $lastRaw = $lastStmt->fetchColumn();
+    if (is_string($lastRaw) && trim($lastRaw) !== '') {
+        $last = stc_parse_utc($lastRaw);
+        $now = new DateTimeImmutable('now', new DateTimeZone('UTC'));
+        if ($last !== null && ($now->getTimestamp() - $last->getTimestamp()) < 21600) {
+            return null;
+        }
+    }
+
+    $latestStmt = $pdo->query(
+        "SELECT payload_json, result_json, created_at_utc FROM stc_webhook_events "
+        . "WHERE status = 'ingested' ORDER BY id DESC LIMIT 1"
+    );
+    $latest = $latestStmt->fetch();
+    if ($latest === false) {
+        return null;
+    }
+
+    $payload = json_decode((string)$latest['payload_json'], true);
+    $result = json_decode((string)$latest['result_json'], true);
+    $decision = is_array($result) ? ($result['decision'] ?? null) : null;
+    $signal = is_array($decision) ? ($decision['signal'] ?? null) : null;
+    $symbol = is_array($payload) ? (string)($payload['symbol'] ?? '-') : '-';
+    $competitionId = is_array($payload) ? (string)($payload['competition_id'] ?? '-') : '-';
+    $recommendation = is_array($signal) ? (string)($signal['recommendation'] ?? 'WAIT') : 'WAIT';
+    $preGate = is_array($signal) ? (string)($signal['pre_gate_recommendation'] ?? 'WAIT') : 'WAIT';
+    $quality = is_array($signal) && isset($signal['setup_quality_score'])
+        ? (string)$signal['setup_quality_score'] . '/100'
+        : '-';
+
+    $openCount = (int)$pdo->query("SELECT COUNT(*) FROM stc_positions WHERE status = 'OPEN'")->fetchColumn();
+    $bucket = gmdate('YmdH');
+    return stc_dispatch_notification($pdo, $config, [
+        'event_key' => 'heartbeat:' . $bucket,
+        'event_type' => 'SYSTEM_HEARTBEAT',
+        'competition_id' => $competitionId === '-' ? null : $competitionId,
+        'symbol' => $symbol === '-' ? null : $symbol,
+        'position_id' => null,
+        'severity' => 'normal',
+        'title' => 'STC RUNNING • MARKET MONITOR ACTIVE',
+        'body' => implode("\n", [
+            'STC is receiving and processing market events.',
+            'Latest event: ' . $symbol . ' @ ' . (string)$latest['created_at_utc'] . ' UTC',
+            'Latest decision: ' . $recommendation . ' | pre-gate ' . $preGate . ' | quality ' . $quality,
+            'Open positions in STC ledger: ' . $openCount,
+            'No qualified NEW PLAN alert was required in this heartbeat interval.',
+            'This is a system health message, not a trade recommendation.',
+        ]),
+    ]);
+}
+
 function stc_notify_portfolio(PDO $pdo, array $config): array {
     $notifications = [];
     $stmt = $pdo->query("SELECT * FROM stc_positions WHERE status = 'OPEN' ORDER BY id ASC");
@@ -598,6 +653,10 @@ function stc_notify_portfolio(PDO $pdo, array $config): array {
         if ($dispatch['delivered_any']) {
             stc_set_state_hash($pdo, $stateKey, $fingerprint);
         }
+    }
+    $heartbeat = stc_maybe_notify_system_heartbeat($pdo, $config);
+    if ($heartbeat !== null) {
+        $notifications[] = $heartbeat;
     }
     return ['ok' => true, 'notifications' => $notifications];
 }
