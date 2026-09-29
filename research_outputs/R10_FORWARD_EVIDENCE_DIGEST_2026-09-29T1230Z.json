@@ -1,0 +1,454 @@
+{
+  "schema_version": 1,
+  "registry_id": "R10-FORWARD-SHADOW-REGISTRY-V1",
+  "window": {
+    "from": "2026-09-29T11:15:00Z",
+    "through": "2026-09-29T12:15:00Z"
+  },
+  "authority": {
+    "research_only": true,
+    "live_authorized": false,
+    "execution": "none",
+    "retuned": false
+  },
+  "frozen_identities": {
+    "mtf_protocol_sha256": "beeb4883b7e01afa19bf6c70b25d2caa337c7d632c25d126bae2458217a96eb2",
+    "candidate_sha256": {
+      "CAPITALCOM:ETHUSD": "2d1406da93b44d8ec1cf15d47b5e8664abcaf5809515e0c0382286917d4784d9",
+      "CAPITALCOM:DOGEUSD": "e22c97ad3e915bf4032afececa7c5d463a7250850ac76627f5ed11ad8ad44d98"
+    },
+    "regime_protocol_id": "R10-REGIME-SESSION-SHADOW-V1",
+    "regime_protocol_sha256": "96e94a305c0a6eb22f92f495560f1e0c66dc60d7395608c140da1e5b6e0def97"
+  },
+  "mtf_columns": [
+    "source_time",
+    "symbol",
+    "decision",
+    "canonical_or_receipt_sha256",
+    "source[o,h,l,c,v,ema20,ema50,rsi14,atr14,fire_id,webhook]",
+    "closed1h[time,ema20,ema50,ema200]",
+    "closed4h[time,ema20,ema50,vendor_score_not_substituted]",
+    "next_open[time,open]",
+    "reason"
+  ],
+  "mtf": [
+    [
+      "2026-09-29T11:15:00Z",
+      "CAPITALCOM:ETHUSD",
+      "CENSORED",
+      "8e037dd173b3c5e2402073fe8e4fb8a76bd20098a6bdd668ba5aa589032264af",
+      [
+        2715.39,
+        2717.5,
+        2713.25,
+        2716.9,
+        2739,
+        2706.4350200115,
+        2693.8200237978,
+        64.4241916524,
+        7.56933292,
+        57556061012,
+        "HTTP_200"
+      ],
+      [
+        "2026-09-29T10:00:00Z",
+        2687.4255780774,
+        2682.738088233,
+        2668.5584966145
+      ],
+      [
+        "2026-09-29T05:00:00Z",
+        null,
+        null,
+        1
+      ],
+      [
+        "2026-09-29T11:30:00Z",
+        2716.86
+      ],
+      "missing decision-material exact closed 4h EMA20/EMA50"
+    ],
+    [
+      "2026-09-29T11:15:00Z",
+      "CAPITALCOM:DOGEUSD",
+      "WAIT",
+      "0a0f053e69cf3155257ea84cce349fe51eafdc7ab88b7f09a0584314c0aae652",
+      [
+        0.0947301,
+        0.094813,
+        0.0945828,
+        0.0947697,
+        1831,
+        0.0945756831,
+        0.0940583886,
+        57.2025423332,
+        0.0004235972,
+        57556067603,
+        "HTTP_200"
+      ],
+      [
+        "2026-09-29T10:00:00Z",
+        0.0939353713,
+        0.0944381718,
+        0.0941323229
+      ],
+      [
+        "2026-09-29T05:00:00Z",
+        null,
+        null,
+        0.15
+      ],
+      [
+        "2026-09-29T11:30:00Z",
+        0.0947746
+      ],
+      "SHORT pullback fails: distance +0.458022 ATR, RSI 57.2025, close above EMA20, bullish"
+    ],
+    [
+      "2026-09-29T11:30:00Z",
+      "CAPITALCOM:ETHUSD",
+      "CENSORED",
+      "8d468ffe2065a087871de10759bf0f240bc424971e29f9f5a5a07e617fac9024",
+      [
+        2716.86,
+        2730.19,
+        2716.6,
+        2723.24,
+        3974,
+        2708.0337709401,
+        2694.9729947984,
+        68.4344371187,
+        7.9993805685,
+        57556708745,
+        "TIMEOUT"
+      ],
+      [
+        "2026-09-29T10:00:00Z",
+        2687.4255780774,
+        2682.738088233,
+        2668.5584966145
+      ],
+      [
+        "2026-09-29T05:00:00Z",
+        null,
+        null,
+        1
+      ],
+      [
+        "2026-09-29T11:45:00Z",
+        2723.16
+      ],
+      "missing decision-material exact closed 4h EMA20/EMA50"
+    ],
+    [
+      "2026-09-29T11:30:00Z",
+      "CAPITALCOM:DOGEUSD",
+      "WAIT",
+      "6abe67469c12ceacec735c3982152270a7ed6ee13f416f61c27b81845d83047e",
+      [
+        0.0947746,
+        0.0953593,
+        0.0947448,
+        0.09532,
+        2658,
+        0.0946468462,
+        0.0941079842,
+        64.9248008724,
+        0.0004372331,
+        57556708396,
+        "TIMEOUT"
+      ],
+      [
+        "2026-09-29T10:00:00Z",
+        0.0939353713,
+        0.0944381718,
+        0.0941323229
+      ],
+      [
+        "2026-09-29T05:00:00Z",
+        null,
+        null,
+        0.15
+      ],
+      [
+        "2026-09-29T11:45:00Z",
+        0.0953241
+      ],
+      "SHORT pullback fails: distance +1.539576 ATR, RSI 64.9248, close above EMA20, bullish"
+    ],
+    [
+      "2026-09-29T11:45:00Z",
+      "CAPITALCOM:ETHUSD",
+      "CENSORED",
+      "e346452b348a9cca632a6a298a06b7806322ed3fbb7e0b11f2735f62c8c8e4b3",
+      [
+        2723.16,
+        2736.91,
+        2722.49,
+        2730.54,
+        4942,
+        2710.1686045467,
+        2696.3640115345,
+        72.3080396601,
+        8.4579962422,
+        57557478344,
+        "HTTP_200"
+      ],
+      [
+        "2026-09-29T10:00:00Z",
+        2687.4255780774,
+        2682.738088233,
+        2668.5584966145
+      ],
+      [
+        "2026-09-29T05:00:00Z",
+        null,
+        null,
+        1
+      ],
+      [
+        "2026-09-29T12:00:00Z",
+        2730.57
+      ],
+      "missing decision-material exact closed 4h EMA20/EMA50"
+    ],
+    [
+      "2026-09-29T11:45:00Z",
+      "CAPITALCOM:DOGEUSD",
+      "WAIT",
+      "921838cc26ae9cd70ad859e28ee2fbeae4b1fbff42b30643e0747a19c24e38a5",
+      [
+        0.0953241,
+        0.095744,
+        0.0952985,
+        0.0954673,
+        3366,
+        0.0947253896,
+        0.0941614678,
+        66.6559031553,
+        0.0004378236,
+        57557484204,
+        "TIMEOUT"
+      ],
+      [
+        "2026-09-29T10:00:00Z",
+        0.0939353713,
+        0.0944381718,
+        0.0941323229
+      ],
+      [
+        "2026-09-29T05:00:00Z",
+        null,
+        null,
+        0.15
+      ],
+      [
+        "2026-09-29T12:00:00Z",
+        0.0954758
+      ],
+      "SHORT pullback fails: distance +1.694542 ATR, RSI 66.6559, close above EMA20, bullish"
+    ],
+    [
+      "2026-09-29T12:00:00Z",
+      "CAPITALCOM:ETHUSD",
+      "CENSORED",
+      "a49215edf703070c6bfe00c978166bd6724fb9ec15d5666e02492cba262fe1fc",
+      [
+        2730.57,
+        2732.12,
+        2727.92,
+        2730.03,
+        4017,
+        2712.0601660185,
+        2697.6842463763,
+        71.6471820519,
+        8.1538536535,
+        57558210498,
+        "HTTP_200"
+      ],
+      [
+        "2026-09-29T11:00:00Z",
+        2691.5317134986,
+        2684.6126730082,
+        2669.1752279915
+      ],
+      [
+        "2026-09-29T05:00:00Z",
+        null,
+        null,
+        1
+      ],
+      [
+        "2026-09-29T12:15:00Z",
+        2730.31
+      ],
+      "missing decision-material exact closed 4h EMA20/EMA50"
+    ],
+    [
+      "2026-09-29T12:00:00Z",
+      "CAPITALCOM:DOGEUSD",
+      "WAIT",
+      "b61e12880fdcb0c5d0afb50a7839fbf57b7e5475ffde1b0c39508556fa2be0c1",
+      [
+        0.0954758,
+        0.0956278,
+        0.0953458,
+        0.0954489,
+        2900,
+        0.0947950192,
+        0.0942122718,
+        66.1107318438,
+        0.0004266933,
+        57558211274,
+        "HTTP_200"
+      ],
+      [
+        "2026-09-29T11:00:00Z",
+        0.0940820693,
+        0.0944788591,
+        0.0941456898
+      ],
+      [
+        "2026-09-29T05:00:00Z",
+        null,
+        null,
+        0.15
+      ],
+      [
+        "2026-09-29T12:15:00Z",
+        0.0954545
+      ],
+      "SHORT pullback fails: distance +1.532437 ATR, RSI 66.1107, close above EMA20"
+    ],
+    [
+      "2026-09-29T12:15:00Z",
+      "CAPITALCOM:ETHUSD",
+      "CENSORED_PENDING_NEXT_OPEN",
+      "577ccd88eb7004eefa8ecdb5d68e861bec8e7dc69a51472bd80b6b6c41ed7f3a",
+      [
+        2730.31,
+        2747.12,
+        2730.28,
+        2734.61,
+        5278,
+        2714.2293112049,
+        2699.1417345999,
+        74.1403027298,
+        8.7742926782,
+        57558900182,
+        "HTTP_200"
+      ],
+      [
+        "2026-09-29T11:00:00Z",
+        2691.5317134986,
+        2684.6126730082,
+        2669.1752279915
+      ],
+      [
+        "2026-09-29T05:00:00Z",
+        null,
+        null,
+        1
+      ],
+      null,
+      "missing decision-material exact closed 4h EMA20/EMA50; next-open receipt pending"
+    ],
+    [
+      "2026-09-29T12:15:00Z",
+      "CAPITALCOM:DOGEUSD",
+      "WAIT_PENDING_NEXT_OPEN",
+      "f2490ac725420addd8df6a8c3821e9da3a10776ad41b5d8af1397bc1a4e4e76a",
+      [
+        0.0954545,
+        0.0959124,
+        0.0952757,
+        0.0954655,
+        4188,
+        0.0948590899,
+        0.0942615122,
+        66.3524775948,
+        0.0004416938,
+        57558900866,
+        "HTTP_200"
+      ],
+      [
+        "2026-09-29T11:00:00Z",
+        0.0940820693,
+        0.0944788591,
+        0.0941456898
+      ],
+      [
+        "2026-09-29T05:00:00Z",
+        null,
+        null,
+        0.15
+      ],
+      null,
+      "invariant WAIT before next open: distance +1.372920 ATR, RSI 66.3525, close above EMA20, bullish"
+    ]
+  ],
+  "regime": {
+    "out_of_session_wait_rows": 30,
+    "out_of_session_times": [
+      "2026-09-29T11:15:00Z",
+      "2026-09-29T11:30:00Z",
+      "2026-09-29T11:45:00Z"
+    ],
+    "in_session_times": [
+      "2026-09-29T12:00:00Z",
+      "2026-09-29T12:15:00Z"
+    ],
+    "in_session_rows_censored": 20,
+    "missing_decision_time_features": [
+      "ema200",
+      "adx14",
+      "zscore20",
+      "range_atr"
+    ],
+    "per_row_evidence_sha256": {
+      "2026-09-29T12:00:00Z": {
+        "AUDUSD": "b454c7c04d5e5680d6eba38612146495796e1192c4d282f7e88cc6a9c9c47978",
+        "BTCUSD": "75336c5f2cab3e563ec33935fa1cb6d6cd9615a157ca343dc311b4012febba12",
+        "DOGEUSD": "4d98ba6b6fff9fe16941f572631b66807a155c7cd14541fbba86031ab84c03c0",
+        "ETHUSD": "8470d8d8d3364410e9e1832e2e199992aa5c9a2245f5a38eb9fa9ac2f7cd2eef",
+        "EURUSD": "d8e3ffc959f56bf334b07fb8afad78576d8ca3311254c542fd9c757b14f90e4b",
+        "NAS100": "8f8181f390215880d507d7c8897a15b6da6cd139eec51c25cda3aa18d0671104",
+        "SPX500": "bb3ff662f6b853674d66645b0910f4b24c9f9bbfced87071c0f7a73ddf038076",
+        "USDZAR": "15c3462cbf49b8af80ca81f058e580ca0c0b5c6f1e9d2f969de9bc34130abd1f",
+        "XAGUSD": "722315e1fc14e54404a3eb78d3815e9167f2b14dfdbfda9aef821ae5de7aadc4",
+        "XAUUSD": "7d5d1f3681d759891d55ac60fd453b2469a380cf80cb6a0fc5e866db325982bc"
+      },
+      "2026-09-29T12:15:00Z": {
+        "AUDUSD": "817e1582bc349d95dd87d79a91fd9fcdfc62a53ec678748621d8a2d37fcc5c12",
+        "BTCUSD": "85393012509cd0a4d938143614dfb6171658e76ea4fe119a5df2b3e8a47a8c18",
+        "DOGEUSD": "36c3d909de5f246140651e263c9ba54c269db14774c5059e2e99935fe611c050",
+        "ETHUSD": "0a1742745812a624fb800e8ec1d411ca34377b6d7a8f6525337d6b69c8a19428",
+        "EURUSD": "2da1d47bf0989e8e685b00e685e2a3442f8dbdf14732eeb879de8c74ddd08385",
+        "NAS100": "ae151364dfe63a232f46386eaa7a99f4b63a834ebe147c1a126f77c0d96a63f7",
+        "SPX500": "40fadd6747c932ed4a462a7ba07f2475e53732b164c46e3c7f5eaa2481cf5866",
+        "USDZAR": "df690520b4c829a1b224132bc3128101d1e7176cb1046dc8b7db1e88eb080fff",
+        "XAGUSD": "3ff522fb3b790528c4b69f4f8ba394c5d6021428379fce63a43376e0a69e5da4",
+        "XAUUSD": "8f20bbbc3dd0c968f2199db85a0f0cbbedfdb109f19ad3814424939aee746d61"
+      }
+    },
+    "batch_sha256": "57b7f2d4d1ee1013d9931cb4e6a89c25122486f78852b752576b88df2b549d3a"
+  },
+  "integrity": {
+    "capital_receipts_present": "10/10 at each of 11:15,11:30,11:45,12:00,12:15 UTC",
+    "missing_intervals": 0,
+    "webhook_timeouts": 15,
+    "retrospective_revisions": "32/50 checked source rows",
+    "policy": "alert-time evidence canonical; later TradingView history not substituted"
+  },
+  "portfolio": {
+    "state": "FLAT",
+    "accepted_entries": 0,
+    "overlap_rejections": 0,
+    "valued_forward_trades": 0
+  },
+  "review": {
+    "state": "COLLECTING",
+    "changed": false
+  },
+  "full_evaluated_batch_sha256": "bc9bd15131fcdabc773236277317e4eeae1c18addc97236cdc47566ae01dd344"
+}
