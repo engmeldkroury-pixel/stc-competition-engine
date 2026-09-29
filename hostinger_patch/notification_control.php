@@ -547,7 +547,11 @@ function stc_maybe_notify_system_heartbeat(PDO $pdo, array $config): ?array {
     );
     $lastRaw = $lastStmt->fetchColumn();
     if (is_string($lastRaw) && trim($lastRaw) !== '') {
-        $last = stc_parse_utc($lastRaw);
+        try {
+            $last = new DateTimeImmutable($lastRaw, new DateTimeZone('UTC'));
+        } catch (Throwable $e) {
+            $last = null;
+        }
         $now = new DateTimeImmutable('now', new DateTimeZone('UTC'));
         if ($last !== null && ($now->getTimestamp() - $last->getTimestamp()) < 21600) {
             return null;
