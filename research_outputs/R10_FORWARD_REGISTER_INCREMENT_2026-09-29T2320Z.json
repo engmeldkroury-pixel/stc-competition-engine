@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "register_increment_id": "R10-FORWARD-REGISTER-2026-09-29T2320Z",
+  "evidence_file": "research_outputs/R10_FORWARD_EVIDENCE_INCREMENT_2026-09-29T2320Z.json",
+  "evidence_batch_sha256": "2fb36bee3971fcd280e79b9423e25ce34beba3037dbf74acd68ca83e89014b4b",
+  "completed_window": [
+    "2026-09-29T22:00:00Z",
+    "2026-09-29T22:45:00Z"
+  ],
+  "pending_source_time": "2026-09-29T23:00:00Z",
+  "mtf_summary": {
+    "directional_observations": 0,
+    "censored": 1,
+    "waits": 7,
+    "portfolio_state": "FLAT",
+    "review_state": "COLLECTING"
+  },
+  "regime_summary": {
+    "completed_rows": 40,
+    "waits": 40,
+    "censored": 0,
+    "missing_source_intervals": 0,
+    "review_state": "COLLECTING"
+  },
+  "integrity_summary": {
+    "webhook_failures": 0,
+    "retrospective_revision_rows_completed": 18,
+    "retrospective_revision_rows_pending": 4,
+    "material_issue_count": 3
+  },
+  "authority": {
+    "research_only": true,
+    "execution": "none",
+    "auto_promote": false
+  },
+  "register_increment_sha256": "5ba6e3a72441c41ce91b50334dd37d5e57ee98718d5497696d8470914aa7adfe"
+}
