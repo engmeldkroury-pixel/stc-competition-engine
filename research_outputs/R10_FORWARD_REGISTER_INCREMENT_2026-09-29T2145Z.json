@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "register_id": "R10-FORWARD-SHADOW-REGISTRY-V1",
+  "checked_at_utc": "2026-09-29T21:45:21Z",
+  "evidence_path": "research_outputs/R10_FORWARD_EVIDENCE_INCREMENT_2026-09-29T2145Z.json",
+  "evidence_commit": "dda492fbc2d4beb3b14def283ecc5cc41d1052bb",
+  "batch_sha256": "866e8ae78222a4944ad24015fd20fd80d57c4bcf2e03f1e330921194d9ab0209",
+  "mtf": {
+    "source_times": [
+      "2026-09-29T20:30:00Z",
+      "2026-09-29T20:45:00Z",
+      "2026-09-29T21:00:00Z",
+      "2026-09-29T21:15:00Z",
+      "2026-09-29T21:30:00Z"
+    ],
+    "ETHUSD": [
+      "WAIT",
+      "CENSORED",
+      "WAIT",
+      "WAIT",
+      "WAIT"
+    ],
+    "DOGEUSD": [
+      "WAIT",
+      "WAIT",
+      "WAIT",
+      "WAIT",
+      "WAIT"
+    ],
+    "directional_entries": 0
+  },
+  "regime": {
+    "rows_total": 50,
+    "wait": 42,
+    "censored": 8,
+    "missing_source": 6,
+    "missing_next_open": 2
+  },
+  "portfolio": {
+    "state": "FLAT",
+    "accepted_entries": 0,
+    "overlap_rejections": 0,
+    "valued_forward_trades": 0
+  },
+  "review_state": "COLLECTING",
+  "integrity": {
+    "stale_htf_boundary": [
+      "CAPITALCOM:ETHUSD@2026-09-29T20:45:00Z"
+    ],
+    "new_webhook_timeouts": [
+      "CAPITALCOM:BTCUSD@2026-09-29T21:15:00Z",
+      "CAPITALCOM:ETHUSD@2026-09-29T21:15:00Z",
+      "CAPITALCOM:EURUSD@2026-09-29T21:15:00Z",
+      "CAPITALCOM:NAS100@2026-09-29T21:15:00Z",
+      "CAPITALCOM:SPX500@2026-09-29T21:15:00Z"
+    ],
+    "missing_source_intervals": [
+      "CAPITALCOM:XAGUSD@2026-09-29T21:00:00Z",
+      "CAPITALCOM:XAUUSD@2026-09-29T21:00:00Z",
+      "CAPITALCOM:XAGUSD@2026-09-29T21:15:00Z",
+      "CAPITALCOM:XAUUSD@2026-09-29T21:15:00Z",
+      "CAPITALCOM:XAGUSD@2026-09-29T21:30:00Z",
+      "CAPITALCOM:XAUUSD@2026-09-29T21:30:00Z"
+    ],
+    "retrospective_revision_rows_new": 6
+  },
+  "authority": {
+    "research_only": true,
+    "retuned": false,
+    "executed": false
+  }
+}
