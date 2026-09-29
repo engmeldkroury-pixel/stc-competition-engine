@@ -167,6 +167,18 @@ def test_actionable_locked_plan_triggers_fail_soft_signal_notification():
     assert client.signal_notifications == ["evt-serverless-1"]
 
 
+def test_monitor_only_ingested_event_still_reaches_notification_policy():
+    payload = _actionable_payload()
+    # Remove the higher-timeframe evidence required for a locked plan so the
+    # event is ingested but the final recommendation is monitor-only/WAIT.
+    payload["trend_2h_score"] = None
+    payload["trend_4h_score"] = None
+    client = NotificationFakeClient(payload)
+    result = run_serverless_once(client, worker_id="notify-monitor", limit=5)
+    assert result.ingested == 1
+    assert client.signal_notifications == ["evt-serverless-1"]
+
+
 class DrainNotificationClient(DrainFakeClient):
     def __init__(self, batches):
         super().__init__(batches)
