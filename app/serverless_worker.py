@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from .bridge_client import BridgeClient
 from .event_decision import decide_bridge_event
@@ -12,9 +12,24 @@ class ServerlessRunResult:
     ingested: int = 0
     rejected: int = 0
     failed: int = 0
+    signal_notification_attempted: int = 0
+    signal_notification_delivered: int = 0
+    signal_notification_skipped: int = 0
+    signal_notification_no_delivery: int = 0
+    signal_notification_errors: int = 0
+    signal_notification_skip_reasons: dict[str, int] = field(default_factory=dict)
+    portfolio_notification_attempted: int = 0
+    portfolio_notification_errors: int = 0
 
     def to_dict(self) -> dict:
         return self.__dict__.copy()
+
+    def record_signal_notification_skip(self, reason: str) -> None:
+        reason = reason or "unspecified"
+        self.signal_notification_skipped += 1
+        self.signal_notification_skip_reasons[reason] = (
+            self.signal_notification_skip_reasons.get(reason, 0) + 1
+        )
 
 
 def run_serverless_once(
@@ -48,12 +63,21 @@ def run_serverless_once(
                 result.ingested += 1
                 notifier = getattr(client, "notify_signal", None)
                 if callable(notifier) and outcome.get("decision", {}).get("locked_trade_plan"):
+                    result.signal_notification_attempted += 1
                     try:
-                        notifier(item.event_id)
+                        notification = notifier(item.event_id)
+                        if bool(notification.get("skipped", False)):
+                            result.record_signal_notification_skip(
+                                str(notification.get("reason") or "unspecified")
+                            )
+                        elif bool((notification.get("dispatch") or {}).get("delivered_any", False)):
+                            result.signal_notification_delivered += 1
+                        else:
+                            result.signal_notification_no_delivery += 1
                     except Exception:
                         # Notifications are secondary. Never turn a successfully
                         # persisted market event into a failed trading signal.
-                        pass
+                        result.signal_notification_errors += 1
         except Exception as exc:
             result.failed += 1
             try:
@@ -98,16 +122,26 @@ def run_serverless_drain(
         total.ingested += batch.ingested
         total.rejected += batch.rejected
         total.failed += batch.failed
+        total.signal_notification_attempted += batch.signal_notification_attempted
+        total.signal_notification_delivered += batch.signal_notification_delivered
+        total.signal_notification_skipped += batch.signal_notification_skipped
+        total.signal_notification_no_delivery += batch.signal_notification_no_delivery
+        total.signal_notification_errors += batch.signal_notification_errors
+        for reason, count in batch.signal_notification_skip_reasons.items():
+            total.signal_notification_skip_reasons[reason] = (
+                total.signal_notification_skip_reasons.get(reason, 0) + count
+            )
         if batch.claimed < limit:
             break
 
     portfolio_notifier = getattr(client, "notify_portfolio", None)
     if callable(portfolio_notifier) and total.claimed > 0:
+        total.portfolio_notification_attempted += 1
         try:
             portfolio_notifier()
         except Exception:
             # Fail-soft: position-management alerts must never compromise
             # ingestion of the authoritative market-data cycle.
-            pass
+            total.portfolio_notification_errors += 1
 
     return total
