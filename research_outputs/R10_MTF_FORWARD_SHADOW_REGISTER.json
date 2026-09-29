@@ -101,6 +101,53 @@
         }
       ],
       "decision": "Do not retune, promote, execute, or count any ETHUSD/DOGEUSD MTF forward outcome from this check. Preserve the frozen parameters and require an exact immutable forward boundary plus closed-bar/source receipts before admission."
+    },
+    {
+      "checked_at_utc": "2026-09-29T12:30:00Z",
+      "previous_check_utc": "2026-09-29T11:00:00Z",
+      "status": "DATA_INTEGRITY_BLOCK",
+      "evidence_digest_path": "research_outputs/R10_FORWARD_EVIDENCE_DIGEST_2026-09-29T1230Z.json",
+      "evidence_digest_commit": "db2c9c3073429f8493a6d5a4c4c84126097a97d1",
+      "full_evaluated_batch_sha256": "bc9bd15131fcdabc773236277317e4eeae1c18addc97236cdc47566ae01dd344",
+      "mtf_completed_source_times": [
+        "2026-09-29T11:15:00Z",
+        "2026-09-29T11:30:00Z",
+        "2026-09-29T11:45:00Z",
+        "2026-09-29T12:00:00Z"
+      ],
+      "mtf_pending_source_time": "2026-09-29T12:15:00Z",
+      "admitted_forward_signals": [],
+      "outcomes": [],
+      "portfolio": {
+        "state": "FLAT",
+        "accepted_entries": 0,
+        "overlap_rejections": 0,
+        "valued_forward_trades": 0
+      },
+      "review_state": "COLLECTING",
+      "issues": [
+        {
+          "id": "MTF_ETH_4H_EXACT_FEATURE_MISSING",
+          "severity": "CENSOR",
+          "detail": "ETH local 15m and eligible closed 1h trends are bullish in the new window, but exact decision-time eligible closed 4h EMA20/EMA50 was not captured. Vendor trend_4h_score is not substituted; ETH observations are censored."
+        },
+        {
+          "id": "REGIME_IN_SESSION_FEATURES_MISSING",
+          "severity": "CENSOR",
+          "detail": "At 12:00Z and 12:15Z, exact decision-time ema200/adx14/zscore20/range_atr are absent for all 10 Capital source receipts. The 20 in-session regime rows are censored."
+        },
+        {
+          "id": "WEBHOOK_TIMEOUTS",
+          "severity": "WARNING",
+          "detail": "15 alert deliveries timed out across 11:15Z-11:45Z source receipts; alert-log payloads remain present and canonical."
+        },
+        {
+          "id": "RETROSPECTIVE_VENDOR_REVISIONS",
+          "severity": "WARNING",
+          "detail": "32 of 50 checked source rows differ in later TradingView OHLCV history. Alert-time values remain canonical and were not overwritten."
+        }
+      ],
+      "decision": "No retuning, promotion, execution, live-risk, broker, position/stop or notification-setting change. Continue prospective collection only."
     }
   ]
 }
