@@ -193,6 +193,54 @@
         }
       ],
       "decision": "No retuning, promotion, execution, live-risk change, broker-state change, or notification-setting change."
+    },
+    {
+      "checked_at_utc": "2026-09-29T02:31:45Z",
+      "previous_check_utc": "2026-09-28T21:20:23Z",
+      "status": "DATA_INTEGRITY_BLOCK",
+      "admitted_forward_signals": [],
+      "outcomes": [],
+      "evidence_increment": {
+        "path": "research_outputs/R10_FORWARD_EVIDENCE_INCREMENT_2026-09-29T023145Z.json",
+        "commit_sha": "7df3d410ad7e4902533341b405651b8c4f063ed9",
+        "batch_sha256": "51d66d50c06e305fa85ad23b4cc536cc282ce1ec67b6e65fef88a602f04a8595",
+        "completed_source_times": [
+          "2026-09-29T00:45:00Z",
+          "2026-09-29T01:00:00Z",
+          "2026-09-29T01:15:00Z",
+          "2026-09-29T01:30:00Z",
+          "2026-09-29T01:45:00Z",
+          "2026-09-29T02:00:00Z"
+        ],
+        "pending_source_time": "2026-09-29T02:15:00Z"
+      },
+      "review_state": "COLLECTING",
+      "valued_forward_trades": 0,
+      "portfolio_state": "FLAT",
+      "continuity_note": "Central register was previously behind immutable increment files; this append records only the genuinely new 00:45Z-02:15Z evidence window and does not reconstruct missing central-register entries.",
+      "issues": [
+        {
+          "id": "MTF_EXACT_4H_EMA_PAIR_MISSING_NOW_DECISION_MATERIAL",
+          "severity": "BLOCKER",
+          "detail": "ETHUSD 01:30Z, 01:45Z and 02:00Z have local=-1 and eligible closed 1h=-1, so the MTF vote is no longer invariant. Exact decision-time eligible closed 4h EMA20/EMA50 is absent; these observations are censored instead of labeled WAIT/SHORT."
+        },
+        {
+          "id": "REGIME_DECISION_FEATURES_MISSING",
+          "severity": "BLOCKER",
+          "detail": "R10-REGIME-SESSION-SHADOW-V1 rows 00:45Z-02:15Z lack exact decision-time ema200/adx14/zscore20/range_atr; 70/70 expected rows are censored."
+        },
+        {
+          "id": "WEBHOOK_TIMEOUTS_NEW",
+          "severity": "WARNING",
+          "detail": "New timeouts: 01:30Z AUDUSD/EURUSD/NAS100/SPX500/XAGUSD/XAUUSD; 01:45Z AUDUSD/BTCUSD/ETHUSD; 02:00Z BTCUSD/NAS100/SPX500/USDZAR/XAGUSD/XAUUSD."
+        },
+        {
+          "id": "RETROSPECTIVE_REVISIONS_NEW",
+          "severity": "WARNING",
+          "detail": "Later TradingView history revised 39 of the 60 newly completed/post-00:45 regime rows checked from 01:00Z-02:00Z; preserved alert-time values remain authoritative. Examples include ETHUSD 01:00Z close 2667.72->2668.09, DOGEUSD 01:00Z 0.0929185->0.0929438, ETHUSD 01:45Z 2663.61->2663.29, and DOGEUSD 02:00Z 0.0921273->0.0921462."
+        }
+      ],
+      "decision": "No retuning, promotion, execution, live-risk change, broker-state change, existing-stop change, or notification-setting change."
     }
   ]
 }
