@@ -1,0 +1,125 @@
+{
+  "schema_version": 1,
+  "registry_id": "R10-FORWARD-SHADOW-REGISTRY-V1",
+  "captured_at_utc": "2026-09-29T09:40:28Z",
+  "evidence_scope": "RESEARCH_SHADOW_ONLY",
+  "candidate_hashes": {
+    "CAPITALCOM:ETHUSD": "2d1406da93b44d8ec1cf15d47b5e8664abcaf5809515e0c0382286917d4784d9",
+    "CAPITALCOM:DOGEUSD": "e22c97ad3e915bf4032afececa7c5d463a7250850ac76627f5ed11ad8ad44d98"
+  },
+  "completed_mtf": [
+    [
+      "2026-09-29T08:00:00Z",
+      "CAPITALCOM:ETHUSD",
+      "WAIT",
+      "64c1a335952ab2614f3ac0ed8fde21ffa77e42f2e46a536d5165bc21d9dca35a"
+    ],
+    [
+      "2026-09-29T08:00:00Z",
+      "CAPITALCOM:DOGEUSD",
+      "WAIT",
+      "a99c923366305ac70c4f7c7921cf68340b7868f7b7a541ad773e5934bc530c6d"
+    ],
+    [
+      "2026-09-29T08:15:00Z",
+      "CAPITALCOM:ETHUSD",
+      "WAIT",
+      "696ccf7cc43755928a7d1b1628d5f1ec1cca2a482bae0781ba4cb2f94108c670"
+    ],
+    [
+      "2026-09-29T08:15:00Z",
+      "CAPITALCOM:DOGEUSD",
+      "WAIT",
+      "6300a25836d5670a9f0af53a757805fe4179b1c911b481a8c2b31bcb501a31b5"
+    ],
+    [
+      "2026-09-29T08:30:00Z",
+      "CAPITALCOM:ETHUSD",
+      "WAIT",
+      "f5869d6a60ab332934c8bf50b70960a927da74a5189dfccd34feebe22e4001d0"
+    ],
+    [
+      "2026-09-29T08:30:00Z",
+      "CAPITALCOM:DOGEUSD",
+      "WAIT",
+      "0b0af91dd0087383fb46987a4d1194e027197853018e22757050854d5d00d01b"
+    ],
+    [
+      "2026-09-29T08:45:00Z",
+      "CAPITALCOM:ETHUSD",
+      "WAIT",
+      "77d7064388169af90c6d1b8f7c1ef04e57548fca8251e20b7aa7968a74ef55e4"
+    ],
+    [
+      "2026-09-29T08:45:00Z",
+      "CAPITALCOM:DOGEUSD",
+      "WAIT",
+      "ead4a4861010b554b6c3a10b6397fb27958f0dd07636b0f0872033db369567f0"
+    ],
+    [
+      "2026-09-29T09:00:00Z",
+      "CAPITALCOM:ETHUSD",
+      "CENSORED",
+      "da01fc2835014b96fe074557dc02952ef6ad47d205117999288549dfcbd5b7a1"
+    ],
+    [
+      "2026-09-29T09:00:00Z",
+      "CAPITALCOM:DOGEUSD",
+      "WAIT",
+      "0cbff602472286780127d14708c598b97b7965959a3ae934faa0b83d59972d79"
+    ]
+  ],
+  "pending_mtf": [
+    [
+      "2026-09-29T09:15:00Z",
+      "CAPITALCOM:ETHUSD",
+      "CENSORED",
+      "379d0060dee1ab120a1e42b69bf0fd15e7dde477fd59dd02e938be1a076d91cf"
+    ],
+    [
+      "2026-09-29T09:15:00Z",
+      "CAPITALCOM:DOGEUSD",
+      "WAIT",
+      "5595f87bfd4ab45919747d0b1a61cb7db63bf1151daf165b1e458a42b8c391d1"
+    ]
+  ],
+  "regime_session": {
+    "protocol_id": "R10-REGIME-SESSION-SHADOW-V1",
+    "protocol_contract_blob_sha": "7ea7abb7cbdfced80527e068b6347890739cf8de",
+    "completed_source_times": [
+      "2026-09-29T08:15:00Z",
+      "2026-09-29T08:30:00Z",
+      "2026-09-29T08:45:00Z",
+      "2026-09-29T09:00:00Z"
+    ],
+    "pending_source_time": "2026-09-29T09:15:00Z",
+    "completed_rows": 40,
+    "completed_decision": "WAIT",
+    "reason": "outside frozen 12:00-17:00 UTC session gate",
+    "missing_intervals": 0,
+    "new_delivery_failures": 0,
+    "retrospective_revision_rows": 34,
+    "evidence_sha256": "450b2526eae9830ccab724f4ca8a130e040ad22b482dd80a8848a12a6dd1da84"
+  },
+  "portfolio": {
+    "state": "FLAT",
+    "accepted_entries": 0,
+    "rejected_overlaps": 0
+  },
+  "review_state": "COLLECTING",
+  "valued_forward_trades": 0,
+  "issues": [
+    "ETHUSD 09:00Z and pending 09:15Z are censored because the exact eligible closed 4h EMA20/EMA50 pair is decision-material and missing.",
+    "Earlier out-of-session regime rows were over-censored for missing features; they are not rewritten. New rows apply the frozen session gate first and are WAIT.",
+    "Later TradingView revisions are excluded from all canonical hashes."
+  ],
+  "batch_sha256": "cbefedcc2cddaf80709382985cf783ac1ad089b8fe2145c4318a75ce85f2112d",
+  "authority": {
+    "live": false,
+    "execution": false,
+    "risk_change": false,
+    "broker_state_change": false,
+    "position_or_stop_change": false,
+    "notification_setting_change": false
+  }
+}
