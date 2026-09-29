@@ -241,6 +241,48 @@
         }
       ],
       "decision": "No retuning, promotion, execution, live-risk change, broker-state change, existing-stop change, or notification-setting change."
+    },
+    {
+      "checked_at_utc": "2026-09-29T06:45:14Z",
+      "previous_check_utc": "2026-09-29T02:31:45Z",
+      "status": "DATA_INTEGRITY_BLOCK",
+      "admitted_forward_signals": [],
+      "outcomes": [],
+      "evidence_increment": {
+        "path": "research_outputs/R10_FORWARD_EVIDENCE_INCREMENT_2026-09-29T064514Z.json",
+        "commit_sha": "87cdf9d5f4333f2ac0a43ad7c3bf9bfd73d44dd3",
+        "batch_sha256": "e0cf93ef22806de560ddce60183a8c14512e77df6dcc807fd3252d2e2eba7519",
+        "completed_source_times": [
+          "2026-09-29T05:15:00Z",
+          "2026-09-29T05:30:00Z",
+          "2026-09-29T05:45:00Z",
+          "2026-09-29T06:00:00Z",
+          "2026-09-29T06:15:00Z"
+        ],
+        "pending_source_time": "2026-09-29T06:30:00Z"
+      },
+      "review_state": "COLLECTING",
+      "valued_forward_trades": 0,
+      "portfolio_state": "FLAT",
+      "continuity_note": "Only genuinely new evidence after the previously delivered run is appended; the prior unpersisted 04:15Z-05:15Z batch is not reconstructed.",
+      "issues": [
+        {
+          "id": "MTF_EXACT_4H_EMA_PAIR_MISSING_DECISION_MATERIAL",
+          "severity": "BLOCKER",
+          "detail": "ETHUSD 05:15Z, 05:30Z, 05:45Z, 06:00Z and 06:15Z have local 15m EMA20<EMA50 and eligible closed 1h EMA20<EMA50; exact decision-time closed 4h EMA20/EMA50 is absent, so these observations are censored rather than retrospectively classified."
+        },
+        {
+          "id": "REGIME_DECISION_FEATURES_MISSING",
+          "severity": "BLOCKER",
+          "detail": "R10-REGIME-SESSION-SHADOW-V1 05:30Z-06:30Z rows omit exact decision-time ema200/adx14/zscore20/range_atr; all observed rows are censored."
+        },
+        {
+          "id": "RETROSPECTIVE_REVISIONS_NEW",
+          "severity": "WARNING",
+          "detail": "Later TradingView history differs from alert-time evidence in 34 of 50 new regime rows. Alert-time values remain authoritative; later values are excluded from canonical hashes."
+        }
+      ],
+      "decision": "No retuning, promotion, execution, live-risk change, broker-state change, existing-position/stop change, or notification-setting change."
     }
   ]
 }
