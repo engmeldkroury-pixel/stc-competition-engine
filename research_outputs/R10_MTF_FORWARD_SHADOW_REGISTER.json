@@ -148,6 +148,61 @@
         }
       ],
       "decision": "No retuning, promotion, execution, live-risk, broker, position/stop or notification-setting change. Continue prospective collection only."
+    },
+    {
+      "checked_at_utc": "2026-09-29T14:11:20Z",
+      "previous_check_utc": "2026-09-29T12:30:00Z",
+      "status": "DATA_INTEGRITY_BLOCK",
+      "full_evaluated_batch_sha256": "30de928d54bad805a5441896b49ab3e8596359af6e34b18946647782ff6aa0a8",
+      "mtf_completed_source_times": [
+        "2026-09-29T12:45:00Z",
+        "2026-09-29T13:00:00Z",
+        "2026-09-29T13:15:00Z",
+        "2026-09-29T13:30:00Z"
+      ],
+      "mtf_pending_source_time": "2026-09-29T13:45:00Z",
+      "admitted_forward_signals": [],
+      "outcomes": [],
+      "portfolio": {
+        "state": "FLAT",
+        "accepted_entries": 0,
+        "overlap_rejections": 0,
+        "valued_forward_trades": 0
+      },
+      "review_state": "COLLECTING",
+      "issues": [
+        {
+          "id": "MTF_ETH_4H_EXACT_FEATURE_MISSING",
+          "severity": "CENSOR",
+          "detail": "ETH exact eligible closed 4h EMA20/EMA50 remains absent; vendor trend_4h_score was not substituted."
+        },
+        {
+          "id": "MTF_HTF_BOUNDARY_CAPTURE",
+          "severity": "WARNING",
+          "detail": "12:45Z and 13:45Z source decisions carry stale 1h boundary receipts; 12:45Z also carries stale 4h time. No retrospective replacement."
+        },
+        {
+          "id": "REGIME_IN_SESSION_FEATURES_MISSING",
+          "severity": "CENSOR",
+          "detail": "All 40 genuinely new 13:00Z-13:45Z regime rows lack exact decision-time ema200/adx14/zscore20/range_atr and are censored."
+        },
+        {
+          "id": "WEBHOOK_TIMEOUTS",
+          "severity": "WARNING",
+          "detail": "3 new delivery timeouts: NAS100 and SPX500 at 13:15Z; ETHUSD at 13:45Z. Alert-log payloads remain canonical."
+        },
+        {
+          "id": "RETROSPECTIVE_VENDOR_REVISIONS",
+          "severity": "WARNING",
+          "detail": "32 of 40 genuinely new regime source rows differ in later TradingView OHLCV; later values were not substituted."
+        },
+        {
+          "id": "GITHUB_EVIDENCE_WRITE_BLOCKED",
+          "severity": "WARNING",
+          "detail": "Full and reduced immutable evidence-file creates were blocked by connector safety checks in this run; no evidence file was created."
+        }
+      ],
+      "decision": "No retuning, promotion, execution, live-risk, broker, position/stop or notification-setting change. Continue prospective collection only."
     }
   ]
 }
