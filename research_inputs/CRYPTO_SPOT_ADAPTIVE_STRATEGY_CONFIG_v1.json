@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "mode": "RESEARCH_ONLY",
+  "execution": "PAPER_TRADING_ONLY",
+  "assets": ["BTCUSDT", "ETHUSDT", "SOLUSDT", "TRBUSDT", "GALAUSDT", "YGGUSDT", "NOTUSDT"],
+  "timeframes": ["15m", "1h", "4h", "1D"],
+  "signal_families": {
+    "trend": {
+      "enabled": true,
+      "features": ["EMA", "ADX", "ATR"]
+    },
+    "momentum": {
+      "enabled": true,
+      "features": ["RSI", "MACD", "ROC"]
+    },
+    "volatility": {
+      "enabled": true,
+      "features": ["BOLLINGER", "KELTNER", "ATR_EXPANSION"]
+    },
+    "structure": {
+      "enabled": true,
+      "features": ["BREAK_OF_STRUCTURE", "SUPPORT_RESISTANCE", "VOLUME_CONFIRMATION"]
+    }
+  },
+  "adaptive_rules": {
+    "asset_specific_weights": true,
+    "weights_must_be_data_derived": true,
+    "no_manual_profit_optimization": true,
+    "walk_forward_required": true,
+    "paper_trade_required": true
+  },
+  "risk": {
+    "spot_only": true,
+    "leverage": false,
+    "short": false,
+    "max_single_position_fraction": 0.05,
+    "atr_stop_required": true
+  }
+}
