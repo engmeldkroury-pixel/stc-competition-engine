@@ -1,0 +1,26 @@
+{
+  "version": 1,
+  "mode": "SPOT_ONLY",
+  "status": "RESEARCH_ONLY",
+  "strategies": {
+    "trend": ["EMA_SYSTEM", "BREAKOUT_MODEL", "TREND_FOLLOWING"],
+    "momentum": ["RSI", "MACD", "ROC", "DIVERGENCE"],
+    "volatility": ["ATR_EXPANSION", "BOLLINGER_BANDS", "KELTNER_CHANNEL"],
+    "structure": ["SUPPORT_RESISTANCE", "BREAK_OF_STRUCTURE", "LIQUIDITY_ZONES"]
+  },
+  "assets": {
+    "BTC": {"phase": "benchmark", "enabled": true},
+    "ETH": {"phase": "benchmark", "enabled": true},
+    "SOL": {"phase": "benchmark", "enabled": true},
+    "TRB": {"phase": "high_volatility", "enabled": true},
+    "GALA": {"phase": "high_volatility", "enabled": true},
+    "YGG": {"phase": "high_volatility", "enabled": true},
+    "NOT": {"phase": "high_volatility", "enabled": true}
+  },
+  "promotion": {
+    "backtest_required": true,
+    "walk_forward_required": true,
+    "paper_trading_required": true,
+    "live_authority": false
+  }
+}
