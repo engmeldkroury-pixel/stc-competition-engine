@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "register_increment_id": "R10_FORWARD_REGISTER_INCREMENT_2026-09-30T0734Z",
+  "captured_at_utc": "2026-09-30T07:34:31Z",
+  "predecessor_register_path": "research_outputs/R10_FORWARD_REGISTER_INCREMENT_2026-09-30T0646Z.json",
+  "evidence_path": "research_outputs/R10_FORWARD_EVIDENCE_INCREMENT_2026-09-30T0734Z.json",
+  "evidence_commit": "6909622ed816d023730f426885e676101a880406",
+  "batch_sha256": "536e6899456ee2d81473d54ba87aa8593ade17f1600a29f08ea0d0bd31dd1825",
+  "window": {
+    "completed_source_times": [
+      "2026-09-30T06:30:00Z",
+      "2026-09-30T06:45:00Z",
+      "2026-09-30T07:00:00Z"
+    ],
+    "pending_source_time": "2026-09-30T07:15:00Z"
+  },
+  "review_states": {
+    "mtf": "COLLECTING",
+    "regime_session": "COLLECTING"
+  },
+  "causal_crypto_portfolio": {
+    "state": "FLAT",
+    "accepted_entries": 0,
+    "overlap_rejections": 0,
+    "valued_forward_trades": 0
+  },
+  "counts": {
+    "mtf_completed": 6,
+    "mtf_pending": 2,
+    "regime_completed": 30,
+    "regime_pending": 10,
+    "missing_source_intervals": 0,
+    "missing_completed_next_open_intervals": 0,
+    "new_webhook_failures": 0,
+    "completed_retrospective_revision_rows": 15,
+    "pending_retrospective_revision_rows": 4
+  },
+  "material_integrity": [
+    {
+      "scope": "MTF",
+      "source_time": "2026-09-30T06:45:00Z",
+      "symbol": "CAPITALCOM:ETHUSD",
+      "issue": "stale_1h_boundary",
+      "expected": "2026-09-30T06:00:00Z",
+      "observed": "2026-09-30T05:00:00Z",
+      "decision": "WAIT",
+      "effect": "invariant_geometry_fails"
+    },
+    {
+      "scope": "MTF",
+      "source_time": "2026-09-30T06:45:00Z",
+      "symbol": "CAPITALCOM:DOGEUSD",
+      "issue": "stale_1h_boundary",
+      "expected": "2026-09-30T06:00:00Z",
+      "observed": "2026-09-30T05:00:00Z",
+      "decision": "WAIT",
+      "effect": "invariant_outside_session"
+    },
+    {
+      "scope": "SOURCE_REVISION_AUDIT",
+      "completed_rows": 15,
+      "pending_rows": 4,
+      "issue": "later_history_differs_from_frozen_receipts"
+    }
+  ],
+  "prior_artifact_note": {
+    "path": "research_outputs/R10_FORWARD_EVIDENCE_INCREMENT_2026-09-30T0646Z.json",
+    "status": "do_not_use_affected_mtf_0445_to_0530_or_its_batch_sha",
+    "reason": "prior slope_atr reconstruction omitted the required t_minus_4 source EMA20; append-only correction is in the 0734Z evidence file"
+  },
+  "authority": {
+    "research_only": true,
+    "live_authorized": false,
+    "execution": "none",
+    "retune_on_forward": false
+  }
+}
