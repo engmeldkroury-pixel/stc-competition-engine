@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "register_increment_id": "R10_FORWARD_REGISTER_INCREMENT_2026-09-30T1710Z",
+  "captured_at_utc": "2026-09-30T17:09:21Z",
+  "evidence_path": "research_outputs/R10_FORWARD_EVIDENCE_ACCESS_INTEGRITY_2026-09-30T1710Z.json",
+  "evidence_commit_sha": "8ef80791e55ef136fc5468c1e823a0c6648def57",
+  "evidence_batch_sha256": "0895768b21850704e632170463bd95558616885dd81b5314a4750ed9d47103b6",
+  "material_update_type": "DATA_INTEGRITY_FAILURE",
+  "new_source_times": [
+    "2026-09-30T16:30:00Z",
+    "2026-09-30T16:45:00Z"
+  ],
+  "disposition": "CENSORED_UNRESOLVED",
+  "reason": "canonical alert-time receipts unavailable to evaluator; no retrospective TradingView substitution",
+  "status": {
+    "mtf_review_state": "COLLECTING",
+    "regime_session_review_state": "COLLECTING",
+    "causal_crypto_portfolio": "FLAT",
+    "accepted_entries": 1,
+    "overlap_rejections": 0,
+    "valued_forward_trades": 1
+  },
+  "repository_ci": {
+    "run_id": 36746716938,
+    "critical": "success",
+    "full": "failure",
+    "owner_action_required": true,
+    "error": "ModuleNotFoundError: app.crypto_spot_registry"
+  },
+  "authority": {
+    "research_only": true,
+    "execution": "none",
+    "retune": false,
+    "live_state_changes": false
+  }
+}
