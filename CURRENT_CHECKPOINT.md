@@ -1,3 +1,14 @@
+## Telegram visibility recovery + Hostinger verification — 2026-09-30
+- PR #198 merged at d8b342aa14b66d9f0547bd52f97ff142697e0259 after exact-head CI: critical 312 passed / 1 warning; full 608 passed / 1 warning.
+- Hostinger deploy run 36674895438: SUCCESS.
+- Production live readback run 36675016413: SUCCESS.
+- One-shot production Telegram smoke run 36675136833: SUCCESS; temporary smoke workflow/trigger removed afterward.
+- Root cause of perceived silence: notifier was called only for events already containing a locked trade plan; monitor-only/blocked states were silent even while feeds continued ingesting. Telegram transport itself remained configured and previously returned HTTP 200.
+- Fixes: every ingested event now reaches notification policy; >=78 directional near-misses may emit deduplicated WATCHLIST / NOT ACTIONABLE messages; qualified plans blocked by stale/unavailable account state emit ENTRY_BLOCKED alerts; six-hour deduplicated SYSTEM_HEARTBEAT reports monitoring activity; snapshot now exposes competition_mode and quality_floor.
+- Live trade gate remains unchanged at shared competition opportunity floor 84; risk_fraction remains 0.005; manual approval/order entry remains mandatory; no auto-execution added.
+- Production readback at 2026-09-30 05:47Z: Capital and AMP feeds current through about 05:30Z; no active locked opportunities at that instant; AMP now visibly reports competition_mode=true and quality_floor=84.
+- Account states remain stale initial_profile_seed and are intentionally ineligible for new sizing. STC ledger still shows NAS100 and SPX500 open; SPX500 supervision currently returns EXIT_NOW because current price is below the stored active stop. Do not mutate those positions without external platform evidence.
+
 
 
 ## R10 causal MTF shadow checkpoint - 2026-09-28
