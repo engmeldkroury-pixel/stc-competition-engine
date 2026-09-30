@@ -1,2 +1,2 @@
-2026-09-27T21:27:00+03:00
-Deploy verified main: R5/R6 diagnostics + paused new-entry alerts + R3b stale-management fail-closed controls.
+2026-09-30T08:44:00+03:00
+Deploy merged Telegram visibility, runtime heartbeat, and snapshot observability fixes from PR198.
