@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "register_increment_id": "R10_FORWARD_REGISTER_INCREMENT_2026-09-30T1210Z",
+  "captured_at_utc": "2026-09-30T12:10:18Z",
+  "predecessor_register_path": "research_outputs/R10_FORWARD_REGISTER_INCREMENT_2026-09-30T1022Z.json",
+  "evidence_path": "research_outputs/R10_FORWARD_EVIDENCE_INCREMENT_2026-09-30T1210Z.json",
+  "evidence_commit": "8620792c8b846aa6711dbd6e7a8626e8d41d2313",
+  "evidence_batch_sha256": "f02dfaa3c5676a2ea07d03bbd0755be86ca2c25ed278aaf0703e7ff936e8306d",
+  "material_update": {
+    "type": "DATA_INTEGRITY_FAILURE",
+    "summary": "9 preserved-payload webhook timeouts across CAPITALCOM research symbols plus stale 1h MTF evidence at 11:45Z for ETHUSD/DOGEUSD; both MTF decisions remained invariant WAIT",
+    "new_directional_entries": 0,
+    "new_valued_outcomes": 0
+  },
+  "review_states": {
+    "mtf": "COLLECTING",
+    "regime_session": "COLLECTING"
+  },
+  "causal_crypto_portfolio": {
+    "state": "FLAT",
+    "accepted_entries": 1,
+    "overlap_rejections": 0,
+    "valued_forward_trades": 1
+  },
+  "integrity": {
+    "missing_source_intervals": 0,
+    "missing_completed_next_open_intervals": 0,
+    "new_webhook_failures": 9,
+    "stale_mtf_events": 2,
+    "completed_retrospective_revision_rows": 19,
+    "pending_retrospective_revision_rows": 5
+  },
+  "hash_correction_persisted": {
+    "prior_1022_hash_fields_superseded": true,
+    "corrected_prior_evidence_batch_sha256": "b0e413d13fa70ca413b9c55cae5a1ba5a22b133f3a23698a044c654df998c208",
+    "corrected_doge_0830_stop_outcome_sha256": "c03b473de09db2bf9b55380743fa1f5e002a24804fc7f76a6fd5f749689aa5ac"
+  },
+  "authority": {
+    "research_only": true,
+    "live_authorized": false,
+    "execution": "none",
+    "retune_on_forward": false
+  },
+  "register_sha256": "c49ffaaec07152a77e71de38e73c5291100089bdf857e1ff716917c75d31a094"
+}
