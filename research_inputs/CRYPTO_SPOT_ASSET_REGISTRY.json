@@ -1,0 +1,152 @@
+{
+  "version": 1,
+  "updated_utc": "2026-09-30T09:37:00Z",
+  "mode": "SPOT_ONLY",
+  "quote_asset": "USDT",
+  "constraints": {
+    "futures": false,
+    "leverage": false,
+    "shorting": false,
+    "real_money_authorized": false,
+    "promotion_requires_backtest": true,
+    "promotion_requires_walk_forward": true,
+    "promotion_requires_paper_trading": true
+  },
+  "research_order": [
+    "BTC",
+    "ETH",
+    "SOL",
+    "TRB",
+    "GALA",
+    "YGG",
+    "NOT"
+  ],
+  "assets": [
+    {
+      "asset": "BTC",
+      "pair": "BTCUSDT",
+      "tier": "CORE",
+      "status": "RESEARCH",
+      "priority": 1
+    },
+    {
+      "asset": "ETH",
+      "pair": "ETHUSDT",
+      "tier": "CORE",
+      "status": "RESEARCH",
+      "priority": 2
+    },
+    {
+      "asset": "SOL",
+      "pair": "SOLUSDT",
+      "tier": "CORE",
+      "status": "RESEARCH",
+      "priority": 3
+    },
+    {
+      "asset": "BNB",
+      "pair": "BNBUSDT",
+      "tier": "CORE",
+      "status": "QUEUED",
+      "priority": 8
+    },
+    {
+      "asset": "XRP",
+      "pair": "XRPUSDT",
+      "tier": "CORE",
+      "status": "QUEUED",
+      "priority": 9
+    },
+    {
+      "asset": "ADA",
+      "pair": "ADAUSDT",
+      "tier": "CORE",
+      "status": "QUEUED",
+      "priority": 10
+    },
+    {
+      "asset": "AVAX",
+      "pair": "AVAXUSDT",
+      "tier": "CORE",
+      "status": "QUEUED",
+      "priority": 11
+    },
+    {
+      "asset": "TRB",
+      "pair": "TRBUSDT",
+      "tier": "HIGH_VOLATILITY",
+      "status": "RESEARCH",
+      "priority": 4
+    },
+    {
+      "asset": "GALA",
+      "pair": "GALAUSDT",
+      "tier": "HIGH_VOLATILITY",
+      "status": "RESEARCH",
+      "priority": 5
+    },
+    {
+      "asset": "YGG",
+      "pair": "YGGUSDT",
+      "tier": "HIGH_VOLATILITY",
+      "status": "RESEARCH",
+      "priority": 6
+    },
+    {
+      "asset": "NOT",
+      "pair": "NOTUSDT",
+      "tier": "HIGH_VOLATILITY",
+      "status": "RESEARCH",
+      "priority": 7
+    },
+    {
+      "asset": "NEO",
+      "pair": "NEOUSDT",
+      "tier": "HIGH_VOLATILITY",
+      "status": "QUEUED",
+      "priority": 12
+    },
+    {
+      "asset": "OP",
+      "pair": "OPUSDT",
+      "tier": "HIGH_VOLATILITY",
+      "status": "QUEUED",
+      "priority": 13
+    },
+    {
+      "asset": "ARB",
+      "pair": "ARBUSDT",
+      "tier": "HIGH_VOLATILITY",
+      "status": "QUEUED",
+      "priority": 14
+    },
+    {
+      "asset": "SUI",
+      "pair": "SUIUSDT",
+      "tier": "HIGH_VOLATILITY",
+      "status": "QUEUED",
+      "priority": 15
+    },
+    {
+      "asset": "INJ",
+      "pair": "INJUSDT",
+      "tier": "HIGH_VOLATILITY",
+      "status": "QUEUED",
+      "priority": 16
+    }
+  ],
+  "data_policy": {
+    "primary_provider": "BINANCE_SPOT_PUBLIC",
+    "base_endpoint": "https://api.binance.com",
+    "exact_pair_required": true,
+    "provider_substitution": "FORBIDDEN_UNLESS_RECORDED",
+    "required_intervals": [
+      "15m",
+      "1h",
+      "4h",
+      "1d"
+    ],
+    "min_bars_per_interval": 900,
+    "closed_bars_only": true
+  }
+}
