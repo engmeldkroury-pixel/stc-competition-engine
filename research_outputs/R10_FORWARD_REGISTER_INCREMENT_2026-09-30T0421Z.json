@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "register_increment_id": "R10_FORWARD_REGISTER_INCREMENT_2026-09-30T0421Z",
+  "captured_at_utc": "2026-09-30T04:21:40Z",
+  "predecessor_register_path": "research_outputs/R10_FORWARD_REGISTER_INCREMENT_2026-09-30T0330Z.json",
+  "evidence_path": "research_outputs/R10_FORWARD_EVIDENCE_INCREMENT_2026-09-30T0421Z.json",
+  "evidence_commit": "8066aa13cbf9a97c4044a792791a6f0282bc06ae",
+  "batch_sha256": "af493fdc845e7e4640f993b0ce598d0bfd5172477b2148a9d2868777d6730a75",
+  "window": {
+    "completed_source_times": [
+      "2026-09-30T03:15:00Z",
+      "2026-09-30T03:30:00Z",
+      "2026-09-30T03:45:00Z"
+    ],
+    "pending_source_time": "2026-09-30T04:00:00Z"
+  },
+  "review_states": {
+    "mtf": "COLLECTING",
+    "regime_session": "COLLECTING"
+  },
+  "causal_crypto_portfolio": {
+    "state": "FLAT",
+    "accepted_entries": 0,
+    "overlap_rejections": 0,
+    "valued_forward_trades": 0
+  },
+  "counts": {
+    "mtf_completed": 6,
+    "mtf_pending": 2,
+    "regime_completed": 30,
+    "regime_pending": 10,
+    "missing_source_intervals": 0,
+    "webhook_timeouts": 13,
+    "completed_retrospective_revision_rows": 15,
+    "pending_retrospective_revision_rows": 5
+  },
+  "material_integrity": [
+    "MTF:stale_1h_boundary_expected_2026-09-30T03:00:00Z_observed_2026-09-30T02:00:00Z",
+    "MTF:stale_1h_boundary_expected_2026-09-30T03:00:00Z_observed_2026-09-30T02:00:00Z",
+    "WEBHOOK:delivery_timeout_payload_present",
+    "SOURCE_REVISION_AUDIT:later_history_differs_from_frozen_receipts"
+  ],
+  "authority": {
+    "research_only": true,
+    "live_authorized": false,
+    "execution": "none",
+    "retune_on_forward": false,
+    "live_risk_change": false,
+    "broker_state_change": false,
+    "notification_setting_change": false
+  }
+}
