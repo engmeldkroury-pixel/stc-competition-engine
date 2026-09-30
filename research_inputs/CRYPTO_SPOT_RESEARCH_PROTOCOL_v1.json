@@ -1,0 +1,31 @@
+{
+  "version": 1,
+  "mode": "RESEARCH_ONLY",
+  "asset_registry": "CRYPTO_SPOT_ASSET_REGISTRY.json",
+  "validation_pipeline": [
+    "historical_study",
+    "backtest",
+    "validation",
+    "walk_forward",
+    "paper_trading",
+    "forward_performance_tracking"
+  ],
+  "timeframes": [
+    "15m",
+    "1h",
+    "4h",
+    "1d"
+  ],
+  "strategies": {
+    "trend": ["EMA", "TREND_FOLLOWING", "BREAKOUT"],
+    "momentum": ["RSI", "MACD", "ROC", "DIVERGENCE"],
+    "volatility": ["ATR", "BOLLINGER", "KELTNER"],
+    "structure": ["SUPPORT_RESISTANCE", "BREAK_OF_STRUCTURE", "LIQUIDITY_ZONES"]
+  },
+  "promotion": {
+    "live_money": false,
+    "paper_trading_required": true,
+    "walk_forward_required": true,
+    "record_required": true
+  }
+}
