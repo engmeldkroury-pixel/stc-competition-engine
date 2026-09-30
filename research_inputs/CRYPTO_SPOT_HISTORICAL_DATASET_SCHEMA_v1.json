@@ -1,0 +1,1 @@
+{"version":1,"asset_source":"SPOT_ONLY","fields":["timestamp","open","high","low","close","volume"],"closed_candles_only":true,"required_timeframes":["15m","1h","4h","1d"]}
