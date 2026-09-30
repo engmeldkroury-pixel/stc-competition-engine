@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "register_increment_id": "R10_FORWARD_REGISTER_INCREMENT_2026-09-30T1633Z",
+  "captured_at_utc": "2026-09-30T16:33:53Z",
+  "evidence_path": "research_outputs/R10_FORWARD_EVIDENCE_ACCESS_INTEGRITY_2026-09-30T1633Z.json",
+  "evidence_commit_sha": "c145b75d9418257df15b6d942e01a2605ccbaa27",
+  "evidence_batch_sha256": "a355b0194e0cf8ad55deac7e910b3fd4fa741a8fb55b7504d67b5bd67c5a43bf",
+  "material_update_type": "DATA_INTEGRITY_FAILURE",
+  "status": {
+    "mtf_review_state": "COLLECTING",
+    "regime_session_review_state": "COLLECTING",
+    "causal_crypto_portfolio": "FLAT",
+    "accepted_entries": 1,
+    "overlap_rejections": 0,
+    "valued_forward_trades": 1
+  },
+  "new_evidence_scope": {
+    "continuity_source_time": "2026-09-30T14:45:00Z",
+    "new_source_times": [
+      "2026-09-30T15:00:00Z",
+      "2026-09-30T15:15:00Z",
+      "2026-09-30T15:30:00Z",
+      "2026-09-30T15:45:00Z",
+      "2026-09-30T16:00:00Z",
+      "2026-09-30T16:15:00Z"
+    ],
+    "disposition": "CENSORED_UNRESOLVED",
+    "reason": "exact canonical alert-time receipts not retrievable by evaluator; no retrospective TradingView substitution"
+  },
+  "owner_action_required": false,
+  "authority": {
+    "research_only": true,
+    "execution": "none",
+    "retune": false,
+    "live_state_changes": false
+  }
+}
