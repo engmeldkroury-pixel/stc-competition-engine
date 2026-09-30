@@ -1,0 +1,210 @@
+{
+  "schema_version": 1,
+  "increment_id": "R10_FORWARD_EVIDENCE_ACCESS_INTEGRITY_2026-09-30T1633Z",
+  "captured_at_utc": "2026-09-30T16:33:53Z",
+  "predecessor_persisted_evidence_path": "research_outputs/R10_FORWARD_EVIDENCE_INCREMENT_2026-09-30T1427Z.json",
+  "continuity_note": "A prior non-persisted automation evaluation covered source observations through 2026-09-30T14:45:00Z. This append does not reconstruct or overwrite those observations. It records only the newly discovered inability of this evaluator to retrieve exact alert-time raw receipts needed to causally complete 14:45Z and evaluate later source times.",
+  "canonicalization": "recursive lexicographic object-key ordering; JSON compact; SHA-256 excludes evidence_batch_sha256",
+  "frozen_registry": {
+    "registry_id": "R10-FORWARD-SHADOW-REGISTRY-V1",
+    "registry_blob_sha": "c3f199f1c0e39e95227b3895911c4801443aa452",
+    "mtf_candidates_blob_sha": "0eb29de0f0098c8bd3039c4b99e47fc371385b87",
+    "regime_protocol_blob_sha": "7ea7abb7cbdfced80527e068b6347890739cf8de"
+  },
+  "frozen_protocols": {
+    "mtf_protocol_sha256": "beeb4883b7e01afa19bf6c70b25d2caa337c7d632c25d126bae2458217a96eb2",
+    "mtf_candidates": {
+      "CAPITALCOM:ETHUSD": "2d1406da93b44d8ec1cf15d47b5e8664abcaf5809515e0c0382286917d4784d9",
+      "CAPITALCOM:DOGEUSD": "e22c97ad3e915bf4032afececa7c5d463a7250850ac76627f5ed11ad8ad44d98"
+    },
+    "regime_protocol_id": "R10-REGIME-SESSION-SHADOW-V1",
+    "regime_protocol_sha256": "96e94a305c0a6eb22f92f495560f1e0c66dc60d7395608c140da1e5b6e0def97"
+  },
+  "scope": {
+    "continuity_pending_source_time": "2026-09-30T14:45:00Z",
+    "genuinely_new_source_times": [
+      "2026-09-30T15:00:00Z",
+      "2026-09-30T15:15:00Z",
+      "2026-09-30T15:30:00Z",
+      "2026-09-30T15:45:00Z",
+      "2026-09-30T16:00:00Z",
+      "2026-09-30T16:15:00Z"
+    ],
+    "causal_cutoff_utc": "2026-09-30T16:33:53Z"
+  },
+  "evidence_access_integrity": {
+    "status": "FAIL",
+    "failure_class": "CANONICAL_ALERT_TIME_RECEIPT_UNAVAILABLE_TO_EVALUATOR",
+    "detail": "Production bridge processing is observable, but exact alert-time payload_json/result_json rows are stored behind authenticated Hostinger data surfaces and are not exposed by the available read-only GitHub process logs. Later TradingView history is prohibited as a substitute.",
+    "production_source_intervals_claimed_missing": false,
+    "evaluator_receipt_access_missing": true,
+    "continuity_14_45_next_open": "UNRESOLVED_CENSORED",
+    "mtf_new_intervals": [
+      {
+        "source_time": "2026-09-30T15:00:00Z",
+        "status": "CENSORED_UNRESOLVED",
+        "reason": "exact_alert_time_source_OHLC_features_HTF_and_next_open_receipt_not_retrievable"
+      },
+      {
+        "source_time": "2026-09-30T15:15:00Z",
+        "status": "CENSORED_UNRESOLVED",
+        "reason": "exact_alert_time_source_OHLC_features_HTF_and_next_open_receipt_not_retrievable"
+      },
+      {
+        "source_time": "2026-09-30T15:30:00Z",
+        "status": "CENSORED_UNRESOLVED",
+        "reason": "exact_alert_time_source_OHLC_features_HTF_and_next_open_receipt_not_retrievable"
+      },
+      {
+        "source_time": "2026-09-30T15:45:00Z",
+        "status": "CENSORED_UNRESOLVED",
+        "reason": "exact_alert_time_source_OHLC_features_HTF_and_next_open_receipt_not_retrievable"
+      },
+      {
+        "source_time": "2026-09-30T16:00:00Z",
+        "status": "CENSORED_UNRESOLVED",
+        "reason": "exact_alert_time_source_OHLC_features_HTF_and_next_open_receipt_not_retrievable"
+      },
+      {
+        "source_time": "2026-09-30T16:15:00Z",
+        "status": "CENSORED_UNRESOLVED",
+        "reason": "exact_alert_time_source_OHLC_features_HTF_and_next_open_receipt_not_retrievable"
+      }
+    ],
+    "regime_new_intervals": [
+      {
+        "source_time": "2026-09-30T15:00:00Z",
+        "status": "CENSORED_UNRESOLVED",
+        "reason": "exact_alert_time_source_OHLC_and_decision_features_not_retrievable"
+      },
+      {
+        "source_time": "2026-09-30T15:15:00Z",
+        "status": "CENSORED_UNRESOLVED",
+        "reason": "exact_alert_time_source_OHLC_and_decision_features_not_retrievable"
+      },
+      {
+        "source_time": "2026-09-30T15:30:00Z",
+        "status": "CENSORED_UNRESOLVED",
+        "reason": "exact_alert_time_source_OHLC_and_decision_features_not_retrievable"
+      },
+      {
+        "source_time": "2026-09-30T15:45:00Z",
+        "status": "CENSORED_UNRESOLVED",
+        "reason": "exact_alert_time_source_OHLC_and_decision_features_not_retrievable"
+      },
+      {
+        "source_time": "2026-09-30T16:00:00Z",
+        "status": "CENSORED_UNRESOLVED",
+        "reason": "exact_alert_time_source_OHLC_and_decision_features_not_retrievable"
+      },
+      {
+        "source_time": "2026-09-30T16:15:00Z",
+        "status": "CENSORED_UNRESOLVED",
+        "reason": "exact_alert_time_source_OHLC_and_decision_features_not_retrievable"
+      }
+    ]
+  },
+  "bridge_transport_observations": [
+    {
+      "dispatch_cycle_utc": "2026-09-30T15:00:00Z",
+      "claimed": 26,
+      "ingested": 26,
+      "rejected": 0,
+      "failed": 0,
+      "workflow_run_id": 36733378873
+    },
+    {
+      "dispatch_cycle_utc": "2026-09-30T15:15:00Z",
+      "claimed": 26,
+      "ingested": 26,
+      "rejected": 0,
+      "failed": 0,
+      "workflow_run_id": 36735282313
+    },
+    {
+      "dispatch_cycle_utc": "2026-09-30T15:30:00Z",
+      "claimed": 26,
+      "ingested": 26,
+      "rejected": 0,
+      "failed": 0,
+      "workflow_run_id": 36737201792
+    },
+    {
+      "dispatch_cycle_utc": "2026-09-30T15:45:00Z",
+      "claimed": 26,
+      "ingested": 26,
+      "rejected": 0,
+      "failed": 0,
+      "workflow_run_id": 36739098700
+    },
+    {
+      "dispatch_cycle_utc": "2026-09-30T16:00:00Z",
+      "claimed": 26,
+      "ingested": 26,
+      "rejected": 0,
+      "failed": 0,
+      "workflow_run_id": 36740973782
+    },
+    {
+      "dispatch_cycle_utc": "2026-09-30T16:15:00Z",
+      "claimed": 26,
+      "ingested": 26,
+      "rejected": 0,
+      "failed": 0,
+      "workflow_run_id": 36742824077
+    },
+    {
+      "dispatch_cycle_utc": "2026-09-30T16:30:00Z",
+      "claimed_total_observed": 26,
+      "ingested_total_observed": 26,
+      "rejected_total_observed": 0,
+      "failed_total_observed": 0,
+      "workflow_run_ids": [
+        36744657456,
+        36744694757
+      ],
+      "split_batches": [
+        {
+          "claimed": 16,
+          "ingested": 16
+        },
+        {
+          "claimed": 10,
+          "ingested": 10
+        }
+      ]
+    }
+  ],
+  "admissible_inference": {
+    "new_directional_mtf_entries": 0,
+    "new_mtf_outcomes": 0,
+    "new_regime_directional_entries": 0,
+    "new_regime_outcomes": 0,
+    "note": "Zeros mean no new observation is admissible from the currently retrievable canonical evidence; they do not assert that the inaccessible production receipts contained WAIT decisions."
+  },
+  "causal_crypto_portfolio": {
+    "state": "FLAT",
+    "accepted_entries": 1,
+    "overlap_rejections": 0,
+    "valued_forward_trades": 1
+  },
+  "review_states": {
+    "mtf": "COLLECTING",
+    "regime_session": "COLLECTING"
+  },
+  "authority": {
+    "research_only": true,
+    "live_authorized": false,
+    "execution": "none",
+    "retune_on_forward": false,
+    "risk_change": false,
+    "broker_change": false,
+    "position_or_stop_change": false,
+    "notification_change": false
+  },
+  "summary": {
+    "material_update_type": "DATA_INTEGRITY_FAILURE",
+    "owner_action_required": false
+  },
+  "evidence_batch_sha256": "a355b0194e0cf8ad55deac7e910b3fd4fa741a8fb55b7504d67b5bd67c5a43bf"
+}
