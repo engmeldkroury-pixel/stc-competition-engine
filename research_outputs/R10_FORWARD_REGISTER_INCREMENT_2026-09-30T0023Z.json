@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "register_increment_id": "R10_FORWARD_REGISTER_INCREMENT_2026-09-30T0023Z",
+  "captured_at_utc": "2026-09-30T00:23:44Z",
+  "evidence_path": "research_outputs/R10_FORWARD_EVIDENCE_INCREMENT_2026-09-30T0023Z.json",
+  "evidence_commit": "2b532447ac18418681e97df2c8e54e9f5df020c6",
+  "batch_sha256": "058c17ebb52a45da9bb904bbc3506d90cabf8c7dd4d533695f05026f100f8553",
+  "window": {
+    "completed_source_times": [
+      "2026-09-29T23:00:00Z",
+      "2026-09-29T23:15:00Z",
+      "2026-09-29T23:30:00Z",
+      "2026-09-29T23:45:00Z"
+    ],
+    "pending_source_time": "2026-09-30T00:00:00Z"
+  },
+  "review_states": {
+    "mtf": "COLLECTING",
+    "regime_session": "COLLECTING"
+  },
+  "causal_crypto_portfolio": {
+    "state": "FLAT",
+    "accepted_entries": 0,
+    "overlap_rejections": 0,
+    "valued_forward_trades": 0
+  },
+  "counts": {
+    "mtf_completed": 8,
+    "mtf_pending": 2,
+    "regime_completed": 40,
+    "regime_pending": 10,
+    "missing_source_intervals": 0,
+    "webhook_timeouts": 13,
+    "completed_retrospective_revision_rows": 18,
+    "pending_retrospective_revision_rows": 1
+  },
+  "material_integrity": [
+    "ETHUSD_2026-09-29T23:45:00Z_CENSORED_STALE_1H_AND_MISSING_EXACT_4H_PAIR",
+    "WEBHOOK_TIMEOUTS_WITH_ALERT_PAYLOADS_PRESENT",
+    "TRADINGVIEW_HISTORY_REVISIONS_AUDIT_ONLY"
+  ],
+  "authority": {
+    "research_only": true,
+    "live_authorized": false,
+    "execution": "none",
+    "retune_on_forward": false,
+    "live_risk_change": false,
+    "broker_state_change": false,
+    "notification_setting_change": false
+  }
+}
