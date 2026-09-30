@@ -1,0 +1,5009 @@
+{
+  "schema_version": 1,
+  "increment_id": "R10_FORWARD_EVIDENCE_INCREMENT_2026-09-30T1022Z",
+  "captured_at_utc": "2026-09-30T10:22:25Z",
+  "predecessor_evidence_path": "research_outputs/R10_FORWARD_EVIDENCE_INCREMENT_2026-09-30T0734Z.json",
+  "predecessor_register_path": "research_outputs/R10_FORWARD_REGISTER_INCREMENT_2026-09-30T0734Z.json",
+  "canonicalization": "recursive lexicographic object-key ordering; JSON compact; SHA-256 over envelope excluding its evidence_sha256/source_receipt_sha256/outcome_sha256; retrospective audit excluded from decision-envelope hash",
+  "frozen_registry": {
+    "registry_id": "R10-FORWARD-SHADOW-REGISTRY-V1",
+    "registry_blob_sha": "c3f199f1c0e39e95227b3895911c4801443aa452",
+    "mtf_candidates_blob_sha": "0eb29de0f0098c8bd3039c4b99e47fc371385b87",
+    "regime_protocol_blob_sha": "7ea7abb7cbdfced80527e068b6347890739cf8de"
+  },
+  "scope": {
+    "continuity_completion_source_time": "2026-09-30T08:45:00Z",
+    "genuinely_new_completed_source_times": [
+      "2026-09-30T09:00:00Z",
+      "2026-09-30T09:15:00Z",
+      "2026-09-30T09:30:00Z",
+      "2026-09-30T09:45:00Z"
+    ],
+    "genuinely_new_pending_source_time": "2026-09-30T10:00:00Z",
+    "directional_outcome_updated_source_time": "2026-09-30T08:30:00Z"
+  },
+  "mtf": {
+    "candidate_hashes": {
+      "CAPITALCOM:ETHUSD": "2d1406da93b44d8ec1cf15d47b5e8664abcaf5809515e0c0382286917d4784d9",
+      "CAPITALCOM:DOGEUSD": "e22c97ad3e915bf4032afececa7c5d463a7250850ac76627f5ed11ad8ad44d98"
+    },
+    "protocol_sha256": "beeb4883b7e01afa19bf6c70b25d2caa337c7d632c25d126bae2458217a96eb2",
+    "observations": [
+      {
+        "schema": "R10_CANONICAL_EVIDENCE_ENVELOPE_V1",
+        "protocol": "mtf_eth_doge_v1",
+        "protocol_sha256": "beeb4883b7e01afa19bf6c70b25d2caa337c7d632c25d126bae2458217a96eb2",
+        "candidate_sha256": "2d1406da93b44d8ec1cf15d47b5e8664abcaf5809515e0c0382286917d4784d9",
+        "symbol": "CAPITALCOM:ETHUSD",
+        "source_time": "2026-09-30T08:45:00Z",
+        "source_observed": {
+          "open": 2666.61,
+          "high": 2672,
+          "low": 2666.57,
+          "close": 2668.88,
+          "volume": 3947,
+          "ema20": 2668.3636696607,
+          "ema50": 2673.1843067356,
+          "rsi14": 49.4554912605,
+          "atr14": 6.4467201569
+        },
+        "higher_timeframe_observed": {
+          "one_hour": {
+            "expected_eligible_open_utc": "2026-09-30T08:00:00Z",
+            "observed_confirm_time": "2026-09-30T07:00:00Z",
+            "ema20": 2677.8204581847,
+            "ema50": 2681.7287118896,
+            "exact_boundary_match": false
+          },
+          "four_hour": {
+            "observed_time": "2026-09-30T01:00:00Z",
+            "observed_score": -0.3,
+            "exact_ema20_ema50": null,
+            "status": "missing_exact_pair"
+          }
+        },
+        "derived": {
+          "local_trend": -1,
+          "trend_1h_observed": -1,
+          "distance_atr": 0.08009194237281685,
+          "slope_atr": -0.12136638696232947
+        },
+        "geometry": {
+          "stop_atr": 1.5,
+          "target_r": 1.5,
+          "max_entry_gap_atr": 0.25,
+          "distance_atr": 0.08009194237281685,
+          "slope_atr": -0.12136638696232947,
+          "entry_gap_atr": 0.012409410995497036
+        },
+        "decision": "WAIT",
+        "direction": "WAIT",
+        "reason": "geometry_fails_for_all_causally_possible_vote_directions_despite_stale_1h_and_unknown_4h",
+        "costs_bps": {
+          "1": "not_applicable",
+          "2": "not_applicable",
+          "3": "not_applicable",
+          "5": "not_applicable"
+        },
+        "mfe_mae": null,
+        "stop_target_horizon_outcome": null,
+        "integrity": {
+          "issues": [
+            "stale_1h_boundary_expected_2026-09-30T08:00:00Z_observed_2026-09-30T07:00:00Z",
+            "exact_eligible_4h_ema20_ema50_missing"
+          ],
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "next_open_observed": {
+          "time": "2026-09-30T09:00:00Z",
+          "open": 2668.96,
+          "fire_id": 57618141730,
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "evidence_sha256": "1b32171c7b2be9b930817ab7559c60b657cfa073bde20789e432b1fd5711b276",
+        "prior_source_receipt_sha256": "5b85124f320b7e3ec091c10bda3eccbff270ae696aac0767f4e1a963661e42a2"
+      },
+      {
+        "schema": "R10_CANONICAL_EVIDENCE_ENVELOPE_V1",
+        "protocol": "mtf_eth_doge_v1",
+        "protocol_sha256": "beeb4883b7e01afa19bf6c70b25d2caa337c7d632c25d126bae2458217a96eb2",
+        "candidate_sha256": "2d1406da93b44d8ec1cf15d47b5e8664abcaf5809515e0c0382286917d4784d9",
+        "symbol": "CAPITALCOM:ETHUSD",
+        "source_time": "2026-09-30T09:00:00Z",
+        "source_observed": {
+          "open": 2668.96,
+          "high": 2677.52,
+          "low": 2668.32,
+          "close": 2676.58,
+          "volume": 4299,
+          "ema20": 2669.1504857021,
+          "ema50": 2673.3193550682,
+          "rsi14": 57.799707969,
+          "atr14": 6.6433830029
+        },
+        "higher_timeframe_observed": {
+          "one_hour": {
+            "expected_eligible_open_utc": "2026-09-30T08:00:00Z",
+            "observed_confirm_time": "2026-09-30T08:00:00Z",
+            "ema20": 2676.9737478814,
+            "ema50": 2681.2268016194,
+            "exact_boundary_match": true
+          },
+          "four_hour": {
+            "observed_time": "2026-09-30T05:00:00Z",
+            "observed_score": 0,
+            "exact_ema20_ema50": null,
+            "status": "missing_exact_pair"
+          }
+        },
+        "derived": {
+          "local_trend": -1,
+          "trend_1h_observed": -1,
+          "distance_atr": 1.1183329780409692,
+          "slope_atr": 0.06657140252294294
+        },
+        "geometry": {
+          "stop_atr": 1.5,
+          "target_r": 1.5,
+          "max_entry_gap_atr": 0.25,
+          "distance_atr": 1.1183329780409692,
+          "slope_atr": 0.06657140252294294,
+          "entry_gap_atr": 0.0030105143706529217
+        },
+        "decision": "WAIT",
+        "direction": "WAIT",
+        "reason": "geometry_fails_for_all_causally_possible_vote_directions_with_unknown_4h",
+        "costs_bps": {
+          "1": "not_applicable",
+          "2": "not_applicable",
+          "3": "not_applicable",
+          "5": "not_applicable"
+        },
+        "mfe_mae": null,
+        "stop_target_horizon_outcome": null,
+        "integrity": {
+          "issues": [
+            "exact_eligible_4h_ema20_ema50_missing"
+          ],
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "next_open_observed": {
+          "time": "2026-09-30T09:15:00Z",
+          "open": 2676.6,
+          "fire_id": 57618822152,
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "evidence_sha256": "c77d296a14d0877520352ffd7d5ff778ff2e0d8509e0bc6fd0e8b0650e3ca55f"
+      },
+      {
+        "schema": "R10_CANONICAL_EVIDENCE_ENVELOPE_V1",
+        "protocol": "mtf_eth_doge_v1",
+        "protocol_sha256": "beeb4883b7e01afa19bf6c70b25d2caa337c7d632c25d126bae2458217a96eb2",
+        "candidate_sha256": "2d1406da93b44d8ec1cf15d47b5e8664abcaf5809515e0c0382286917d4784d9",
+        "symbol": "CAPITALCOM:ETHUSD",
+        "source_time": "2026-09-30T09:15:00Z",
+        "source_observed": {
+          "open": 2676.6,
+          "high": 2684.88,
+          "low": 2675.04,
+          "close": 2683.62,
+          "volume": 3891,
+          "ema20": 2670.5285346828,
+          "ema50": 2673.7233019282,
+          "rsi14": 63.7024874422,
+          "atr14": 6.8717127884
+        },
+        "higher_timeframe_observed": {
+          "one_hour": {
+            "expected_eligible_open_utc": "2026-09-30T08:00:00Z",
+            "observed_confirm_time": "2026-09-30T08:00:00Z",
+            "ema20": 2676.9737478814,
+            "ema50": 2681.2268016194,
+            "exact_boundary_match": true
+          },
+          "four_hour": {
+            "observed_time": "2026-09-30T05:00:00Z",
+            "observed_score": 0,
+            "exact_ema20_ema50": null,
+            "status": "missing_exact_pair"
+          }
+        },
+        "derived": {
+          "local_trend": -1,
+          "trend_1h_observed": -1,
+          "distance_atr": 1.9051240528124704,
+          "slope_atr": 0.29661231328537613
+        },
+        "geometry": {
+          "stop_atr": 1.5,
+          "target_r": 1.5,
+          "max_entry_gap_atr": 0.25,
+          "distance_atr": 1.9051240528124704,
+          "slope_atr": 0.29661231328537613,
+          "entry_gap_atr": 0.048022961692606475
+        },
+        "decision": "WAIT",
+        "direction": "WAIT",
+        "reason": "geometry_fails_for_all_causally_possible_vote_directions_with_unknown_4h",
+        "costs_bps": {
+          "1": "not_applicable",
+          "2": "not_applicable",
+          "3": "not_applicable",
+          "5": "not_applicable"
+        },
+        "mfe_mae": null,
+        "stop_target_horizon_outcome": null,
+        "integrity": {
+          "issues": [
+            "exact_eligible_4h_ema20_ema50_missing"
+          ],
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "next_open_observed": {
+          "time": "2026-09-30T09:30:00Z",
+          "open": 2683.95,
+          "fire_id": 57619590852,
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "evidence_sha256": "2517d96eec63d16e33b71c5c3bc7db15e9147b39f292b65d59785a1307aa0a52"
+      },
+      {
+        "schema": "R10_CANONICAL_EVIDENCE_ENVELOPE_V1",
+        "protocol": "mtf_eth_doge_v1",
+        "protocol_sha256": "beeb4883b7e01afa19bf6c70b25d2caa337c7d632c25d126bae2458217a96eb2",
+        "candidate_sha256": "2d1406da93b44d8ec1cf15d47b5e8664abcaf5809515e0c0382286917d4784d9",
+        "symbol": "CAPITALCOM:ETHUSD",
+        "source_time": "2026-09-30T09:30:00Z",
+        "source_observed": {
+          "open": 2683.95,
+          "high": 2695.95,
+          "low": 2682.55,
+          "close": 2687.21,
+          "volume": 5467,
+          "ema20": 2672.1422343275,
+          "ema50": 2674.2631186154,
+          "rsi14": 66.2779123571,
+          "atr14": 7.3380190178
+        },
+        "higher_timeframe_observed": {
+          "one_hour": {
+            "expected_eligible_open_utc": "2026-09-30T08:00:00Z",
+            "observed_confirm_time": "2026-09-30T08:00:00Z",
+            "ema20": 2676.9737478814,
+            "ema50": 2681.2268016194,
+            "exact_boundary_match": true
+          },
+          "four_hour": {
+            "observed_time": "2026-09-30T05:00:00Z",
+            "observed_score": 0,
+            "exact_ema20_ema50": null,
+            "status": "missing_exact_pair"
+          }
+        },
+        "derived": {
+          "local_trend": -1,
+          "trend_1h_observed": -1,
+          "distance_atr": 2.053383295403017,
+          "slope_atr": 0.5223365079188445
+        },
+        "geometry": {
+          "stop_atr": 1.5,
+          "target_r": 1.5,
+          "max_entry_gap_atr": 0.25,
+          "distance_atr": 2.053383295403017,
+          "slope_atr": 0.5223365079188445,
+          "entry_gap_atr": 0.001362765615012213
+        },
+        "decision": "WAIT",
+        "direction": "WAIT",
+        "reason": "geometry_fails_for_all_causally_possible_vote_directions_with_unknown_4h",
+        "costs_bps": {
+          "1": "not_applicable",
+          "2": "not_applicable",
+          "3": "not_applicable",
+          "5": "not_applicable"
+        },
+        "mfe_mae": null,
+        "stop_target_horizon_outcome": null,
+        "integrity": {
+          "issues": [
+            "exact_eligible_4h_ema20_ema50_missing"
+          ],
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "next_open_observed": {
+          "time": "2026-09-30T09:45:00Z",
+          "open": 2687.22,
+          "fire_id": 57620237498,
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "evidence_sha256": "a28461265fe4cc967e17a7364efc75edc99a491dc9511f273a036cf24654f00d"
+      },
+      {
+        "schema": "R10_CANONICAL_EVIDENCE_ENVELOPE_V1",
+        "protocol": "mtf_eth_doge_v1",
+        "protocol_sha256": "beeb4883b7e01afa19bf6c70b25d2caa337c7d632c25d126bae2458217a96eb2",
+        "candidate_sha256": "2d1406da93b44d8ec1cf15d47b5e8664abcaf5809515e0c0382286917d4784d9",
+        "symbol": "CAPITALCOM:ETHUSD",
+        "source_time": "2026-09-30T09:45:00Z",
+        "source_observed": {
+          "open": 2687.22,
+          "high": 2689.66,
+          "low": 2684.99,
+          "close": 2686.62,
+          "volume": 4144,
+          "ema20": 2673.5288242555,
+          "ema50": 2674.7510932026,
+          "rsi14": 65.3879568364,
+          "atr14": 7.1474462308
+        },
+        "higher_timeframe_observed": {
+          "one_hour": {
+            "expected_eligible_open_utc": "2026-09-30T09:00:00Z",
+            "observed_confirm_time": "2026-09-30T08:00:00Z",
+            "ema20": 2676.9737478814,
+            "ema50": 2681.2268016194,
+            "exact_boundary_match": false
+          },
+          "four_hour": {
+            "observed_time": "2026-09-30T05:00:00Z",
+            "observed_score": 0,
+            "exact_ema20_ema50": null,
+            "status": "missing_exact_pair"
+          }
+        },
+        "derived": {
+          "local_trend": -1,
+          "trend_1h_observed": -1,
+          "distance_atr": 1.8315878597431345,
+          "slope_atr": 0.7226573559297222
+        },
+        "geometry": {
+          "stop_atr": 1.5,
+          "target_r": 1.5,
+          "max_entry_gap_atr": 0.25,
+          "distance_atr": 1.8315878597431345,
+          "slope_atr": 0.7226573559297222,
+          "entry_gap_atr": 0.0013991011162380231
+        },
+        "decision": "WAIT",
+        "direction": "WAIT",
+        "reason": "geometry_fails_for_all_causally_possible_vote_directions_despite_stale_1h_and_unknown_4h",
+        "costs_bps": {
+          "1": "not_applicable",
+          "2": "not_applicable",
+          "3": "not_applicable",
+          "5": "not_applicable"
+        },
+        "mfe_mae": null,
+        "stop_target_horizon_outcome": null,
+        "integrity": {
+          "issues": [
+            "stale_1h_boundary_expected_2026-09-30T09:00:00Z_observed_2026-09-30T08:00:00Z",
+            "exact_eligible_4h_ema20_ema50_missing"
+          ],
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "next_open_observed": {
+          "time": "2026-09-30T10:00:00Z",
+          "open": 2686.61,
+          "fire_id": 57620915561,
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "evidence_sha256": "86a0143e56cbb297cc5ba4f7c7e375632fad6f6b06820e7214ef6e1c313f15d5"
+      },
+      {
+        "schema": "R10_CANONICAL_EVIDENCE_ENVELOPE_V1",
+        "protocol": "mtf_eth_doge_v1",
+        "protocol_sha256": "beeb4883b7e01afa19bf6c70b25d2caa337c7d632c25d126bae2458217a96eb2",
+        "candidate_sha256": "2d1406da93b44d8ec1cf15d47b5e8664abcaf5809515e0c0382286917d4784d9",
+        "symbol": "CAPITALCOM:ETHUSD",
+        "source_time": "2026-09-30T10:00:00Z",
+        "source_observed": {
+          "open": 2686.61,
+          "high": 2690.43,
+          "low": 2686.54,
+          "close": 2688.95,
+          "volume": 4502,
+          "ema20": 2674.9992310158,
+          "ema50": 2675.3086666333,
+          "rsi14": 67.1381948639,
+          "atr14": 6.9147715
+        },
+        "higher_timeframe_observed": {
+          "one_hour": {
+            "expected_eligible_open_utc": "2026-09-30T09:00:00Z",
+            "observed_confirm_time": "2026-09-30T09:00:00Z",
+            "ema20": 2677.8943433212,
+            "ema50": 2681.4390839089,
+            "exact_boundary_match": true
+          },
+          "four_hour": {
+            "observed_time": "2026-09-30T05:00:00Z",
+            "observed_score": 0,
+            "exact_ema20_ema50": null,
+            "status": "missing_exact_pair"
+          }
+        },
+        "derived": {
+          "local_trend": -1,
+          "trend_1h_observed": -1,
+          "distance_atr": 2.01753145193588,
+          "slope_atr": 0.8458334904775906
+        },
+        "geometry": {
+          "stop_atr": 1.5,
+          "target_r": 1.5,
+          "max_entry_gap_atr": 0.25,
+          "distance_atr": 2.01753145193588,
+          "slope_atr": 0.8458334904775906,
+          "entry_gap_atr": null
+        },
+        "decision": "WAIT",
+        "direction": "WAIT",
+        "reason": "geometry_fails_for_all_causally_possible_vote_directions_with_unknown_4h",
+        "costs_bps": {
+          "1": "not_applicable",
+          "2": "not_applicable",
+          "3": "not_applicable",
+          "5": "not_applicable"
+        },
+        "mfe_mae": null,
+        "stop_target_horizon_outcome": null,
+        "integrity": {
+          "issues": [
+            "exact_eligible_4h_ema20_ema50_missing"
+          ],
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "pending_next_open": true,
+        "source_receipt_sha256": "e3a5e65b6ef1d097531add23c6b3def123f77634cc4536d03e95c24efb83aa3f"
+      },
+      {
+        "schema": "R10_CANONICAL_EVIDENCE_ENVELOPE_V1",
+        "protocol": "mtf_eth_doge_v1",
+        "protocol_sha256": "beeb4883b7e01afa19bf6c70b25d2caa337c7d632c25d126bae2458217a96eb2",
+        "candidate_sha256": "e22c97ad3e915bf4032afececa7c5d463a7250850ac76627f5ed11ad8ad44d98",
+        "symbol": "CAPITALCOM:DOGEUSD",
+        "source_time": "2026-09-30T08:45:00Z",
+        "source_observed": {
+          "open": 0.0931751,
+          "high": 0.0935028,
+          "low": 0.0931527,
+          "close": 0.093344,
+          "volume": 3053,
+          "ema20": 0.0933106695,
+          "ema50": 0.0934753445,
+          "rsi14": 49.9671583444,
+          "atr14": 0.0004336104
+        },
+        "higher_timeframe_observed": {
+          "one_hour": {
+            "expected_eligible_open_utc": "2026-09-30T08:00:00Z",
+            "observed_confirm_time": "2026-09-30T07:00:00Z",
+            "ema20": 0.0935956447,
+            "ema50": 0.0940198559,
+            "exact_boundary_match": false
+          },
+          "four_hour": {
+            "observed_time": "2026-09-30T01:00:00Z",
+            "observed_score": -0.15,
+            "exact_ema20_ema50": null,
+            "status": "missing_exact_pair"
+          }
+        },
+        "derived": {
+          "local_trend": -1,
+          "trend_1h_observed": -1,
+          "distance_atr": 0.07686739063453694,
+          "slope_atr": -0.07732863418405918
+        },
+        "geometry": {
+          "stop_atr": 1.2,
+          "target_r": 2.5,
+          "max_entry_gap_atr": 0.25,
+          "distance_atr": 0.07686739063453694,
+          "slope_atr": -0.07732863418405918,
+          "entry_gap_atr": 0.0020755959727859954
+        },
+        "decision": "CENSORED",
+        "direction": "WAIT",
+        "reason": "stale_1h_decision_material_long_geometry_would_pass_if_correct_1h_long",
+        "costs_bps": {
+          "1": "not_applicable",
+          "2": "not_applicable",
+          "3": "not_applicable",
+          "5": "not_applicable"
+        },
+        "mfe_mae": null,
+        "stop_target_horizon_outcome": null,
+        "integrity": {
+          "issues": [
+            "stale_1h_boundary_expected_2026-09-30T08:00:00Z_observed_2026-09-30T07:00:00Z"
+          ],
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "next_open_observed": {
+          "time": "2026-09-30T09:00:00Z",
+          "open": 0.0933449,
+          "fire_id": 57618141619,
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "evidence_sha256": "815cc18e6dac9a24b10163f660712275ffe7aef8402ccb5b5af96de24992ac43",
+        "prior_source_receipt_sha256": "74663920f9a555c9e210fe9236098f97ce3b0d3019bafc332d68b2a0a23dd262"
+      },
+      {
+        "schema": "R10_CANONICAL_EVIDENCE_ENVELOPE_V1",
+        "protocol": "mtf_eth_doge_v1",
+        "protocol_sha256": "beeb4883b7e01afa19bf6c70b25d2caa337c7d632c25d126bae2458217a96eb2",
+        "candidate_sha256": "e22c97ad3e915bf4032afececa7c5d463a7250850ac76627f5ed11ad8ad44d98",
+        "symbol": "CAPITALCOM:DOGEUSD",
+        "source_time": "2026-09-30T09:00:00Z",
+        "source_observed": {
+          "open": 0.0933449,
+          "high": 0.0936757,
+          "low": 0.0932761,
+          "close": 0.0936721,
+          "volume": 2643,
+          "ema20": 0.093345169,
+          "ema50": 0.0934830943,
+          "rsi14": 55.0099735052,
+          "atr14": 0.000431181
+        },
+        "higher_timeframe_observed": {
+          "one_hour": {
+            "expected_eligible_open_utc": "2026-09-30T08:00:00Z",
+            "observed_confirm_time": "2026-09-30T08:00:00Z",
+            "ema20": 0.0935717643,
+            "ema50": 0.0939933871,
+            "exact_boundary_match": true
+          },
+          "four_hour": {
+            "observed_time": "2026-09-30T05:00:00Z",
+            "observed_score": 0,
+            "exact_ema20_ema50": null,
+            "status": "missing_exact_pair"
+          }
+        },
+        "derived": {
+          "local_trend": -1,
+          "trend_1h_observed": -1,
+          "distance_atr": 0.7582221851148094,
+          "slope_atr": 0.059299922770259035
+        },
+        "geometry": {
+          "stop_atr": 1.2,
+          "target_r": 2.5,
+          "max_entry_gap_atr": 0.25,
+          "distance_atr": 0.7582221851148094,
+          "slope_atr": 0.059299922770259035,
+          "entry_gap_atr": 0.006029950299274546
+        },
+        "decision": "WAIT",
+        "direction": "WAIT",
+        "reason": "frozen_pullback_geometry_fails",
+        "costs_bps": {
+          "1": "not_applicable",
+          "2": "not_applicable",
+          "3": "not_applicable",
+          "5": "not_applicable"
+        },
+        "mfe_mae": null,
+        "stop_target_horizon_outcome": null,
+        "integrity": {
+          "issues": [],
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "next_open_observed": {
+          "time": "2026-09-30T09:15:00Z",
+          "open": 0.0936695,
+          "fire_id": 57618826376,
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "evidence_sha256": "4d2fdc7106704b540cc5831dd916686e21087e2d259c0031adad3efe773a4978"
+      },
+      {
+        "schema": "R10_CANONICAL_EVIDENCE_ENVELOPE_V1",
+        "protocol": "mtf_eth_doge_v1",
+        "protocol_sha256": "beeb4883b7e01afa19bf6c70b25d2caa337c7d632c25d126bae2458217a96eb2",
+        "candidate_sha256": "e22c97ad3e915bf4032afececa7c5d463a7250850ac76627f5ed11ad8ad44d98",
+        "symbol": "CAPITALCOM:DOGEUSD",
+        "source_time": "2026-09-30T09:15:00Z",
+        "source_observed": {
+          "open": 0.0936695,
+          "high": 0.0939216,
+          "low": 0.0936343,
+          "close": 0.0938497,
+          "volume": 2531,
+          "ema20": 0.0933932195,
+          "ema50": 0.093497471,
+          "rsi14": 57.5071012183,
+          "atr14": 0.0004209038
+        },
+        "higher_timeframe_observed": {
+          "one_hour": {
+            "expected_eligible_open_utc": "2026-09-30T08:00:00Z",
+            "observed_confirm_time": "2026-09-30T08:00:00Z",
+            "ema20": 0.0935717643,
+            "ema50": 0.0939933871,
+            "exact_boundary_match": true
+          },
+          "four_hour": {
+            "observed_time": "2026-09-30T05:00:00Z",
+            "observed_score": 0,
+            "exact_ema20_ema50": null,
+            "status": "missing_exact_pair"
+          }
+        },
+        "derived": {
+          "local_trend": -1,
+          "trend_1h_observed": -1,
+          "distance_atr": 1.084524539811698,
+          "slope_atr": 0.17155939195607905
+        },
+        "geometry": {
+          "stop_atr": 1.2,
+          "target_r": 2.5,
+          "max_entry_gap_atr": 0.25,
+          "distance_atr": 1.084524539811698,
+          "slope_atr": 0.17155939195607905,
+          "entry_gap_atr": 0.01425503879985403
+        },
+        "decision": "WAIT",
+        "direction": "WAIT",
+        "reason": "frozen_pullback_geometry_fails",
+        "costs_bps": {
+          "1": "not_applicable",
+          "2": "not_applicable",
+          "3": "not_applicable",
+          "5": "not_applicable"
+        },
+        "mfe_mae": null,
+        "stop_target_horizon_outcome": null,
+        "integrity": {
+          "issues": [],
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "next_open_observed": {
+          "time": "2026-09-30T09:30:00Z",
+          "open": 0.0938557,
+          "fire_id": 57619588548,
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "evidence_sha256": "c1185c40b8a83a6c7e767d04ed14a22f736652ea00453d6088493f48926f0a9c"
+      },
+      {
+        "schema": "R10_CANONICAL_EVIDENCE_ENVELOPE_V1",
+        "protocol": "mtf_eth_doge_v1",
+        "protocol_sha256": "beeb4883b7e01afa19bf6c70b25d2caa337c7d632c25d126bae2458217a96eb2",
+        "candidate_sha256": "e22c97ad3e915bf4032afececa7c5d463a7250850ac76627f5ed11ad8ad44d98",
+        "symbol": "CAPITALCOM:DOGEUSD",
+        "source_time": "2026-09-30T09:30:00Z",
+        "source_observed": {
+          "open": 0.0938557,
+          "high": 0.094417,
+          "low": 0.0937796,
+          "close": 0.0941043,
+          "volume": 2768,
+          "ema20": 0.0934610363,
+          "ema50": 0.0935213097,
+          "rsi14": 60.8599357011,
+          "atr14": 0.0004363678
+        },
+        "higher_timeframe_observed": {
+          "one_hour": {
+            "expected_eligible_open_utc": "2026-09-30T08:00:00Z",
+            "observed_confirm_time": "2026-09-30T08:00:00Z",
+            "ema20": 0.0935717643,
+            "ema50": 0.0939933871,
+            "exact_boundary_match": true
+          },
+          "four_hour": {
+            "observed_time": "2026-09-30T05:00:00Z",
+            "observed_score": 0,
+            "exact_ema20_ema50": null,
+            "status": "missing_exact_pair"
+          }
+        },
+        "derived": {
+          "local_trend": -1,
+          "trend_1h_observed": -1,
+          "distance_atr": 1.4741319134913424,
+          "slope_atr": 0.351689102633119
+        },
+        "geometry": {
+          "stop_atr": 1.2,
+          "target_r": 2.5,
+          "max_entry_gap_atr": 0.25,
+          "distance_atr": 1.4741319134913424,
+          "slope_atr": 0.351689102633119,
+          "entry_gap_atr": 0.005958276481457559
+        },
+        "decision": "WAIT",
+        "direction": "WAIT",
+        "reason": "frozen_pullback_geometry_fails",
+        "costs_bps": {
+          "1": "not_applicable",
+          "2": "not_applicable",
+          "3": "not_applicable",
+          "5": "not_applicable"
+        },
+        "mfe_mae": null,
+        "stop_target_horizon_outcome": null,
+        "integrity": {
+          "issues": [],
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "next_open_observed": {
+          "time": "2026-09-30T09:45:00Z",
+          "open": 0.0941017,
+          "fire_id": 57620232558,
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "evidence_sha256": "62ed3154ae1f618b347243247a0ea0d65555394eca5ca279dc1d07a4744276e7"
+      },
+      {
+        "schema": "R10_CANONICAL_EVIDENCE_ENVELOPE_V1",
+        "protocol": "mtf_eth_doge_v1",
+        "protocol_sha256": "beeb4883b7e01afa19bf6c70b25d2caa337c7d632c25d126bae2458217a96eb2",
+        "candidate_sha256": "e22c97ad3e915bf4032afececa7c5d463a7250850ac76627f5ed11ad8ad44d98",
+        "symbol": "CAPITALCOM:DOGEUSD",
+        "source_time": "2026-09-30T09:45:00Z",
+        "source_observed": {
+          "open": 0.0941017,
+          "high": 0.09419,
+          "low": 0.0939758,
+          "close": 0.093982,
+          "volume": 1792,
+          "ema20": 0.0935108156,
+          "ema50": 0.0935394475,
+          "rsi14": 58.4603662595,
+          "atr14": 0.0004204987
+        },
+        "higher_timeframe_observed": {
+          "one_hour": {
+            "expected_eligible_open_utc": "2026-09-30T09:00:00Z",
+            "observed_confirm_time": "2026-09-30T08:00:00Z",
+            "ema20": 0.0935717643,
+            "ema50": 0.0939933871,
+            "exact_boundary_match": false
+          },
+          "four_hour": {
+            "observed_time": "2026-09-30T05:00:00Z",
+            "observed_score": 0,
+            "exact_ema20_ema50": null,
+            "status": "missing_exact_pair"
+          }
+        },
+        "derived": {
+          "local_trend": -1,
+          "trend_1h_observed": -1,
+          "distance_atr": 1.1205371146212602,
+          "slope_atr": 0.4759731718552436
+        },
+        "geometry": {
+          "stop_atr": 1.2,
+          "target_r": 2.5,
+          "max_entry_gap_atr": 0.25,
+          "distance_atr": 1.1205371146212602,
+          "slope_atr": 0.4759731718552436,
+          "entry_gap_atr": 0.0028537543635518336
+        },
+        "decision": "WAIT",
+        "direction": "WAIT",
+        "reason": "geometry_fails_for_all_causally_possible_directions_despite_stale_1h",
+        "costs_bps": {
+          "1": "not_applicable",
+          "2": "not_applicable",
+          "3": "not_applicable",
+          "5": "not_applicable"
+        },
+        "mfe_mae": null,
+        "stop_target_horizon_outcome": null,
+        "integrity": {
+          "issues": [
+            "stale_1h_boundary_expected_2026-09-30T09:00:00Z_observed_2026-09-30T08:00:00Z"
+          ],
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "next_open_observed": {
+          "time": "2026-09-30T10:00:00Z",
+          "open": 0.0939808,
+          "fire_id": 57620908122,
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "evidence_sha256": "a286308b77c446492bfe7d1231c974df167d5744e16264dba946cfdfd72e757c"
+      },
+      {
+        "schema": "R10_CANONICAL_EVIDENCE_ENVELOPE_V1",
+        "protocol": "mtf_eth_doge_v1",
+        "protocol_sha256": "beeb4883b7e01afa19bf6c70b25d2caa337c7d632c25d126bae2458217a96eb2",
+        "candidate_sha256": "e22c97ad3e915bf4032afececa7c5d463a7250850ac76627f5ed11ad8ad44d98",
+        "symbol": "CAPITALCOM:DOGEUSD",
+        "source_time": "2026-09-30T10:00:00Z",
+        "source_observed": {
+          "open": 0.0939808,
+          "high": 0.0944017,
+          "low": 0.0939476,
+          "close": 0.0941637,
+          "volume": 2204,
+          "ema20": 0.0935729864,
+          "ema50": 0.0935639243,
+          "rsi14": 60.9103360424,
+          "atr14": 0.0004228988
+        },
+        "higher_timeframe_observed": {
+          "one_hour": {
+            "expected_eligible_open_utc": "2026-09-30T09:00:00Z",
+            "observed_confirm_time": "2026-09-30T09:00:00Z",
+            "ema20": 0.0936108248,
+            "ema50": 0.0939929366,
+            "exact_boundary_match": true
+          },
+          "four_hour": {
+            "observed_time": "2026-09-30T05:00:00Z",
+            "observed_score": 0,
+            "exact_ema20_ema50": null,
+            "status": "missing_exact_pair"
+          }
+        },
+        "derived": {
+          "local_trend": 1,
+          "trend_1h_observed": -1,
+          "distance_atr": 1.3968202321690217,
+          "slope_atr": 0.5387042952119907
+        },
+        "geometry": {
+          "stop_atr": 1.2,
+          "target_r": 2.5,
+          "max_entry_gap_atr": 0.25,
+          "distance_atr": 1.3968202321690217,
+          "slope_atr": 0.5387042952119907,
+          "entry_gap_atr": null
+        },
+        "decision": "WAIT",
+        "direction": "WAIT",
+        "reason": "frozen_pullback_geometry_fails",
+        "costs_bps": {
+          "1": "not_applicable",
+          "2": "not_applicable",
+          "3": "not_applicable",
+          "5": "not_applicable"
+        },
+        "mfe_mae": null,
+        "stop_target_horizon_outcome": null,
+        "integrity": {
+          "issues": [],
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "pending_next_open": true,
+        "source_receipt_sha256": "583713c51422c699582ff6e4996f6901d391f7dd6db59964a915e76634c08694"
+      }
+    ],
+    "directional_outcomes": [
+      {
+        "schema": "R10_DIRECTIONAL_OUTCOME_V1",
+        "protocol": "mtf_eth_doge_v1",
+        "protocol_sha256": "beeb4883b7e01afa19bf6c70b25d2caa337c7d632c25d126bae2458217a96eb2",
+        "candidate_sha256": "e22c97ad3e915bf4032afececa7c5d463a7250850ac76627f5ed11ad8ad44d98",
+        "source_time": "2026-09-30T08:30:00Z",
+        "direction": "SHORT",
+        "prior_evidence_sha256": "87f44ff8cb0af919d2162183aeee2948a31aa9216fb4ee20781ca3cddf275163",
+        "entry_time": "2026-09-30T08:45:00Z",
+        "entry": 0.0931751,
+        "stop": 0.09370314104,
+        "target": 0.0918549974,
+        "planned_risk": 0.0005280410399999963,
+        "path_as_observed": [
+          {
+            "time": "2026-09-30T08:45:00Z",
+            "open": 0.0931751,
+            "high": 0.0935028,
+            "low": 0.0931527,
+            "close": 0.093344,
+            "fire_id": 57617294267,
+            "webhook": {
+              "http_code": 200
+            }
+          },
+          {
+            "time": "2026-09-30T09:00:00Z",
+            "open": 0.0933449,
+            "high": 0.0936757,
+            "low": 0.0932761,
+            "close": 0.0936721,
+            "fire_id": 57618141619,
+            "webhook": {
+              "http_code": 200
+            }
+          },
+          {
+            "time": "2026-09-30T09:15:00Z",
+            "open": 0.0936695,
+            "high": 0.0939216,
+            "low": 0.0936343,
+            "close": 0.0938497,
+            "fire_id": 57618826376,
+            "webhook": {
+              "http_code": 200
+            }
+          }
+        ],
+        "status": "STOP",
+        "exit_time": "2026-09-30T09:15:00Z",
+        "exit_price": 0.09370314104,
+        "bars_observed": 3,
+        "same_bar_stop_target": false,
+        "mfe_r": 0.042420945159853535,
+        "mae_r": 1.4137158732965196,
+        "costs_bps": {
+          "1": {
+            "cost_r": 0.01764542771145225,
+            "net_r": -1.0176454277114522
+          },
+          "2": {
+            "cost_r": 0.0352908554229045,
+            "net_r": -1.0352908554229046
+          },
+          "3": {
+            "cost_r": 0.052936283134356735,
+            "net_r": -1.0529362831343567
+          },
+          "5": {
+            "cost_r": 0.08822713855726123,
+            "net_r": -1.0882271385572613
+          }
+        },
+        "horizon_bars": 32,
+        "integrity": {
+          "missing_intervals": [],
+          "same_bar_rule": "stop_first"
+        },
+        "outcome_sha256": "379812d89cc45d726137cce0fecc3af14cb3c97de63900dd27668b4c60755327"
+      }
+    ],
+    "review_state": "COLLECTING"
+  },
+  "regime_session": {
+    "protocol_id": "R10-REGIME-SESSION-SHADOW-V1",
+    "protocol_sha256": "96e94a305c0a6eb22f92f495560f1e0c66dc60d7395608c140da1e5b6e0def97",
+    "observations": [
+      {
+        "schema": "R10_CANONICAL_EVIDENCE_ENVELOPE_V1",
+        "protocol": "regime_session_v1",
+        "protocol_id": "R10-REGIME-SESSION-SHADOW-V1",
+        "protocol_sha256": "96e94a305c0a6eb22f92f495560f1e0c66dc60d7395608c140da1e5b6e0def97",
+        "symbol": "CAPITALCOM:ETHUSD",
+        "source_time": "2026-09-30T08:45:00Z",
+        "source_observed": {
+          "open": 2666.61,
+          "high": 2672,
+          "low": 2666.57,
+          "close": 2668.88,
+          "volume": 3947,
+          "ema20": 2668.3636696607,
+          "ema50": 2673.1843067356,
+          "ema200": null,
+          "atr14": 6.4467201569,
+          "adx14": null,
+          "rsi14": 49.4554912605,
+          "zscore20": null,
+          "range_atr": null
+        },
+        "missing_protocol_features": [
+          "ema200",
+          "adx14",
+          "zscore20",
+          "range_atr"
+        ],
+        "decision": "WAIT",
+        "direction": "WAIT",
+        "reason": "outside_frozen_12_17_utc_session_gate",
+        "geometry": {
+          "initial_stop_atr": 1.5,
+          "single_target_r": 2,
+          "horizon_bars": 32
+        },
+        "costs_bps": {
+          "1": "not_applicable",
+          "2": "not_applicable",
+          "3": "not_applicable",
+          "5": "not_applicable"
+        },
+        "mfe_mae": null,
+        "stop_target_horizon_outcome": null,
+        "integrity": {
+          "issues": [],
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "next_open_observed": {
+          "time": "2026-09-30T09:00:00Z",
+          "open": 2668.96,
+          "fire_id": 57618141730,
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "evidence_sha256": "ea15256e3aa7fe049012ad5117bd1346cfcf27248667603e7b0a64e27882c70c"
+      },
+      {
+        "schema": "R10_CANONICAL_EVIDENCE_ENVELOPE_V1",
+        "protocol": "regime_session_v1",
+        "protocol_id": "R10-REGIME-SESSION-SHADOW-V1",
+        "protocol_sha256": "96e94a305c0a6eb22f92f495560f1e0c66dc60d7395608c140da1e5b6e0def97",
+        "symbol": "CAPITALCOM:DOGEUSD",
+        "source_time": "2026-09-30T08:45:00Z",
+        "source_observed": {
+          "open": 0.0931751,
+          "high": 0.0935028,
+          "low": 0.0931527,
+          "close": 0.093344,
+          "volume": 3053,
+          "ema20": 0.0933106695,
+          "ema50": 0.0934753445,
+          "ema200": null,
+          "atr14": 0.0004336104,
+          "adx14": null,
+          "rsi14": 49.9671583444,
+          "zscore20": null,
+          "range_atr": null
+        },
+        "missing_protocol_features": [
+          "ema200",
+          "adx14",
+          "zscore20",
+          "range_atr"
+        ],
+        "decision": "WAIT",
+        "direction": "WAIT",
+        "reason": "outside_frozen_12_17_utc_session_gate",
+        "geometry": {
+          "initial_stop_atr": 1.5,
+          "single_target_r": 2,
+          "horizon_bars": 32
+        },
+        "costs_bps": {
+          "1": "not_applicable",
+          "2": "not_applicable",
+          "3": "not_applicable",
+          "5": "not_applicable"
+        },
+        "mfe_mae": null,
+        "stop_target_horizon_outcome": null,
+        "integrity": {
+          "issues": [],
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "next_open_observed": {
+          "time": "2026-09-30T09:00:00Z",
+          "open": 0.0933449,
+          "fire_id": 57618141619,
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "evidence_sha256": "c6fac905df54e658976856d40532c90f3876c1c56696fa2a592d2436de56c0b5"
+      },
+      {
+        "schema": "R10_CANONICAL_EVIDENCE_ENVELOPE_V1",
+        "protocol": "regime_session_v1",
+        "protocol_id": "R10-REGIME-SESSION-SHADOW-V1",
+        "protocol_sha256": "96e94a305c0a6eb22f92f495560f1e0c66dc60d7395608c140da1e5b6e0def97",
+        "symbol": "CAPITALCOM:BTCUSD",
+        "source_time": "2026-09-30T08:45:00Z",
+        "source_observed": {
+          "open": 83015,
+          "high": 83115.85,
+          "low": 82956.25,
+          "close": 83001.25,
+          "volume": 4349,
+          "ema20": 83163.7309310594,
+          "ema50": 83289.0853893428,
+          "ema200": null,
+          "atr14": 171.9407745296,
+          "adx14": null,
+          "rsi14": 40.4577197895,
+          "zscore20": null,
+          "range_atr": null
+        },
+        "missing_protocol_features": [
+          "ema200",
+          "adx14",
+          "zscore20",
+          "range_atr"
+        ],
+        "decision": "WAIT",
+        "direction": "WAIT",
+        "reason": "outside_frozen_12_17_utc_session_gate",
+        "geometry": {
+          "initial_stop_atr": 1.5,
+          "single_target_r": 2,
+          "horizon_bars": 32
+        },
+        "costs_bps": {
+          "1": "not_applicable",
+          "2": "not_applicable",
+          "3": "not_applicable",
+          "5": "not_applicable"
+        },
+        "mfe_mae": null,
+        "stop_target_horizon_outcome": null,
+        "integrity": {
+          "issues": [],
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "next_open_observed": {
+          "time": "2026-09-30T09:00:00Z",
+          "open": 83001.4,
+          "fire_id": 57618141615,
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "evidence_sha256": "f1cd4c9709f4ae421c6a5f1cdea66d4459f9da135f6ca00d01a77ca0a3ac28ca"
+      },
+      {
+        "schema": "R10_CANONICAL_EVIDENCE_ENVELOPE_V1",
+        "protocol": "regime_session_v1",
+        "protocol_id": "R10-REGIME-SESSION-SHADOW-V1",
+        "protocol_sha256": "96e94a305c0a6eb22f92f495560f1e0c66dc60d7395608c140da1e5b6e0def97",
+        "symbol": "CAPITALCOM:AUDUSD",
+        "source_time": "2026-09-30T08:45:00Z",
+        "source_observed": {
+          "open": 0.69761,
+          "high": 0.69765,
+          "low": 0.69734,
+          "close": 0.69754,
+          "volume": 705,
+          "ema20": 0.6974694595,
+          "ema50": 0.6977243212,
+          "ema200": null,
+          "atr14": 0.0004937468,
+          "adx14": null,
+          "rsi14": 50.5129042785,
+          "zscore20": null,
+          "range_atr": null
+        },
+        "missing_protocol_features": [
+          "ema200",
+          "adx14",
+          "zscore20",
+          "range_atr"
+        ],
+        "decision": "WAIT",
+        "direction": "WAIT",
+        "reason": "outside_frozen_12_17_utc_session_gate",
+        "geometry": {
+          "initial_stop_atr": 1.5,
+          "single_target_r": 2,
+          "horizon_bars": 32
+        },
+        "costs_bps": {
+          "1": "not_applicable",
+          "2": "not_applicable",
+          "3": "not_applicable",
+          "5": "not_applicable"
+        },
+        "mfe_mae": null,
+        "stop_target_horizon_outcome": null,
+        "integrity": {
+          "issues": [],
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "next_open_observed": {
+          "time": "2026-09-30T09:00:00Z",
+          "open": 0.69748,
+          "fire_id": 57618141633,
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "evidence_sha256": "42cf86869280bf2e4da5399ec9809af31ff57a3a1c12d4e6a9365bf3e04372c9"
+      },
+      {
+        "schema": "R10_CANONICAL_EVIDENCE_ENVELOPE_V1",
+        "protocol": "regime_session_v1",
+        "protocol_id": "R10-REGIME-SESSION-SHADOW-V1",
+        "protocol_sha256": "96e94a305c0a6eb22f92f495560f1e0c66dc60d7395608c140da1e5b6e0def97",
+        "symbol": "CAPITALCOM:EURUSD",
+        "source_time": "2026-09-30T08:45:00Z",
+        "source_observed": {
+          "open": 1.13533,
+          "high": 1.13604,
+          "low": 1.13507,
+          "close": 1.13578,
+          "volume": 1641,
+          "ema20": 1.134676841,
+          "ema50": 1.1342759244,
+          "ema200": null,
+          "atr14": 0.0005591598,
+          "adx14": null,
+          "rsi14": 67.2452472842,
+          "zscore20": null,
+          "range_atr": null
+        },
+        "missing_protocol_features": [
+          "ema200",
+          "adx14",
+          "zscore20",
+          "range_atr"
+        ],
+        "decision": "WAIT",
+        "direction": "WAIT",
+        "reason": "outside_frozen_12_17_utc_session_gate",
+        "geometry": {
+          "initial_stop_atr": 1.5,
+          "single_target_r": 2,
+          "horizon_bars": 32
+        },
+        "costs_bps": {
+          "1": "not_applicable",
+          "2": "not_applicable",
+          "3": "not_applicable",
+          "5": "not_applicable"
+        },
+        "mfe_mae": null,
+        "stop_target_horizon_outcome": null,
+        "integrity": {
+          "issues": [],
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "next_open_observed": {
+          "time": "2026-09-30T09:00:00Z",
+          "open": 1.13577,
+          "fire_id": 57618141632,
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "evidence_sha256": "f2a48cfd2f6e9cd4f1ecbc67f855034af557e9fc72ce954bbe0851294e322160"
+      },
+      {
+        "schema": "R10_CANONICAL_EVIDENCE_ENVELOPE_V1",
+        "protocol": "regime_session_v1",
+        "protocol_id": "R10-REGIME-SESSION-SHADOW-V1",
+        "protocol_sha256": "96e94a305c0a6eb22f92f495560f1e0c66dc60d7395608c140da1e5b6e0def97",
+        "symbol": "CAPITALCOM:NAS100",
+        "source_time": "2026-09-30T08:45:00Z",
+        "source_observed": {
+          "open": 30360.7,
+          "high": 30378.8,
+          "low": 30344.2,
+          "close": 30344.2,
+          "volume": 3099,
+          "ema20": 30359.6191258757,
+          "ema50": 30356.2822866972,
+          "ema200": null,
+          "atr14": 37.2112064503,
+          "adx14": null,
+          "rsi14": 46.9463351995,
+          "zscore20": null,
+          "range_atr": null
+        },
+        "missing_protocol_features": [
+          "ema200",
+          "adx14",
+          "zscore20",
+          "range_atr"
+        ],
+        "decision": "WAIT",
+        "direction": "WAIT",
+        "reason": "outside_frozen_12_17_utc_session_gate",
+        "geometry": {
+          "initial_stop_atr": 1.5,
+          "single_target_r": 2,
+          "horizon_bars": 32
+        },
+        "costs_bps": {
+          "1": "not_applicable",
+          "2": "not_applicable",
+          "3": "not_applicable",
+          "5": "not_applicable"
+        },
+        "mfe_mae": null,
+        "stop_target_horizon_outcome": null,
+        "integrity": {
+          "issues": [],
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "next_open_observed": {
+          "time": "2026-09-30T09:00:00Z",
+          "open": 30343.6,
+          "fire_id": 57618141489,
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "evidence_sha256": "7bf01bf782d30b7b66bd508caa6f88241ae27fa08178018577b3ad10dcb98f58"
+      },
+      {
+        "schema": "R10_CANONICAL_EVIDENCE_ENVELOPE_V1",
+        "protocol": "regime_session_v1",
+        "protocol_id": "R10-REGIME-SESSION-SHADOW-V1",
+        "protocol_sha256": "96e94a305c0a6eb22f92f495560f1e0c66dc60d7395608c140da1e5b6e0def97",
+        "symbol": "CAPITALCOM:SPX500",
+        "source_time": "2026-09-30T08:45:00Z",
+        "source_observed": {
+          "open": 7686,
+          "high": 7688.9,
+          "low": 7683.2,
+          "close": 7683.2,
+          "volume": 560,
+          "ema20": 7686.6694481487,
+          "ema50": 7684.521476729,
+          "ema200": null,
+          "atr14": 5.7554700579,
+          "adx14": null,
+          "rsi14": 45.5709202125,
+          "zscore20": null,
+          "range_atr": null
+        },
+        "missing_protocol_features": [
+          "ema200",
+          "adx14",
+          "zscore20",
+          "range_atr"
+        ],
+        "decision": "WAIT",
+        "direction": "WAIT",
+        "reason": "outside_frozen_12_17_utc_session_gate",
+        "geometry": {
+          "initial_stop_atr": 1.5,
+          "single_target_r": 2,
+          "horizon_bars": 32
+        },
+        "costs_bps": {
+          "1": "not_applicable",
+          "2": "not_applicable",
+          "3": "not_applicable",
+          "5": "not_applicable"
+        },
+        "mfe_mae": null,
+        "stop_target_horizon_outcome": null,
+        "integrity": {
+          "issues": [],
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "next_open_observed": {
+          "time": "2026-09-30T09:00:00Z",
+          "open": 7683,
+          "fire_id": 57618141446,
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "evidence_sha256": "614247f43994a5e4a82b993f712b489d76c248b40519cc81cbdbe75d540dd30b"
+      },
+      {
+        "schema": "R10_CANONICAL_EVIDENCE_ENVELOPE_V1",
+        "protocol": "regime_session_v1",
+        "protocol_id": "R10-REGIME-SESSION-SHADOW-V1",
+        "protocol_sha256": "96e94a305c0a6eb22f92f495560f1e0c66dc60d7395608c140da1e5b6e0def97",
+        "symbol": "CAPITALCOM:USDZAR",
+        "source_time": "2026-09-30T08:45:00Z",
+        "source_observed": {
+          "open": 16.36648,
+          "high": 16.37688,
+          "low": 16.36088,
+          "close": 16.37628,
+          "volume": 2166,
+          "ema20": 16.3743851302,
+          "ema50": 16.3865215126,
+          "ema200": null,
+          "atr14": 0.0138667046,
+          "adx14": null,
+          "rsi14": 48.9829017313,
+          "zscore20": null,
+          "range_atr": null
+        },
+        "missing_protocol_features": [
+          "ema200",
+          "adx14",
+          "zscore20",
+          "range_atr"
+        ],
+        "decision": "WAIT",
+        "direction": "WAIT",
+        "reason": "outside_frozen_12_17_utc_session_gate",
+        "geometry": {
+          "initial_stop_atr": 1.5,
+          "single_target_r": 2,
+          "horizon_bars": 32
+        },
+        "costs_bps": {
+          "1": "not_applicable",
+          "2": "not_applicable",
+          "3": "not_applicable",
+          "5": "not_applicable"
+        },
+        "mfe_mae": null,
+        "stop_target_horizon_outcome": null,
+        "integrity": {
+          "issues": [],
+          "webhook": {
+            "error": "request took too long and timed out"
+          }
+        },
+        "next_open_observed": {
+          "time": "2026-09-30T09:00:00Z",
+          "open": 16.37648,
+          "fire_id": 57618141427,
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "evidence_sha256": "aca535c17cd748c202d9e887a99d33573c440abaacaaf80467268485f56453fb"
+      },
+      {
+        "schema": "R10_CANONICAL_EVIDENCE_ENVELOPE_V1",
+        "protocol": "regime_session_v1",
+        "protocol_id": "R10-REGIME-SESSION-SHADOW-V1",
+        "protocol_sha256": "96e94a305c0a6eb22f92f495560f1e0c66dc60d7395608c140da1e5b6e0def97",
+        "symbol": "CAPITALCOM:XAGUSD",
+        "source_time": "2026-09-30T08:45:00Z",
+        "source_observed": {
+          "open": 61.167,
+          "high": 61.175,
+          "low": 60.998,
+          "close": 61.018,
+          "volume": 1454,
+          "ema20": 61.1476404074,
+          "ema50": 61.1304915258,
+          "ema200": null,
+          "atr14": 0.1634545486,
+          "adx14": null,
+          "rsi14": 43.4906038529,
+          "zscore20": null,
+          "range_atr": null
+        },
+        "missing_protocol_features": [
+          "ema200",
+          "adx14",
+          "zscore20",
+          "range_atr"
+        ],
+        "decision": "WAIT",
+        "direction": "WAIT",
+        "reason": "outside_frozen_12_17_utc_session_gate",
+        "geometry": {
+          "initial_stop_atr": 1.5,
+          "single_target_r": 2,
+          "horizon_bars": 32
+        },
+        "costs_bps": {
+          "1": "not_applicable",
+          "2": "not_applicable",
+          "3": "not_applicable",
+          "5": "not_applicable"
+        },
+        "mfe_mae": null,
+        "stop_target_horizon_outcome": null,
+        "integrity": {
+          "issues": [],
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "next_open_observed": {
+          "time": "2026-09-30T09:00:00Z",
+          "open": 61.015,
+          "fire_id": 57618141474,
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "evidence_sha256": "53a2963b77f00f5b5e9e3301f3273e5b826fa8363f78a7a3db678537e8867d1f"
+      },
+      {
+        "schema": "R10_CANONICAL_EVIDENCE_ENVELOPE_V1",
+        "protocol": "regime_session_v1",
+        "protocol_id": "R10-REGIME-SESSION-SHADOW-V1",
+        "protocol_sha256": "96e94a305c0a6eb22f92f495560f1e0c66dc60d7395608c140da1e5b6e0def97",
+        "symbol": "CAPITALCOM:XAUUSD",
+        "source_time": "2026-09-30T08:45:00Z",
+        "source_observed": {
+          "open": 4197.82,
+          "high": 4199.48,
+          "low": 4191.1,
+          "close": 4191.91,
+          "volume": 3449,
+          "ema20": 4187.6238781811,
+          "ema50": 4179.432324566,
+          "ema200": null,
+          "atr14": 6.8778540867,
+          "adx14": null,
+          "rsi14": 58.1785300091,
+          "zscore20": null,
+          "range_atr": null
+        },
+        "missing_protocol_features": [
+          "ema200",
+          "adx14",
+          "zscore20",
+          "range_atr"
+        ],
+        "decision": "WAIT",
+        "direction": "WAIT",
+        "reason": "outside_frozen_12_17_utc_session_gate",
+        "geometry": {
+          "initial_stop_atr": 1.5,
+          "single_target_r": 2,
+          "horizon_bars": 32
+        },
+        "costs_bps": {
+          "1": "not_applicable",
+          "2": "not_applicable",
+          "3": "not_applicable",
+          "5": "not_applicable"
+        },
+        "mfe_mae": null,
+        "stop_target_horizon_outcome": null,
+        "integrity": {
+          "issues": [],
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "next_open_observed": {
+          "time": "2026-09-30T09:00:00Z",
+          "open": 4191.66,
+          "fire_id": 57618141464,
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "evidence_sha256": "9634bb17775b87c896b855e9dd84166690f83cb92720e25ea1c8da05ad7f4d6c"
+      },
+      {
+        "schema": "R10_CANONICAL_EVIDENCE_ENVELOPE_V1",
+        "protocol": "regime_session_v1",
+        "protocol_id": "R10-REGIME-SESSION-SHADOW-V1",
+        "protocol_sha256": "96e94a305c0a6eb22f92f495560f1e0c66dc60d7395608c140da1e5b6e0def97",
+        "symbol": "CAPITALCOM:ETHUSD",
+        "source_time": "2026-09-30T09:00:00Z",
+        "source_observed": {
+          "open": 2668.96,
+          "high": 2677.52,
+          "low": 2668.32,
+          "close": 2676.58,
+          "volume": 4299,
+          "ema20": 2669.1504857021,
+          "ema50": 2673.3193550682,
+          "ema200": null,
+          "atr14": 6.6433830029,
+          "adx14": null,
+          "rsi14": 57.799707969,
+          "zscore20": null,
+          "range_atr": null
+        },
+        "missing_protocol_features": [
+          "ema200",
+          "adx14",
+          "zscore20",
+          "range_atr"
+        ],
+        "decision": "WAIT",
+        "direction": "WAIT",
+        "reason": "outside_frozen_12_17_utc_session_gate",
+        "geometry": {
+          "initial_stop_atr": 1.5,
+          "single_target_r": 2,
+          "horizon_bars": 32
+        },
+        "costs_bps": {
+          "1": "not_applicable",
+          "2": "not_applicable",
+          "3": "not_applicable",
+          "5": "not_applicable"
+        },
+        "mfe_mae": null,
+        "stop_target_horizon_outcome": null,
+        "integrity": {
+          "issues": [],
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "next_open_observed": {
+          "time": "2026-09-30T09:15:00Z",
+          "open": 2676.6,
+          "fire_id": 57618822152,
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "evidence_sha256": "e10dd37d9e07ec2800e3e8e7b3de8bbd94a77d2e0f58c521bc6da5e08b8c6fd9"
+      },
+      {
+        "schema": "R10_CANONICAL_EVIDENCE_ENVELOPE_V1",
+        "protocol": "regime_session_v1",
+        "protocol_id": "R10-REGIME-SESSION-SHADOW-V1",
+        "protocol_sha256": "96e94a305c0a6eb22f92f495560f1e0c66dc60d7395608c140da1e5b6e0def97",
+        "symbol": "CAPITALCOM:DOGEUSD",
+        "source_time": "2026-09-30T09:00:00Z",
+        "source_observed": {
+          "open": 0.0933449,
+          "high": 0.0936757,
+          "low": 0.0932761,
+          "close": 0.0936721,
+          "volume": 2643,
+          "ema20": 0.093345169,
+          "ema50": 0.0934830943,
+          "ema200": null,
+          "atr14": 0.000431181,
+          "adx14": null,
+          "rsi14": 55.0099735052,
+          "zscore20": null,
+          "range_atr": null
+        },
+        "missing_protocol_features": [
+          "ema200",
+          "adx14",
+          "zscore20",
+          "range_atr"
+        ],
+        "decision": "WAIT",
+        "direction": "WAIT",
+        "reason": "outside_frozen_12_17_utc_session_gate",
+        "geometry": {
+          "initial_stop_atr": 1.5,
+          "single_target_r": 2,
+          "horizon_bars": 32
+        },
+        "costs_bps": {
+          "1": "not_applicable",
+          "2": "not_applicable",
+          "3": "not_applicable",
+          "5": "not_applicable"
+        },
+        "mfe_mae": null,
+        "stop_target_horizon_outcome": null,
+        "integrity": {
+          "issues": [],
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "next_open_observed": {
+          "time": "2026-09-30T09:15:00Z",
+          "open": 0.0936695,
+          "fire_id": 57618826376,
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "evidence_sha256": "133eb6538d7079ddefe4e5370de49a190d53743ada67b919e2d7632a47d51bbf"
+      },
+      {
+        "schema": "R10_CANONICAL_EVIDENCE_ENVELOPE_V1",
+        "protocol": "regime_session_v1",
+        "protocol_id": "R10-REGIME-SESSION-SHADOW-V1",
+        "protocol_sha256": "96e94a305c0a6eb22f92f495560f1e0c66dc60d7395608c140da1e5b6e0def97",
+        "symbol": "CAPITALCOM:BTCUSD",
+        "source_time": "2026-09-30T09:00:00Z",
+        "source_observed": {
+          "open": 83001.4,
+          "high": 83230.5,
+          "low": 82986.15,
+          "close": 83229.9,
+          "volume": 6019,
+          "ema20": 83170.032747149,
+          "ema50": 83286.7643936823,
+          "ema200": null,
+          "atr14": 177.1128620632,
+          "adx14": null,
+          "rsi14": 51.2054739845,
+          "zscore20": null,
+          "range_atr": null
+        },
+        "missing_protocol_features": [
+          "ema200",
+          "adx14",
+          "zscore20",
+          "range_atr"
+        ],
+        "decision": "WAIT",
+        "direction": "WAIT",
+        "reason": "outside_frozen_12_17_utc_session_gate",
+        "geometry": {
+          "initial_stop_atr": 1.5,
+          "single_target_r": 2,
+          "horizon_bars": 32
+        },
+        "costs_bps": {
+          "1": "not_applicable",
+          "2": "not_applicable",
+          "3": "not_applicable",
+          "5": "not_applicable"
+        },
+        "mfe_mae": null,
+        "stop_target_horizon_outcome": null,
+        "integrity": {
+          "issues": [],
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "next_open_observed": {
+          "time": "2026-09-30T09:15:00Z",
+          "open": 83230.25,
+          "fire_id": 57618826902,
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "evidence_sha256": "e3c934aba93d919a388bbe0ddc104ab2a8f119db3bffc4fe00d75985a9735f87"
+      },
+      {
+        "schema": "R10_CANONICAL_EVIDENCE_ENVELOPE_V1",
+        "protocol": "regime_session_v1",
+        "protocol_id": "R10-REGIME-SESSION-SHADOW-V1",
+        "protocol_sha256": "96e94a305c0a6eb22f92f495560f1e0c66dc60d7395608c140da1e5b6e0def97",
+        "symbol": "CAPITALCOM:AUDUSD",
+        "source_time": "2026-09-30T09:00:00Z",
+        "source_observed": {
+          "open": 0.69748,
+          "high": 0.69753,
+          "low": 0.69686,
+          "close": 0.69714,
+          "volume": 930,
+          "ema20": 0.697431189,
+          "ema50": 0.6976983924,
+          "ema200": null,
+          "atr14": 0.0005063363,
+          "adx14": null,
+          "rsi14": 45.2570369036,
+          "zscore20": null,
+          "range_atr": null
+        },
+        "missing_protocol_features": [
+          "ema200",
+          "adx14",
+          "zscore20",
+          "range_atr"
+        ],
+        "decision": "WAIT",
+        "direction": "WAIT",
+        "reason": "outside_frozen_12_17_utc_session_gate",
+        "geometry": {
+          "initial_stop_atr": 1.5,
+          "single_target_r": 2,
+          "horizon_bars": 32
+        },
+        "costs_bps": {
+          "1": "not_applicable",
+          "2": "not_applicable",
+          "3": "not_applicable",
+          "5": "not_applicable"
+        },
+        "mfe_mae": null,
+        "stop_target_horizon_outcome": null,
+        "integrity": {
+          "issues": [],
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "next_open_observed": {
+          "time": "2026-09-30T09:15:00Z",
+          "open": 0.69715,
+          "fire_id": 57618822247,
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "evidence_sha256": "27b22e59fa8d148967c6c86b3035e23333deeda9b68287f8ca76ed29fe3a7d37"
+      },
+      {
+        "schema": "R10_CANONICAL_EVIDENCE_ENVELOPE_V1",
+        "protocol": "regime_session_v1",
+        "protocol_id": "R10-REGIME-SESSION-SHADOW-V1",
+        "protocol_sha256": "96e94a305c0a6eb22f92f495560f1e0c66dc60d7395608c140da1e5b6e0def97",
+        "symbol": "CAPITALCOM:EURUSD",
+        "source_time": "2026-09-30T09:00:00Z",
+        "source_observed": {
+          "open": 1.13577,
+          "high": 1.13602,
+          "low": 1.13514,
+          "close": 1.1354,
+          "volume": 1773,
+          "ema20": 1.1347457133,
+          "ema50": 1.1343200058,
+          "ema200": null,
+          "atr14": 0.000582077,
+          "adx14": null,
+          "rsi14": 60.9298666086,
+          "zscore20": null,
+          "range_atr": null
+        },
+        "missing_protocol_features": [
+          "ema200",
+          "adx14",
+          "zscore20",
+          "range_atr"
+        ],
+        "decision": "WAIT",
+        "direction": "WAIT",
+        "reason": "outside_frozen_12_17_utc_session_gate",
+        "geometry": {
+          "initial_stop_atr": 1.5,
+          "single_target_r": 2,
+          "horizon_bars": 32
+        },
+        "costs_bps": {
+          "1": "not_applicable",
+          "2": "not_applicable",
+          "3": "not_applicable",
+          "5": "not_applicable"
+        },
+        "mfe_mae": null,
+        "stop_target_horizon_outcome": null,
+        "integrity": {
+          "issues": [],
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "next_open_observed": {
+          "time": "2026-09-30T09:15:00Z",
+          "open": 1.13539,
+          "fire_id": 57618826998,
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "evidence_sha256": "9c3fe23b2b2f21491ff08aa5dc599840da14df19cda780def8fee9d5d55e62e7"
+      },
+      {
+        "schema": "R10_CANONICAL_EVIDENCE_ENVELOPE_V1",
+        "protocol": "regime_session_v1",
+        "protocol_id": "R10-REGIME-SESSION-SHADOW-V1",
+        "protocol_sha256": "96e94a305c0a6eb22f92f495560f1e0c66dc60d7395608c140da1e5b6e0def97",
+        "symbol": "CAPITALCOM:NAS100",
+        "source_time": "2026-09-30T09:00:00Z",
+        "source_observed": {
+          "open": 30343.6,
+          "high": 30354.3,
+          "low": 30311.3,
+          "close": 30354.2,
+          "volume": 3310,
+          "ema20": 30359.1030186495,
+          "ema50": 30356.2006283953,
+          "ema200": null,
+          "atr14": 37.6246917039,
+          "adx14": null,
+          "rsi14": 49.057259465,
+          "zscore20": null,
+          "range_atr": null
+        },
+        "missing_protocol_features": [
+          "ema200",
+          "adx14",
+          "zscore20",
+          "range_atr"
+        ],
+        "decision": "WAIT",
+        "direction": "WAIT",
+        "reason": "outside_frozen_12_17_utc_session_gate",
+        "geometry": {
+          "initial_stop_atr": 1.5,
+          "single_target_r": 2,
+          "horizon_bars": 32
+        },
+        "costs_bps": {
+          "1": "not_applicable",
+          "2": "not_applicable",
+          "3": "not_applicable",
+          "5": "not_applicable"
+        },
+        "mfe_mae": null,
+        "stop_target_horizon_outcome": null,
+        "integrity": {
+          "issues": [],
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "next_open_observed": {
+          "time": "2026-09-30T09:15:00Z",
+          "open": 30354.1,
+          "fire_id": 57618829122,
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "evidence_sha256": "763efd3b18c12a139b17bde945d8e2419921e92c3a41c5633d848929f26ebdc1"
+      },
+      {
+        "schema": "R10_CANONICAL_EVIDENCE_ENVELOPE_V1",
+        "protocol": "regime_session_v1",
+        "protocol_id": "R10-REGIME-SESSION-SHADOW-V1",
+        "protocol_sha256": "96e94a305c0a6eb22f92f495560f1e0c66dc60d7395608c140da1e5b6e0def97",
+        "symbol": "CAPITALCOM:SPX500",
+        "source_time": "2026-09-30T09:00:00Z",
+        "source_observed": {
+          "open": 7683,
+          "high": 7684.2,
+          "low": 7677.4,
+          "close": 7684.2,
+          "volume": 708,
+          "ema20": 7686.4084122706,
+          "ema50": 7684.4975664536,
+          "ema200": null,
+          "atr14": 5.8499772987,
+          "adx14": null,
+          "rsi14": 47.2198843155,
+          "zscore20": null,
+          "range_atr": null
+        },
+        "missing_protocol_features": [
+          "ema200",
+          "adx14",
+          "zscore20",
+          "range_atr"
+        ],
+        "decision": "WAIT",
+        "direction": "WAIT",
+        "reason": "outside_frozen_12_17_utc_session_gate",
+        "geometry": {
+          "initial_stop_atr": 1.5,
+          "single_target_r": 2,
+          "horizon_bars": 32
+        },
+        "costs_bps": {
+          "1": "not_applicable",
+          "2": "not_applicable",
+          "3": "not_applicable",
+          "5": "not_applicable"
+        },
+        "mfe_mae": null,
+        "stop_target_horizon_outcome": null,
+        "integrity": {
+          "issues": [],
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "next_open_observed": {
+          "time": "2026-09-30T09:15:00Z",
+          "open": 7684,
+          "fire_id": 57618827084,
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "evidence_sha256": "3886ec7698a1ad2669907544c4d39e934688c1f466e181d54a41e476ccc814de"
+      },
+      {
+        "schema": "R10_CANONICAL_EVIDENCE_ENVELOPE_V1",
+        "protocol": "regime_session_v1",
+        "protocol_id": "R10-REGIME-SESSION-SHADOW-V1",
+        "protocol_sha256": "96e94a305c0a6eb22f92f495560f1e0c66dc60d7395608c140da1e5b6e0def97",
+        "symbol": "CAPITALCOM:USDZAR",
+        "source_time": "2026-09-30T09:00:00Z",
+        "source_observed": {
+          "open": 16.37648,
+          "high": 16.39328,
+          "low": 16.37408,
+          "close": 16.38468,
+          "volume": 2331,
+          "ema20": 16.375365594,
+          "ema50": 16.3864492964,
+          "ema200": null,
+          "atr14": 0.0142476543,
+          "adx14": null,
+          "rsi14": 53.8062459497,
+          "zscore20": null,
+          "range_atr": null
+        },
+        "missing_protocol_features": [
+          "ema200",
+          "adx14",
+          "zscore20",
+          "range_atr"
+        ],
+        "decision": "WAIT",
+        "direction": "WAIT",
+        "reason": "outside_frozen_12_17_utc_session_gate",
+        "geometry": {
+          "initial_stop_atr": 1.5,
+          "single_target_r": 2,
+          "horizon_bars": 32
+        },
+        "costs_bps": {
+          "1": "not_applicable",
+          "2": "not_applicable",
+          "3": "not_applicable",
+          "5": "not_applicable"
+        },
+        "mfe_mae": null,
+        "stop_target_horizon_outcome": null,
+        "integrity": {
+          "issues": [],
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "next_open_observed": {
+          "time": "2026-09-30T09:15:00Z",
+          "open": 16.38488,
+          "fire_id": 57618826967,
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "evidence_sha256": "7b797f37c48464b4e28ba69ef4e7d8cdbb0682007caaa3b175864286b2dedb5a"
+      },
+      {
+        "schema": "R10_CANONICAL_EVIDENCE_ENVELOPE_V1",
+        "protocol": "regime_session_v1",
+        "protocol_id": "R10-REGIME-SESSION-SHADOW-V1",
+        "protocol_sha256": "96e94a305c0a6eb22f92f495560f1e0c66dc60d7395608c140da1e5b6e0def97",
+        "symbol": "CAPITALCOM:XAGUSD",
+        "source_time": "2026-09-30T09:00:00Z",
+        "source_observed": {
+          "open": 61.015,
+          "high": 61.168,
+          "low": 60.988,
+          "close": 61.042,
+          "volume": 1814,
+          "ema20": 61.1374070806,
+          "ema50": 61.1269459143,
+          "ema200": null,
+          "atr14": 0.1646363666,
+          "adx14": null,
+          "rsi14": 44.8831144996,
+          "zscore20": null,
+          "range_atr": null
+        },
+        "missing_protocol_features": [
+          "ema200",
+          "adx14",
+          "zscore20",
+          "range_atr"
+        ],
+        "decision": "WAIT",
+        "direction": "WAIT",
+        "reason": "outside_frozen_12_17_utc_session_gate",
+        "geometry": {
+          "initial_stop_atr": 1.5,
+          "single_target_r": 2,
+          "horizon_bars": 32
+        },
+        "costs_bps": {
+          "1": "not_applicable",
+          "2": "not_applicable",
+          "3": "not_applicable",
+          "5": "not_applicable"
+        },
+        "mfe_mae": null,
+        "stop_target_horizon_outcome": null,
+        "integrity": {
+          "issues": [],
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "next_open_observed": {
+          "time": "2026-09-30T09:15:00Z",
+          "open": 61.043,
+          "fire_id": 57618822063,
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "evidence_sha256": "0d835c9e23d9d6c66ac046505b4d3de54b8107fbfd0176ac468d1a767608993b"
+      },
+      {
+        "schema": "R10_CANONICAL_EVIDENCE_ENVELOPE_V1",
+        "protocol": "regime_session_v1",
+        "protocol_id": "R10-REGIME-SESSION-SHADOW-V1",
+        "protocol_sha256": "96e94a305c0a6eb22f92f495560f1e0c66dc60d7395608c140da1e5b6e0def97",
+        "symbol": "CAPITALCOM:XAUUSD",
+        "source_time": "2026-09-30T09:00:00Z",
+        "source_observed": {
+          "open": 4191.66,
+          "high": 4194.95,
+          "low": 4187.57,
+          "close": 4190.39,
+          "volume": 3785,
+          "ema20": 4187.8674997602,
+          "ema50": 4179.8533714303,
+          "ema200": null,
+          "atr14": 6.9137216519,
+          "adx14": null,
+          "rsi14": 56.0704291791,
+          "zscore20": null,
+          "range_atr": null
+        },
+        "missing_protocol_features": [
+          "ema200",
+          "adx14",
+          "zscore20",
+          "range_atr"
+        ],
+        "decision": "WAIT",
+        "direction": "WAIT",
+        "reason": "outside_frozen_12_17_utc_session_gate",
+        "geometry": {
+          "initial_stop_atr": 1.5,
+          "single_target_r": 2,
+          "horizon_bars": 32
+        },
+        "costs_bps": {
+          "1": "not_applicable",
+          "2": "not_applicable",
+          "3": "not_applicable",
+          "5": "not_applicable"
+        },
+        "mfe_mae": null,
+        "stop_target_horizon_outcome": null,
+        "integrity": {
+          "issues": [],
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "next_open_observed": {
+          "time": "2026-09-30T09:15:00Z",
+          "open": 4190.29,
+          "fire_id": 57618828881,
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "evidence_sha256": "c4eaafe5e997ba7bb9e4e99bfdd7cdf988a4f605b6a86e0cd4ca031bec5a14c2"
+      },
+      {
+        "schema": "R10_CANONICAL_EVIDENCE_ENVELOPE_V1",
+        "protocol": "regime_session_v1",
+        "protocol_id": "R10-REGIME-SESSION-SHADOW-V1",
+        "protocol_sha256": "96e94a305c0a6eb22f92f495560f1e0c66dc60d7395608c140da1e5b6e0def97",
+        "symbol": "CAPITALCOM:ETHUSD",
+        "source_time": "2026-09-30T09:15:00Z",
+        "source_observed": {
+          "open": 2676.6,
+          "high": 2684.88,
+          "low": 2675.04,
+          "close": 2683.62,
+          "volume": 3891,
+          "ema20": 2670.5285346828,
+          "ema50": 2673.7233019282,
+          "ema200": null,
+          "atr14": 6.8717127884,
+          "adx14": null,
+          "rsi14": 63.7024874422,
+          "zscore20": null,
+          "range_atr": null
+        },
+        "missing_protocol_features": [
+          "ema200",
+          "adx14",
+          "zscore20",
+          "range_atr"
+        ],
+        "decision": "WAIT",
+        "direction": "WAIT",
+        "reason": "outside_frozen_12_17_utc_session_gate",
+        "geometry": {
+          "initial_stop_atr": 1.5,
+          "single_target_r": 2,
+          "horizon_bars": 32
+        },
+        "costs_bps": {
+          "1": "not_applicable",
+          "2": "not_applicable",
+          "3": "not_applicable",
+          "5": "not_applicable"
+        },
+        "mfe_mae": null,
+        "stop_target_horizon_outcome": null,
+        "integrity": {
+          "issues": [],
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "next_open_observed": {
+          "time": "2026-09-30T09:30:00Z",
+          "open": 2683.95,
+          "fire_id": 57619590852,
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "evidence_sha256": "12dc6f384a5c449893bf3992b8d5d85b57108edd18bb58d561c96cb08fff2b2c"
+      },
+      {
+        "schema": "R10_CANONICAL_EVIDENCE_ENVELOPE_V1",
+        "protocol": "regime_session_v1",
+        "protocol_id": "R10-REGIME-SESSION-SHADOW-V1",
+        "protocol_sha256": "96e94a305c0a6eb22f92f495560f1e0c66dc60d7395608c140da1e5b6e0def97",
+        "symbol": "CAPITALCOM:DOGEUSD",
+        "source_time": "2026-09-30T09:15:00Z",
+        "source_observed": {
+          "open": 0.0936695,
+          "high": 0.0939216,
+          "low": 0.0936343,
+          "close": 0.0938497,
+          "volume": 2531,
+          "ema20": 0.0933932195,
+          "ema50": 0.093497471,
+          "ema200": null,
+          "atr14": 0.0004209038,
+          "adx14": null,
+          "rsi14": 57.5071012183,
+          "zscore20": null,
+          "range_atr": null
+        },
+        "missing_protocol_features": [
+          "ema200",
+          "adx14",
+          "zscore20",
+          "range_atr"
+        ],
+        "decision": "WAIT",
+        "direction": "WAIT",
+        "reason": "outside_frozen_12_17_utc_session_gate",
+        "geometry": {
+          "initial_stop_atr": 1.5,
+          "single_target_r": 2,
+          "horizon_bars": 32
+        },
+        "costs_bps": {
+          "1": "not_applicable",
+          "2": "not_applicable",
+          "3": "not_applicable",
+          "5": "not_applicable"
+        },
+        "mfe_mae": null,
+        "stop_target_horizon_outcome": null,
+        "integrity": {
+          "issues": [],
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "next_open_observed": {
+          "time": "2026-09-30T09:30:00Z",
+          "open": 0.0938557,
+          "fire_id": 57619588548,
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "evidence_sha256": "d188d2d47aeb53002f39c3d27a704d4c438b44a2b4b21d54beb09ac13e72c6cc"
+      },
+      {
+        "schema": "R10_CANONICAL_EVIDENCE_ENVELOPE_V1",
+        "protocol": "regime_session_v1",
+        "protocol_id": "R10-REGIME-SESSION-SHADOW-V1",
+        "protocol_sha256": "96e94a305c0a6eb22f92f495560f1e0c66dc60d7395608c140da1e5b6e0def97",
+        "symbol": "CAPITALCOM:BTCUSD",
+        "source_time": "2026-09-30T09:15:00Z",
+        "source_observed": {
+          "open": 83230.25,
+          "high": 83366.45,
+          "low": 83198.4,
+          "close": 83357.25,
+          "volume": 4769,
+          "ema20": 83187.8629617062,
+          "ema50": 83289.5285351065,
+          "ema200": null,
+          "atr14": 176.465514773,
+          "adx14": null,
+          "rsi14": 55.9723137447,
+          "zscore20": null,
+          "range_atr": null
+        },
+        "missing_protocol_features": [
+          "ema200",
+          "adx14",
+          "zscore20",
+          "range_atr"
+        ],
+        "decision": "WAIT",
+        "direction": "WAIT",
+        "reason": "outside_frozen_12_17_utc_session_gate",
+        "geometry": {
+          "initial_stop_atr": 1.5,
+          "single_target_r": 2,
+          "horizon_bars": 32
+        },
+        "costs_bps": {
+          "1": "not_applicable",
+          "2": "not_applicable",
+          "3": "not_applicable",
+          "5": "not_applicable"
+        },
+        "mfe_mae": null,
+        "stop_target_horizon_outcome": null,
+        "integrity": {
+          "issues": [],
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "next_open_observed": {
+          "time": "2026-09-30T09:30:00Z",
+          "open": 83355.75,
+          "fire_id": 57619589752,
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "evidence_sha256": "d40eededdf6d44245b87bfa97808347171b0c21bbb9689bc462f6f67bca98088"
+      },
+      {
+        "schema": "R10_CANONICAL_EVIDENCE_ENVELOPE_V1",
+        "protocol": "regime_session_v1",
+        "protocol_id": "R10-REGIME-SESSION-SHADOW-V1",
+        "protocol_sha256": "96e94a305c0a6eb22f92f495560f1e0c66dc60d7395608c140da1e5b6e0def97",
+        "symbol": "CAPITALCOM:AUDUSD",
+        "source_time": "2026-09-30T09:15:00Z",
+        "source_observed": {
+          "open": 0.69715,
+          "high": 0.69717,
+          "low": 0.69668,
+          "close": 0.6969,
+          "volume": 664,
+          "ema20": 0.6973805996,
+          "ema50": 0.6976670829,
+          "ema200": null,
+          "atr14": 0.0005051694,
+          "adx14": null,
+          "rsi14": 42.3673035795,
+          "zscore20": null,
+          "range_atr": null
+        },
+        "missing_protocol_features": [
+          "ema200",
+          "adx14",
+          "zscore20",
+          "range_atr"
+        ],
+        "decision": "WAIT",
+        "direction": "WAIT",
+        "reason": "outside_frozen_12_17_utc_session_gate",
+        "geometry": {
+          "initial_stop_atr": 1.5,
+          "single_target_r": 2,
+          "horizon_bars": 32
+        },
+        "costs_bps": {
+          "1": "not_applicable",
+          "2": "not_applicable",
+          "3": "not_applicable",
+          "5": "not_applicable"
+        },
+        "mfe_mae": null,
+        "stop_target_horizon_outcome": null,
+        "integrity": {
+          "issues": [],
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "next_open_observed": {
+          "time": "2026-09-30T09:30:00Z",
+          "open": 0.69689,
+          "fire_id": 57619590826,
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "evidence_sha256": "ce6c879970a12b3c276a71667ac07661e4490f892cb3c72cb947f34467f0649a"
+      },
+      {
+        "schema": "R10_CANONICAL_EVIDENCE_ENVELOPE_V1",
+        "protocol": "regime_session_v1",
+        "protocol_id": "R10-REGIME-SESSION-SHADOW-V1",
+        "protocol_sha256": "96e94a305c0a6eb22f92f495560f1e0c66dc60d7395608c140da1e5b6e0def97",
+        "symbol": "CAPITALCOM:EURUSD",
+        "source_time": "2026-09-30T09:15:00Z",
+        "source_observed": {
+          "open": 1.13539,
+          "high": 1.13567,
+          "low": 1.13511,
+          "close": 1.13547,
+          "volume": 1351,
+          "ema20": 1.134814693,
+          "ema50": 1.1343651036,
+          "ema200": null,
+          "atr14": 0.0005805001,
+          "adx14": null,
+          "rsi14": 61.6444699692,
+          "zscore20": null,
+          "range_atr": null
+        },
+        "missing_protocol_features": [
+          "ema200",
+          "adx14",
+          "zscore20",
+          "range_atr"
+        ],
+        "decision": "WAIT",
+        "direction": "WAIT",
+        "reason": "outside_frozen_12_17_utc_session_gate",
+        "geometry": {
+          "initial_stop_atr": 1.5,
+          "single_target_r": 2,
+          "horizon_bars": 32
+        },
+        "costs_bps": {
+          "1": "not_applicable",
+          "2": "not_applicable",
+          "3": "not_applicable",
+          "5": "not_applicable"
+        },
+        "mfe_mae": null,
+        "stop_target_horizon_outcome": null,
+        "integrity": {
+          "issues": [],
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "next_open_observed": {
+          "time": "2026-09-30T09:30:00Z",
+          "open": 1.13546,
+          "fire_id": 57619589590,
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "evidence_sha256": "f52f59cf822846e23fc0f4c3f5c264688592a2d88e7fb8d914dd54009ec3d65f"
+      },
+      {
+        "schema": "R10_CANONICAL_EVIDENCE_ENVELOPE_V1",
+        "protocol": "regime_session_v1",
+        "protocol_id": "R10-REGIME-SESSION-SHADOW-V1",
+        "protocol_sha256": "96e94a305c0a6eb22f92f495560f1e0c66dc60d7395608c140da1e5b6e0def97",
+        "symbol": "CAPITALCOM:NAS100",
+        "source_time": "2026-09-30T09:15:00Z",
+        "source_observed": {
+          "open": 30354.1,
+          "high": 30357.4,
+          "low": 30331.8,
+          "close": 30339.1,
+          "volume": 3045,
+          "ema20": 30357.1979692543,
+          "ema50": 30355.5300155171,
+          "ema200": null,
+          "atr14": 36.7657851536,
+          "adx14": null,
+          "rsi14": 46.0760394055,
+          "zscore20": null,
+          "range_atr": null
+        },
+        "missing_protocol_features": [
+          "ema200",
+          "adx14",
+          "zscore20",
+          "range_atr"
+        ],
+        "decision": "WAIT",
+        "direction": "WAIT",
+        "reason": "outside_frozen_12_17_utc_session_gate",
+        "geometry": {
+          "initial_stop_atr": 1.5,
+          "single_target_r": 2,
+          "horizon_bars": 32
+        },
+        "costs_bps": {
+          "1": "not_applicable",
+          "2": "not_applicable",
+          "3": "not_applicable",
+          "5": "not_applicable"
+        },
+        "mfe_mae": null,
+        "stop_target_horizon_outcome": null,
+        "integrity": {
+          "issues": [],
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "next_open_observed": {
+          "time": "2026-09-30T09:30:00Z",
+          "open": 30339.6,
+          "fire_id": 57619590057,
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "evidence_sha256": "9df589ce97053e1e0cae59dcb6eed905ca970e3a0a872f2fa97b78b3104c4a5b"
+      },
+      {
+        "schema": "R10_CANONICAL_EVIDENCE_ENVELOPE_V1",
+        "protocol": "regime_session_v1",
+        "protocol_id": "R10-REGIME-SESSION-SHADOW-V1",
+        "protocol_sha256": "96e94a305c0a6eb22f92f495560f1e0c66dc60d7395608c140da1e5b6e0def97",
+        "symbol": "CAPITALCOM:SPX500",
+        "source_time": "2026-09-30T09:15:00Z",
+        "source_observed": {
+          "open": 7684,
+          "high": 7684.9,
+          "low": 7679.7,
+          "close": 7680.7,
+          "volume": 558,
+          "ema20": 7685.8647539591,
+          "ema50": 7684.3486422789,
+          "ema200": null,
+          "atr14": 5.8035503488,
+          "adx14": null,
+          "rsi14": 42.6540098342,
+          "zscore20": null,
+          "range_atr": null
+        },
+        "missing_protocol_features": [
+          "ema200",
+          "adx14",
+          "zscore20",
+          "range_atr"
+        ],
+        "decision": "WAIT",
+        "direction": "WAIT",
+        "reason": "outside_frozen_12_17_utc_session_gate",
+        "geometry": {
+          "initial_stop_atr": 1.5,
+          "single_target_r": 2,
+          "horizon_bars": 32
+        },
+        "costs_bps": {
+          "1": "not_applicable",
+          "2": "not_applicable",
+          "3": "not_applicable",
+          "5": "not_applicable"
+        },
+        "mfe_mae": null,
+        "stop_target_horizon_outcome": null,
+        "integrity": {
+          "issues": [],
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "next_open_observed": {
+          "time": "2026-09-30T09:30:00Z",
+          "open": 7680.8,
+          "fire_id": 57619588401,
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "evidence_sha256": "0451e9505b42e9664eb85b11b49c5036ea34a3aaf29cbd62f5eb41e98d763c8f"
+      },
+      {
+        "schema": "R10_CANONICAL_EVIDENCE_ENVELOPE_V1",
+        "protocol": "regime_session_v1",
+        "protocol_id": "R10-REGIME-SESSION-SHADOW-V1",
+        "protocol_sha256": "96e94a305c0a6eb22f92f495560f1e0c66dc60d7395608c140da1e5b6e0def97",
+        "symbol": "CAPITALCOM:USDZAR",
+        "source_time": "2026-09-30T09:15:00Z",
+        "source_observed": {
+          "open": 16.38488,
+          "high": 16.39128,
+          "low": 16.38188,
+          "close": 16.38868,
+          "volume": 1900,
+          "ema20": 16.3766336327,
+          "ema50": 16.386536775,
+          "ema200": null,
+          "atr14": 0.0139013933,
+          "adx14": null,
+          "rsi14": 55.9423350673,
+          "zscore20": null,
+          "range_atr": null
+        },
+        "missing_protocol_features": [
+          "ema200",
+          "adx14",
+          "zscore20",
+          "range_atr"
+        ],
+        "decision": "WAIT",
+        "direction": "WAIT",
+        "reason": "outside_frozen_12_17_utc_session_gate",
+        "geometry": {
+          "initial_stop_atr": 1.5,
+          "single_target_r": 2,
+          "horizon_bars": 32
+        },
+        "costs_bps": {
+          "1": "not_applicable",
+          "2": "not_applicable",
+          "3": "not_applicable",
+          "5": "not_applicable"
+        },
+        "mfe_mae": null,
+        "stop_target_horizon_outcome": null,
+        "integrity": {
+          "issues": [],
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "next_open_observed": {
+          "time": "2026-09-30T09:30:00Z",
+          "open": 16.38848,
+          "fire_id": 57619588462,
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "evidence_sha256": "3ee4e6eca27ccb3f40d8fe0fe30ac6f410cc55f143c403b7f2a0cd3994832ce2"
+      },
+      {
+        "schema": "R10_CANONICAL_EVIDENCE_ENVELOPE_V1",
+        "protocol": "regime_session_v1",
+        "protocol_id": "R10-REGIME-SESSION-SHADOW-V1",
+        "protocol_sha256": "96e94a305c0a6eb22f92f495560f1e0c66dc60d7395608c140da1e5b6e0def97",
+        "symbol": "CAPITALCOM:XAGUSD",
+        "source_time": "2026-09-30T09:15:00Z",
+        "source_observed": {
+          "open": 61.043,
+          "high": 61.049,
+          "low": 60.765,
+          "close": 60.885,
+          "volume": 1734,
+          "ema20": 61.113368311,
+          "ema50": 61.1174578392,
+          "ema200": null,
+          "atr14": 0.1731623404,
+          "adx14": null,
+          "rsi14": 38.3757985007,
+          "zscore20": null,
+          "range_atr": null
+        },
+        "missing_protocol_features": [
+          "ema200",
+          "adx14",
+          "zscore20",
+          "range_atr"
+        ],
+        "decision": "WAIT",
+        "direction": "WAIT",
+        "reason": "outside_frozen_12_17_utc_session_gate",
+        "geometry": {
+          "initial_stop_atr": 1.5,
+          "single_target_r": 2,
+          "horizon_bars": 32
+        },
+        "costs_bps": {
+          "1": "not_applicable",
+          "2": "not_applicable",
+          "3": "not_applicable",
+          "5": "not_applicable"
+        },
+        "mfe_mae": null,
+        "stop_target_horizon_outcome": null,
+        "integrity": {
+          "issues": [],
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "next_open_observed": {
+          "time": "2026-09-30T09:30:00Z",
+          "open": 60.885,
+          "fire_id": 57619587714,
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "evidence_sha256": "0458caa94dfdee8a0f0b5a12fd35bdc06f493bf7b8e01a079bbfc54272987cd4"
+      },
+      {
+        "schema": "R10_CANONICAL_EVIDENCE_ENVELOPE_V1",
+        "protocol": "regime_session_v1",
+        "protocol_id": "R10-REGIME-SESSION-SHADOW-V1",
+        "protocol_sha256": "96e94a305c0a6eb22f92f495560f1e0c66dc60d7395608c140da1e5b6e0def97",
+        "symbol": "CAPITALCOM:XAUUSD",
+        "source_time": "2026-09-30T09:15:00Z",
+        "source_observed": {
+          "open": 4190.29,
+          "high": 4190.8,
+          "low": 4182.9,
+          "close": 4185.8,
+          "volume": 3344,
+          "ema20": 4187.6705950211,
+          "ema50": 4180.0865725507,
+          "ema200": null,
+          "atr14": 6.9841701053,
+          "adx14": null,
+          "rsi14": 50.1020373606,
+          "zscore20": null,
+          "range_atr": null
+        },
+        "missing_protocol_features": [
+          "ema200",
+          "adx14",
+          "zscore20",
+          "range_atr"
+        ],
+        "decision": "WAIT",
+        "direction": "WAIT",
+        "reason": "outside_frozen_12_17_utc_session_gate",
+        "geometry": {
+          "initial_stop_atr": 1.5,
+          "single_target_r": 2,
+          "horizon_bars": 32
+        },
+        "costs_bps": {
+          "1": "not_applicable",
+          "2": "not_applicable",
+          "3": "not_applicable",
+          "5": "not_applicable"
+        },
+        "mfe_mae": null,
+        "stop_target_horizon_outcome": null,
+        "integrity": {
+          "issues": [],
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "next_open_observed": {
+          "time": "2026-09-30T09:30:00Z",
+          "open": 4185.82,
+          "fire_id": 57619589575,
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "evidence_sha256": "b16488c9c9943bf7c9d9ad5b82d88d88f0fe017ea7cf220a3185a2129e64722b"
+      },
+      {
+        "schema": "R10_CANONICAL_EVIDENCE_ENVELOPE_V1",
+        "protocol": "regime_session_v1",
+        "protocol_id": "R10-REGIME-SESSION-SHADOW-V1",
+        "protocol_sha256": "96e94a305c0a6eb22f92f495560f1e0c66dc60d7395608c140da1e5b6e0def97",
+        "symbol": "CAPITALCOM:ETHUSD",
+        "source_time": "2026-09-30T09:30:00Z",
+        "source_observed": {
+          "open": 2683.95,
+          "high": 2695.95,
+          "low": 2682.55,
+          "close": 2687.21,
+          "volume": 5467,
+          "ema20": 2672.1422343275,
+          "ema50": 2674.2631186154,
+          "ema200": null,
+          "atr14": 7.3380190178,
+          "adx14": null,
+          "rsi14": 66.2779123571,
+          "zscore20": null,
+          "range_atr": null
+        },
+        "missing_protocol_features": [
+          "ema200",
+          "adx14",
+          "zscore20",
+          "range_atr"
+        ],
+        "decision": "WAIT",
+        "direction": "WAIT",
+        "reason": "outside_frozen_12_17_utc_session_gate",
+        "geometry": {
+          "initial_stop_atr": 1.5,
+          "single_target_r": 2,
+          "horizon_bars": 32
+        },
+        "costs_bps": {
+          "1": "not_applicable",
+          "2": "not_applicable",
+          "3": "not_applicable",
+          "5": "not_applicable"
+        },
+        "mfe_mae": null,
+        "stop_target_horizon_outcome": null,
+        "integrity": {
+          "issues": [],
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "next_open_observed": {
+          "time": "2026-09-30T09:45:00Z",
+          "open": 2687.22,
+          "fire_id": 57620237498,
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "evidence_sha256": "74825a3c0b6930425065721916520a0598fd3a4de97a37e2e4dc85ae218e17fb"
+      },
+      {
+        "schema": "R10_CANONICAL_EVIDENCE_ENVELOPE_V1",
+        "protocol": "regime_session_v1",
+        "protocol_id": "R10-REGIME-SESSION-SHADOW-V1",
+        "protocol_sha256": "96e94a305c0a6eb22f92f495560f1e0c66dc60d7395608c140da1e5b6e0def97",
+        "symbol": "CAPITALCOM:DOGEUSD",
+        "source_time": "2026-09-30T09:30:00Z",
+        "source_observed": {
+          "open": 0.0938557,
+          "high": 0.094417,
+          "low": 0.0937796,
+          "close": 0.0941043,
+          "volume": 2768,
+          "ema20": 0.0934610363,
+          "ema50": 0.0935213097,
+          "ema200": null,
+          "atr14": 0.0004363678,
+          "adx14": null,
+          "rsi14": 60.8599357011,
+          "zscore20": null,
+          "range_atr": null
+        },
+        "missing_protocol_features": [
+          "ema200",
+          "adx14",
+          "zscore20",
+          "range_atr"
+        ],
+        "decision": "WAIT",
+        "direction": "WAIT",
+        "reason": "outside_frozen_12_17_utc_session_gate",
+        "geometry": {
+          "initial_stop_atr": 1.5,
+          "single_target_r": 2,
+          "horizon_bars": 32
+        },
+        "costs_bps": {
+          "1": "not_applicable",
+          "2": "not_applicable",
+          "3": "not_applicable",
+          "5": "not_applicable"
+        },
+        "mfe_mae": null,
+        "stop_target_horizon_outcome": null,
+        "integrity": {
+          "issues": [],
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "next_open_observed": {
+          "time": "2026-09-30T09:45:00Z",
+          "open": 0.0941017,
+          "fire_id": 57620232558,
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "evidence_sha256": "0ddfcd25b448eb688820d93191d9bb35f36535c866fae246b30410d016a3e909"
+      },
+      {
+        "schema": "R10_CANONICAL_EVIDENCE_ENVELOPE_V1",
+        "protocol": "regime_session_v1",
+        "protocol_id": "R10-REGIME-SESSION-SHADOW-V1",
+        "protocol_sha256": "96e94a305c0a6eb22f92f495560f1e0c66dc60d7395608c140da1e5b6e0def97",
+        "symbol": "CAPITALCOM:BTCUSD",
+        "source_time": "2026-09-30T09:30:00Z",
+        "source_observed": {
+          "open": 83355.75,
+          "high": 83751.55,
+          "low": 83355.1,
+          "close": 83505.55,
+          "volume": 6379,
+          "ema20": 83218.1188701151,
+          "ema50": 83297.9999651024,
+          "ema200": null,
+          "atr14": 192.1786922892,
+          "adx14": null,
+          "rsi14": 60.7776121722,
+          "zscore20": null,
+          "range_atr": null
+        },
+        "missing_protocol_features": [
+          "ema200",
+          "adx14",
+          "zscore20",
+          "range_atr"
+        ],
+        "decision": "WAIT",
+        "direction": "WAIT",
+        "reason": "outside_frozen_12_17_utc_session_gate",
+        "geometry": {
+          "initial_stop_atr": 1.5,
+          "single_target_r": 2,
+          "horizon_bars": 32
+        },
+        "costs_bps": {
+          "1": "not_applicable",
+          "2": "not_applicable",
+          "3": "not_applicable",
+          "5": "not_applicable"
+        },
+        "mfe_mae": null,
+        "stop_target_horizon_outcome": null,
+        "integrity": {
+          "issues": [],
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "next_open_observed": {
+          "time": "2026-09-30T09:45:00Z",
+          "open": 83504.8,
+          "fire_id": 57620240787,
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "evidence_sha256": "a5e1b3f363c61ef6dd716c9024e72fbe25e776e86e8b9b4f0885f24b3da80af8"
+      },
+      {
+        "schema": "R10_CANONICAL_EVIDENCE_ENVELOPE_V1",
+        "protocol": "regime_session_v1",
+        "protocol_id": "R10-REGIME-SESSION-SHADOW-V1",
+        "protocol_sha256": "96e94a305c0a6eb22f92f495560f1e0c66dc60d7395608c140da1e5b6e0def97",
+        "symbol": "CAPITALCOM:AUDUSD",
+        "source_time": "2026-09-30T09:30:00Z",
+        "source_observed": {
+          "open": 0.69689,
+          "high": 0.69714,
+          "low": 0.69674,
+          "close": 0.69687,
+          "volume": 658,
+          "ema20": 0.697331971,
+          "ema50": 0.6976358248,
+          "ema200": null,
+          "atr14": 0.0004976573,
+          "adx14": null,
+          "rsi14": 42.0062429078,
+          "zscore20": null,
+          "range_atr": null
+        },
+        "missing_protocol_features": [
+          "ema200",
+          "adx14",
+          "zscore20",
+          "range_atr"
+        ],
+        "decision": "WAIT",
+        "direction": "WAIT",
+        "reason": "outside_frozen_12_17_utc_session_gate",
+        "geometry": {
+          "initial_stop_atr": 1.5,
+          "single_target_r": 2,
+          "horizon_bars": 32
+        },
+        "costs_bps": {
+          "1": "not_applicable",
+          "2": "not_applicable",
+          "3": "not_applicable",
+          "5": "not_applicable"
+        },
+        "mfe_mae": null,
+        "stop_target_horizon_outcome": null,
+        "integrity": {
+          "issues": [],
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "next_open_observed": {
+          "time": "2026-09-30T09:45:00Z",
+          "open": 0.69689,
+          "fire_id": 57620237503,
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "evidence_sha256": "26c4692f6c6cf2c9c820aa88f1f7c2b7473daa475a1c7cafacd2bf251efd85fa"
+      },
+      {
+        "schema": "R10_CANONICAL_EVIDENCE_ENVELOPE_V1",
+        "protocol": "regime_session_v1",
+        "protocol_id": "R10-REGIME-SESSION-SHADOW-V1",
+        "protocol_sha256": "96e94a305c0a6eb22f92f495560f1e0c66dc60d7395608c140da1e5b6e0def97",
+        "symbol": "CAPITALCOM:EURUSD",
+        "source_time": "2026-09-30T09:30:00Z",
+        "source_observed": {
+          "open": 1.13546,
+          "high": 1.13591,
+          "low": 1.13526,
+          "close": 1.13546,
+          "volume": 1530,
+          "ema20": 1.1348761508,
+          "ema50": 1.1344080407,
+          "ema200": null,
+          "atr14": 0.0005854643,
+          "adx14": null,
+          "rsi14": 61.4714960656,
+          "zscore20": null,
+          "range_atr": null
+        },
+        "missing_protocol_features": [
+          "ema200",
+          "adx14",
+          "zscore20",
+          "range_atr"
+        ],
+        "decision": "WAIT",
+        "direction": "WAIT",
+        "reason": "outside_frozen_12_17_utc_session_gate",
+        "geometry": {
+          "initial_stop_atr": 1.5,
+          "single_target_r": 2,
+          "horizon_bars": 32
+        },
+        "costs_bps": {
+          "1": "not_applicable",
+          "2": "not_applicable",
+          "3": "not_applicable",
+          "5": "not_applicable"
+        },
+        "mfe_mae": null,
+        "stop_target_horizon_outcome": null,
+        "integrity": {
+          "issues": [],
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "next_open_observed": {
+          "time": "2026-09-30T09:45:00Z",
+          "open": 1.13547,
+          "fire_id": 57620249354,
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "evidence_sha256": "20a28a1aa746d878e4e3a40b35b00c61f56347858c751f4ad1ffa0241e7595dc"
+      },
+      {
+        "schema": "R10_CANONICAL_EVIDENCE_ENVELOPE_V1",
+        "protocol": "regime_session_v1",
+        "protocol_id": "R10-REGIME-SESSION-SHADOW-V1",
+        "protocol_sha256": "96e94a305c0a6eb22f92f495560f1e0c66dc60d7395608c140da1e5b6e0def97",
+        "symbol": "CAPITALCOM:NAS100",
+        "source_time": "2026-09-30T09:30:00Z",
+        "source_observed": {
+          "open": 30339.6,
+          "high": 30364.3,
+          "low": 30316.3,
+          "close": 30327.7,
+          "volume": 3059,
+          "ema20": 30354.4058724092,
+          "ema50": 30354.4461779228,
+          "ema200": null,
+          "atr14": 37.5682290712,
+          "adx14": null,
+          "rsi14": 43.904078074,
+          "zscore20": null,
+          "range_atr": null
+        },
+        "missing_protocol_features": [
+          "ema200",
+          "adx14",
+          "zscore20",
+          "range_atr"
+        ],
+        "decision": "WAIT",
+        "direction": "WAIT",
+        "reason": "outside_frozen_12_17_utc_session_gate",
+        "geometry": {
+          "initial_stop_atr": 1.5,
+          "single_target_r": 2,
+          "horizon_bars": 32
+        },
+        "costs_bps": {
+          "1": "not_applicable",
+          "2": "not_applicable",
+          "3": "not_applicable",
+          "5": "not_applicable"
+        },
+        "mfe_mae": null,
+        "stop_target_horizon_outcome": null,
+        "integrity": {
+          "issues": [],
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "next_open_observed": {
+          "time": "2026-09-30T09:45:00Z",
+          "open": 30327.6,
+          "fire_id": 57620243463,
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "evidence_sha256": "2945de5c69b0375a2ebf2638361605e123832def88cf5464ee9620a2cbc61ab7"
+      },
+      {
+        "schema": "R10_CANONICAL_EVIDENCE_ENVELOPE_V1",
+        "protocol": "regime_session_v1",
+        "protocol_id": "R10-REGIME-SESSION-SHADOW-V1",
+        "protocol_sha256": "96e94a305c0a6eb22f92f495560f1e0c66dc60d7395608c140da1e5b6e0def97",
+        "symbol": "CAPITALCOM:SPX500",
+        "source_time": "2026-09-30T09:30:00Z",
+        "source_observed": {
+          "open": 7680.8,
+          "high": 7685.7,
+          "low": 7676.9,
+          "close": 7678.9,
+          "volume": 623,
+          "ema20": 7685.2014440583,
+          "ema50": 7684.1349700327,
+          "ema200": null,
+          "atr14": 6.0175824667,
+          "adx14": null,
+          "rsi14": 40.4858492387,
+          "zscore20": null,
+          "range_atr": null
+        },
+        "missing_protocol_features": [
+          "ema200",
+          "adx14",
+          "zscore20",
+          "range_atr"
+        ],
+        "decision": "WAIT",
+        "direction": "WAIT",
+        "reason": "outside_frozen_12_17_utc_session_gate",
+        "geometry": {
+          "initial_stop_atr": 1.5,
+          "single_target_r": 2,
+          "horizon_bars": 32
+        },
+        "costs_bps": {
+          "1": "not_applicable",
+          "2": "not_applicable",
+          "3": "not_applicable",
+          "5": "not_applicable"
+        },
+        "mfe_mae": null,
+        "stop_target_horizon_outcome": null,
+        "integrity": {
+          "issues": [],
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "next_open_observed": {
+          "time": "2026-09-30T09:45:00Z",
+          "open": 7679.2,
+          "fire_id": 57620244384,
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "evidence_sha256": "af081b4615ffcb5d321daa7104596cb5b55a21189d003393f55d5410e1845b69"
+      },
+      {
+        "schema": "R10_CANONICAL_EVIDENCE_ENVELOPE_V1",
+        "protocol": "regime_session_v1",
+        "protocol_id": "R10-REGIME-SESSION-SHADOW-V1",
+        "protocol_sha256": "96e94a305c0a6eb22f92f495560f1e0c66dc60d7395608c140da1e5b6e0def97",
+        "symbol": "CAPITALCOM:USDZAR",
+        "source_time": "2026-09-30T09:30:00Z",
+        "source_observed": {
+          "open": 16.38848,
+          "high": 16.39428,
+          "low": 16.37588,
+          "close": 16.38708,
+          "volume": 1855,
+          "ema20": 16.3776285248,
+          "ema50": 16.3865580779,
+          "ema200": null,
+          "atr14": 0.0142227223,
+          "adx14": null,
+          "rsi14": 54.849749565,
+          "zscore20": null,
+          "range_atr": null
+        },
+        "missing_protocol_features": [
+          "ema200",
+          "adx14",
+          "zscore20",
+          "range_atr"
+        ],
+        "decision": "WAIT",
+        "direction": "WAIT",
+        "reason": "outside_frozen_12_17_utc_session_gate",
+        "geometry": {
+          "initial_stop_atr": 1.5,
+          "single_target_r": 2,
+          "horizon_bars": 32
+        },
+        "costs_bps": {
+          "1": "not_applicable",
+          "2": "not_applicable",
+          "3": "not_applicable",
+          "5": "not_applicable"
+        },
+        "mfe_mae": null,
+        "stop_target_horizon_outcome": null,
+        "integrity": {
+          "issues": [],
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "next_open_observed": {
+          "time": "2026-09-30T09:45:00Z",
+          "open": 16.38688,
+          "fire_id": 57620243863,
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "evidence_sha256": "9b55a6f025aabaf744f0b6d1bc0673ebe03b567793fafa5c4aa5c2c00ae0c5ae"
+      },
+      {
+        "schema": "R10_CANONICAL_EVIDENCE_ENVELOPE_V1",
+        "protocol": "regime_session_v1",
+        "protocol_id": "R10-REGIME-SESSION-SHADOW-V1",
+        "protocol_sha256": "96e94a305c0a6eb22f92f495560f1e0c66dc60d7395608c140da1e5b6e0def97",
+        "symbol": "CAPITALCOM:XAGUSD",
+        "source_time": "2026-09-30T09:30:00Z",
+        "source_observed": {
+          "open": 60.885,
+          "high": 60.992,
+          "low": 60.839,
+          "close": 60.859,
+          "volume": 1548,
+          "ema20": 61.0888842542,
+          "ema50": 61.1072092042,
+          "ema200": null,
+          "atr14": 0.1717221732,
+          "adx14": null,
+          "rsi14": 37.4163007603,
+          "zscore20": null,
+          "range_atr": null
+        },
+        "missing_protocol_features": [
+          "ema200",
+          "adx14",
+          "zscore20",
+          "range_atr"
+        ],
+        "decision": "WAIT",
+        "direction": "WAIT",
+        "reason": "outside_frozen_12_17_utc_session_gate",
+        "geometry": {
+          "initial_stop_atr": 1.5,
+          "single_target_r": 2,
+          "horizon_bars": 32
+        },
+        "costs_bps": {
+          "1": "not_applicable",
+          "2": "not_applicable",
+          "3": "not_applicable",
+          "5": "not_applicable"
+        },
+        "mfe_mae": null,
+        "stop_target_horizon_outcome": null,
+        "integrity": {
+          "issues": [],
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "next_open_observed": {
+          "time": "2026-09-30T09:45:00Z",
+          "open": 60.86,
+          "fire_id": 57620252379,
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "evidence_sha256": "d7d6abe508ecc65bd5df6c22f729e5b83f62595fc23ad34eb3bf9c6dbae2eb5b"
+      },
+      {
+        "schema": "R10_CANONICAL_EVIDENCE_ENVELOPE_V1",
+        "protocol": "regime_session_v1",
+        "protocol_id": "R10-REGIME-SESSION-SHADOW-V1",
+        "protocol_sha256": "96e94a305c0a6eb22f92f495560f1e0c66dc60d7395608c140da1e5b6e0def97",
+        "symbol": "CAPITALCOM:XAUUSD",
+        "source_time": "2026-09-30T09:30:00Z",
+        "source_observed": {
+          "open": 4185.82,
+          "high": 4190.53,
+          "low": 4185.55,
+          "close": 4187.91,
+          "volume": 2821,
+          "ema20": 4187.6873637493,
+          "ema50": 4180.39073618,
+          "ema200": null,
+          "atr14": 6.8410150978,
+          "adx14": null,
+          "rsi14": 52.5974497604,
+          "zscore20": null,
+          "range_atr": null
+        },
+        "missing_protocol_features": [
+          "ema200",
+          "adx14",
+          "zscore20",
+          "range_atr"
+        ],
+        "decision": "WAIT",
+        "direction": "WAIT",
+        "reason": "outside_frozen_12_17_utc_session_gate",
+        "geometry": {
+          "initial_stop_atr": 1.5,
+          "single_target_r": 2,
+          "horizon_bars": 32
+        },
+        "costs_bps": {
+          "1": "not_applicable",
+          "2": "not_applicable",
+          "3": "not_applicable",
+          "5": "not_applicable"
+        },
+        "mfe_mae": null,
+        "stop_target_horizon_outcome": null,
+        "integrity": {
+          "issues": [],
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "next_open_observed": {
+          "time": "2026-09-30T09:45:00Z",
+          "open": 4187.94,
+          "fire_id": 57620242832,
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "evidence_sha256": "17b4ca2908d91be6a5a0e6503646d87cb29d5a555c2b2f5111014bd1a3d69821"
+      },
+      {
+        "schema": "R10_CANONICAL_EVIDENCE_ENVELOPE_V1",
+        "protocol": "regime_session_v1",
+        "protocol_id": "R10-REGIME-SESSION-SHADOW-V1",
+        "protocol_sha256": "96e94a305c0a6eb22f92f495560f1e0c66dc60d7395608c140da1e5b6e0def97",
+        "symbol": "CAPITALCOM:ETHUSD",
+        "source_time": "2026-09-30T09:45:00Z",
+        "source_observed": {
+          "open": 2687.22,
+          "high": 2689.66,
+          "low": 2684.99,
+          "close": 2686.62,
+          "volume": 4144,
+          "ema20": 2673.5288242555,
+          "ema50": 2674.7510932026,
+          "ema200": null,
+          "atr14": 7.1474462308,
+          "adx14": null,
+          "rsi14": 65.3879568364,
+          "zscore20": null,
+          "range_atr": null
+        },
+        "missing_protocol_features": [
+          "ema200",
+          "adx14",
+          "zscore20",
+          "range_atr"
+        ],
+        "decision": "WAIT",
+        "direction": "WAIT",
+        "reason": "outside_frozen_12_17_utc_session_gate",
+        "geometry": {
+          "initial_stop_atr": 1.5,
+          "single_target_r": 2,
+          "horizon_bars": 32
+        },
+        "costs_bps": {
+          "1": "not_applicable",
+          "2": "not_applicable",
+          "3": "not_applicable",
+          "5": "not_applicable"
+        },
+        "mfe_mae": null,
+        "stop_target_horizon_outcome": null,
+        "integrity": {
+          "issues": [],
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "next_open_observed": {
+          "time": "2026-09-30T10:00:00Z",
+          "open": 2686.61,
+          "fire_id": 57620915561,
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "evidence_sha256": "1930a1dc4c0dfe8a6767301028b377e7a4cd6033a532eb795ac126c760358ce1"
+      },
+      {
+        "schema": "R10_CANONICAL_EVIDENCE_ENVELOPE_V1",
+        "protocol": "regime_session_v1",
+        "protocol_id": "R10-REGIME-SESSION-SHADOW-V1",
+        "protocol_sha256": "96e94a305c0a6eb22f92f495560f1e0c66dc60d7395608c140da1e5b6e0def97",
+        "symbol": "CAPITALCOM:DOGEUSD",
+        "source_time": "2026-09-30T09:45:00Z",
+        "source_observed": {
+          "open": 0.0941017,
+          "high": 0.09419,
+          "low": 0.0939758,
+          "close": 0.093982,
+          "volume": 1792,
+          "ema20": 0.0935108156,
+          "ema50": 0.0935394475,
+          "ema200": null,
+          "atr14": 0.0004204987,
+          "adx14": null,
+          "rsi14": 58.4603662595,
+          "zscore20": null,
+          "range_atr": null
+        },
+        "missing_protocol_features": [
+          "ema200",
+          "adx14",
+          "zscore20",
+          "range_atr"
+        ],
+        "decision": "WAIT",
+        "direction": "WAIT",
+        "reason": "outside_frozen_12_17_utc_session_gate",
+        "geometry": {
+          "initial_stop_atr": 1.5,
+          "single_target_r": 2,
+          "horizon_bars": 32
+        },
+        "costs_bps": {
+          "1": "not_applicable",
+          "2": "not_applicable",
+          "3": "not_applicable",
+          "5": "not_applicable"
+        },
+        "mfe_mae": null,
+        "stop_target_horizon_outcome": null,
+        "integrity": {
+          "issues": [],
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "next_open_observed": {
+          "time": "2026-09-30T10:00:00Z",
+          "open": 0.0939808,
+          "fire_id": 57620908122,
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "evidence_sha256": "87f0f98b34bc331f1ed755bbd9c9598b6cf97e1b918921003c13fb7b7e486338"
+      },
+      {
+        "schema": "R10_CANONICAL_EVIDENCE_ENVELOPE_V1",
+        "protocol": "regime_session_v1",
+        "protocol_id": "R10-REGIME-SESSION-SHADOW-V1",
+        "protocol_sha256": "96e94a305c0a6eb22f92f495560f1e0c66dc60d7395608c140da1e5b6e0def97",
+        "symbol": "CAPITALCOM:BTCUSD",
+        "source_time": "2026-09-30T09:45:00Z",
+        "source_observed": {
+          "open": 83504.8,
+          "high": 83595.85,
+          "low": 83467.85,
+          "close": 83568.45,
+          "volume": 4420,
+          "ema20": 83251.483739628,
+          "ema50": 83308.6058488238,
+          "ema200": null,
+          "atr14": 187.5944999828,
+          "adx14": null,
+          "rsi14": 62.6401038438,
+          "zscore20": null,
+          "range_atr": null
+        },
+        "missing_protocol_features": [
+          "ema200",
+          "adx14",
+          "zscore20",
+          "range_atr"
+        ],
+        "decision": "WAIT",
+        "direction": "WAIT",
+        "reason": "outside_frozen_12_17_utc_session_gate",
+        "geometry": {
+          "initial_stop_atr": 1.5,
+          "single_target_r": 2,
+          "horizon_bars": 32
+        },
+        "costs_bps": {
+          "1": "not_applicable",
+          "2": "not_applicable",
+          "3": "not_applicable",
+          "5": "not_applicable"
+        },
+        "mfe_mae": null,
+        "stop_target_horizon_outcome": null,
+        "integrity": {
+          "issues": [],
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "next_open_observed": {
+          "time": "2026-09-30T10:00:00Z",
+          "open": 83569.55,
+          "fire_id": 57620912042,
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "evidence_sha256": "cdba42e46f68f5a0d96ecca68936d57bb80e0e8fe18eec97f6ef9d7dd8cbb86b"
+      },
+      {
+        "schema": "R10_CANONICAL_EVIDENCE_ENVELOPE_V1",
+        "protocol": "regime_session_v1",
+        "protocol_id": "R10-REGIME-SESSION-SHADOW-V1",
+        "protocol_sha256": "96e94a305c0a6eb22f92f495560f1e0c66dc60d7395608c140da1e5b6e0def97",
+        "symbol": "CAPITALCOM:AUDUSD",
+        "source_time": "2026-09-30T09:45:00Z",
+        "source_observed": {
+          "open": 0.69689,
+          "high": 0.69702,
+          "low": 0.69674,
+          "close": 0.69696,
+          "volume": 642,
+          "ema20": 0.6972965452,
+          "ema50": 0.6976093218,
+          "ema200": null,
+          "atr14": 0.0004821104,
+          "adx14": null,
+          "rsi14": 43.5602060677,
+          "zscore20": null,
+          "range_atr": null
+        },
+        "missing_protocol_features": [
+          "ema200",
+          "adx14",
+          "zscore20",
+          "range_atr"
+        ],
+        "decision": "WAIT",
+        "direction": "WAIT",
+        "reason": "outside_frozen_12_17_utc_session_gate",
+        "geometry": {
+          "initial_stop_atr": 1.5,
+          "single_target_r": 2,
+          "horizon_bars": 32
+        },
+        "costs_bps": {
+          "1": "not_applicable",
+          "2": "not_applicable",
+          "3": "not_applicable",
+          "5": "not_applicable"
+        },
+        "mfe_mae": null,
+        "stop_target_horizon_outcome": null,
+        "integrity": {
+          "issues": [],
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "next_open_observed": {
+          "time": "2026-09-30T10:00:00Z",
+          "open": 0.69697,
+          "fire_id": 57620915758,
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "evidence_sha256": "dcb99f8e263ee86a962b7d6869329dc22ed909d57ce90179ba1558cc2b5aeb2e"
+      },
+      {
+        "schema": "R10_CANONICAL_EVIDENCE_ENVELOPE_V1",
+        "protocol": "regime_session_v1",
+        "protocol_id": "R10-REGIME-SESSION-SHADOW-V1",
+        "protocol_sha256": "96e94a305c0a6eb22f92f495560f1e0c66dc60d7395608c140da1e5b6e0def97",
+        "symbol": "CAPITALCOM:EURUSD",
+        "source_time": "2026-09-30T09:45:00Z",
+        "source_observed": {
+          "open": 1.13547,
+          "high": 1.13591,
+          "low": 1.13539,
+          "close": 1.13579,
+          "volume": 1328,
+          "ema20": 1.1349631841,
+          "ema50": 1.1344622352,
+          "ema200": null,
+          "atr14": 0.0005807883,
+          "adx14": null,
+          "rsi14": 64.9651899833,
+          "zscore20": null,
+          "range_atr": null
+        },
+        "missing_protocol_features": [
+          "ema200",
+          "adx14",
+          "zscore20",
+          "range_atr"
+        ],
+        "decision": "WAIT",
+        "direction": "WAIT",
+        "reason": "outside_frozen_12_17_utc_session_gate",
+        "geometry": {
+          "initial_stop_atr": 1.5,
+          "single_target_r": 2,
+          "horizon_bars": 32
+        },
+        "costs_bps": {
+          "1": "not_applicable",
+          "2": "not_applicable",
+          "3": "not_applicable",
+          "5": "not_applicable"
+        },
+        "mfe_mae": null,
+        "stop_target_horizon_outcome": null,
+        "integrity": {
+          "issues": [],
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "next_open_observed": {
+          "time": "2026-09-30T10:00:00Z",
+          "open": 1.1358,
+          "fire_id": 57620912283,
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "evidence_sha256": "369571de3ccd2df1d271dd886e55a82544b323e2bf0dc038352bbf877bf1a58e"
+      },
+      {
+        "schema": "R10_CANONICAL_EVIDENCE_ENVELOPE_V1",
+        "protocol": "regime_session_v1",
+        "protocol_id": "R10-REGIME-SESSION-SHADOW-V1",
+        "protocol_sha256": "96e94a305c0a6eb22f92f495560f1e0c66dc60d7395608c140da1e5b6e0def97",
+        "symbol": "CAPITALCOM:NAS100",
+        "source_time": "2026-09-30T09:45:00Z",
+        "source_observed": {
+          "open": 30327.6,
+          "high": 30339.4,
+          "low": 30326.2,
+          "close": 30337.4,
+          "volume": 2905,
+          "ema20": 30352.7862655131,
+          "ema50": 30353.7777003572,
+          "ema200": null,
+          "atr14": 35.8276412804,
+          "adx14": null,
+          "rsi14": 46.2239987298,
+          "zscore20": null,
+          "range_atr": null
+        },
+        "missing_protocol_features": [
+          "ema200",
+          "adx14",
+          "zscore20",
+          "range_atr"
+        ],
+        "decision": "WAIT",
+        "direction": "WAIT",
+        "reason": "outside_frozen_12_17_utc_session_gate",
+        "geometry": {
+          "initial_stop_atr": 1.5,
+          "single_target_r": 2,
+          "horizon_bars": 32
+        },
+        "costs_bps": {
+          "1": "not_applicable",
+          "2": "not_applicable",
+          "3": "not_applicable",
+          "5": "not_applicable"
+        },
+        "mfe_mae": null,
+        "stop_target_horizon_outcome": null,
+        "integrity": {
+          "issues": [],
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "next_open_observed": {
+          "time": "2026-09-30T10:00:00Z",
+          "open": 30337.6,
+          "fire_id": 57620911742,
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "evidence_sha256": "8beac73fd599451daf984d2a8202319a997c4a63c94ff51d400812f8605689f5"
+      },
+      {
+        "schema": "R10_CANONICAL_EVIDENCE_ENVELOPE_V1",
+        "protocol": "regime_session_v1",
+        "protocol_id": "R10-REGIME-SESSION-SHADOW-V1",
+        "protocol_sha256": "96e94a305c0a6eb22f92f495560f1e0c66dc60d7395608c140da1e5b6e0def97",
+        "symbol": "CAPITALCOM:SPX500",
+        "source_time": "2026-09-30T09:45:00Z",
+        "source_observed": {
+          "open": 7679.2,
+          "high": 7680.7,
+          "low": 7678.4,
+          "close": 7680.2,
+          "volume": 437,
+          "ema20": 7684.7251160527,
+          "ema50": 7683.9806574824,
+          "ema200": null,
+          "atr14": 5.752040862,
+          "adx14": null,
+          "rsi14": 42.7492842715,
+          "zscore20": null,
+          "range_atr": null
+        },
+        "missing_protocol_features": [
+          "ema200",
+          "adx14",
+          "zscore20",
+          "range_atr"
+        ],
+        "decision": "WAIT",
+        "direction": "WAIT",
+        "reason": "outside_frozen_12_17_utc_session_gate",
+        "geometry": {
+          "initial_stop_atr": 1.5,
+          "single_target_r": 2,
+          "horizon_bars": 32
+        },
+        "costs_bps": {
+          "1": "not_applicable",
+          "2": "not_applicable",
+          "3": "not_applicable",
+          "5": "not_applicable"
+        },
+        "mfe_mae": null,
+        "stop_target_horizon_outcome": null,
+        "integrity": {
+          "issues": [],
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "next_open_observed": {
+          "time": "2026-09-30T10:00:00Z",
+          "open": 7679.9,
+          "fire_id": 57620907475,
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "evidence_sha256": "63193fae0b803a9c79374e84ea0141545f6a738e3c3afa41c600833628e85b2a"
+      },
+      {
+        "schema": "R10_CANONICAL_EVIDENCE_ENVELOPE_V1",
+        "protocol": "regime_session_v1",
+        "protocol_id": "R10-REGIME-SESSION-SHADOW-V1",
+        "protocol_sha256": "96e94a305c0a6eb22f92f495560f1e0c66dc60d7395608c140da1e5b6e0def97",
+        "symbol": "CAPITALCOM:USDZAR",
+        "source_time": "2026-09-30T09:45:00Z",
+        "source_observed": {
+          "open": 16.38688,
+          "high": 16.39248,
+          "low": 16.38468,
+          "close": 16.39128,
+          "volume": 1804,
+          "ema20": 16.3789286653,
+          "ema50": 16.3867432513,
+          "ema200": null,
+          "atr14": 0.0137639565,
+          "adx14": null,
+          "rsi14": 57.2121282727,
+          "zscore20": null,
+          "range_atr": null
+        },
+        "missing_protocol_features": [
+          "ema200",
+          "adx14",
+          "zscore20",
+          "range_atr"
+        ],
+        "decision": "WAIT",
+        "direction": "WAIT",
+        "reason": "outside_frozen_12_17_utc_session_gate",
+        "geometry": {
+          "initial_stop_atr": 1.5,
+          "single_target_r": 2,
+          "horizon_bars": 32
+        },
+        "costs_bps": {
+          "1": "not_applicable",
+          "2": "not_applicable",
+          "3": "not_applicable",
+          "5": "not_applicable"
+        },
+        "mfe_mae": null,
+        "stop_target_horizon_outcome": null,
+        "integrity": {
+          "issues": [],
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "next_open_observed": {
+          "time": "2026-09-30T10:00:00Z",
+          "open": 16.39128,
+          "fire_id": 57620906882,
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "evidence_sha256": "4c407f821e902e98501b03c3d93918a5e89c46868b95f7284797e7b918588c04"
+      },
+      {
+        "schema": "R10_CANONICAL_EVIDENCE_ENVELOPE_V1",
+        "protocol": "regime_session_v1",
+        "protocol_id": "R10-REGIME-SESSION-SHADOW-V1",
+        "protocol_sha256": "96e94a305c0a6eb22f92f495560f1e0c66dc60d7395608c140da1e5b6e0def97",
+        "symbol": "CAPITALCOM:XAGUSD",
+        "source_time": "2026-09-30T09:45:00Z",
+        "source_observed": {
+          "open": 60.86,
+          "high": 60.882,
+          "low": 60.768,
+          "close": 60.827,
+          "volume": 1356,
+          "ema20": 61.0639428967,
+          "ema50": 61.096220608,
+          "ema200": null,
+          "atr14": 0.1675991609,
+          "adx14": null,
+          "rsi14": 36.2064603252,
+          "zscore20": null,
+          "range_atr": null
+        },
+        "missing_protocol_features": [
+          "ema200",
+          "adx14",
+          "zscore20",
+          "range_atr"
+        ],
+        "decision": "WAIT",
+        "direction": "WAIT",
+        "reason": "outside_frozen_12_17_utc_session_gate",
+        "geometry": {
+          "initial_stop_atr": 1.5,
+          "single_target_r": 2,
+          "horizon_bars": 32
+        },
+        "costs_bps": {
+          "1": "not_applicable",
+          "2": "not_applicable",
+          "3": "not_applicable",
+          "5": "not_applicable"
+        },
+        "mfe_mae": null,
+        "stop_target_horizon_outcome": null,
+        "integrity": {
+          "issues": [],
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "next_open_observed": {
+          "time": "2026-09-30T10:00:00Z",
+          "open": 60.827,
+          "fire_id": 57620907656,
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "evidence_sha256": "a40e02234548b9a62a2833cf0ceeac6f5a1cd5f1c80f42142843f8ad98dbd9f9"
+      },
+      {
+        "schema": "R10_CANONICAL_EVIDENCE_ENVELOPE_V1",
+        "protocol": "regime_session_v1",
+        "protocol_id": "R10-REGIME-SESSION-SHADOW-V1",
+        "protocol_sha256": "96e94a305c0a6eb22f92f495560f1e0c66dc60d7395608c140da1e5b6e0def97",
+        "symbol": "CAPITALCOM:XAUUSD",
+        "source_time": "2026-09-30T09:45:00Z",
+        "source_observed": {
+          "open": 4187.94,
+          "high": 4189.18,
+          "low": 4185.22,
+          "close": 4187.73,
+          "volume": 2825,
+          "ema20": 4187.6983177686,
+          "ema50": 4180.6815646728,
+          "ema200": null,
+          "atr14": 6.6352283051,
+          "adx14": null,
+          "rsi14": 52.3410343779,
+          "zscore20": null,
+          "range_atr": null
+        },
+        "missing_protocol_features": [
+          "ema200",
+          "adx14",
+          "zscore20",
+          "range_atr"
+        ],
+        "decision": "WAIT",
+        "direction": "WAIT",
+        "reason": "outside_frozen_12_17_utc_session_gate",
+        "geometry": {
+          "initial_stop_atr": 1.5,
+          "single_target_r": 2,
+          "horizon_bars": 32
+        },
+        "costs_bps": {
+          "1": "not_applicable",
+          "2": "not_applicable",
+          "3": "not_applicable",
+          "5": "not_applicable"
+        },
+        "mfe_mae": null,
+        "stop_target_horizon_outcome": null,
+        "integrity": {
+          "issues": [],
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "next_open_observed": {
+          "time": "2026-09-30T10:00:00Z",
+          "open": 4187.74,
+          "fire_id": 57620911927,
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "evidence_sha256": "a5c7ff9b2238034843861e091bbcacde24ff4af3e379a31cf24cb2e9749af036"
+      },
+      {
+        "schema": "R10_CANONICAL_EVIDENCE_ENVELOPE_V1",
+        "protocol": "regime_session_v1",
+        "protocol_id": "R10-REGIME-SESSION-SHADOW-V1",
+        "protocol_sha256": "96e94a305c0a6eb22f92f495560f1e0c66dc60d7395608c140da1e5b6e0def97",
+        "symbol": "CAPITALCOM:ETHUSD",
+        "source_time": "2026-09-30T10:00:00Z",
+        "source_observed": {
+          "open": 2686.61,
+          "high": 2690.43,
+          "low": 2686.54,
+          "close": 2688.95,
+          "volume": 4502,
+          "ema20": 2674.9992310158,
+          "ema50": 2675.3086666333,
+          "ema200": null,
+          "atr14": 6.9147715,
+          "adx14": null,
+          "rsi14": 67.1381948639,
+          "zscore20": null,
+          "range_atr": null
+        },
+        "missing_protocol_features": [
+          "ema200",
+          "adx14",
+          "zscore20",
+          "range_atr"
+        ],
+        "decision": "WAIT",
+        "direction": "WAIT",
+        "reason": "outside_frozen_12_17_utc_session_gate",
+        "geometry": {
+          "initial_stop_atr": 1.5,
+          "single_target_r": 2,
+          "horizon_bars": 32
+        },
+        "costs_bps": {
+          "1": "not_applicable",
+          "2": "not_applicable",
+          "3": "not_applicable",
+          "5": "not_applicable"
+        },
+        "mfe_mae": null,
+        "stop_target_horizon_outcome": null,
+        "integrity": {
+          "issues": [],
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "pending_next_open": true,
+        "source_receipt_sha256": "6ffc7dd6341c42296568a08c6f89b1a9a1485ee512b7e6be9975aff6a5107ddd"
+      },
+      {
+        "schema": "R10_CANONICAL_EVIDENCE_ENVELOPE_V1",
+        "protocol": "regime_session_v1",
+        "protocol_id": "R10-REGIME-SESSION-SHADOW-V1",
+        "protocol_sha256": "96e94a305c0a6eb22f92f495560f1e0c66dc60d7395608c140da1e5b6e0def97",
+        "symbol": "CAPITALCOM:DOGEUSD",
+        "source_time": "2026-09-30T10:00:00Z",
+        "source_observed": {
+          "open": 0.0939808,
+          "high": 0.0944017,
+          "low": 0.0939476,
+          "close": 0.0941637,
+          "volume": 2204,
+          "ema20": 0.0935729864,
+          "ema50": 0.0935639243,
+          "ema200": null,
+          "atr14": 0.0004228988,
+          "adx14": null,
+          "rsi14": 60.9103360424,
+          "zscore20": null,
+          "range_atr": null
+        },
+        "missing_protocol_features": [
+          "ema200",
+          "adx14",
+          "zscore20",
+          "range_atr"
+        ],
+        "decision": "WAIT",
+        "direction": "WAIT",
+        "reason": "outside_frozen_12_17_utc_session_gate",
+        "geometry": {
+          "initial_stop_atr": 1.5,
+          "single_target_r": 2,
+          "horizon_bars": 32
+        },
+        "costs_bps": {
+          "1": "not_applicable",
+          "2": "not_applicable",
+          "3": "not_applicable",
+          "5": "not_applicable"
+        },
+        "mfe_mae": null,
+        "stop_target_horizon_outcome": null,
+        "integrity": {
+          "issues": [],
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "pending_next_open": true,
+        "source_receipt_sha256": "b0c48096054c3391e0423605dba01eafbb51998b771dfcb5af0e63630b6fe559"
+      },
+      {
+        "schema": "R10_CANONICAL_EVIDENCE_ENVELOPE_V1",
+        "protocol": "regime_session_v1",
+        "protocol_id": "R10-REGIME-SESSION-SHADOW-V1",
+        "protocol_sha256": "96e94a305c0a6eb22f92f495560f1e0c66dc60d7395608c140da1e5b6e0def97",
+        "symbol": "CAPITALCOM:BTCUSD",
+        "source_time": "2026-09-30T10:00:00Z",
+        "source_observed": {
+          "open": 83569.55,
+          "high": 83733.45,
+          "low": 83569.2,
+          "close": 83659.2,
+          "volume": 4570,
+          "ema20": 83290.3138596634,
+          "ema50": 83322.354639066,
+          "ema200": null,
+          "atr14": 185.9806071269,
+          "adx14": null,
+          "rsi14": 65.207135185,
+          "zscore20": null,
+          "range_atr": null
+        },
+        "missing_protocol_features": [
+          "ema200",
+          "adx14",
+          "zscore20",
+          "range_atr"
+        ],
+        "decision": "WAIT",
+        "direction": "WAIT",
+        "reason": "outside_frozen_12_17_utc_session_gate",
+        "geometry": {
+          "initial_stop_atr": 1.5,
+          "single_target_r": 2,
+          "horizon_bars": 32
+        },
+        "costs_bps": {
+          "1": "not_applicable",
+          "2": "not_applicable",
+          "3": "not_applicable",
+          "5": "not_applicable"
+        },
+        "mfe_mae": null,
+        "stop_target_horizon_outcome": null,
+        "integrity": {
+          "issues": [],
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "pending_next_open": true,
+        "source_receipt_sha256": "ac767b950b2e89d53460b9279e30e81d0b7563e63394e1e08a08097b61bbc955"
+      },
+      {
+        "schema": "R10_CANONICAL_EVIDENCE_ENVELOPE_V1",
+        "protocol": "regime_session_v1",
+        "protocol_id": "R10-REGIME-SESSION-SHADOW-V1",
+        "protocol_sha256": "96e94a305c0a6eb22f92f495560f1e0c66dc60d7395608c140da1e5b6e0def97",
+        "symbol": "CAPITALCOM:AUDUSD",
+        "source_time": "2026-09-30T10:00:00Z",
+        "source_observed": {
+          "open": 0.69697,
+          "high": 0.69726,
+          "low": 0.69689,
+          "close": 0.69708,
+          "volume": 793,
+          "ema20": 0.6972759219,
+          "ema50": 0.6975885641,
+          "ema200": null,
+          "atr14": 0.0004741025,
+          "adx14": null,
+          "rsi14": 45.651293101,
+          "zscore20": null,
+          "range_atr": null
+        },
+        "missing_protocol_features": [
+          "ema200",
+          "adx14",
+          "zscore20",
+          "range_atr"
+        ],
+        "decision": "WAIT",
+        "direction": "WAIT",
+        "reason": "outside_frozen_12_17_utc_session_gate",
+        "geometry": {
+          "initial_stop_atr": 1.5,
+          "single_target_r": 2,
+          "horizon_bars": 32
+        },
+        "costs_bps": {
+          "1": "not_applicable",
+          "2": "not_applicable",
+          "3": "not_applicable",
+          "5": "not_applicable"
+        },
+        "mfe_mae": null,
+        "stop_target_horizon_outcome": null,
+        "integrity": {
+          "issues": [],
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "pending_next_open": true,
+        "source_receipt_sha256": "b2715b3084926c5fa793bd88e35c22b9384902fa01fce1051e32a9fbd6625728"
+      },
+      {
+        "schema": "R10_CANONICAL_EVIDENCE_ENVELOPE_V1",
+        "protocol": "regime_session_v1",
+        "protocol_id": "R10-REGIME-SESSION-SHADOW-V1",
+        "protocol_sha256": "96e94a305c0a6eb22f92f495560f1e0c66dc60d7395608c140da1e5b6e0def97",
+        "symbol": "CAPITALCOM:EURUSD",
+        "source_time": "2026-09-30T10:00:00Z",
+        "source_observed": {
+          "open": 1.1358,
+          "high": 1.13635,
+          "low": 1.13576,
+          "close": 1.13608,
+          "volume": 1650,
+          "ema20": 1.1350695475,
+          "ema50": 1.134525677,
+          "ema200": null,
+          "atr14": 0.0005814463,
+          "adx14": null,
+          "rsi14": 67.7341375247,
+          "zscore20": null,
+          "range_atr": null
+        },
+        "missing_protocol_features": [
+          "ema200",
+          "adx14",
+          "zscore20",
+          "range_atr"
+        ],
+        "decision": "WAIT",
+        "direction": "WAIT",
+        "reason": "outside_frozen_12_17_utc_session_gate",
+        "geometry": {
+          "initial_stop_atr": 1.5,
+          "single_target_r": 2,
+          "horizon_bars": 32
+        },
+        "costs_bps": {
+          "1": "not_applicable",
+          "2": "not_applicable",
+          "3": "not_applicable",
+          "5": "not_applicable"
+        },
+        "mfe_mae": null,
+        "stop_target_horizon_outcome": null,
+        "integrity": {
+          "issues": [],
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "pending_next_open": true,
+        "source_receipt_sha256": "f42a9977e98a267e4729ca9ec4e16601ffeedd6d069a78a3c0d32fd4d0e26980"
+      },
+      {
+        "schema": "R10_CANONICAL_EVIDENCE_ENVELOPE_V1",
+        "protocol": "regime_session_v1",
+        "protocol_id": "R10-REGIME-SESSION-SHADOW-V1",
+        "protocol_sha256": "96e94a305c0a6eb22f92f495560f1e0c66dc60d7395608c140da1e5b6e0def97",
+        "symbol": "CAPITALCOM:NAS100",
+        "source_time": "2026-09-30T10:00:00Z",
+        "source_observed": {
+          "open": 30337.6,
+          "high": 30337.6,
+          "low": 30305.4,
+          "close": 30317.9,
+          "volume": 3003,
+          "ema20": 30349.4637640357,
+          "ema50": 30352.3707317157,
+          "ema200": null,
+          "atr14": 35.5685240461,
+          "adx14": null,
+          "rsi14": 42.4254647903,
+          "zscore20": null,
+          "range_atr": null
+        },
+        "missing_protocol_features": [
+          "ema200",
+          "adx14",
+          "zscore20",
+          "range_atr"
+        ],
+        "decision": "WAIT",
+        "direction": "WAIT",
+        "reason": "outside_frozen_12_17_utc_session_gate",
+        "geometry": {
+          "initial_stop_atr": 1.5,
+          "single_target_r": 2,
+          "horizon_bars": 32
+        },
+        "costs_bps": {
+          "1": "not_applicable",
+          "2": "not_applicable",
+          "3": "not_applicable",
+          "5": "not_applicable"
+        },
+        "mfe_mae": null,
+        "stop_target_horizon_outcome": null,
+        "integrity": {
+          "issues": [],
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "pending_next_open": true,
+        "source_receipt_sha256": "93ff758b3702c9293037cb3c407622687481934d3b60c5153406852f0b322557"
+      },
+      {
+        "schema": "R10_CANONICAL_EVIDENCE_ENVELOPE_V1",
+        "protocol": "regime_session_v1",
+        "protocol_id": "R10-REGIME-SESSION-SHADOW-V1",
+        "protocol_sha256": "96e94a305c0a6eb22f92f495560f1e0c66dc60d7395608c140da1e5b6e0def97",
+        "symbol": "CAPITALCOM:SPX500",
+        "source_time": "2026-09-30T10:00:00Z",
+        "source_observed": {
+          "open": 7679.9,
+          "high": 7680.2,
+          "low": 7674.4,
+          "close": 7676.7,
+          "volume": 462,
+          "ema20": 7683.9608192858,
+          "ema50": 7683.6951415027,
+          "ema200": null,
+          "atr14": 5.7554665147,
+          "adx14": null,
+          "rsi14": 38.5035048142,
+          "zscore20": null,
+          "range_atr": null
+        },
+        "missing_protocol_features": [
+          "ema200",
+          "adx14",
+          "zscore20",
+          "range_atr"
+        ],
+        "decision": "WAIT",
+        "direction": "WAIT",
+        "reason": "outside_frozen_12_17_utc_session_gate",
+        "geometry": {
+          "initial_stop_atr": 1.5,
+          "single_target_r": 2,
+          "horizon_bars": 32
+        },
+        "costs_bps": {
+          "1": "not_applicable",
+          "2": "not_applicable",
+          "3": "not_applicable",
+          "5": "not_applicable"
+        },
+        "mfe_mae": null,
+        "stop_target_horizon_outcome": null,
+        "integrity": {
+          "issues": [],
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "pending_next_open": true,
+        "source_receipt_sha256": "844469b75b6fa3eefe6636f5297a4138fd623925de2148d4743d874de23d3629"
+      },
+      {
+        "schema": "R10_CANONICAL_EVIDENCE_ENVELOPE_V1",
+        "protocol": "regime_session_v1",
+        "protocol_id": "R10-REGIME-SESSION-SHADOW-V1",
+        "protocol_sha256": "96e94a305c0a6eb22f92f495560f1e0c66dc60d7395608c140da1e5b6e0def97",
+        "symbol": "CAPITALCOM:USDZAR",
+        "source_time": "2026-09-30T10:00:00Z",
+        "source_observed": {
+          "open": 16.39128,
+          "high": 16.39168,
+          "low": 16.37348,
+          "close": 16.37388,
+          "volume": 1995,
+          "ema20": 16.37844784,
+          "ema50": 16.3862388101,
+          "ema200": null,
+          "atr14": 0.0140808167,
+          "adx14": null,
+          "rsi14": 46.3842263233,
+          "zscore20": null,
+          "range_atr": null
+        },
+        "missing_protocol_features": [
+          "ema200",
+          "adx14",
+          "zscore20",
+          "range_atr"
+        ],
+        "decision": "WAIT",
+        "direction": "WAIT",
+        "reason": "outside_frozen_12_17_utc_session_gate",
+        "geometry": {
+          "initial_stop_atr": 1.5,
+          "single_target_r": 2,
+          "horizon_bars": 32
+        },
+        "costs_bps": {
+          "1": "not_applicable",
+          "2": "not_applicable",
+          "3": "not_applicable",
+          "5": "not_applicable"
+        },
+        "mfe_mae": null,
+        "stop_target_horizon_outcome": null,
+        "integrity": {
+          "issues": [],
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "pending_next_open": true,
+        "source_receipt_sha256": "5c4d3e026a1af6b9aaf364678bf5253fcdc4c4ba37e6bd3f8bdfd6f5cfda7f77"
+      },
+      {
+        "schema": "R10_CANONICAL_EVIDENCE_ENVELOPE_V1",
+        "protocol": "regime_session_v1",
+        "protocol_id": "R10-REGIME-SESSION-SHADOW-V1",
+        "protocol_sha256": "96e94a305c0a6eb22f92f495560f1e0c66dc60d7395608c140da1e5b6e0def97",
+        "symbol": "CAPITALCOM:XAGUSD",
+        "source_time": "2026-09-30T10:00:00Z",
+        "source_observed": {
+          "open": 60.827,
+          "high": 60.925,
+          "low": 60.755,
+          "close": 60.821,
+          "volume": 1379,
+          "ema20": 61.0408916457,
+          "ema50": 61.0854653208,
+          "ema200": null,
+          "atr14": 0.1677706494,
+          "adx14": null,
+          "rsi14": 35.9688206007,
+          "zscore20": null,
+          "range_atr": null
+        },
+        "missing_protocol_features": [
+          "ema200",
+          "adx14",
+          "zscore20",
+          "range_atr"
+        ],
+        "decision": "WAIT",
+        "direction": "WAIT",
+        "reason": "outside_frozen_12_17_utc_session_gate",
+        "geometry": {
+          "initial_stop_atr": 1.5,
+          "single_target_r": 2,
+          "horizon_bars": 32
+        },
+        "costs_bps": {
+          "1": "not_applicable",
+          "2": "not_applicable",
+          "3": "not_applicable",
+          "5": "not_applicable"
+        },
+        "mfe_mae": null,
+        "stop_target_horizon_outcome": null,
+        "integrity": {
+          "issues": [],
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "pending_next_open": true,
+        "source_receipt_sha256": "a5a2276485ad75d39473e2c3097c3c45c93651b510dae4b378707e5727aad059"
+      },
+      {
+        "schema": "R10_CANONICAL_EVIDENCE_ENVELOPE_V1",
+        "protocol": "regime_session_v1",
+        "protocol_id": "R10-REGIME-SESSION-SHADOW-V1",
+        "protocol_sha256": "96e94a305c0a6eb22f92f495560f1e0c66dc60d7395608c140da1e5b6e0def97",
+        "symbol": "CAPITALCOM:XAUUSD",
+        "source_time": "2026-09-30T10:00:00Z",
+        "source_observed": {
+          "open": 4187.74,
+          "high": 4190.49,
+          "low": 4185.99,
+          "close": 4188.62,
+          "volume": 3194,
+          "ema20": 4187.7852353508,
+          "ema50": 4180.9924990839,
+          "ema200": null,
+          "atr14": 6.4827119976,
+          "adx14": null,
+          "rsi14": 53.4664702246,
+          "zscore20": null,
+          "range_atr": null
+        },
+        "missing_protocol_features": [
+          "ema200",
+          "adx14",
+          "zscore20",
+          "range_atr"
+        ],
+        "decision": "WAIT",
+        "direction": "WAIT",
+        "reason": "outside_frozen_12_17_utc_session_gate",
+        "geometry": {
+          "initial_stop_atr": 1.5,
+          "single_target_r": 2,
+          "horizon_bars": 32
+        },
+        "costs_bps": {
+          "1": "not_applicable",
+          "2": "not_applicable",
+          "3": "not_applicable",
+          "5": "not_applicable"
+        },
+        "mfe_mae": null,
+        "stop_target_horizon_outcome": null,
+        "integrity": {
+          "issues": [],
+          "webhook": {
+            "http_code": 200
+          }
+        },
+        "pending_next_open": true,
+        "source_receipt_sha256": "cb9eb822c13606e99e2f902ebc6a85aa4d36dfef8c8a5ddd2ca17a28769b3a67"
+      }
+    ],
+    "review_state": "COLLECTING"
+  },
+  "causal_crypto_portfolio": {
+    "state": "FLAT",
+    "accepted_entries": 1,
+    "overlap_rejections": 0,
+    "valued_forward_trades": 1,
+    "last_closed_position": {
+      "symbol": "CAPITALCOM:DOGEUSD",
+      "direction": "SHORT",
+      "source_time": "2026-09-30T08:30:00Z",
+      "outcome": "STOP",
+      "exit_time": "2026-09-30T09:15:00Z"
+    }
+  },
+  "integrity": {
+    "missing_source_intervals": [],
+    "missing_completed_next_open_intervals": [],
+    "new_webhook_failures": [],
+    "prior_already_reported_webhook_failures": [
+      {
+        "source_time": "2026-09-30T08:45:00Z",
+        "symbol": "CAPITALCOM:USDZAR",
+        "fire_id": 57617307438,
+        "webhook": {
+          "error": "request took too long and timed out"
+        }
+      }
+    ],
+    "stale_htf_new": [
+      {
+        "symbol": "CAPITALCOM:DOGEUSD",
+        "source_time": "2026-09-30T09:45:00Z",
+        "issue": "stale_1h_boundary",
+        "expected": "2026-09-30T09:00:00Z",
+        "observed": "2026-09-30T08:00:00Z",
+        "effect": "decision_invariant_geometry_fails_all_directions"
+      },
+      {
+        "symbol": "CAPITALCOM:ETHUSD",
+        "source_time": "2026-09-30T09:45:00Z",
+        "issue": "stale_1h_boundary_plus_missing_exact_4h_pair",
+        "expected": "2026-09-30T09:00:00Z",
+        "observed": "2026-09-30T08:00:00Z",
+        "effect": "decision_invariant_wait"
+      }
+    ],
+    "retrospective_revision_audit": {
+      "completed_rows": 22,
+      "pending_rows": 7,
+      "details": [
+        {
+          "symbol": "CAPITALCOM:ETHUSD",
+          "source_time": "2026-09-30T08:45:00Z",
+          "diff": {
+            "c": {
+              "frozen": 2668.88,
+              "later": 2668.93
+            },
+            "v": {
+              "frozen": 3947,
+              "later": 3973
+            }
+          }
+        },
+        {
+          "symbol": "CAPITALCOM:ETHUSD",
+          "source_time": "2026-09-30T09:15:00Z",
+          "diff": {
+            "c": {
+              "frozen": 2683.62,
+              "later": 2683.91
+            },
+            "v": {
+              "frozen": 3891,
+              "later": 3902
+            }
+          }
+        },
+        {
+          "symbol": "CAPITALCOM:ETHUSD",
+          "source_time": "2026-09-30T09:30:00Z",
+          "diff": {
+            "c": {
+              "frozen": 2687.21,
+              "later": 2687.3
+            },
+            "v": {
+              "frozen": 5467,
+              "later": 5490
+            }
+          }
+        },
+        {
+          "symbol": "CAPITALCOM:ETHUSD",
+          "source_time": "2026-09-30T09:45:00Z",
+          "diff": {
+            "c": {
+              "frozen": 2686.62,
+              "later": 2686.64
+            },
+            "v": {
+              "frozen": 4144,
+              "later": 4169
+            }
+          }
+        },
+        {
+          "symbol": "CAPITALCOM:ETHUSD",
+          "source_time": "2026-09-30T10:00:00Z",
+          "diff": {
+            "c": {
+              "frozen": 2688.95,
+              "later": 2687.72
+            },
+            "v": {
+              "frozen": 4502,
+              "later": 4537
+            }
+          }
+        },
+        {
+          "symbol": "CAPITALCOM:DOGEUSD",
+          "source_time": "2026-09-30T08:45:00Z",
+          "diff": {
+            "c": {
+              "frozen": 0.093344,
+              "later": 0.0933449
+            },
+            "v": {
+              "frozen": 3053,
+              "later": 3076
+            }
+          }
+        },
+        {
+          "symbol": "CAPITALCOM:DOGEUSD",
+          "source_time": "2026-09-30T09:15:00Z",
+          "diff": {
+            "c": {
+              "frozen": 0.0938497,
+              "later": 0.0938508
+            },
+            "v": {
+              "frozen": 2531,
+              "later": 2542
+            }
+          }
+        },
+        {
+          "symbol": "CAPITALCOM:DOGEUSD",
+          "source_time": "2026-09-30T09:30:00Z",
+          "diff": {
+            "c": {
+              "frozen": 0.0941043,
+              "later": 0.0941062
+            },
+            "v": {
+              "frozen": 2768,
+              "later": 2775
+            }
+          }
+        },
+        {
+          "symbol": "CAPITALCOM:DOGEUSD",
+          "source_time": "2026-09-30T09:45:00Z",
+          "diff": {
+            "c": {
+              "frozen": 0.093982,
+              "later": 0.0939819
+            },
+            "v": {
+              "frozen": 1792,
+              "later": 1799
+            }
+          }
+        },
+        {
+          "symbol": "CAPITALCOM:DOGEUSD",
+          "source_time": "2026-09-30T10:00:00Z",
+          "diff": {
+            "c": {
+              "frozen": 0.0941637,
+              "later": 0.0941409
+            },
+            "v": {
+              "frozen": 2204,
+              "later": 2220
+            }
+          }
+        },
+        {
+          "symbol": "CAPITALCOM:AUDUSD",
+          "source_time": "2026-09-30T08:45:00Z",
+          "diff": {
+            "c": {
+              "frozen": 0.69754,
+              "later": 0.69746
+            },
+            "v": {
+              "frozen": 705,
+              "later": 714
+            }
+          }
+        },
+        {
+          "symbol": "CAPITALCOM:AUDUSD",
+          "source_time": "2026-09-30T09:45:00Z",
+          "diff": {
+            "v": {
+              "frozen": 642,
+              "later": 646
+            }
+          }
+        },
+        {
+          "symbol": "CAPITALCOM:NAS100",
+          "source_time": "2026-09-30T09:15:00Z",
+          "diff": {
+            "c": {
+              "frozen": 30339.1,
+              "later": 30339.3
+            },
+            "v": {
+              "frozen": 3045,
+              "later": 3051
+            }
+          }
+        },
+        {
+          "symbol": "CAPITALCOM:NAS100",
+          "source_time": "2026-09-30T09:45:00Z",
+          "diff": {
+            "v": {
+              "frozen": 2905,
+              "later": 2907
+            }
+          }
+        },
+        {
+          "symbol": "CAPITALCOM:NAS100",
+          "source_time": "2026-09-30T10:00:00Z",
+          "diff": {
+            "c": {
+              "frozen": 30317.9,
+              "later": 30306.8
+            },
+            "v": {
+              "frozen": 3003,
+              "later": 3010
+            }
+          }
+        },
+        {
+          "symbol": "CAPITALCOM:SPX500",
+          "source_time": "2026-09-30T08:45:00Z",
+          "diff": {
+            "l": {
+              "frozen": 7683.2,
+              "later": 7682.9
+            },
+            "c": {
+              "frozen": 7683.2,
+              "later": 7682.9
+            },
+            "v": {
+              "frozen": 560,
+              "later": 561
+            }
+          }
+        },
+        {
+          "symbol": "CAPITALCOM:SPX500",
+          "source_time": "2026-09-30T10:00:00Z",
+          "diff": {
+            "c": {
+              "frozen": 7676.7,
+              "later": 7675.4
+            },
+            "v": {
+              "frozen": 462,
+              "later": 463
+            }
+          }
+        },
+        {
+          "symbol": "CAPITALCOM:USDZAR",
+          "source_time": "2026-09-30T09:45:00Z",
+          "diff": {
+            "v": {
+              "frozen": 1804,
+              "later": 1808
+            }
+          }
+        },
+        {
+          "symbol": "CAPITALCOM:USDZAR",
+          "source_time": "2026-09-30T10:00:00Z",
+          "diff": {
+            "c": {
+              "frozen": 16.37388,
+              "later": 16.37828
+            },
+            "v": {
+              "frozen": 1995,
+              "later": 2000
+            }
+          }
+        },
+        {
+          "symbol": "CAPITALCOM:XAGUSD",
+          "source_time": "2026-09-30T08:45:00Z",
+          "diff": {
+            "c": {
+              "frozen": 61.018,
+              "later": 61.016
+            },
+            "v": {
+              "frozen": 1454,
+              "later": 1459
+            }
+          }
+        },
+        {
+          "symbol": "CAPITALCOM:XAGUSD",
+          "source_time": "2026-09-30T09:15:00Z",
+          "diff": {
+            "c": {
+              "frozen": 60.885,
+              "later": 60.882
+            },
+            "v": {
+              "frozen": 1734,
+              "later": 1737
+            }
+          }
+        },
+        {
+          "symbol": "CAPITALCOM:XAGUSD",
+          "source_time": "2026-09-30T09:30:00Z",
+          "diff": {
+            "v": {
+              "frozen": 1548,
+              "later": 1550
+            }
+          }
+        },
+        {
+          "symbol": "CAPITALCOM:XAGUSD",
+          "source_time": "2026-09-30T09:45:00Z",
+          "diff": {
+            "c": {
+              "frozen": 60.827,
+              "later": 60.828
+            },
+            "v": {
+              "frozen": 1356,
+              "later": 1360
+            }
+          }
+        },
+        {
+          "symbol": "CAPITALCOM:XAGUSD",
+          "source_time": "2026-09-30T10:00:00Z",
+          "diff": {
+            "c": {
+              "frozen": 60.821,
+              "later": 60.781
+            },
+            "v": {
+              "frozen": 1379,
+              "later": 1385
+            }
+          }
+        },
+        {
+          "symbol": "CAPITALCOM:XAUUSD",
+          "source_time": "2026-09-30T08:45:00Z",
+          "diff": {
+            "c": {
+              "frozen": 4191.91,
+              "later": 4191.68
+            },
+            "v": {
+              "frozen": 3449,
+              "later": 3460
+            }
+          }
+        },
+        {
+          "symbol": "CAPITALCOM:XAUUSD",
+          "source_time": "2026-09-30T09:15:00Z",
+          "diff": {
+            "c": {
+              "frozen": 4185.8,
+              "later": 4185.73
+            },
+            "v": {
+              "frozen": 3344,
+              "later": 3349
+            }
+          }
+        },
+        {
+          "symbol": "CAPITALCOM:XAUUSD",
+          "source_time": "2026-09-30T09:30:00Z",
+          "diff": {
+            "c": {
+              "frozen": 4187.91,
+              "later": 4187.99
+            },
+            "v": {
+              "frozen": 2821,
+              "later": 2836
+            }
+          }
+        },
+        {
+          "symbol": "CAPITALCOM:XAUUSD",
+          "source_time": "2026-09-30T09:45:00Z",
+          "diff": {
+            "c": {
+              "frozen": 4187.73,
+              "later": 4187.72
+            },
+            "v": {
+              "frozen": 2825,
+              "later": 2831
+            }
+          }
+        },
+        {
+          "symbol": "CAPITALCOM:XAUUSD",
+          "source_time": "2026-09-30T10:00:00Z",
+          "diff": {
+            "c": {
+              "frozen": 4188.62,
+              "later": 4187.31
+            },
+            "v": {
+              "frozen": 3194,
+              "later": 3216
+            }
+          }
+        }
+      ],
+      "treatment": "audit_only_never_substituted_into_canonical_evidence"
+    }
+  },
+  "review_states": {
+    "mtf": "COLLECTING",
+    "regime_session": "COLLECTING"
+  },
+  "authority": {
+    "research_only": true,
+    "live_authorized": false,
+    "execution": "none",
+    "retune_on_forward": false,
+    "live_risk_change": false,
+    "broker_state_change": false,
+    "notification_setting_change": false
+  },
+  "batch_sha256": "44e7cdc224dc3b111c86c23df1d129b597652f143ae4b98f00e579ed23427805"
+}
