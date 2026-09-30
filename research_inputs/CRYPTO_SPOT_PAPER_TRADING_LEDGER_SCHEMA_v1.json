@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "name": "STC Crypto Spot Paper Trading Ledger",
+  "mode": "PAPER_ONLY",
+  "execution": "NONE",
+  "fields": {
+    "trade_id": "unique identifier",
+    "timestamp": "UTC timestamp",
+    "asset": "registered asset symbol",
+    "pair": "spot pair",
+    "strategy_id": "validated strategy reference",
+    "timeframe": "signal timeframe",
+    "entry_price": "simulated entry",
+    "exit_price": "simulated exit",
+    "quantity": "paper quantity",
+    "fees": "simulated fees",
+    "pnl": "paper profit loss",
+    "mfe": "maximum favorable excursion",
+    "mae": "maximum adverse excursion",
+    "market_regime": "trend/range/unknown",
+    "validation_status": "backtest/forward/paper"
+  },
+  "rules": {
+    "real_order": false,
+    "leverage": false,
+    "futures": false,
+    "short": false,
+    "immutable_history": true
+  }
+}
