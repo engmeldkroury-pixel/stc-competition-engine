@@ -1,2 +1,2 @@
-2026-09-27 R8 acceptance readback after main merge.
-Verify current production account freshness, open-position evidence, signal freshness and notification config without changing controls.
+2026-09-30T08:47:00+03:00
+Verify production after PR198 Telegram visibility and heartbeat deployment; confirm notification channel, live competition policy fields, current opportunities, runtime controls and open-position management.
