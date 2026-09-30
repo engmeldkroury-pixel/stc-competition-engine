@@ -47,8 +47,12 @@ def run_serverless_once(
             else:
                 result.ingested += 1
                 notifier = getattr(client, "notify_signal", None)
-                if callable(notifier) and outcome.get("decision", {}).get("locked_trade_plan"):
+                if callable(notifier):
                     try:
+                        # Evaluate every persisted market event for notification
+                        # visibility. The Hostinger notification policy decides
+                        # whether this is an actionable plan, blocked plan,
+                        # monitor-only near miss, heartbeat, or a no-op.
                         notifier(item.event_id)
                     except Exception:
                         # Notifications are secondary. Never turn a successfully

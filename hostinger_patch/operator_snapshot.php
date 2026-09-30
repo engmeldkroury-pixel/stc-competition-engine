@@ -374,6 +374,8 @@ try {
             'composite_score' => (float)($signal['composite_score'] ?? 0.0),
             'confidence' => (float)($signal['confidence'] ?? 0.0),
             'quality_gate_passed' => $qualityGatePassed,
+            'competition_mode' => (bool)($signal['competition_mode'] ?? false),
+            'quality_floor' => isset($signal['quality_floor']) ? (int)$signal['quality_floor'] : null,
             'setup_grade' => (string)($signal['setup_grade'] ?? 'MONITOR_ONLY'),
             'setup_quality_score' => isset($signal['setup_quality_score']) ? (int)$signal['setup_quality_score'] : null,
             'setup_quality_label' => (string)($signal['setup_quality_label'] ?? ''),

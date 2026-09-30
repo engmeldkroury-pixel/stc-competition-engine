@@ -22,3 +22,21 @@ def test_notification_uses_fail_safe_max_quantity_language_and_blocks_duplicate_
     assert "'reason' => 'existing_open_position'" in notify
     assert "'reason' => 'same_direction_loss_cooldown'" in notify
     assert "stc_recent_same_direction_loss_cooldown(" in notify
+
+
+def test_monitor_only_directional_near_miss_is_visible_but_never_actionable():
+    notify = Path("hostinger_patch/notification_control.php").read_text(encoding="utf-8")
+    assert "STC_MONITOR_VISIBILITY_FLOOR = 78" in notify
+    assert "SIGNAL_WATCHLIST" in notify
+    assert "STATUS: WATCHLIST • NOT ACTIONABLE" in notify
+    assert "No locked trade plan was created." in notify
+    assert "No quantity, approval, or entry is authorized by this message." in notify
+    assert "monitor_state_unchanged" in notify
+
+
+def test_qualified_plan_with_stale_account_sends_blocked_telegram_visibility():
+    notify = Path("hostinger_patch/notification_control.php").read_text(encoding="utf-8")
+    assert "ENTRY_BLOCKED" in notify
+    assert "STC PLAN BLOCKED • REFRESH EQUITY" in notify
+    assert "Quantity is intentionally withheld while account equity is stale or unverified." in notify
+    assert "Refresh owner-confirmed competition equity in STC before any manual entry." in notify

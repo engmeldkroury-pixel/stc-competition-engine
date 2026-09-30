@@ -2,6 +2,8 @@
 declare(strict_types=1);
 require_once __DIR__ . '/portfolio_control.php';
 
+const STC_MONITOR_VISIBILITY_FLOOR = 78;
+
 function stc_notification_id(string $eventKey): string {
     return 'notify-' . substr(hash('sha256', $eventKey), 0, 40);
 }
@@ -214,10 +216,71 @@ function stc_notify_signal_event(PDO $pdo, array $config, string $eventId): arra
     $decision = is_array($result) ? ($result['decision'] ?? null) : null;
     $signal = is_array($decision) ? ($decision['signal'] ?? null) : null;
     $plan = is_array($decision) ? ($decision['locked_trade_plan'] ?? null) : null;
-    if (!is_array($payload) || !is_array($signal) || !is_array($plan)) {
+    if (!is_array($payload) || !is_array($signal)) {
+        return ['ok' => true, 'skipped' => true, 'reason' => 'signal_payload_unavailable'];
+    }
+
+    $competitionId = (string)($payload['competition_id'] ?? '');
+    $symbol = (string)($payload['symbol'] ?? '');
+    $direction = (string)($signal['recommendation'] ?? 'WAIT');
+    $preGateDirection = (string)($signal['pre_gate_recommendation'] ?? 'WAIT');
+
+    if (!is_array($plan)) {
+        $qualityScore = isset($signal['setup_quality_score']) && is_numeric($signal['setup_quality_score'])
+            ? (int)$signal['setup_quality_score']
+            : 0;
+        $qualityFloor = isset($signal['quality_floor']) && is_numeric($signal['quality_floor'])
+            ? (int)$signal['quality_floor']
+            : 84;
+        $failures = is_array($signal['quality_gate_failures'] ?? null)
+            ? array_values(array_map('strval', $signal['quality_gate_failures']))
+            : [];
+        sort($failures, SORT_STRING);
+
+        if (in_array($preGateDirection, ['LONG', 'SHORT'], true)
+            && $qualityScore >= STC_MONITOR_VISIBILITY_FLOOR) {
+            $qualityBand = intdiv($qualityScore, 5) * 5;
+            $fingerprint = hash('sha256', json_encode([
+                'direction' => $preGateDirection,
+                'quality_band' => $qualityBand,
+                'failures' => $failures,
+            ], JSON_UNESCAPED_SLASHES));
+            $stateKey = 'watch:' . $competitionId . '|' . $symbol;
+            if (stc_state_hash($pdo, $stateKey) === $fingerprint) {
+                return ['ok' => true, 'skipped' => true, 'reason' => 'monitor_state_unchanged'];
+            }
+
+            $label = $competitionId === 'amp-futures-sep-2026' ? 'AMP Futures' : 'Capital.com Africa';
+            $body = implode("\n", [
+                $symbol,
+                'STATUS: WATCHLIST • NOT ACTIONABLE',
+                'Directional bias: ' . $preGateDirection,
+                'Setup quality: ' . $qualityScore . '/100 | live floor ' . $qualityFloor . '/100',
+                'Gate blocks: ' . ($failures === [] ? 'not fully qualified' : implode(', ', $failures)),
+                'Signal score: ' . number_format((float)($signal['composite_score'] ?? 0.0), 2, '.', ''),
+                'No locked trade plan was created.',
+                'No quantity, approval, or entry is authorized by this message.',
+                'Wait for an STC NEW PLAN notification before any manual entry.',
+            ]);
+            $dispatch = stc_dispatch_notification($pdo, $config, [
+                'event_key' => 'watch:' . $competitionId . '|' . $symbol . '|' . $fingerprint,
+                'event_type' => 'SIGNAL_WATCHLIST',
+                'competition_id' => $competitionId,
+                'symbol' => $symbol,
+                'position_id' => null,
+                'severity' => 'normal',
+                'title' => 'STC WATCHLIST • ' . $label . ' • ' . $preGateDirection,
+                'body' => $body,
+            ]);
+            if ($dispatch['delivered_any']) {
+                stc_set_state_hash($pdo, $stateKey, $fingerprint);
+            }
+            return ['ok' => true, 'skipped' => false, 'dispatch' => $dispatch, 'watchlist_only' => true];
+        }
+
         return ['ok' => true, 'skipped' => true, 'reason' => 'no_locked_plan'];
     }
-    $direction = (string)($signal['recommendation'] ?? 'WAIT');
+
     if (!in_array($direction, ['LONG', 'SHORT'], true)) {
         return ['ok' => true, 'skipped' => true, 'reason' => 'wait_signal'];
     }
@@ -240,9 +303,6 @@ function stc_notify_signal_event(PDO $pdo, array $config, string $eventId): arra
         return ['ok' => true, 'skipped' => true, 'reason' => 'expired_plan'];
     }
     $minutesLeft = max(1, (int)ceil(($validUntil->getTimestamp() - $now->getTimestamp()) / 60));
-
-    $competitionId = (string)$payload['competition_id'];
-    $symbol = (string)$payload['symbol'];
 
     $openStmt = $pdo->prepare(
         "SELECT COALESCE(SUM(quantity), 0) FROM stc_positions "
@@ -272,15 +332,53 @@ function stc_notify_signal_event(PDO $pdo, array $config, string $eventId): arra
 
     $account = stc_account_state_for($pdo, $competitionId);
     if (!is_array($account)) {
-        return ['ok' => true, 'skipped' => true, 'reason' => 'account_state_unavailable'];
+        $dispatch = stc_dispatch_notification($pdo, $config, [
+            'event_key' => 'blocked-plan:' . (string)$plan['plan_id'] . ':account_state_unavailable',
+            'event_type' => 'ENTRY_BLOCKED',
+            'competition_id' => $competitionId,
+            'symbol' => $symbol,
+            'position_id' => null,
+            'severity' => 'high',
+            'title' => 'STC PLAN BLOCKED • ACCOUNT STATE REQUIRED',
+            'body' => implode("\n", [
+                $symbol . ' • ' . $direction,
+                'A qualified locked plan exists, but entry is BLOCKED.',
+                'Reason: current competition account state is unavailable.',
+                'Quantity is intentionally withheld.',
+                'Refresh owner-confirmed competition equity in STC before any manual entry.',
+                'This message is not an execution approval.',
+            ]),
+        ]);
+        return ['ok' => true, 'skipped' => false, 'reason' => 'account_state_unavailable', 'dispatch' => $dispatch];
     }
     $freshness = stc_account_state_freshness($account);
     if (($freshness['eligible'] ?? false) !== true) {
+        $reasons = is_array($freshness['reasons'] ?? null)
+            ? implode(', ', array_map('strval', $freshness['reasons']))
+            : 'account_state_not_fresh';
+        $dispatch = stc_dispatch_notification($pdo, $config, [
+            'event_key' => 'blocked-plan:' . (string)$plan['plan_id'] . ':account_state_not_fresh',
+            'event_type' => 'ENTRY_BLOCKED',
+            'competition_id' => $competitionId,
+            'symbol' => $symbol,
+            'position_id' => null,
+            'severity' => 'high',
+            'title' => 'STC PLAN BLOCKED • REFRESH EQUITY',
+            'body' => implode("\n", [
+                $symbol . ' • ' . $direction,
+                'A qualified locked plan exists, but entry is BLOCKED.',
+                'Reason: ' . $reasons,
+                'Quantity is intentionally withheld while account equity is stale or unverified.',
+                'Refresh owner-confirmed competition equity in STC before any manual entry.',
+                'This message is not an execution approval.',
+            ]),
+        ]);
         return [
             'ok' => true,
-            'skipped' => true,
+            'skipped' => false,
             'reason' => 'account_state_not_fresh',
             'details' => $freshness,
+            'dispatch' => $dispatch,
         ];
     }
     $sizingText = 'MAX STC QUANTITY: update account state / sizing before manual entry.';
@@ -443,6 +541,65 @@ function stc_set_state_hash(PDO $pdo, string $stateKey, string $hash): void {
     $stmt->execute([$stateKey, $hash]);
 }
 
+function stc_maybe_notify_system_heartbeat(PDO $pdo, array $config): ?array {
+    $lastStmt = $pdo->query(
+        "SELECT MAX(created_at_utc) FROM stc_notification_events WHERE event_type = 'SYSTEM_HEARTBEAT'"
+    );
+    $lastRaw = $lastStmt->fetchColumn();
+    if (is_string($lastRaw) && trim($lastRaw) !== '') {
+        try {
+            $last = new DateTimeImmutable($lastRaw, new DateTimeZone('UTC'));
+        } catch (Throwable $e) {
+            $last = null;
+        }
+        $now = new DateTimeImmutable('now', new DateTimeZone('UTC'));
+        if ($last !== null && ($now->getTimestamp() - $last->getTimestamp()) < 21600) {
+            return null;
+        }
+    }
+
+    $latestStmt = $pdo->query(
+        "SELECT payload_json, result_json, created_at_utc FROM stc_webhook_events "
+        . "WHERE status = 'ingested' ORDER BY id DESC LIMIT 1"
+    );
+    $latest = $latestStmt->fetch();
+    if ($latest === false) {
+        return null;
+    }
+
+    $payload = json_decode((string)$latest['payload_json'], true);
+    $result = json_decode((string)$latest['result_json'], true);
+    $decision = is_array($result) ? ($result['decision'] ?? null) : null;
+    $signal = is_array($decision) ? ($decision['signal'] ?? null) : null;
+    $symbol = is_array($payload) ? (string)($payload['symbol'] ?? '-') : '-';
+    $competitionId = is_array($payload) ? (string)($payload['competition_id'] ?? '-') : '-';
+    $recommendation = is_array($signal) ? (string)($signal['recommendation'] ?? 'WAIT') : 'WAIT';
+    $preGate = is_array($signal) ? (string)($signal['pre_gate_recommendation'] ?? 'WAIT') : 'WAIT';
+    $quality = is_array($signal) && isset($signal['setup_quality_score'])
+        ? (string)$signal['setup_quality_score'] . '/100'
+        : '-';
+
+    $openCount = (int)$pdo->query("SELECT COUNT(*) FROM stc_positions WHERE status = 'OPEN'")->fetchColumn();
+    $bucket = gmdate('YmdH');
+    return stc_dispatch_notification($pdo, $config, [
+        'event_key' => 'heartbeat:' . $bucket,
+        'event_type' => 'SYSTEM_HEARTBEAT',
+        'competition_id' => $competitionId === '-' ? null : $competitionId,
+        'symbol' => $symbol === '-' ? null : $symbol,
+        'position_id' => null,
+        'severity' => 'normal',
+        'title' => 'STC RUNNING • MARKET MONITOR ACTIVE',
+        'body' => implode("\n", [
+            'STC is receiving and processing market events.',
+            'Latest event: ' . $symbol . ' @ ' . (string)$latest['created_at_utc'] . ' UTC',
+            'Latest decision: ' . $recommendation . ' | pre-gate ' . $preGate . ' | quality ' . $quality,
+            'Open positions in STC ledger: ' . $openCount,
+            'No qualified NEW PLAN alert was required in this heartbeat interval.',
+            'This is a system health message, not a trade recommendation.',
+        ]),
+    ]);
+}
+
 function stc_notify_portfolio(PDO $pdo, array $config): array {
     $notifications = [];
     $stmt = $pdo->query("SELECT * FROM stc_positions WHERE status = 'OPEN' ORDER BY id ASC");
@@ -500,6 +657,10 @@ function stc_notify_portfolio(PDO $pdo, array $config): array {
         if ($dispatch['delivered_any']) {
             stc_set_state_hash($pdo, $stateKey, $fingerprint);
         }
+    }
+    $heartbeat = stc_maybe_notify_system_heartbeat($pdo, $config);
+    if ($heartbeat !== null) {
+        $notifications[] = $heartbeat;
     }
     return ['ok' => true, 'notifications' => $notifications];
 }
