@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "asset": "BTC",
+  "pair": "BTCUSDT",
+  "mode": "SPOT_ONLY_RESEARCH",
+  "timeframes": ["15m", "1h", "4h", "1d"],
+  "closed_bars_only": true,
+  "validation": {
+    "backtest": true,
+    "validation": true,
+    "walk_forward": true,
+    "paper_trading": true,
+    "forward_tracking": true
+  },
+  "strategies": {
+    "trend": ["EMA_SYSTEM", "BREAKOUT"],
+    "momentum": ["RSI", "MACD", "ROC"],
+    "volatility": ["ATR_EXPANSION", "BOLLINGER", "KELTNER"],
+    "structure": ["SUPPORT_RESISTANCE", "BREAK_OF_STRUCTURE", "LIQUIDITY_ZONES"]
+  },
+  "metrics": [
+    "trade_count",
+    "win_rate",
+    "profit_factor",
+    "max_drawdown",
+    "average_return",
+    "mfe",
+    "mae",
+    "holding_period"
+  ],
+  "promotion": {
+    "live_authorized": false,
+    "requires_independent_forward_evidence": true
+  }
+}
