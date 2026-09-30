@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "increment_id": "R10_FORWARD_EVIDENCE_ACCESS_INTEGRITY_2026-09-30T1710Z",
+  "captured_at_utc": "2026-09-30T17:09:21Z",
+  "registry_id": "R10-FORWARD-SHADOW-REGISTRY-V1",
+  "registry_blob_sha": "c3f199f1c0e39e95227b3895911c4801443aa452",
+  "mtf_candidates_blob_sha": "0eb29de0f0098c8bd3039c4b99e47fc371385b87",
+  "regime_protocol_blob_sha": "7ea7abb7cbdfced80527e068b6347890739cf8de",
+  "mtf_candidate_sha256": {
+    "CAPITALCOM:ETHUSD": "2d1406da93b44d8ec1cf15d47b5e8664abcaf5809515e0c0382286917d4784d9",
+    "CAPITALCOM:DOGEUSD": "e22c97ad3e915bf4032afececa7c5d463a7250850ac76627f5ed11ad8ad44d98"
+  },
+  "regime_protocol_id": "R10-REGIME-SESSION-SHADOW-V1",
+  "regime_protocol_sha256": "96e94a305c0a6eb22f92f495560f1e0c66dc60d7395608c140da1e5b6e0def97",
+  "new_fully_closed_source_times": [
+    "2026-09-30T16:30:00Z",
+    "2026-09-30T16:45:00Z"
+  ],
+  "disposition": "CENSORED_UNRESOLVED",
+  "reason": "canonical alert-time payload/result receipts unavailable to evaluator; no retrospective TradingView substitution",
+  "bridge_observations": [
+    {
+      "minute_utc": "2026-09-30T16:45:00Z",
+      "workflow_runs": 25,
+      "success_run": 36746496627,
+      "claimed": 0,
+      "ingested": 0,
+      "rejected": 0,
+      "failed": 0
+    },
+    {
+      "minute_utc": "2026-09-30T17:00:00Z",
+      "workflow_runs": 25,
+      "success_run": 36748274174,
+      "claimed": 25,
+      "ingested": 25,
+      "rejected": 0,
+      "failed": 0
+    }
+  ],
+  "repository_ci": {
+    "run_id": 36746716938,
+    "critical": "success",
+    "full": "failure",
+    "error": "ModuleNotFoundError: app.crypto_spot_registry during collection of crypto research pipeline/registry tests"
+  },
+  "new_directional_mtf_entries": 0,
+  "new_mtf_outcomes": 0,
+  "new_regime_directional_entries": 0,
+  "new_regime_outcomes": 0,
+  "causal_crypto_portfolio": {
+    "state": "FLAT",
+    "accepted_entries": 1,
+    "overlap_rejections": 0,
+    "valued_forward_trades": 1
+  },
+  "review_states": {
+    "mtf": "COLLECTING",
+    "regime_session": "COLLECTING"
+  },
+  "owner_action_required": true,
+  "authority": {
+    "research_only": true,
+    "live_authorized": false,
+    "execution": "none",
+    "retune_on_forward": false,
+    "risk_change": false,
+    "broker_change": false,
+    "position_or_stop_change": false,
+    "notification_change": false
+  },
+  "evidence_batch_sha256": "0895768b21850704e632170463bd95558616885dd81b5314a4750ed9d47103b6"
+}
