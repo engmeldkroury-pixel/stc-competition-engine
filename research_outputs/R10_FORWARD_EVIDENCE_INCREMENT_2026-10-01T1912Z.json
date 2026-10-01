@@ -1,0 +1,2188 @@
+{
+  "schema_version": 1,
+  "increment_id": "R10_FORWARD_EVIDENCE_INCREMENT_2026-10-01T1912Z",
+  "captured_at_utc": "2026-10-01T19:12:54Z",
+  "predecessor_evidence_path": "research_outputs/R10_FORWARD_EVIDENCE_ACCESS_INTEGRITY_2026-09-30T1710Z.json",
+  "predecessor_register_path": "research_outputs/R10_FORWARD_REGISTER_INCREMENT_2026-09-30T1710Z.json",
+  "frozen_contract": {
+    "registry_id": "R10-FORWARD-SHADOW-REGISTRY-V1",
+    "protocol_id": "R10-REGIME-SESSION-SHADOW-V1",
+    "protocol_blob_sha": "7ea7abb7cbdfced80527e068b6347890739cf8de",
+    "protocol_sha256": "96e94a305c0a6eb22f92f495560f1e0c66dc60d7395608c140da1e5b6e0def97",
+    "not_before_utc": "2026-09-28T12:00:00Z",
+    "timeframe": "15m",
+    "session_utc": {
+      "start_inclusive": 12,
+      "end_exclusive": 17
+    },
+    "adx": {
+      "trend_min": 30,
+      "range_max": 20
+    },
+    "initial_stop_atr": 1.5,
+    "target_r": 2,
+    "horizon_bars": 32,
+    "cost_sensitivity_bps": [
+      1,
+      2,
+      3,
+      5
+    ],
+    "retuned": false
+  },
+  "scope": {
+    "previous_registered_last_source_time": "2026-09-30T16:45:00Z",
+    "evaluated_session_day": "2026-10-01",
+    "evaluated_source_times": [
+      "2026-10-01T12:00:00Z",
+      "2026-10-01T12:15:00Z",
+      "2026-10-01T12:30:00Z",
+      "2026-10-01T12:45:00Z",
+      "2026-10-01T13:00:00Z",
+      "2026-10-01T13:15:00Z",
+      "2026-10-01T13:30:00Z",
+      "2026-10-01T13:45:00Z",
+      "2026-10-01T14:00:00Z",
+      "2026-10-01T14:15:00Z",
+      "2026-10-01T14:30:00Z",
+      "2026-10-01T14:45:00Z",
+      "2026-10-01T15:00:00Z",
+      "2026-10-01T15:15:00Z",
+      "2026-10-01T15:30:00Z",
+      "2026-10-01T15:45:00Z",
+      "2026-10-01T16:00:00Z",
+      "2026-10-01T16:15:00Z",
+      "2026-10-01T16:30:00Z",
+      "2026-10-01T16:45:00Z"
+    ],
+    "latest_outcome_bar_open_used": "2026-10-01T18:45:00Z",
+    "expected_rows": 200,
+    "observed_rows": 200,
+    "missing_source_rows": 0
+  },
+  "methodology": {
+    "market_data_source": "TradingView Official OHLCV for CAPITALCOM symbols",
+    "receipt_source": "TradingView alert fire history where retrievable",
+    "decision_source_rule": "Use alert-time OHLCV/EMA20/EMA50/RSI14/ATR14 when receipt is available; reconstruct only missing EMA200/ADX14/zscore20 causally from TradingView OHLCV. When receipt is unavailable, reconstruct the entire snapshot from historical OHLCV.",
+    "disposition": "RECONSTRUCTED_NOT_PROMOTION_GRADE",
+    "same_bar_stop_target_ambiguity": "STOP_FIRST",
+    "cost_rule": "Protocol sensitivity only: subtract total friction bps * 1e-4 * entry / (1.5 * source ATR) from gross R on completed outcomes.",
+    "caveat": "Protocol receipt does not contain EMA200, ADX14 or zscore20; these decision-material features remain reconstructed, so directional observations are research-only and not prospective promotion-grade evidence."
+  },
+  "results": {
+    "day": {
+      "regimes": {
+        "TREND": 22,
+        "RANGE": 78,
+        "NEUTRAL": 100
+      },
+      "decisions": {
+        "WAIT": 197,
+        "LONG": 2,
+        "SHORT": 1
+      },
+      "completed_directional_trades": 3,
+      "gross_r": 0,
+      "net_r_by_cost_bps": {
+        "1": -0.2014803100003184,
+        "2": -0.40296062000063726,
+        "3": -0.6044409300009561,
+        "5": -1.007401550001593
+      }
+    },
+    "by_regime": {
+      "TREND": {
+        "bars": 22,
+        "signals": 1,
+        "completed": 1,
+        "gross_r": 2,
+        "net_r_by_cost_bps": {
+          "1": 1.925223869897771,
+          "2": 1.8504477397955421,
+          "3": 1.7756716096933132,
+          "5": 1.6261193494888553
+        }
+      },
+      "RANGE": {
+        "bars": 78,
+        "signals": 2,
+        "completed": 2,
+        "gross_r": -2,
+        "net_r_by_cost_bps": {
+          "1": -2.1267041798980895,
+          "2": -2.2534083597961794,
+          "3": -2.3801125396942693,
+          "5": -2.633520899490448
+        }
+      },
+      "NEUTRAL": {
+        "bars": 100,
+        "signals": 0,
+        "completed": 0,
+        "gross_r": 0,
+        "net_r_by_cost_bps": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "5": 0
+        }
+      }
+    },
+    "by_symbol": {
+      "CAPITALCOM:AUDUSD": {
+        "bars": 20,
+        "missing_source": 0,
+        "regimes": {
+          "TREND": 0,
+          "RANGE": 12,
+          "NEUTRAL": 8
+        },
+        "decisions": {
+          "WAIT": 18,
+          "LONG": 2,
+          "SHORT": 0
+        },
+        "outcomes": {
+          "STOP": 2,
+          "TARGET": 0,
+          "HORIZON": 0,
+          "PENDING": 0,
+          "NO_TRADE": 18,
+          "PENDING_NEXT_OPEN": 0
+        },
+        "completed": 2,
+        "gross_r": -2,
+        "net_r_by_cost_bps": {
+          "1": -2.1267041798980895,
+          "2": -2.2534083597961794,
+          "3": -2.3801125396942693,
+          "5": -2.633520899490448
+        }
+      },
+      "CAPITALCOM:BTCUSD": {
+        "bars": 20,
+        "missing_source": 0,
+        "regimes": {
+          "TREND": 0,
+          "RANGE": 18,
+          "NEUTRAL": 2
+        },
+        "decisions": {
+          "WAIT": 20,
+          "LONG": 0,
+          "SHORT": 0
+        },
+        "outcomes": {
+          "STOP": 0,
+          "TARGET": 0,
+          "HORIZON": 0,
+          "PENDING": 0,
+          "NO_TRADE": 20,
+          "PENDING_NEXT_OPEN": 0
+        },
+        "completed": 0,
+        "gross_r": 0,
+        "net_r_by_cost_bps": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "5": 0
+        }
+      },
+      "CAPITALCOM:DOGEUSD": {
+        "bars": 20,
+        "missing_source": 0,
+        "regimes": {
+          "TREND": 0,
+          "RANGE": 0,
+          "NEUTRAL": 20
+        },
+        "decisions": {
+          "WAIT": 20,
+          "LONG": 0,
+          "SHORT": 0
+        },
+        "outcomes": {
+          "STOP": 0,
+          "TARGET": 0,
+          "HORIZON": 0,
+          "PENDING": 0,
+          "NO_TRADE": 20,
+          "PENDING_NEXT_OPEN": 0
+        },
+        "completed": 0,
+        "gross_r": 0,
+        "net_r_by_cost_bps": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "5": 0
+        }
+      },
+      "CAPITALCOM:ETHUSD": {
+        "bars": 20,
+        "missing_source": 0,
+        "regimes": {
+          "TREND": 0,
+          "RANGE": 19,
+          "NEUTRAL": 1
+        },
+        "decisions": {
+          "WAIT": 20,
+          "LONG": 0,
+          "SHORT": 0
+        },
+        "outcomes": {
+          "STOP": 0,
+          "TARGET": 0,
+          "HORIZON": 0,
+          "PENDING": 0,
+          "NO_TRADE": 20,
+          "PENDING_NEXT_OPEN": 0
+        },
+        "completed": 0,
+        "gross_r": 0,
+        "net_r_by_cost_bps": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "5": 0
+        }
+      },
+      "CAPITALCOM:EURUSD": {
+        "bars": 20,
+        "missing_source": 0,
+        "regimes": {
+          "TREND": 8,
+          "RANGE": 0,
+          "NEUTRAL": 12
+        },
+        "decisions": {
+          "WAIT": 19,
+          "LONG": 0,
+          "SHORT": 1
+        },
+        "outcomes": {
+          "STOP": 0,
+          "TARGET": 1,
+          "HORIZON": 0,
+          "PENDING": 0,
+          "NO_TRADE": 19,
+          "PENDING_NEXT_OPEN": 0
+        },
+        "completed": 1,
+        "gross_r": 2,
+        "net_r_by_cost_bps": {
+          "1": 1.925223869897771,
+          "2": 1.8504477397955421,
+          "3": 1.7756716096933132,
+          "5": 1.6261193494888553
+        }
+      },
+      "CAPITALCOM:NAS100": {
+        "bars": 20,
+        "missing_source": 0,
+        "regimes": {
+          "TREND": 11,
+          "RANGE": 0,
+          "NEUTRAL": 9
+        },
+        "decisions": {
+          "WAIT": 20,
+          "LONG": 0,
+          "SHORT": 0
+        },
+        "outcomes": {
+          "STOP": 0,
+          "TARGET": 0,
+          "HORIZON": 0,
+          "PENDING": 0,
+          "NO_TRADE": 20,
+          "PENDING_NEXT_OPEN": 0
+        },
+        "completed": 0,
+        "gross_r": 0,
+        "net_r_by_cost_bps": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "5": 0
+        }
+      },
+      "CAPITALCOM:SPX500": {
+        "bars": 20,
+        "missing_source": 0,
+        "regimes": {
+          "TREND": 3,
+          "RANGE": 8,
+          "NEUTRAL": 9
+        },
+        "decisions": {
+          "WAIT": 20,
+          "LONG": 0,
+          "SHORT": 0
+        },
+        "outcomes": {
+          "STOP": 0,
+          "TARGET": 0,
+          "HORIZON": 0,
+          "PENDING": 0,
+          "NO_TRADE": 20,
+          "PENDING_NEXT_OPEN": 0
+        },
+        "completed": 0,
+        "gross_r": 0,
+        "net_r_by_cost_bps": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "5": 0
+        }
+      },
+      "CAPITALCOM:USDZAR": {
+        "bars": 20,
+        "missing_source": 0,
+        "regimes": {
+          "TREND": 0,
+          "RANGE": 5,
+          "NEUTRAL": 15
+        },
+        "decisions": {
+          "WAIT": 20,
+          "LONG": 0,
+          "SHORT": 0
+        },
+        "outcomes": {
+          "STOP": 0,
+          "TARGET": 0,
+          "HORIZON": 0,
+          "PENDING": 0,
+          "NO_TRADE": 20,
+          "PENDING_NEXT_OPEN": 0
+        },
+        "completed": 0,
+        "gross_r": 0,
+        "net_r_by_cost_bps": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "5": 0
+        }
+      },
+      "CAPITALCOM:XAGUSD": {
+        "bars": 20,
+        "missing_source": 0,
+        "regimes": {
+          "TREND": 0,
+          "RANGE": 0,
+          "NEUTRAL": 20
+        },
+        "decisions": {
+          "WAIT": 20,
+          "LONG": 0,
+          "SHORT": 0
+        },
+        "outcomes": {
+          "STOP": 0,
+          "TARGET": 0,
+          "HORIZON": 0,
+          "PENDING": 0,
+          "NO_TRADE": 20,
+          "PENDING_NEXT_OPEN": 0
+        },
+        "completed": 0,
+        "gross_r": 0,
+        "net_r_by_cost_bps": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "5": 0
+        }
+      },
+      "CAPITALCOM:XAUUSD": {
+        "bars": 20,
+        "missing_source": 0,
+        "regimes": {
+          "TREND": 0,
+          "RANGE": 16,
+          "NEUTRAL": 4
+        },
+        "decisions": {
+          "WAIT": 20,
+          "LONG": 0,
+          "SHORT": 0
+        },
+        "outcomes": {
+          "STOP": 0,
+          "TARGET": 0,
+          "HORIZON": 0,
+          "PENDING": 0,
+          "NO_TRADE": 20,
+          "PENDING_NEXT_OPEN": 0
+        },
+        "completed": 0,
+        "gross_r": 0,
+        "net_r_by_cost_bps": {
+          "1": 0,
+          "2": 0,
+          "3": 0,
+          "5": 0
+        }
+      }
+    },
+    "directional_setups": [
+      {
+        "symbol": "CAPITALCOM:AUDUSD",
+        "source_time": "2026-10-01T15:00:00Z",
+        "regime": "RANGE",
+        "decision": "LONG",
+        "reason": "range_extreme_fade",
+        "source_mode": "ALERT_TIME_KNOWN_FIELDS_PLUS_RECONSTRUCTED_MISSING",
+        "source_features_used": {
+          "o": 0.69265,
+          "h": 0.69271,
+          "l": 0.69198,
+          "c": 0.69238,
+          "ema20": 0.694141329,
+          "ema50": 0.6944095154,
+          "atr14": 0.0007306071,
+          "rsi14": 30.3964099052,
+          "ema200": 0.6961577064731026,
+          "adx14": 18.900171849602682,
+          "zscore20": -2.654981204714914,
+          "range_atr": 0.9991690472211513
+        },
+        "extension_atr": -2.410774546264379,
+        "integrity": {
+          "canonical_receipt": "AVAILABLE",
+          "source_conflict": true,
+          "webhook": {
+            "http_code": 200
+          },
+          "missing_decision_material_features_from_receipt": [
+            "ema200",
+            "adx14",
+            "zscore20"
+          ]
+        },
+        "outcome": {
+          "state": "STOP",
+          "gross_r": -1,
+          "resolved_time": "2026-10-01T15:30:00Z",
+          "bars_to_resolution": 2,
+          "entry": 0.69247,
+          "stop": 0.69137408935,
+          "target": 0.6946618213,
+          "risk_abs": 0.00109591065,
+          "net_r_by_cost_bps": {
+            "1": -1.0631867205597463,
+            "2": -1.1263734411194928,
+            "3": -1.189560161679239,
+            "5": -1.3159336027987318
+          }
+        }
+      },
+      {
+        "symbol": "CAPITALCOM:AUDUSD",
+        "source_time": "2026-10-01T15:15:00Z",
+        "regime": "RANGE",
+        "decision": "LONG",
+        "reason": "range_extreme_fade",
+        "source_mode": "ALERT_TIME_KNOWN_FIELDS_PLUS_RECONSTRUCTED_MISSING",
+        "source_features_used": {
+          "o": 0.69247,
+          "h": 0.69247,
+          "l": 0.6918,
+          "c": 0.69198,
+          "ema20": 0.6939423816,
+          "ema50": 0.6943172545,
+          "atr14": 0.000726278,
+          "rsi14": 27.988926549,
+          "ema200": 0.6961161372544648,
+          "adx14": 19.95090104862319,
+          "zscore20": -2.555672449436009,
+          "range_atr": 0.9225117654672996
+        },
+        "extension_atr": -2.7019703199049836,
+        "integrity": {
+          "canonical_receipt": "AVAILABLE",
+          "source_conflict": false,
+          "webhook": {
+            "http_code": 200
+          },
+          "missing_decision_material_features_from_receipt": [
+            "ema200",
+            "adx14",
+            "zscore20"
+          ]
+        },
+        "outcome": {
+          "state": "STOP",
+          "gross_r": -1,
+          "resolved_time": "2026-10-01T15:30:00Z",
+          "bars_to_resolution": 1,
+          "entry": 0.69197,
+          "stop": 0.690880583,
+          "target": 0.6941488339999999,
+          "risk_abs": 0.001089417,
+          "net_r_by_cost_bps": {
+            "1": -1.0635174593383434,
+            "2": -1.1270349186766866,
+            "3": -1.19055237801503,
+            "5": -1.3175872966917166
+          }
+        }
+      },
+      {
+        "symbol": "CAPITALCOM:EURUSD",
+        "source_time": "2026-10-01T12:00:00Z",
+        "regime": "TREND",
+        "decision": "SHORT",
+        "reason": "trend_pullback",
+        "source_mode": "HISTORICAL_RECONSTRUCTION_ONLY",
+        "source_features_used": {
+          "o": 1.13043,
+          "h": 1.13071,
+          "l": 1.12966,
+          "c": 1.12972,
+          "ema20": 1.1296219589617225,
+          "ema50": 1.130801154010482,
+          "atr14": 0.0010071930694599425,
+          "rsi14": 48.7630029718737,
+          "ema200": 1.1332924052173623,
+          "adx14": 35.142805927469055,
+          "zscore20": 0.4546220132407808,
+          "range_atr": 1.0425012163387959
+        },
+        "extension_atr": 0.09734085871953639,
+        "integrity": {
+          "canonical_receipt": "UNAVAILABLE_LOG_WINDOW",
+          "source_conflict": "UNKNOWN",
+          "webhook": "UNKNOWN",
+          "missing_decision_material_features_from_receipt": [
+            "ema200",
+            "adx14",
+            "zscore20"
+          ]
+        },
+        "outcome": {
+          "state": "TARGET",
+          "gross_r": 2,
+          "resolved_time": "2026-10-01T14:45:00Z",
+          "bars_to_resolution": 11,
+          "entry": 1.12971,
+          "stop": 1.13122078960419,
+          "target": 1.1266884207916201,
+          "risk_abs": 0.0015107896041899138,
+          "net_r_by_cost_bps": {
+            "1": 1.925223869897771,
+            "2": 1.8504477397955421,
+            "3": 1.7756716096933132,
+            "5": 1.6261193494888553
+          }
+        }
+      }
+    ]
+  },
+  "integrity": {
+    "canonical_receipt_available_rows": 110,
+    "canonical_receipt_unavailable_rows": 90,
+    "available_receipt_window_utc": [
+      "2026-10-01T14:15:00Z",
+      "2026-10-01T16:45:00Z"
+    ],
+    "source_conflict_rows": 65,
+    "source_conflict_field_counts": {
+      "o": 0,
+      "h": 0,
+      "l": 0,
+      "c": 60,
+      "v": 65
+    },
+    "source_conflicts": [
+      {
+        "symbol": "CAPITALCOM:AUDUSD",
+        "time": "2026-10-01T14:15:00Z",
+        "diffs": {
+          "c": {
+            "historical": 0.69398,
+            "alert_time": 0.69399
+          },
+          "v": {
+            "historical": 1873,
+            "alert_time": 1864
+          }
+        }
+      },
+      {
+        "symbol": "CAPITALCOM:AUDUSD",
+        "time": "2026-10-01T14:30:00Z",
+        "diffs": {
+          "c": {
+            "historical": 0.69392,
+            "alert_time": 0.69394
+          },
+          "v": {
+            "historical": 2026,
+            "alert_time": 2017
+          }
+        }
+      },
+      {
+        "symbol": "CAPITALCOM:AUDUSD",
+        "time": "2026-10-01T14:45:00Z",
+        "diffs": {
+          "v": {
+            "historical": 2148,
+            "alert_time": 2142
+          }
+        }
+      },
+      {
+        "symbol": "CAPITALCOM:AUDUSD",
+        "time": "2026-10-01T15:00:00Z",
+        "diffs": {
+          "c": {
+            "historical": 0.69246,
+            "alert_time": 0.69238
+          },
+          "v": {
+            "historical": 1839,
+            "alert_time": 1825
+          }
+        }
+      },
+      {
+        "symbol": "CAPITALCOM:AUDUSD",
+        "time": "2026-10-01T16:30:00Z",
+        "diffs": {
+          "c": {
+            "historical": 0.6915,
+            "alert_time": 0.69153
+          },
+          "v": {
+            "historical": 1263,
+            "alert_time": 1259
+          }
+        }
+      },
+      {
+        "symbol": "CAPITALCOM:AUDUSD",
+        "time": "2026-10-01T16:45:00Z",
+        "diffs": {
+          "c": {
+            "historical": 0.69107,
+            "alert_time": 0.69108
+          },
+          "v": {
+            "historical": 1211,
+            "alert_time": 1204
+          }
+        }
+      },
+      {
+        "symbol": "CAPITALCOM:DOGEUSD",
+        "time": "2026-10-01T14:15:00Z",
+        "diffs": {
+          "c": {
+            "historical": 0.0942784,
+            "alert_time": 0.0942863
+          },
+          "v": {
+            "historical": 5012,
+            "alert_time": 4984
+          }
+        }
+      },
+      {
+        "symbol": "CAPITALCOM:DOGEUSD",
+        "time": "2026-10-01T14:30:00Z",
+        "diffs": {
+          "c": {
+            "historical": 0.0941879,
+            "alert_time": 0.0941859
+          },
+          "v": {
+            "historical": 4437,
+            "alert_time": 4408
+          }
+        }
+      },
+      {
+        "symbol": "CAPITALCOM:DOGEUSD",
+        "time": "2026-10-01T14:45:00Z",
+        "diffs": {
+          "c": {
+            "historical": 0.0938938,
+            "alert_time": 0.0938966
+          },
+          "v": {
+            "historical": 4648,
+            "alert_time": 4628
+          }
+        }
+      },
+      {
+        "symbol": "CAPITALCOM:DOGEUSD",
+        "time": "2026-10-01T15:00:00Z",
+        "diffs": {
+          "c": {
+            "historical": 0.0940063,
+            "alert_time": 0.0939859
+          },
+          "v": {
+            "historical": 3507,
+            "alert_time": 3490
+          }
+        }
+      },
+      {
+        "symbol": "CAPITALCOM:DOGEUSD",
+        "time": "2026-10-01T15:30:00Z",
+        "diffs": {
+          "c": {
+            "historical": 0.0936842,
+            "alert_time": 0.09369
+          },
+          "v": {
+            "historical": 4008,
+            "alert_time": 3983
+          }
+        }
+      },
+      {
+        "symbol": "CAPITALCOM:DOGEUSD",
+        "time": "2026-10-01T16:45:00Z",
+        "diffs": {
+          "c": {
+            "historical": 0.093506,
+            "alert_time": 0.0935035
+          },
+          "v": {
+            "historical": 3354,
+            "alert_time": 3353
+          }
+        }
+      },
+      {
+        "symbol": "CAPITALCOM:ETHUSD",
+        "time": "2026-10-01T14:15:00Z",
+        "diffs": {
+          "c": {
+            "historical": 2696.27,
+            "alert_time": 2696.29
+          },
+          "v": {
+            "historical": 6797,
+            "alert_time": 6754
+          }
+        }
+      },
+      {
+        "symbol": "CAPITALCOM:ETHUSD",
+        "time": "2026-10-01T14:30:00Z",
+        "diffs": {
+          "c": {
+            "historical": 2691.5,
+            "alert_time": 2691.56
+          },
+          "v": {
+            "historical": 6092,
+            "alert_time": 6054
+          }
+        }
+      },
+      {
+        "symbol": "CAPITALCOM:ETHUSD",
+        "time": "2026-10-01T14:45:00Z",
+        "diffs": {
+          "c": {
+            "historical": 2688.22,
+            "alert_time": 2688.16
+          },
+          "v": {
+            "historical": 6582,
+            "alert_time": 6532
+          }
+        }
+      },
+      {
+        "symbol": "CAPITALCOM:ETHUSD",
+        "time": "2026-10-01T15:00:00Z",
+        "diffs": {
+          "c": {
+            "historical": 2687.6,
+            "alert_time": 2687.39
+          },
+          "v": {
+            "historical": 6318,
+            "alert_time": 6282
+          }
+        }
+      },
+      {
+        "symbol": "CAPITALCOM:ETHUSD",
+        "time": "2026-10-01T15:30:00Z",
+        "diffs": {
+          "c": {
+            "historical": 2674.91,
+            "alert_time": 2675.37
+          },
+          "v": {
+            "historical": 6438,
+            "alert_time": 6392
+          }
+        }
+      },
+      {
+        "symbol": "CAPITALCOM:ETHUSD",
+        "time": "2026-10-01T15:45:00Z",
+        "diffs": {
+          "c": {
+            "historical": 2680.75,
+            "alert_time": 2680.83
+          },
+          "v": {
+            "historical": 6513,
+            "alert_time": 6510
+          }
+        }
+      },
+      {
+        "symbol": "CAPITALCOM:ETHUSD",
+        "time": "2026-10-01T16:15:00Z",
+        "diffs": {
+          "c": {
+            "historical": 2683.85,
+            "alert_time": 2683.78
+          },
+          "v": {
+            "historical": 5520,
+            "alert_time": 5504
+          }
+        }
+      },
+      {
+        "symbol": "CAPITALCOM:EURUSD",
+        "time": "2026-10-01T14:45:00Z",
+        "diffs": {
+          "c": {
+            "historical": 1.12656,
+            "alert_time": 1.12659
+          },
+          "v": {
+            "historical": 4936,
+            "alert_time": 4917
+          }
+        }
+      },
+      {
+        "symbol": "CAPITALCOM:EURUSD",
+        "time": "2026-10-01T15:00:00Z",
+        "diffs": {
+          "v": {
+            "historical": 4406,
+            "alert_time": 4381
+          }
+        }
+      },
+      {
+        "symbol": "CAPITALCOM:EURUSD",
+        "time": "2026-10-01T15:30:00Z",
+        "diffs": {
+          "c": {
+            "historical": 1.12376,
+            "alert_time": 1.12374
+          },
+          "v": {
+            "historical": 5480,
+            "alert_time": 5454
+          }
+        }
+      },
+      {
+        "symbol": "CAPITALCOM:EURUSD",
+        "time": "2026-10-01T16:30:00Z",
+        "diffs": {
+          "c": {
+            "historical": 1.12251,
+            "alert_time": 1.12252
+          },
+          "v": {
+            "historical": 3012,
+            "alert_time": 3011
+          }
+        }
+      },
+      {
+        "symbol": "CAPITALCOM:NAS100",
+        "time": "2026-10-01T14:15:00Z",
+        "diffs": {
+          "c": {
+            "historical": 30344.5,
+            "alert_time": 30349.1
+          },
+          "v": {
+            "historical": 4066,
+            "alert_time": 4058
+          }
+        }
+      },
+      {
+        "symbol": "CAPITALCOM:NAS100",
+        "time": "2026-10-01T14:30:00Z",
+        "diffs": {
+          "c": {
+            "historical": 30406,
+            "alert_time": 30405.1
+          },
+          "v": {
+            "historical": 4004,
+            "alert_time": 3997
+          }
+        }
+      },
+      {
+        "symbol": "CAPITALCOM:NAS100",
+        "time": "2026-10-01T14:45:00Z",
+        "diffs": {
+          "c": {
+            "historical": 30360.6,
+            "alert_time": 30364
+          },
+          "v": {
+            "historical": 3742,
+            "alert_time": 3735
+          }
+        }
+      },
+      {
+        "symbol": "CAPITALCOM:NAS100",
+        "time": "2026-10-01T15:00:00Z",
+        "diffs": {
+          "c": {
+            "historical": 30343.7,
+            "alert_time": 30339.6
+          },
+          "v": {
+            "historical": 3976,
+            "alert_time": 3967
+          }
+        }
+      },
+      {
+        "symbol": "CAPITALCOM:NAS100",
+        "time": "2026-10-01T15:15:00Z",
+        "diffs": {
+          "c": {
+            "historical": 30358.5,
+            "alert_time": 30365.6
+          },
+          "v": {
+            "historical": 3929,
+            "alert_time": 3919
+          }
+        }
+      },
+      {
+        "symbol": "CAPITALCOM:NAS100",
+        "time": "2026-10-01T15:30:00Z",
+        "diffs": {
+          "c": {
+            "historical": 30294,
+            "alert_time": 30294.1
+          },
+          "v": {
+            "historical": 3956,
+            "alert_time": 3950
+          }
+        }
+      },
+      {
+        "symbol": "CAPITALCOM:NAS100",
+        "time": "2026-10-01T15:45:00Z",
+        "diffs": {
+          "c": {
+            "historical": 30337,
+            "alert_time": 30338.1
+          },
+          "v": {
+            "historical": 3911,
+            "alert_time": 3903
+          }
+        }
+      },
+      {
+        "symbol": "CAPITALCOM:NAS100",
+        "time": "2026-10-01T16:30:00Z",
+        "diffs": {
+          "c": {
+            "historical": 30365.8,
+            "alert_time": 30365.5
+          },
+          "v": {
+            "historical": 3692,
+            "alert_time": 3686
+          }
+        }
+      },
+      {
+        "symbol": "CAPITALCOM:NAS100",
+        "time": "2026-10-01T16:45:00Z",
+        "diffs": {
+          "c": {
+            "historical": 30321,
+            "alert_time": 30318.5
+          },
+          "v": {
+            "historical": 3781,
+            "alert_time": 3667
+          }
+        }
+      },
+      {
+        "symbol": "CAPITALCOM:SPX500",
+        "time": "2026-10-01T14:15:00Z",
+        "diffs": {
+          "c": {
+            "historical": 7630.8,
+            "alert_time": 7631.3
+          },
+          "v": {
+            "historical": 1926,
+            "alert_time": 1922
+          }
+        }
+      },
+      {
+        "symbol": "CAPITALCOM:SPX500",
+        "time": "2026-10-01T14:30:00Z",
+        "diffs": {
+          "c": {
+            "historical": 7641,
+            "alert_time": 7640.8
+          },
+          "v": {
+            "historical": 1800,
+            "alert_time": 1799
+          }
+        }
+      },
+      {
+        "symbol": "CAPITALCOM:SPX500",
+        "time": "2026-10-01T14:45:00Z",
+        "diffs": {
+          "c": {
+            "historical": 7630,
+            "alert_time": 7630.8
+          },
+          "v": {
+            "historical": 1846,
+            "alert_time": 1843
+          }
+        }
+      },
+      {
+        "symbol": "CAPITALCOM:SPX500",
+        "time": "2026-10-01T15:00:00Z",
+        "diffs": {
+          "c": {
+            "historical": 7628.8,
+            "alert_time": 7628.5
+          },
+          "v": {
+            "historical": 1664,
+            "alert_time": 1661
+          }
+        }
+      },
+      {
+        "symbol": "CAPITALCOM:SPX500",
+        "time": "2026-10-01T15:15:00Z",
+        "diffs": {
+          "c": {
+            "historical": 7629.8,
+            "alert_time": 7631.5
+          },
+          "v": {
+            "historical": 1568,
+            "alert_time": 1564
+          }
+        }
+      },
+      {
+        "symbol": "CAPITALCOM:SPX500",
+        "time": "2026-10-01T15:45:00Z",
+        "diffs": {
+          "c": {
+            "historical": 7632.3,
+            "alert_time": 7632.8
+          },
+          "v": {
+            "historical": 1627,
+            "alert_time": 1626
+          }
+        }
+      },
+      {
+        "symbol": "CAPITALCOM:SPX500",
+        "time": "2026-10-01T16:15:00Z",
+        "diffs": {
+          "c": {
+            "historical": 7638.5,
+            "alert_time": 7638.3
+          },
+          "v": {
+            "historical": 1119,
+            "alert_time": 1118
+          }
+        }
+      },
+      {
+        "symbol": "CAPITALCOM:SPX500",
+        "time": "2026-10-01T16:45:00Z",
+        "diffs": {
+          "v": {
+            "historical": 1137,
+            "alert_time": 1106
+          }
+        }
+      },
+      {
+        "symbol": "CAPITALCOM:USDZAR",
+        "time": "2026-10-01T14:15:00Z",
+        "diffs": {
+          "c": {
+            "historical": 16.63148,
+            "alert_time": 16.63128
+          },
+          "v": {
+            "historical": 3285,
+            "alert_time": 3281
+          }
+        }
+      },
+      {
+        "symbol": "CAPITALCOM:USDZAR",
+        "time": "2026-10-01T14:30:00Z",
+        "diffs": {
+          "c": {
+            "historical": 16.65508,
+            "alert_time": 16.65548
+          },
+          "v": {
+            "historical": 3592,
+            "alert_time": 3583
+          }
+        }
+      },
+      {
+        "symbol": "CAPITALCOM:USDZAR",
+        "time": "2026-10-01T14:45:00Z",
+        "diffs": {
+          "v": {
+            "historical": 3749,
+            "alert_time": 3740
+          }
+        }
+      },
+      {
+        "symbol": "CAPITALCOM:USDZAR",
+        "time": "2026-10-01T15:15:00Z",
+        "diffs": {
+          "v": {
+            "historical": 3482,
+            "alert_time": 3479
+          }
+        }
+      },
+      {
+        "symbol": "CAPITALCOM:USDZAR",
+        "time": "2026-10-01T15:30:00Z",
+        "diffs": {
+          "c": {
+            "historical": 16.70028,
+            "alert_time": 16.69968
+          },
+          "v": {
+            "historical": 4526,
+            "alert_time": 4519
+          }
+        }
+      },
+      {
+        "symbol": "CAPITALCOM:USDZAR",
+        "time": "2026-10-01T16:00:00Z",
+        "diffs": {
+          "c": {
+            "historical": 16.66228,
+            "alert_time": 16.66348
+          },
+          "v": {
+            "historical": 3400,
+            "alert_time": 3398
+          }
+        }
+      },
+      {
+        "symbol": "CAPITALCOM:USDZAR",
+        "time": "2026-10-01T16:30:00Z",
+        "diffs": {
+          "c": {
+            "historical": 16.66368,
+            "alert_time": 16.66408
+          },
+          "v": {
+            "historical": 3349,
+            "alert_time": 3346
+          }
+        }
+      },
+      {
+        "symbol": "CAPITALCOM:XAGUSD",
+        "time": "2026-10-01T14:15:00Z",
+        "diffs": {
+          "c": {
+            "historical": 60.9,
+            "alert_time": 60.902
+          },
+          "v": {
+            "historical": 3117,
+            "alert_time": 3111
+          }
+        }
+      },
+      {
+        "symbol": "CAPITALCOM:XAGUSD",
+        "time": "2026-10-01T14:30:00Z",
+        "diffs": {
+          "c": {
+            "historical": 60.966,
+            "alert_time": 60.976
+          },
+          "v": {
+            "historical": 3248,
+            "alert_time": 3240
+          }
+        }
+      },
+      {
+        "symbol": "CAPITALCOM:XAGUSD",
+        "time": "2026-10-01T14:45:00Z",
+        "diffs": {
+          "c": {
+            "historical": 60.77,
+            "alert_time": 60.758
+          },
+          "v": {
+            "historical": 3125,
+            "alert_time": 3117
+          }
+        }
+      },
+      {
+        "symbol": "CAPITALCOM:XAGUSD",
+        "time": "2026-10-01T15:00:00Z",
+        "diffs": {
+          "c": {
+            "historical": 60.605,
+            "alert_time": 60.609
+          },
+          "v": {
+            "historical": 2909,
+            "alert_time": 2905
+          }
+        }
+      },
+      {
+        "symbol": "CAPITALCOM:XAGUSD",
+        "time": "2026-10-01T15:15:00Z",
+        "diffs": {
+          "c": {
+            "historical": 60.658,
+            "alert_time": 60.67
+          },
+          "v": {
+            "historical": 3002,
+            "alert_time": 2994
+          }
+        }
+      },
+      {
+        "symbol": "CAPITALCOM:XAGUSD",
+        "time": "2026-10-01T15:30:00Z",
+        "diffs": {
+          "c": {
+            "historical": 60.572,
+            "alert_time": 60.58
+          },
+          "v": {
+            "historical": 3308,
+            "alert_time": 3304
+          }
+        }
+      },
+      {
+        "symbol": "CAPITALCOM:XAGUSD",
+        "time": "2026-10-01T15:45:00Z",
+        "diffs": {
+          "c": {
+            "historical": 60.59,
+            "alert_time": 60.595
+          },
+          "v": {
+            "historical": 2985,
+            "alert_time": 2980
+          }
+        }
+      },
+      {
+        "symbol": "CAPITALCOM:XAGUSD",
+        "time": "2026-10-01T16:30:00Z",
+        "diffs": {
+          "c": {
+            "historical": 60.569,
+            "alert_time": 60.571
+          },
+          "v": {
+            "historical": 2199,
+            "alert_time": 2197
+          }
+        }
+      },
+      {
+        "symbol": "CAPITALCOM:XAGUSD",
+        "time": "2026-10-01T16:45:00Z",
+        "diffs": {
+          "c": {
+            "historical": 60.473,
+            "alert_time": 60.467
+          },
+          "v": {
+            "historical": 1947,
+            "alert_time": 1893
+          }
+        }
+      },
+      {
+        "symbol": "CAPITALCOM:XAUUSD",
+        "time": "2026-10-01T14:15:00Z",
+        "diffs": {
+          "c": {
+            "historical": 4162.06,
+            "alert_time": 4162.13
+          },
+          "v": {
+            "historical": 7360,
+            "alert_time": 7347
+          }
+        }
+      },
+      {
+        "symbol": "CAPITALCOM:XAUUSD",
+        "time": "2026-10-01T14:30:00Z",
+        "diffs": {
+          "c": {
+            "historical": 4166.23,
+            "alert_time": 4166.42
+          },
+          "v": {
+            "historical": 7758,
+            "alert_time": 7744
+          }
+        }
+      },
+      {
+        "symbol": "CAPITALCOM:XAUUSD",
+        "time": "2026-10-01T14:45:00Z",
+        "diffs": {
+          "c": {
+            "historical": 4162.6,
+            "alert_time": 4162.74
+          },
+          "v": {
+            "historical": 8036,
+            "alert_time": 8014
+          }
+        }
+      },
+      {
+        "symbol": "CAPITALCOM:XAUUSD",
+        "time": "2026-10-01T15:00:00Z",
+        "diffs": {
+          "c": {
+            "historical": 4156.33,
+            "alert_time": 4156.29
+          },
+          "v": {
+            "historical": 6932,
+            "alert_time": 6921
+          }
+        }
+      },
+      {
+        "symbol": "CAPITALCOM:XAUUSD",
+        "time": "2026-10-01T15:15:00Z",
+        "diffs": {
+          "c": {
+            "historical": 4166.26,
+            "alert_time": 4166.42
+          },
+          "v": {
+            "historical": 7023,
+            "alert_time": 7005
+          }
+        }
+      },
+      {
+        "symbol": "CAPITALCOM:XAUUSD",
+        "time": "2026-10-01T15:30:00Z",
+        "diffs": {
+          "c": {
+            "historical": 4169.1,
+            "alert_time": 4169.48
+          },
+          "v": {
+            "historical": 8947,
+            "alert_time": 8936
+          }
+        }
+      },
+      {
+        "symbol": "CAPITALCOM:XAUUSD",
+        "time": "2026-10-01T15:45:00Z",
+        "diffs": {
+          "c": {
+            "historical": 4169.3,
+            "alert_time": 4169.39
+          },
+          "v": {
+            "historical": 7955,
+            "alert_time": 7944
+          }
+        }
+      },
+      {
+        "symbol": "CAPITALCOM:XAUUSD",
+        "time": "2026-10-01T16:30:00Z",
+        "diffs": {
+          "c": {
+            "historical": 4165.51,
+            "alert_time": 4165.41
+          },
+          "v": {
+            "historical": 5173,
+            "alert_time": 5165
+          }
+        }
+      },
+      {
+        "symbol": "CAPITALCOM:XAUUSD",
+        "time": "2026-10-01T16:45:00Z",
+        "diffs": {
+          "c": {
+            "historical": 4162.31,
+            "alert_time": 4162.46
+          },
+          "v": {
+            "historical": 4839,
+            "alert_time": 4699
+          }
+        }
+      }
+    ],
+    "missing_receipts": [
+      {
+        "symbol": "CAPITALCOM:AUDUSD",
+        "time": "2026-10-01T12:00:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      },
+      {
+        "symbol": "CAPITALCOM:AUDUSD",
+        "time": "2026-10-01T12:15:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      },
+      {
+        "symbol": "CAPITALCOM:AUDUSD",
+        "time": "2026-10-01T12:30:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      },
+      {
+        "symbol": "CAPITALCOM:AUDUSD",
+        "time": "2026-10-01T12:45:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      },
+      {
+        "symbol": "CAPITALCOM:AUDUSD",
+        "time": "2026-10-01T13:00:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      },
+      {
+        "symbol": "CAPITALCOM:AUDUSD",
+        "time": "2026-10-01T13:15:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      },
+      {
+        "symbol": "CAPITALCOM:AUDUSD",
+        "time": "2026-10-01T13:30:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      },
+      {
+        "symbol": "CAPITALCOM:AUDUSD",
+        "time": "2026-10-01T13:45:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      },
+      {
+        "symbol": "CAPITALCOM:AUDUSD",
+        "time": "2026-10-01T14:00:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      },
+      {
+        "symbol": "CAPITALCOM:BTCUSD",
+        "time": "2026-10-01T12:00:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      },
+      {
+        "symbol": "CAPITALCOM:BTCUSD",
+        "time": "2026-10-01T12:15:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      },
+      {
+        "symbol": "CAPITALCOM:BTCUSD",
+        "time": "2026-10-01T12:30:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      },
+      {
+        "symbol": "CAPITALCOM:BTCUSD",
+        "time": "2026-10-01T12:45:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      },
+      {
+        "symbol": "CAPITALCOM:BTCUSD",
+        "time": "2026-10-01T13:00:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      },
+      {
+        "symbol": "CAPITALCOM:BTCUSD",
+        "time": "2026-10-01T13:15:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      },
+      {
+        "symbol": "CAPITALCOM:BTCUSD",
+        "time": "2026-10-01T13:30:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      },
+      {
+        "symbol": "CAPITALCOM:BTCUSD",
+        "time": "2026-10-01T13:45:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      },
+      {
+        "symbol": "CAPITALCOM:BTCUSD",
+        "time": "2026-10-01T14:00:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      },
+      {
+        "symbol": "CAPITALCOM:DOGEUSD",
+        "time": "2026-10-01T12:00:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      },
+      {
+        "symbol": "CAPITALCOM:DOGEUSD",
+        "time": "2026-10-01T12:15:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      },
+      {
+        "symbol": "CAPITALCOM:DOGEUSD",
+        "time": "2026-10-01T12:30:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      },
+      {
+        "symbol": "CAPITALCOM:DOGEUSD",
+        "time": "2026-10-01T12:45:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      },
+      {
+        "symbol": "CAPITALCOM:DOGEUSD",
+        "time": "2026-10-01T13:00:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      },
+      {
+        "symbol": "CAPITALCOM:DOGEUSD",
+        "time": "2026-10-01T13:15:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      },
+      {
+        "symbol": "CAPITALCOM:DOGEUSD",
+        "time": "2026-10-01T13:30:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      },
+      {
+        "symbol": "CAPITALCOM:DOGEUSD",
+        "time": "2026-10-01T13:45:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      },
+      {
+        "symbol": "CAPITALCOM:DOGEUSD",
+        "time": "2026-10-01T14:00:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      },
+      {
+        "symbol": "CAPITALCOM:ETHUSD",
+        "time": "2026-10-01T12:00:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      },
+      {
+        "symbol": "CAPITALCOM:ETHUSD",
+        "time": "2026-10-01T12:15:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      },
+      {
+        "symbol": "CAPITALCOM:ETHUSD",
+        "time": "2026-10-01T12:30:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      },
+      {
+        "symbol": "CAPITALCOM:ETHUSD",
+        "time": "2026-10-01T12:45:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      },
+      {
+        "symbol": "CAPITALCOM:ETHUSD",
+        "time": "2026-10-01T13:00:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      },
+      {
+        "symbol": "CAPITALCOM:ETHUSD",
+        "time": "2026-10-01T13:15:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      },
+      {
+        "symbol": "CAPITALCOM:ETHUSD",
+        "time": "2026-10-01T13:30:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      },
+      {
+        "symbol": "CAPITALCOM:ETHUSD",
+        "time": "2026-10-01T13:45:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      },
+      {
+        "symbol": "CAPITALCOM:ETHUSD",
+        "time": "2026-10-01T14:00:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      },
+      {
+        "symbol": "CAPITALCOM:EURUSD",
+        "time": "2026-10-01T12:00:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      },
+      {
+        "symbol": "CAPITALCOM:EURUSD",
+        "time": "2026-10-01T12:15:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      },
+      {
+        "symbol": "CAPITALCOM:EURUSD",
+        "time": "2026-10-01T12:30:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      },
+      {
+        "symbol": "CAPITALCOM:EURUSD",
+        "time": "2026-10-01T12:45:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      },
+      {
+        "symbol": "CAPITALCOM:EURUSD",
+        "time": "2026-10-01T13:00:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      },
+      {
+        "symbol": "CAPITALCOM:EURUSD",
+        "time": "2026-10-01T13:15:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      },
+      {
+        "symbol": "CAPITALCOM:EURUSD",
+        "time": "2026-10-01T13:30:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      },
+      {
+        "symbol": "CAPITALCOM:EURUSD",
+        "time": "2026-10-01T13:45:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      },
+      {
+        "symbol": "CAPITALCOM:EURUSD",
+        "time": "2026-10-01T14:00:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      },
+      {
+        "symbol": "CAPITALCOM:NAS100",
+        "time": "2026-10-01T12:00:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      },
+      {
+        "symbol": "CAPITALCOM:NAS100",
+        "time": "2026-10-01T12:15:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      },
+      {
+        "symbol": "CAPITALCOM:NAS100",
+        "time": "2026-10-01T12:30:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      },
+      {
+        "symbol": "CAPITALCOM:NAS100",
+        "time": "2026-10-01T12:45:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      },
+      {
+        "symbol": "CAPITALCOM:NAS100",
+        "time": "2026-10-01T13:00:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      },
+      {
+        "symbol": "CAPITALCOM:NAS100",
+        "time": "2026-10-01T13:15:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      },
+      {
+        "symbol": "CAPITALCOM:NAS100",
+        "time": "2026-10-01T13:30:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      },
+      {
+        "symbol": "CAPITALCOM:NAS100",
+        "time": "2026-10-01T13:45:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      },
+      {
+        "symbol": "CAPITALCOM:NAS100",
+        "time": "2026-10-01T14:00:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      },
+      {
+        "symbol": "CAPITALCOM:SPX500",
+        "time": "2026-10-01T12:00:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      },
+      {
+        "symbol": "CAPITALCOM:SPX500",
+        "time": "2026-10-01T12:15:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      },
+      {
+        "symbol": "CAPITALCOM:SPX500",
+        "time": "2026-10-01T12:30:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      },
+      {
+        "symbol": "CAPITALCOM:SPX500",
+        "time": "2026-10-01T12:45:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      },
+      {
+        "symbol": "CAPITALCOM:SPX500",
+        "time": "2026-10-01T13:00:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      },
+      {
+        "symbol": "CAPITALCOM:SPX500",
+        "time": "2026-10-01T13:15:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      },
+      {
+        "symbol": "CAPITALCOM:SPX500",
+        "time": "2026-10-01T13:30:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      },
+      {
+        "symbol": "CAPITALCOM:SPX500",
+        "time": "2026-10-01T13:45:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      },
+      {
+        "symbol": "CAPITALCOM:SPX500",
+        "time": "2026-10-01T14:00:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      },
+      {
+        "symbol": "CAPITALCOM:USDZAR",
+        "time": "2026-10-01T12:00:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      },
+      {
+        "symbol": "CAPITALCOM:USDZAR",
+        "time": "2026-10-01T12:15:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      },
+      {
+        "symbol": "CAPITALCOM:USDZAR",
+        "time": "2026-10-01T12:30:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      },
+      {
+        "symbol": "CAPITALCOM:USDZAR",
+        "time": "2026-10-01T12:45:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      },
+      {
+        "symbol": "CAPITALCOM:USDZAR",
+        "time": "2026-10-01T13:00:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      },
+      {
+        "symbol": "CAPITALCOM:USDZAR",
+        "time": "2026-10-01T13:15:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      },
+      {
+        "symbol": "CAPITALCOM:USDZAR",
+        "time": "2026-10-01T13:30:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      },
+      {
+        "symbol": "CAPITALCOM:USDZAR",
+        "time": "2026-10-01T13:45:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      },
+      {
+        "symbol": "CAPITALCOM:USDZAR",
+        "time": "2026-10-01T14:00:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      },
+      {
+        "symbol": "CAPITALCOM:XAGUSD",
+        "time": "2026-10-01T12:00:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      },
+      {
+        "symbol": "CAPITALCOM:XAGUSD",
+        "time": "2026-10-01T12:15:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      },
+      {
+        "symbol": "CAPITALCOM:XAGUSD",
+        "time": "2026-10-01T12:30:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      },
+      {
+        "symbol": "CAPITALCOM:XAGUSD",
+        "time": "2026-10-01T12:45:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      },
+      {
+        "symbol": "CAPITALCOM:XAGUSD",
+        "time": "2026-10-01T13:00:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      },
+      {
+        "symbol": "CAPITALCOM:XAGUSD",
+        "time": "2026-10-01T13:15:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      },
+      {
+        "symbol": "CAPITALCOM:XAGUSD",
+        "time": "2026-10-01T13:30:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      },
+      {
+        "symbol": "CAPITALCOM:XAGUSD",
+        "time": "2026-10-01T13:45:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      },
+      {
+        "symbol": "CAPITALCOM:XAGUSD",
+        "time": "2026-10-01T14:00:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      },
+      {
+        "symbol": "CAPITALCOM:XAUUSD",
+        "time": "2026-10-01T12:00:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      },
+      {
+        "symbol": "CAPITALCOM:XAUUSD",
+        "time": "2026-10-01T12:15:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      },
+      {
+        "symbol": "CAPITALCOM:XAUUSD",
+        "time": "2026-10-01T12:30:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      },
+      {
+        "symbol": "CAPITALCOM:XAUUSD",
+        "time": "2026-10-01T12:45:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      },
+      {
+        "symbol": "CAPITALCOM:XAUUSD",
+        "time": "2026-10-01T13:00:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      },
+      {
+        "symbol": "CAPITALCOM:XAUUSD",
+        "time": "2026-10-01T13:15:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      },
+      {
+        "symbol": "CAPITALCOM:XAUUSD",
+        "time": "2026-10-01T13:30:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      },
+      {
+        "symbol": "CAPITALCOM:XAUUSD",
+        "time": "2026-10-01T13:45:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      },
+      {
+        "symbol": "CAPITALCOM:XAUUSD",
+        "time": "2026-10-01T14:00:00Z",
+        "reason": "TradingView alert-log retrieval window does not expose this older session receipt"
+      }
+    ],
+    "webhook_failures": {
+      "count": 25,
+      "details": [
+        {
+          "symbol": "CAPITALCOM:AUDUSD",
+          "time": "2026-10-01T14:15:00Z",
+          "fire_id": 57702814848,
+          "webhook": {
+            "error": "request took too long and timed out"
+          }
+        },
+        {
+          "symbol": "CAPITALCOM:AUDUSD",
+          "time": "2026-10-01T16:30:00Z",
+          "fire_id": 57711671735,
+          "webhook": {
+            "error": "request took too long and timed out"
+          }
+        },
+        {
+          "symbol": "CAPITALCOM:BTCUSD",
+          "time": "2026-10-01T14:15:00Z",
+          "fire_id": 57702816880,
+          "webhook": {
+            "error": "request took too long and timed out"
+          }
+        },
+        {
+          "symbol": "CAPITALCOM:BTCUSD",
+          "time": "2026-10-01T15:45:00Z",
+          "fire_id": 57709003714,
+          "webhook": {
+            "error": "request took too long and timed out"
+          }
+        },
+        {
+          "symbol": "CAPITALCOM:BTCUSD",
+          "time": "2026-10-01T16:00:00Z",
+          "fire_id": 57709962914,
+          "webhook": {
+            "error": "request took too long and timed out"
+          }
+        },
+        {
+          "symbol": "CAPITALCOM:DOGEUSD",
+          "time": "2026-10-01T14:15:00Z",
+          "fire_id": 57702813820,
+          "webhook": {
+            "error": "request took too long and timed out"
+          }
+        },
+        {
+          "symbol": "CAPITALCOM:DOGEUSD",
+          "time": "2026-10-01T15:30:00Z",
+          "fire_id": 57708072034,
+          "webhook": {
+            "error": "request took too long and timed out"
+          }
+        },
+        {
+          "symbol": "CAPITALCOM:DOGEUSD",
+          "time": "2026-10-01T15:45:00Z",
+          "fire_id": 57708996145,
+          "webhook": {
+            "error": "request took too long and timed out"
+          }
+        },
+        {
+          "symbol": "CAPITALCOM:DOGEUSD",
+          "time": "2026-10-01T16:30:00Z",
+          "fire_id": 57711670610,
+          "webhook": {
+            "error": "request took too long and timed out"
+          }
+        },
+        {
+          "symbol": "CAPITALCOM:ETHUSD",
+          "time": "2026-10-01T14:15:00Z",
+          "fire_id": 57702814815,
+          "webhook": {
+            "error": "request took too long and timed out"
+          }
+        },
+        {
+          "symbol": "CAPITALCOM:ETHUSD",
+          "time": "2026-10-01T15:45:00Z",
+          "fire_id": 57709004784,
+          "webhook": {
+            "error": "request took too long and timed out"
+          }
+        },
+        {
+          "symbol": "CAPITALCOM:ETHUSD",
+          "time": "2026-10-01T16:30:00Z",
+          "fire_id": 57711671729,
+          "webhook": {
+            "error": "request took too long and timed out"
+          }
+        },
+        {
+          "symbol": "CAPITALCOM:EURUSD",
+          "time": "2026-10-01T14:15:00Z",
+          "fire_id": 57702816981,
+          "webhook": {
+            "error": "request took too long and timed out"
+          }
+        },
+        {
+          "symbol": "CAPITALCOM:EURUSD",
+          "time": "2026-10-01T16:00:00Z",
+          "fire_id": 57709962931,
+          "webhook": {
+            "error": "request took too long and timed out"
+          }
+        },
+        {
+          "symbol": "CAPITALCOM:EURUSD",
+          "time": "2026-10-01T16:30:00Z",
+          "fire_id": 57711669255,
+          "webhook": {
+            "error": "request took too long and timed out"
+          }
+        },
+        {
+          "symbol": "CAPITALCOM:SPX500",
+          "time": "2026-10-01T14:15:00Z",
+          "fire_id": 57702815702,
+          "webhook": {
+            "error": "request took too long and timed out"
+          }
+        },
+        {
+          "symbol": "CAPITALCOM:SPX500",
+          "time": "2026-10-01T15:45:00Z",
+          "fire_id": 57709033154,
+          "webhook": {
+            "error": "request took too long and timed out"
+          }
+        },
+        {
+          "symbol": "CAPITALCOM:SPX500",
+          "time": "2026-10-01T16:30:00Z",
+          "fire_id": 57711686012,
+          "webhook": {
+            "error": "request took too long and timed out"
+          }
+        },
+        {
+          "symbol": "CAPITALCOM:USDZAR",
+          "time": "2026-10-01T14:15:00Z",
+          "fire_id": 57702815771,
+          "webhook": {
+            "error": "request took too long and timed out"
+          }
+        },
+        {
+          "symbol": "CAPITALCOM:USDZAR",
+          "time": "2026-10-01T16:00:00Z",
+          "fire_id": 57709962939,
+          "webhook": {
+            "error": "request took too long and timed out"
+          }
+        },
+        {
+          "symbol": "CAPITALCOM:XAGUSD",
+          "time": "2026-10-01T14:15:00Z",
+          "fire_id": 57702819663,
+          "webhook": {
+            "error": "request took too long and timed out"
+          }
+        },
+        {
+          "symbol": "CAPITALCOM:XAGUSD",
+          "time": "2026-10-01T15:45:00Z",
+          "fire_id": 57709034198,
+          "webhook": {
+            "error": "request took too long and timed out"
+          }
+        },
+        {
+          "symbol": "CAPITALCOM:XAGUSD",
+          "time": "2026-10-01T16:00:00Z",
+          "fire_id": 57709962933,
+          "webhook": {
+            "error": "request took too long and timed out"
+          }
+        },
+        {
+          "symbol": "CAPITALCOM:XAUUSD",
+          "time": "2026-10-01T15:45:00Z",
+          "fire_id": 57709040847,
+          "webhook": {
+            "error": "request took too long and timed out"
+          }
+        },
+        {
+          "symbol": "CAPITALCOM:XAUUSD",
+          "time": "2026-10-01T16:30:00Z",
+          "fire_id": 57711686403,
+          "webhook": {
+            "error": "request took too long and timed out"
+          }
+        }
+      ]
+    },
+    "reconstructed_vs_alert_known_feature_abs_error": {
+      "ema20": {
+        "n": 110,
+        "median_abs": 9.523874636707674e-7,
+        "max_abs": 0.6761904761988262
+      },
+      "ema50": {
+        "n": 110,
+        "median_abs": 3.9212573010871665e-7,
+        "max_abs": 0.2784313725060201
+      },
+      "rsi14": {
+        "n": 110,
+        "median_abs": 0.026575626838095445,
+        "max_abs": 1.4306332210691792
+      },
+      "atr14": {
+        "n": 110,
+        "median_abs": 2.776654448900795e-11,
+        "max_abs": 4.901763153361549e-11
+      }
+    }
+  },
+  "review_state": "COLLECTING",
+  "material_update_type": "FORWARD_RECONSTRUCTED_RESULTS_AND_DATA_INTEGRITY",
+  "promotion_decision": "NONE",
+  "authority": {
+    "research_only": true,
+    "live_authorized": false,
+    "execution": "none",
+    "retune_on_forward": false,
+    "broker_change": false,
+    "risk_change": false,
+    "position_or_stop_change": false,
+    "approval_change": false,
+    "notification_change": false
+  }
+}
