@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "register_increment_id": "R10_FORWARD_REGISTER_INCREMENT_2026-10-01T1912Z",
+  "captured_at_utc": "2026-10-01T19:12:54Z",
+  "evidence_path": "research_outputs/R10_FORWARD_EVIDENCE_INCREMENT_2026-10-01T1912Z.json",
+  "evidence_commit_sha": "bb11024fc973482170a1baa58a173472c8614752",
+  "material_update_type": "FORWARD_RECONSTRUCTED_RESULTS_AND_DATA_INTEGRITY",
+  "new_source_day": "2026-10-01",
+  "new_source_times": [
+    "2026-10-01T12:00:00Z",
+    "2026-10-01T12:15:00Z",
+    "2026-10-01T12:30:00Z",
+    "2026-10-01T12:45:00Z",
+    "2026-10-01T13:00:00Z",
+    "2026-10-01T13:15:00Z",
+    "2026-10-01T13:30:00Z",
+    "2026-10-01T13:45:00Z",
+    "2026-10-01T14:00:00Z",
+    "2026-10-01T14:15:00Z",
+    "2026-10-01T14:30:00Z",
+    "2026-10-01T14:45:00Z",
+    "2026-10-01T15:00:00Z",
+    "2026-10-01T15:15:00Z",
+    "2026-10-01T15:30:00Z",
+    "2026-10-01T15:45:00Z",
+    "2026-10-01T16:00:00Z",
+    "2026-10-01T16:15:00Z",
+    "2026-10-01T16:30:00Z",
+    "2026-10-01T16:45:00Z"
+  ],
+  "disposition": "RECONSTRUCTED_NOT_PROMOTION_GRADE",
+  "status": {
+    "regime_session_review_state": "COLLECTING",
+    "new_directional_setups": 3,
+    "completed_directional_trades": 3,
+    "gross_r": 0,
+    "net_r_by_cost_bps": {
+      "1": -0.2014803100003184,
+      "2": -0.40296062000063726,
+      "3": -0.6044409300009561,
+      "5": -1.007401550001593
+    },
+    "missing_source_rows": 0,
+    "canonical_receipt_unavailable_rows": 90,
+    "source_conflict_rows": 65,
+    "webhook_failures": 25
+  },
+  "authority": {
+    "research_only": true,
+    "live_authorized": false,
+    "execution": "none",
+    "retune_on_forward": false,
+    "broker_change": false,
+    "risk_change": false,
+    "position_or_stop_change": false,
+    "approval_change": false,
+    "notification_change": false
+  }
+}
