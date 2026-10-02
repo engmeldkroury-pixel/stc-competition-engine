@@ -1,0 +1,234 @@
+{
+  "schema_version": 1,
+  "increment_id": "R10_FORWARD_EVIDENCE_INCREMENT_2026-10-02T1900Z",
+  "captured_at_utc": "2026-10-02T19:00:00Z",
+  "predecessor_evidence_path": "research_outputs/R10_FORWARD_EVIDENCE_INCREMENT_2026-10-01T1912Z.json",
+  "frozen_contract": {
+    "protocol_id": "R10-REGIME-SESSION-SHADOW-V1",
+    "not_before_utc": "2026-09-28T12:00:00Z",
+    "timeframe": "15m",
+    "session_utc": [
+      12,
+      17
+    ],
+    "adx_trend_min": 30,
+    "adx_range_max": 20,
+    "initial_stop_atr": 1.5,
+    "target_r": 2,
+    "horizon_bars": 32,
+    "cost_sensitivity_bps": [
+      1,
+      2,
+      3,
+      5
+    ],
+    "retuned": false
+  },
+  "scope": {
+    "previous_registered_last_source_time": "2026-10-01T16:45:00Z",
+    "evaluated_day": "2026-10-02",
+    "source_window_utc": [
+      "2026-10-02T12:00:00Z",
+      "2026-10-02T16:45:00Z"
+    ],
+    "latest_outcome_bar_open_used": "2026-10-02T18:45:00Z",
+    "expected_rows": 200,
+    "observed_rows": 200,
+    "missing_source_rows": 0
+  },
+  "results": {
+    "day": {
+      "regimes": {
+        "TREND": 59,
+        "RANGE": 15,
+        "NEUTRAL": 126
+      },
+      "decisions": {
+        "WAIT": 196,
+        "LONG": 4,
+        "SHORT": 0
+      },
+      "completed": 1,
+      "pending": 3,
+      "gross_r": -1,
+      "net_r_by_cost_bps": {
+        "1": -1.0185140111831144,
+        "2": -1.0370280223662287,
+        "3": -1.0555420335493433,
+        "5": -1.092570055915572
+      }
+    },
+    "by_regime": {
+      "TREND": {
+        "bars": 59,
+        "signals": 2,
+        "completed": 1,
+        "gross_r": -1,
+        "net_2bps": -1.0370280223662287
+      },
+      "RANGE": {
+        "bars": 15,
+        "signals": 2,
+        "completed": 0,
+        "gross_r": 0
+      },
+      "NEUTRAL": {
+        "bars": 126,
+        "signals": 0,
+        "completed": 0,
+        "gross_r": 0
+      }
+    },
+    "by_symbol": {
+      "AUDUSD": {
+        "T": 11,
+        "R": 0,
+        "N": 9,
+        "L": 0,
+        "S": 0
+      },
+      "BTCUSD": {
+        "T": 15,
+        "R": 0,
+        "N": 5,
+        "L": 0,
+        "S": 0
+      },
+      "DOGEUSD": {
+        "T": 0,
+        "R": 2,
+        "N": 18,
+        "L": 0,
+        "S": 0
+      },
+      "ETHUSD": {
+        "T": 5,
+        "R": 0,
+        "N": 15,
+        "L": 1,
+        "S": 0,
+        "STOP": 1,
+        "gross_r": -1,
+        "net_2bps": -1.0370280223662287
+      },
+      "EURUSD": {
+        "T": 0,
+        "R": 2,
+        "N": 18,
+        "L": 0,
+        "S": 0
+      },
+      "NAS100": {
+        "T": 7,
+        "R": 0,
+        "N": 13,
+        "L": 0,
+        "S": 0
+      },
+      "SPX500": {
+        "T": 16,
+        "R": 0,
+        "N": 4,
+        "L": 1,
+        "S": 0,
+        "PENDING": 1
+      },
+      "USDZAR": {
+        "T": 5,
+        "R": 0,
+        "N": 15,
+        "L": 0,
+        "S": 0
+      },
+      "XAGUSD": {
+        "T": 0,
+        "R": 3,
+        "N": 17,
+        "L": 0,
+        "S": 0
+      },
+      "XAUUSD": {
+        "T": 0,
+        "R": 8,
+        "N": 12,
+        "L": 2,
+        "S": 0,
+        "PENDING": 2
+      }
+    },
+    "directional_setups": [
+      {
+        "symbol": "CAPITALCOM:ETHUSD",
+        "source_time": "2026-10-02T13:15:00Z",
+        "regime": "TREND",
+        "decision": "LONG",
+        "outcome": "STOP",
+        "resolved_time": "2026-10-02T14:00:00Z",
+        "gross_r": -1,
+        "net_2bps": -1.0370280223662287
+      },
+      {
+        "symbol": "CAPITALCOM:SPX500",
+        "source_time": "2026-10-02T15:45:00Z",
+        "regime": "TREND",
+        "decision": "LONG",
+        "outcome": "PENDING"
+      },
+      {
+        "symbol": "CAPITALCOM:XAUUSD",
+        "source_time": "2026-10-02T15:00:00Z",
+        "regime": "RANGE",
+        "decision": "LONG",
+        "outcome": "PENDING"
+      },
+      {
+        "symbol": "CAPITALCOM:XAUUSD",
+        "source_time": "2026-10-02T15:15:00Z",
+        "regime": "RANGE",
+        "decision": "LONG",
+        "outcome": "PENDING"
+      }
+    ]
+  },
+  "integrity": {
+    "canonical_receipt_available_rows": 160,
+    "canonical_receipt_unavailable_rows": 40,
+    "receipt_window_utc": [
+      "2026-10-02T13:00:00Z",
+      "2026-10-02T16:45:00Z"
+    ],
+    "unavailable_receipt_times_all_symbols": [
+      "12:00Z",
+      "12:15Z",
+      "12:30Z",
+      "12:45Z"
+    ],
+    "source_conflict_rows": 90,
+    "source_conflict_field_counts": {
+      "o": 0,
+      "h": 1,
+      "l": 2,
+      "c": 76,
+      "v": 90
+    },
+    "webhook_failures": 8
+  },
+  "methodology": {
+    "disposition": "RECONSTRUCTED_NOT_PROMOTION_GRADE",
+    "decision_rule": "Alert-time known fields where retrievable; EMA200/ADX14/zscore20 reconstructed causally from TradingView OHLCV; fully reconstruct receipt-missing rows.",
+    "cost_rule": "Frozen 1/2/3/5 bps protocol ladder; completed outcomes only.",
+    "same_bar_ambiguity": "STOP_FIRST"
+  },
+  "review_state": "COLLECTING",
+  "promotion_decision": "NO_PROMOTION_DECISION",
+  "authority": {
+    "research_only": true,
+    "live_authorized": false,
+    "execution": "none",
+    "retune_on_forward": false,
+    "broker_change": false,
+    "risk_change": false,
+    "position_or_stop_change": false,
+    "approval_change": false
+  }
+}
