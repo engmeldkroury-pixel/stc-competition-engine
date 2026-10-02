@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "register_increment_id": "R10_FORWARD_REGISTER_INCREMENT_2026-10-02T1900Z",
+  "captured_at_utc": "2026-10-02T19:00:00Z",
+  "material_update_type": "FORWARD_RECONSTRUCTED_RESULTS_AND_DATA_INTEGRITY",
+  "new_source_day": "2026-10-02",
+  "disposition": "RECONSTRUCTED_NOT_PROMOTION_GRADE",
+  "status": {
+    "regime_session_review_state": "COLLECTING",
+    "new_directional_setups": 4,
+    "completed_directional_trades": 1,
+    "pending_directional_setups": 3,
+    "gross_r": -1,
+    "net_r_by_cost_bps": {"1": -1.0185140111831144, "2": -1.0370280223662287, "3": -1.0555420335493433, "5": -1.092570055915572},
+    "missing_source_rows": 0,
+    "canonical_receipt_unavailable_rows": 40,
+    "source_conflict_rows": 90,
+    "webhook_failures": 8
+  },
+  "authority": {"research_only": true, "live_authorized": false, "execution": "none", "retune_on_forward": false, "broker_change": false, "risk_change": false, "position_or_stop_change": false, "approval_change": false, "notification_change": false}
+}
