@@ -1,0 +1,116 @@
+{
+  "schema_version": 1,
+  "register_increment_id": "R10_FORWARD_REGISTER_INCREMENT_2026-10-03T1924Z",
+  "captured_at_utc": "2026-10-03T19:24:24Z",
+  "material_update_type": "FORWARD_RECONSTRUCTED_RESULTS_DATA_INTEGRITY_AND_CENSORING",
+  "new_source_day": "2026-10-03",
+  "disposition": "RECONSTRUCTED_NOT_PROMOTION_GRADE",
+  "frozen_protocol_id": "R10-REGIME-SESSION-SHADOW-V1",
+  "frozen_protocol_sha256": "96e94a305c0a6eb22f92f495560f1e0c66dc60d7395608c140da1e5b6e0def97",
+  "status": {
+    "regime_session_review_state": "COLLECTING",
+    "active_source_rows": 60,
+    "calendar_inactive_rows": 140,
+    "unexpected_missing_source_rows": 0,
+    "new_directional_setups": 1,
+    "completed_directional_trades": 1,
+    "newly_censored_prior_setups": 3,
+    "gross_r": -1,
+    "net_r_by_cost_bps": {
+      "1": -1.0901983163100273,
+      "2": -1.1803966326200543,
+      "3": -1.2705949489300816,
+      "5": -1.4509915815501362
+    },
+    "canonical_receipt_available_rows": 60,
+    "canonical_receipt_unavailable_rows": 0,
+    "source_conflict_rows": 3,
+    "source_conflict_field_counts": {
+      "o": 0,
+      "h": 0,
+      "l": 0,
+      "c": 3,
+      "v": 3
+    },
+    "webhook_failures": 0
+  },
+  "symbol_day": {
+    "BTCUSD": {
+      "T": 9,
+      "R": 3,
+      "N": 8,
+      "S": 1,
+      "L": 0,
+      "STOP": 1
+    },
+    "ETHUSD": {
+      "T": 0,
+      "R": 20,
+      "N": 0,
+      "S": 0,
+      "L": 0
+    },
+    "DOGEUSD": {
+      "T": 0,
+      "R": 20,
+      "N": 0,
+      "S": 0,
+      "L": 0
+    },
+    "AUDUSD": {
+      "source_status": "MARKET_CLOSED_NO_BARS"
+    },
+    "EURUSD": {
+      "source_status": "MARKET_CLOSED_NO_BARS"
+    },
+    "NAS100": {
+      "source_status": "MARKET_CLOSED_NO_BARS"
+    },
+    "SPX500": {
+      "source_status": "MARKET_CLOSED_NO_BARS"
+    },
+    "USDZAR": {
+      "source_status": "MARKET_CLOSED_NO_BARS"
+    },
+    "XAGUSD": {
+      "source_status": "MARKET_CLOSED_NO_BARS"
+    },
+    "XAUUSD": {
+      "source_status": "MARKET_CLOSED_NO_BARS"
+    }
+  },
+  "prior_pending_updates": [
+    {
+      "symbol": "SPX500",
+      "source_time": "2026-10-02T15:45:00Z",
+      "updated_status": "CENSORED_MISSING_BAR",
+      "bars_observed": 20,
+      "first_absent_expected_bar": "2026-10-02T21:00:00Z"
+    },
+    {
+      "symbol": "XAUUSD",
+      "source_time": "2026-10-02T15:00:00Z",
+      "updated_status": "CENSORED_MISSING_BAR",
+      "bars_observed": 23,
+      "first_absent_expected_bar": "2026-10-02T21:00:00Z"
+    },
+    {
+      "symbol": "XAUUSD",
+      "source_time": "2026-10-02T15:15:00Z",
+      "updated_status": "CENSORED_MISSING_BAR",
+      "bars_observed": 22,
+      "first_absent_expected_bar": "2026-10-02T21:00:00Z"
+    }
+  ],
+  "authority": {
+    "research_only": true,
+    "live_authorized": false,
+    "execution": "none",
+    "retune_on_forward": false,
+    "broker_change": false,
+    "risk_change": false,
+    "position_or_stop_change": false,
+    "approval_change": false,
+    "notification_change": false
+  }
+}
