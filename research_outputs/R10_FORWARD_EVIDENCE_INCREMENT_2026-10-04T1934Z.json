@@ -1,0 +1,135 @@
+{
+  "schema_version": 1,
+  "increment_id": "R10_FORWARD_EVIDENCE_INCREMENT_2026-10-04T1934Z",
+  "captured_at_utc": "2026-10-04T19:34:57Z",
+  "predecessor_register_path": "research_outputs/R10_FORWARD_REGISTER_INCREMENT_2026-10-03T1924Z.json",
+  "frozen_contract": {
+    "protocol_id": "R10-REGIME-SESSION-SHADOW-V1",
+    "protocol_sha256": "96e94a305c0a6eb22f92f495560f1e0c66dc60d7395608c140da1e5b6e0def97",
+    "not_before_utc": "2026-09-28T12:00:00Z",
+    "timeframe": "15m",
+    "session_utc": [
+      12,
+      17
+    ],
+    "adx_trend_min": 30,
+    "adx_range_max": 20,
+    "initial_stop_atr": 1.5,
+    "target_r": 2,
+    "horizon_bars": 32,
+    "cost_sensitivity_bps": [
+      1,
+      2,
+      3,
+      5
+    ],
+    "retuned": false
+  },
+  "scope": {
+    "evaluated_day": "2026-10-04",
+    "source_window_utc": [
+      "2026-10-04T12:00:00Z",
+      "2026-10-04T16:45:00Z"
+    ],
+    "expected_rows": 200,
+    "observed_source_rows": 60,
+    "calendar_inactive_rows": 140,
+    "unexpected_missing_source_rows": 0,
+    "latest_closed_outcome_bar_open_used": "2026-10-04T19:15:00Z",
+    "excluded_mutable_last_returned_bar_open": "2026-10-04T19:30:00Z"
+  },
+  "results": {
+    "regimes": {
+      "TREND": 40,
+      "RANGE": 12,
+      "NEUTRAL": 8
+    },
+    "decisions": {
+      "WAIT": 57,
+      "LONG": 3,
+      "SHORT": 0
+    },
+    "completed": 2,
+    "pending": 1,
+    "gross_r": -2,
+    "net_r_by_cost_bps": {
+      "1": -2.130556120315988,
+      "2": -2.2611122406319764,
+      "3": -2.391668360947964,
+      "5": -2.6527806015799404
+    },
+    "directional_setups": [
+      {
+        "symbol": "CAPITALCOM:BTCUSD",
+        "source_time": "2026-10-04T13:15:00Z",
+        "regime": "TREND",
+        "decision": "LONG",
+        "outcome": "STOP",
+        "gross_r": -1,
+        "net_2bps": -1.1317428392571949
+      },
+      {
+        "symbol": "CAPITALCOM:BTCUSD",
+        "source_time": "2026-10-04T13:45:00Z",
+        "regime": "TREND",
+        "decision": "LONG",
+        "outcome": "STOP",
+        "gross_r": -1,
+        "net_2bps": -1.1293694013747813
+      },
+      {
+        "symbol": "CAPITALCOM:BTCUSD",
+        "source_time": "2026-10-04T16:00:00Z",
+        "regime": "TREND",
+        "decision": "LONG",
+        "outcome": "PENDING",
+        "closed_outcome_bars_observed": 13
+      }
+    ]
+  },
+  "integrity": {
+    "canonical_receipt_available_rows": 60,
+    "canonical_receipt_unavailable_rows": 0,
+    "source_conflict_rows": 21,
+    "source_conflict_by_symbol": {
+      "CAPITALCOM:BTCUSD": 0,
+      "CAPITALCOM:DOGEUSD": 13,
+      "CAPITALCOM:ETHUSD": 8
+    },
+    "source_conflict_field_counts": {
+      "o": 0,
+      "h": 0,
+      "l": 3,
+      "c": 21,
+      "v": 21
+    },
+    "webhook_successes": 49,
+    "webhook_failures": 11,
+    "webhook_failures_by_symbol": {
+      "CAPITALCOM:BTCUSD": 6,
+      "CAPITALCOM:DOGEUSD": 2,
+      "CAPITALCOM:ETHUSD": 3
+    }
+  },
+  "methodology": {
+    "market_data_source": "TradingView Official OHLCV for CAPITALCOM symbols",
+    "receipt_source": "TradingView alert fire history",
+    "decision_source_rule": "Alert-time OHLCV/EMA20/EMA50/RSI14/ATR14 where available; EMA200/ADX14/zscore20 reconstructed causally from later TradingView OHLCV without retuning.",
+    "disposition": "RECONSTRUCTED_NOT_PROMOTION_GRADE",
+    "same_bar_stop_target_ambiguity": "STOP_FIRST",
+    "cost_rule": "Frozen 1/2/3/5 bps sensitivity applied to completed outcomes only."
+  },
+  "review_state": "COLLECTING",
+  "promotion_decision": "NO_PROMOTION_DECISION",
+  "authority": {
+    "research_only": true,
+    "live_authorized": false,
+    "execution": "none",
+    "retune_on_forward": false,
+    "broker_change": false,
+    "risk_change": false,
+    "position_or_stop_change": false,
+    "approval_change": false,
+    "notification_change": false
+  }
+}
