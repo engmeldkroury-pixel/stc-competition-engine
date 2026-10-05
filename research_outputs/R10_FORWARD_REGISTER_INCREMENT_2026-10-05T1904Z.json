@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "register_increment_id": "R10_FORWARD_REGISTER_INCREMENT_2026-10-05T1904Z",
+  "captured_at_utc": "2026-10-05T19:04:41Z",
+  "material_update_type": "FORWARD_RESEARCH_OBSERVATION_ONLY",
+  "new_source_day": "2026-10-05",
+  "frozen_protocol_id": "R10-REGIME-SESSION-SHADOW-V1",
+  "frozen_protocol_sha256": "96e94a305c0a6eb22f92f495560f1e0c66dc60d7395608c140da1e5b6e0def97",
+  "disposition": "RECONSTRUCTED_NOT_PROMOTION_GRADE",
+  "status": {
+    "review_state": "COLLECTING",
+    "source_rows": 200,
+    "unexpected_missing_market_rows": 0,
+    "regimes": {
+      "TREND": 31,
+      "RANGE": 104,
+      "NEUTRAL": 65
+    },
+    "decisions": {
+      "WAIT": 199,
+      "LONG": 1,
+      "SHORT": 0
+    },
+    "completed_directional_observations": 1,
+    "gross_r": -1,
+    "net_r_by_cost_bps": {
+      "1": -1.2008307538416154,
+      "2": -1.4016615076832308,
+      "3": -1.602492261524846,
+      "5": -2.0041537692080773
+    },
+    "prior_pending_observation_resolved": {
+      "source_day": "2026-10-04",
+      "symbol": "BTCUSD",
+      "outcome": "TARGET",
+      "gross_r": 2,
+      "net_r_by_cost_bps": {
+        "1": 1.8917981397697619,
+        "2": 1.783596279539524,
+        "3": 1.6753944193092858,
+        "5": 1.4589906988488095
+      },
+      "evidence_quality": "RECONSTRUCTED_SOURCE_RECEIPT_UNAVAILABLE"
+    }
+  },
+  "integrity": {
+    "canonical_receipt_available_rows": 120,
+    "canonical_receipt_unavailable_rows": 80,
+    "source_conflict_rows_among_available_receipts": 68,
+    "source_conflict_field_counts": {
+      "o": 0,
+      "h": 0,
+      "l": 4,
+      "c": 61,
+      "v": 68
+    },
+    "webhook_successes_among_available_receipts": 107,
+    "webhook_failures_among_available_receipts": 13,
+    "missing_cases_preserved": true,
+    "source_conflicts_preserved": true
+  },
+  "authority": {
+    "research_only": true,
+    "live_authorized": false,
+    "execution": "none",
+    "retuned": false,
+    "broker_change": false,
+    "risk_change": false,
+    "position_or_stop_change": false,
+    "approval_change": false
+  }
+}
