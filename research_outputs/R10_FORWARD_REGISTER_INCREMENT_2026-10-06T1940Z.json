@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "register_increment_id": "R10_FORWARD_REGISTER_INCREMENT_2026-10-06T1940Z",
+  "captured_at_utc": "2026-10-06T19:40:28Z",
+  "material_update_type": "FORWARD_RESEARCH_OBSERVATION_ONLY",
+  "new_source_day": "2026-10-06",
+  "frozen_protocol_id": "R10-REGIME-SESSION-SHADOW-V1",
+  "frozen_protocol_sha256": "96e94a305c0a6eb22f92f495560f1e0c66dc60d7395608c140da1e5b6e0def97",
+  "disposition": "RECONSTRUCTED_NOT_PROMOTION_GRADE",
+  "status": {
+    "review_state": "COLLECTING",
+    "source_rows": 200,
+    "unexpected_missing_market_rows": 0,
+    "regimes": {"TREND": 62, "RANGE": 59, "NEUTRAL": 79},
+    "decisions": {"WAIT": 197, "LONG": 3, "SHORT": 0},
+    "completed_directional_observations": 0,
+    "pending_directional_observations": 3,
+    "gross_r": null,
+    "net_r_by_cost_bps": null,
+    "cost_status": "NOT_APPLICABLE_UNTIL_PENDING_OUTCOMES_RESOLVE"
+  },
+  "integrity": {
+    "canonical_receipt_available_rows": 90,
+    "canonical_receipt_unavailable_rows": 110,
+    "receipt_unavailable_window_utc": ["2026-10-06T12:00:00Z", "2026-10-06T14:30:00Z"],
+    "source_conflict_rows_among_available_receipts": 44,
+    "source_conflict_field_counts": {"o": 0, "h": 0, "l": 1, "c": 40, "v": 44},
+    "webhook_successes_among_available_receipts": 65,
+    "webhook_failures_among_available_receipts": 25,
+    "missing_cases_preserved": true,
+    "source_conflicts_preserved": true
+  },
+  "pending_setups": [
+    {"symbol": "EURUSD", "source_time": "2026-10-06T14:00:00Z", "regime": "TREND", "direction": "LONG", "receipt_available": false, "outcome": "PENDING", "closed_outcome_bars_observed": 21},
+    {"symbol": "EURUSD", "source_time": "2026-10-06T16:45:00Z", "regime": "TREND", "direction": "LONG", "receipt_available": true, "receipt_source_conflict": false, "webhook_http_code": 200, "outcome": "PENDING", "closed_outcome_bars_observed": 10},
+    {"symbol": "AUDUSD", "source_time": "2026-10-06T14:00:00Z", "regime": "TREND", "direction": "LONG", "receipt_available": false, "outcome": "PENDING", "closed_outcome_bars_observed": 21}
+  ],
+  "authority": {
+    "research_only": true,
+    "live_authorized": false,
+    "execution": "none",
+    "retuned": false,
+    "broker_change": false,
+    "risk_change": false,
+    "position_or_stop_change": false,
+    "approval_change": false
+  }
+}
