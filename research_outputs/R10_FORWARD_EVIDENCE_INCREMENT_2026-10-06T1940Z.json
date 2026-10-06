@@ -1,0 +1,158 @@
+{
+  "schema_version": 1,
+  "increment_id": "R10_FORWARD_EVIDENCE_INCREMENT_2026-10-06T1940Z",
+  "captured_at_utc": "2026-10-06T19:40:28Z",
+  "predecessor_register_path": "research_outputs/R10_FORWARD_REGISTER_INCREMENT_2026-10-06T1940Z.json",
+  "frozen_protocol_id": "R10-REGIME-SESSION-SHADOW-V1",
+  "disposition": "RECONSTRUCTED_NOT_PROMOTION_GRADE",
+  "scope": {
+    "evaluated_day": "2026-10-06",
+    "source_window_utc": [
+      "2026-10-06T12:00:00Z",
+      "2026-10-06T16:45:00Z"
+    ],
+    "observed_source_rows": 200,
+    "unexpected_missing_source_rows": 0,
+    "latest_closed_outcome_bar_open_used": "2026-10-06T19:15:00Z"
+  },
+  "symbol_day": {
+    "BTCUSD": {
+      "T": 0,
+      "R": 2,
+      "N": 18,
+      "WAIT": 20,
+      "L": 0,
+      "S": 0
+    },
+    "ETHUSD": {
+      "T": 0,
+      "R": 20,
+      "N": 0,
+      "WAIT": 20,
+      "L": 0,
+      "S": 0
+    },
+    "DOGEUSD": {
+      "T": 0,
+      "R": 20,
+      "N": 0,
+      "WAIT": 20,
+      "L": 0,
+      "S": 0
+    },
+    "EURUSD": {
+      "T": 20,
+      "R": 0,
+      "N": 0,
+      "WAIT": 18,
+      "L": 2,
+      "S": 0
+    },
+    "AUDUSD": {
+      "T": 4,
+      "R": 0,
+      "N": 16,
+      "WAIT": 19,
+      "L": 1,
+      "S": 0
+    },
+    "USDZAR": {
+      "T": 18,
+      "R": 0,
+      "N": 2,
+      "WAIT": 20,
+      "L": 0,
+      "S": 0
+    },
+    "XAUUSD": {
+      "T": 7,
+      "R": 3,
+      "N": 10,
+      "WAIT": 20,
+      "L": 0,
+      "S": 0
+    },
+    "XAGUSD": {
+      "T": 0,
+      "R": 14,
+      "N": 6,
+      "WAIT": 20,
+      "L": 0,
+      "S": 0
+    },
+    "SPX500": {
+      "T": 3,
+      "R": 0,
+      "N": 17,
+      "WAIT": 20,
+      "L": 0,
+      "S": 0
+    },
+    "NAS100": {
+      "T": 10,
+      "R": 0,
+      "N": 10,
+      "WAIT": 20,
+      "L": 0,
+      "S": 0
+    }
+  },
+  "aggregate": {
+    "regimes": {
+      "TREND": 62,
+      "RANGE": 59,
+      "NEUTRAL": 79
+    },
+    "decisions": {
+      "WAIT": 197,
+      "LONG": 3,
+      "SHORT": 0
+    },
+    "completed_directional_observations": 0,
+    "pending_directional_observations": 3,
+    "cost_sensitivity_result": "NOT_APPLICABLE_YET"
+  },
+  "pending_observation_ids": [
+    "EURUSD|2026-10-06T14:00:00Z|TREND|LONG",
+    "EURUSD|2026-10-06T16:45:00Z|TREND|LONG",
+    "AUDUSD|2026-10-06T14:00:00Z|TREND|LONG"
+  ],
+  "integrity": {
+    "canonical_receipt_available_rows": 90,
+    "canonical_receipt_unavailable_rows": 110,
+    "unavailable_receipt_window_utc": [
+      "2026-10-06T12:00:00Z",
+      "2026-10-06T14:30:00Z"
+    ],
+    "source_conflict_rows_among_available_receipts": 44,
+    "source_conflict_field_counts": {
+      "o": 0,
+      "h": 0,
+      "l": 1,
+      "c": 40,
+      "v": 44
+    },
+    "webhook_successes_among_available_receipts": 65,
+    "webhook_failures_among_available_receipts": 25,
+    "missing_cases_preserved": true,
+    "source_conflicts_preserved": true
+  },
+  "methodology": {
+    "market_data_source": "TradingView Official OHLCV for CAPITALCOM symbols",
+    "receipt_source": "TradingView alert fire history",
+    "decision_source_rule": "Alert-time OHLCV/EMA20/EMA50/RSI14/ATR14 where retrievable; otherwise later TradingView OHLCV. EMA200/ADX14/zscore20 reconstructed causally from TradingView OHLCV without retuning.",
+    "same_bar_stop_target_ambiguity": "STOP_FIRST"
+  },
+  "review_state": "COLLECTING",
+  "promotion_decision": "NO_PROMOTION_DECISION",
+  "authority": {
+    "research_only": true,
+    "live_authorized": false,
+    "execution": "none",
+    "retuned": false,
+    "broker_change": false,
+    "risk_change": false,
+    "position_or_stop_change": false,
+    "approval_change": false
+  }
+}
