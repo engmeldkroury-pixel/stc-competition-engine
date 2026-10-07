@@ -1,0 +1,303 @@
+{
+  "schema_version": 1,
+  "increment_id": "R10_FORWARD_EVIDENCE_INCREMENT_2026-10-07T1913Z",
+  "captured_at_utc": "2026-10-07T19:13:05Z",
+  "predecessor_register_path": "research_outputs/R10_FORWARD_REGISTER_INCREMENT_2026-10-07T1913Z.json",
+  "frozen_protocol_id": "R10-REGIME-SESSION-SHADOW-V1",
+  "disposition": "SOURCE_INCOMPLETE_NO_DECISION_CLAIM",
+  "scope": {
+    "evaluated_day": "2026-10-07",
+    "expected_symbols": [
+      "CAPITALCOM:BTCUSD",
+      "CAPITALCOM:ETHUSD",
+      "CAPITALCOM:DOGEUSD",
+      "CAPITALCOM:EURUSD",
+      "CAPITALCOM:AUDUSD",
+      "CAPITALCOM:USDZAR",
+      "CAPITALCOM:XAUUSD",
+      "CAPITALCOM:XAGUSD",
+      "CAPITALCOM:SPX500",
+      "CAPITALCOM:NAS100"
+    ],
+    "expected_session_window_utc": [
+      "2026-10-07T12:00:00Z",
+      "2026-10-07T16:45:00Z"
+    ],
+    "verified_symbol": "CAPITALCOM:EURUSD",
+    "verified_source_rows": 20,
+    "verified_outcome_rows_after_session": 9,
+    "latest_verified_closed_bar_open": "2026-10-07T19:00:00Z"
+  },
+  "partial_evidence": {
+    "source": "TradingView browser chart display",
+    "source_url": "https://www.tradingview.com/chart/?symbol=CAPITALCOM%3AEURUSD&interval=15",
+    "note": "OHLC values transcribed from TradingView display. Volume was displayed in rounded K notation and is preserved as display text; it was not expanded or fabricated.",
+    "session_source_bars": [
+      {
+        "t": "2026-10-07T12:00:00Z",
+        "o": 1.11824,
+        "h": 1.11879,
+        "l": 1.11731,
+        "c": 1.11741,
+        "v_display": "2.61K"
+      },
+      {
+        "t": "2026-10-07T12:15:00Z",
+        "o": 1.1174,
+        "h": 1.11752,
+        "l": 1.11644,
+        "c": 1.11678,
+        "v_display": "2.83K"
+      },
+      {
+        "t": "2026-10-07T12:30:00Z",
+        "o": 1.11677,
+        "h": 1.11741,
+        "l": 1.11659,
+        "c": 1.11711,
+        "v_display": "2.75K"
+      },
+      {
+        "t": "2026-10-07T12:45:00Z",
+        "o": 1.11712,
+        "h": 1.11742,
+        "l": 1.11664,
+        "c": 1.11732,
+        "v_display": "2.38K"
+      },
+      {
+        "t": "2026-10-07T13:00:00Z",
+        "o": 1.11731,
+        "h": 1.11815,
+        "l": 1.11731,
+        "c": 1.11799,
+        "v_display": "2.5K"
+      },
+      {
+        "t": "2026-10-07T13:15:00Z",
+        "o": 1.11797,
+        "h": 1.11836,
+        "l": 1.11746,
+        "c": 1.1179,
+        "v_display": "2.03K"
+      },
+      {
+        "t": "2026-10-07T13:30:00Z",
+        "o": 1.11789,
+        "h": 1.11835,
+        "l": 1.11753,
+        "c": 1.11812,
+        "v_display": "2.75K"
+      },
+      {
+        "t": "2026-10-07T13:45:00Z",
+        "o": 1.1181,
+        "h": 1.11866,
+        "l": 1.11762,
+        "c": 1.11865,
+        "v_display": "2.86K"
+      },
+      {
+        "t": "2026-10-07T14:00:00Z",
+        "o": 1.11867,
+        "h": 1.11896,
+        "l": 1.11768,
+        "c": 1.11783,
+        "v_display": "3.12K"
+      },
+      {
+        "t": "2026-10-07T14:15:00Z",
+        "o": 1.11782,
+        "h": 1.11876,
+        "l": 1.1176,
+        "c": 1.11851,
+        "v_display": "2.52K"
+      },
+      {
+        "t": "2026-10-07T14:30:00Z",
+        "o": 1.1185,
+        "h": 1.11914,
+        "l": 1.11834,
+        "c": 1.1187,
+        "v_display": "2.69K"
+      },
+      {
+        "t": "2026-10-07T14:45:00Z",
+        "o": 1.11871,
+        "h": 1.11945,
+        "l": 1.1187,
+        "c": 1.11941,
+        "v_display": "2.42K"
+      },
+      {
+        "t": "2026-10-07T15:00:00Z",
+        "o": 1.1194,
+        "h": 1.12037,
+        "l": 1.11889,
+        "c": 1.11945,
+        "v_display": "2.84K"
+      },
+      {
+        "t": "2026-10-07T15:15:00Z",
+        "o": 1.11946,
+        "h": 1.11955,
+        "l": 1.11863,
+        "c": 1.11872,
+        "v_display": "2.57K"
+      },
+      {
+        "t": "2026-10-07T15:30:00Z",
+        "o": 1.11871,
+        "h": 1.11896,
+        "l": 1.11844,
+        "c": 1.11869,
+        "v_display": "1.89K"
+      },
+      {
+        "t": "2026-10-07T15:45:00Z",
+        "o": 1.1187,
+        "h": 1.11879,
+        "l": 1.1182,
+        "c": 1.11865,
+        "v_display": "1.4K"
+      },
+      {
+        "t": "2026-10-07T16:00:00Z",
+        "o": 1.11866,
+        "h": 1.1195,
+        "l": 1.11841,
+        "c": 1.11926,
+        "v_display": "1.99K"
+      },
+      {
+        "t": "2026-10-07T16:15:00Z",
+        "o": 1.11925,
+        "h": 1.11976,
+        "l": 1.11921,
+        "c": 1.11942,
+        "v_display": "1.59K"
+      },
+      {
+        "t": "2026-10-07T16:30:00Z",
+        "o": 1.11943,
+        "h": 1.11943,
+        "l": 1.11879,
+        "c": 1.11891,
+        "v_display": "1.56K"
+      },
+      {
+        "t": "2026-10-07T16:45:00Z",
+        "o": 1.1189,
+        "h": 1.11928,
+        "l": 1.1189,
+        "c": 1.11924,
+        "v_display": "1.18K"
+      }
+    ],
+    "post_session_closed_bars": [
+      {
+        "t": "2026-10-07T17:00:00Z",
+        "o": 1.11923,
+        "h": 1.11993,
+        "l": 1.11904,
+        "c": 1.11981,
+        "v_display": "2.54K"
+      },
+      {
+        "t": "2026-10-07T17:15:00Z",
+        "o": 1.11982,
+        "h": 1.11998,
+        "l": 1.11949,
+        "c": 1.1195,
+        "v_display": "1.49K"
+      },
+      {
+        "t": "2026-10-07T17:30:00Z",
+        "o": 1.11949,
+        "h": 1.11968,
+        "l": 1.11935,
+        "c": 1.11946,
+        "v_display": "1.27K"
+      },
+      {
+        "t": "2026-10-07T17:45:00Z",
+        "o": 1.11947,
+        "h": 1.11999,
+        "l": 1.11936,
+        "c": 1.11945,
+        "v_display": "1.51K"
+      },
+      {
+        "t": "2026-10-07T18:00:00Z",
+        "o": 1.11945,
+        "h": 1.1203,
+        "l": 1.11945,
+        "c": 1.1198,
+        "v_display": "1.79K"
+      },
+      {
+        "t": "2026-10-07T18:15:00Z",
+        "o": 1.11981,
+        "h": 1.11988,
+        "l": 1.11966,
+        "c": 1.11979,
+        "v_display": "1.06K"
+      },
+      {
+        "t": "2026-10-07T18:30:00Z",
+        "o": 1.1198,
+        "h": 1.11996,
+        "l": 1.1196,
+        "c": 1.11989,
+        "v_display": "1.06K"
+      },
+      {
+        "t": "2026-10-07T18:45:00Z",
+        "o": 1.1199,
+        "h": 1.12006,
+        "l": 1.11975,
+        "c": 1.11982,
+        "v_display": "1.06K"
+      },
+      {
+        "t": "2026-10-07T19:00:00Z",
+        "o": 1.11981,
+        "h": 1.12001,
+        "l": 1.11959,
+        "c": 1.11969,
+        "v_display": "1.68K"
+      }
+    ]
+  },
+  "evaluation": {
+    "regime_counts": null,
+    "decision_counts": null,
+    "directional_setups": null,
+    "cost_sensitivity": null,
+    "reason": "Causal R10 evaluation requires EMA200, ADX14 and zscore20 for every source bar plus full 10-symbol exact-provider coverage. TradingView Official MCP and alert-fire history were unavailable in this run; browser fallback verified only EURUSD OHLC display. No provider substitution or partial-universe inference was allowed."
+  },
+  "integrity": {
+    "official_mcp_error": "internal tool failure",
+    "canonical_alert_receipts_available": null,
+    "canonical_alert_receipts_unavailable": null,
+    "source_conflict_rows": null,
+    "webhook_successes": null,
+    "webhook_failures": null,
+    "missing_market_rows": null,
+    "data_access_missing_preserved": true,
+    "source_conflicts_not_invented": true,
+    "no_provider_substitution": true
+  },
+  "review_state": "COLLECTING",
+  "promotion_decision": "NO_PROMOTION_DECISION",
+  "authority": {
+    "research_only": true,
+    "live_authorized": false,
+    "execution": "none",
+    "retuned": false,
+    "broker_change": false,
+    "risk_change": false,
+    "position_or_stop_change": false,
+    "approval_change": false
+  }
+}
