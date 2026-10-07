@@ -1,0 +1,168 @@
+{
+  "schema_version": 1,
+  "register_increment_id": "R10_FORWARD_REGISTER_INCREMENT_2026-10-07T2010Z",
+  "captured_at_utc": "2026-10-07T20:10:39Z",
+  "material_update_type": "FORWARD_RESEARCH_DATA_ACCESS_PARTIAL_RECOVERY",
+  "new_source_day": "2026-10-07",
+  "frozen_protocol_id": "R10-REGIME-SESSION-SHADOW-V1",
+  "frozen_protocol_sha256": "96e94a305c0a6eb22f92f495560f1e0c66dc60d7395608c140da1e5b6e0def97",
+  "predecessor_register_path": "research_outputs/R10_FORWARD_REGISTER_INCREMENT_2026-10-07T1913Z.json",
+  "disposition": "SOURCE_INCOMPLETE_NO_DECISION_CLAIM",
+  "status": {
+    "review_state": "COLLECTING",
+    "source_rows_expected": 200,
+    "source_rows_verified_union": 110,
+    "source_rows_unverified": 90,
+    "verified_union_basis": "20 EURUSD rows from 12:00-16:45 UTC preserved in predecessor plus 100 canonical Capital alert receipts from 14:30-16:45 UTC; 10 EURUSD rows overlap, yielding 110 unique verified source rows.",
+    "unexpected_missing_market_rows": null,
+    "regimes": null,
+    "decisions": null,
+    "completed_directional_observations": null,
+    "pending_directional_observations": null,
+    "gross_r": null,
+    "net_r_by_cost_bps": null,
+    "cost_status": "NOT_CALCULABLE_SOURCE_AND_FEATURE_HISTORY_INCOMPLETE"
+  },
+  "source_access": {
+    "tradingview_alert_fire_history": "PARTIAL_RECOVERY",
+    "canonical_receipt_window_utc": [
+      "2026-10-07T14:30:00Z",
+      "2026-10-07T16:45:00Z"
+    ],
+    "canonical_receipt_rows_in_window": 100,
+    "canonical_receipt_symbols": 10,
+    "latest_closed_bar_cutoff_used": "2026-10-07T19:45:00Z",
+    "tradingview_official_ohlcv": "UNAVAILABLE_WEBSOCKET_BAD_HANDSHAKE",
+    "tradingview_current_technicals": "AVAILABLE_CURRENT_SNAPSHOT_ONLY_NOT_USED_FOR_HISTORICAL_SOURCE_DECISIONS",
+    "browser_fallback": "NO_ADDITIONAL_EVIDENCE_TASK_COST_LIMIT_REACHED",
+    "missing_historical_decision_features": [
+      "ema200",
+      "adx14",
+      "zscore20"
+    ],
+    "source_conflict_audit": "NOT_PERFORMABLE_WITHOUT_LATER_HISTORY_OHLCV"
+  },
+  "webhook_integrity": {
+    "audited_window_utc": [
+      "2026-10-07T14:30:00Z",
+      "2026-10-07T16:45:00Z"
+    ],
+    "canonical_rows": 100,
+    "http_200_successes": 88,
+    "failures_or_non_200": 12,
+    "per_symbol": {
+      "SPX500": {
+        "rows": 10,
+        "webhook_ok": 8,
+        "webhook_fail": 2
+      },
+      "USDZAR": {
+        "rows": 10,
+        "webhook_ok": 9,
+        "webhook_fail": 1
+      },
+      "NAS100": {
+        "rows": 10,
+        "webhook_ok": 10,
+        "webhook_fail": 0
+      },
+      "XAUUSD": {
+        "rows": 10,
+        "webhook_ok": 9,
+        "webhook_fail": 1
+      },
+      "XAGUSD": {
+        "rows": 10,
+        "webhook_ok": 8,
+        "webhook_fail": 2
+      },
+      "AUDUSD": {
+        "rows": 10,
+        "webhook_ok": 8,
+        "webhook_fail": 2
+      },
+      "ETHUSD": {
+        "rows": 10,
+        "webhook_ok": 8,
+        "webhook_fail": 2
+      },
+      "EURUSD": {
+        "rows": 10,
+        "webhook_ok": 9,
+        "webhook_fail": 1
+      },
+      "BTCUSD": {
+        "rows": 10,
+        "webhook_ok": 10,
+        "webhook_fail": 0
+      },
+      "DOGEUSD": {
+        "rows": 10,
+        "webhook_ok": 9,
+        "webhook_fail": 1
+      }
+    }
+  },
+  "uncovered_source_rows": {
+    "window_utc": [
+      "2026-10-07T12:00:00Z",
+      "2026-10-07T14:15:00Z"
+    ],
+    "symbols_unverified": [
+      "BTCUSD",
+      "ETHUSD",
+      "DOGEUSD",
+      "AUDUSD",
+      "USDZAR",
+      "XAUUSD",
+      "XAGUSD",
+      "SPX500",
+      "NAS100"
+    ],
+    "rows_per_symbol": 10,
+    "total_rows": 90,
+    "note": "EURUSD for this window is preserved from predecessor browser evidence; no provider substitution is allowed for the remaining symbols."
+  },
+  "carried_pending_from_previous_increment": [
+    {
+      "symbol": "EURUSD",
+      "source_time": "2026-10-06T14:00:00Z",
+      "regime": "TREND",
+      "direction": "LONG",
+      "status": "NOT_REVALUED_EXACT_OUTCOME_SEQUENCE_UNAVAILABLE"
+    },
+    {
+      "symbol": "EURUSD",
+      "source_time": "2026-10-06T16:45:00Z",
+      "regime": "TREND",
+      "direction": "LONG",
+      "status": "NOT_REVALUED_EXACT_OUTCOME_SEQUENCE_UNAVAILABLE"
+    },
+    {
+      "symbol": "AUDUSD",
+      "source_time": "2026-10-06T14:00:00Z",
+      "regime": "TREND",
+      "direction": "LONG",
+      "status": "NOT_REVALUED_EXACT_OUTCOME_SEQUENCE_UNAVAILABLE"
+    }
+  ],
+  "integrity": {
+    "missing_cases_preserved": true,
+    "source_conflicts_preserved": true,
+    "no_provider_substitution": true,
+    "no_partial_universe_inference": true,
+    "no_forward_result_fabrication": true,
+    "no_retuning": true
+  },
+  "authority": {
+    "research_only": true,
+    "live_authorized": false,
+    "execution": "none",
+    "broker_change": false,
+    "risk_change": false,
+    "sizing_change": false,
+    "position_or_stop_change": false,
+    "approval_change": false,
+    "live_promotion": false
+  }
+}
