@@ -1,0 +1,90 @@
+{
+  "schema_version": 1,
+  "register_increment_id": "R10_FORWARD_REGISTER_INCREMENT_2026-10-07T1913Z",
+  "captured_at_utc": "2026-10-07T19:13:05Z",
+  "material_update_type": "FORWARD_RESEARCH_DATA_ACCESS_PARTIAL",
+  "new_source_day": "2026-10-07",
+  "frozen_protocol_id": "R10-REGIME-SESSION-SHADOW-V1",
+  "frozen_protocol_sha256": "96e94a305c0a6eb22f92f495560f1e0c66dc60d7395608c140da1e5b6e0def97",
+  "disposition": "SOURCE_INCOMPLETE_NO_DECISION_CLAIM",
+  "status": {
+    "review_state": "COLLECTING",
+    "source_rows_expected": 200,
+    "source_rows_verified": 20,
+    "source_rows_unverified": 180,
+    "unexpected_missing_market_rows": null,
+    "regimes": null,
+    "decisions": null,
+    "completed_directional_observations": null,
+    "pending_directional_observations": null,
+    "gross_r": null,
+    "net_r_by_cost_bps": null,
+    "cost_status": "NOT_CALCULABLE_SOURCE_INCOMPLETE"
+  },
+  "source_access": {
+    "tradingview_official_mcp": "UNAVAILABLE_INTERNAL_ERROR",
+    "browser_fallback": "PARTIAL_SUCCESS",
+    "browser_verified_symbol": "CAPITALCOM:EURUSD",
+    "browser_verified_source_window_utc": [
+      "2026-10-07T12:00:00Z",
+      "2026-10-07T16:45:00Z"
+    ],
+    "browser_verified_source_rows": 20,
+    "browser_latest_closed_outcome_bar_open_used": "2026-10-07T19:00:00Z",
+    "unverified_symbols": [
+      "CAPITALCOM:BTCUSD",
+      "CAPITALCOM:ETHUSD",
+      "CAPITALCOM:DOGEUSD",
+      "CAPITALCOM:AUDUSD",
+      "CAPITALCOM:USDZAR",
+      "CAPITALCOM:XAUUSD",
+      "CAPITALCOM:XAGUSD",
+      "CAPITALCOM:SPX500",
+      "CAPITALCOM:NAS100"
+    ],
+    "alert_fire_history": "UNAVAILABLE_WITH_MCP_OUTAGE",
+    "source_conflict_audit": "NOT_PERFORMABLE",
+    "webhook_delivery_audit": "NOT_PERFORMABLE"
+  },
+  "carried_pending_from_previous_increment": [
+    {
+      "symbol": "EURUSD",
+      "source_time": "2026-10-06T14:00:00Z",
+      "regime": "TREND",
+      "direction": "LONG",
+      "status": "NOT_REVALUED_SOURCE_INCOMPLETE"
+    },
+    {
+      "symbol": "EURUSD",
+      "source_time": "2026-10-06T16:45:00Z",
+      "regime": "TREND",
+      "direction": "LONG",
+      "status": "NOT_REVALUED_SOURCE_INCOMPLETE"
+    },
+    {
+      "symbol": "AUDUSD",
+      "source_time": "2026-10-06T14:00:00Z",
+      "regime": "TREND",
+      "direction": "LONG",
+      "status": "NOT_REVALUED_SOURCE_INCOMPLETE"
+    }
+  ],
+  "integrity": {
+    "missing_cases_preserved": true,
+    "source_conflicts_preserved": true,
+    "no_provider_substitution": true,
+    "no_inference_from_partial_universe": true,
+    "no_forward_result_fabrication": true
+  },
+  "authority": {
+    "research_only": true,
+    "live_authorized": false,
+    "execution": "none",
+    "retuned": false,
+    "broker_change": false,
+    "risk_change": false,
+    "position_or_stop_change": false,
+    "approval_change": false,
+    "live_promotion": false
+  }
+}
