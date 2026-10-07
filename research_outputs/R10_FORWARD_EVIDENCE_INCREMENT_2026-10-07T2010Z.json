@@ -1,0 +1,134 @@
+{
+  "schema_version": 1,
+  "increment_id": "R10_FORWARD_EVIDENCE_INCREMENT_2026-10-07T2010Z",
+  "captured_at_utc": "2026-10-07T20:10:39Z",
+  "predecessor_evidence_path": "research_outputs/R10_FORWARD_EVIDENCE_INCREMENT_2026-10-07T1913Z.json",
+  "register_path": "research_outputs/R10_FORWARD_REGISTER_INCREMENT_2026-10-07T2010Z.json",
+  "frozen_protocol_id": "R10-REGIME-SESSION-SHADOW-V1",
+  "disposition": "SOURCE_INCOMPLETE_NO_DECISION_CLAIM",
+  "scope": {
+    "evaluated_day": "2026-10-07",
+    "expected_session_window_utc": [
+      "2026-10-07T12:00:00Z",
+      "2026-10-07T16:45:00Z"
+    ],
+    "expected_source_rows": 200,
+    "verified_source_rows_union": 110,
+    "unverified_source_rows": 90,
+    "latest_closed_bar_open_allowed": "2026-10-07T19:45:00Z"
+  },
+  "newly_recovered_canonical_receipts": {
+    "window_utc": [
+      "2026-10-07T14:30:00Z",
+      "2026-10-07T16:45:00Z"
+    ],
+    "rows": 100,
+    "per_symbol": {
+      "SPX500": {
+        "rows": 10,
+        "webhook_ok": 8,
+        "webhook_fail": 2
+      },
+      "USDZAR": {
+        "rows": 10,
+        "webhook_ok": 9,
+        "webhook_fail": 1
+      },
+      "NAS100": {
+        "rows": 10,
+        "webhook_ok": 10,
+        "webhook_fail": 0
+      },
+      "XAUUSD": {
+        "rows": 10,
+        "webhook_ok": 9,
+        "webhook_fail": 1
+      },
+      "XAGUSD": {
+        "rows": 10,
+        "webhook_ok": 8,
+        "webhook_fail": 2
+      },
+      "AUDUSD": {
+        "rows": 10,
+        "webhook_ok": 8,
+        "webhook_fail": 2
+      },
+      "ETHUSD": {
+        "rows": 10,
+        "webhook_ok": 8,
+        "webhook_fail": 2
+      },
+      "EURUSD": {
+        "rows": 10,
+        "webhook_ok": 9,
+        "webhook_fail": 1
+      },
+      "BTCUSD": {
+        "rows": 10,
+        "webhook_ok": 10,
+        "webhook_fail": 0
+      },
+      "DOGEUSD": {
+        "rows": 10,
+        "webhook_ok": 9,
+        "webhook_fail": 1
+      }
+    },
+    "webhook_http_200": 88,
+    "webhook_fail_or_non_200": 12,
+    "malformed_messages": 0,
+    "message_fields_confirmed": [
+      "open",
+      "high",
+      "low",
+      "close",
+      "volume",
+      "ema20",
+      "ema50",
+      "rsi14",
+      "atr14"
+    ],
+    "decision_material_fields_absent": [
+      "ema200",
+      "adx14",
+      "zscore20"
+    ]
+  },
+  "prior_partial_evidence_preserved": {
+    "symbol": "CAPITALCOM:EURUSD",
+    "window_utc": [
+      "2026-10-07T12:00:00Z",
+      "2026-10-07T16:45:00Z"
+    ],
+    "rows": 20,
+    "source": "TradingView browser chart display",
+    "overlap_with_new_receipts_rows": 10
+  },
+  "evaluation": {
+    "regime_counts": null,
+    "decision_counts": null,
+    "directional_setups": null,
+    "cost_sensitivity": null,
+    "reason": "Frozen R10 scoring requires historical EMA200, ADX14 and zscore20 at each source bar. Current alert receipts omit these fields; TradingView Official OHLCV remained unavailable with websocket bad handshake, so exact causal reconstruction and source-conflict comparison cannot be completed without inventing data."
+  },
+  "tool_state": {
+    "tradingview_alert_log": "AVAILABLE",
+    "tradingview_ohlcv": "FAILED_WEBSOCKET_BAD_HANDSHAKE",
+    "tradingview_current_technicals": "AVAILABLE_BUT_CURRENT_ONLY",
+    "browser_fallback": "NO_RESULT_COST_LIMIT_REACHED"
+  },
+  "review_state": "COLLECTING",
+  "promotion_decision": "NO_PROMOTION_DECISION",
+  "authority": {
+    "research_only": true,
+    "live_authorized": false,
+    "execution": "none",
+    "retuned": false,
+    "broker_change": false,
+    "risk_change": false,
+    "sizing_change": false,
+    "position_or_stop_change": false,
+    "approval_change": false
+  }
+}
