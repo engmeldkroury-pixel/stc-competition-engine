@@ -1,0 +1,5482 @@
+{
+  "schema_version": 1,
+  "increment_id": "R10_FORWARD_EVIDENCE_INCREMENT_2026-10-08T1859Z",
+  "frozen_protocol_id": "R10-REGIME-SESSION-SHADOW-V1",
+  "frozen_protocol_sha256": "96e94a305c0a6eb22f92f495560f1e0c66dc60d7395608c140da1e5b6e0def97",
+  "frozen_protocol_path": "research_inputs/R10_REGIME_SESSION_FROZEN_PROTOCOL.json",
+  "frozen_code_path": "app/r10_regime_session_shadow.py",
+  "frozen_forward_boundary": "2026-09-28T12:00:00Z",
+  "evaluated_day": "2026-10-08",
+  "session_utc": [
+    "12:00",
+    "17:00"
+  ],
+  "timeframe": "15m",
+  "symbols": [
+    "BTCUSD",
+    "ETHUSD",
+    "DOGEUSD",
+    "EURUSD",
+    "AUDUSD",
+    "USDZAR",
+    "XAUUSD",
+    "XAGUSD",
+    "SPX500",
+    "NAS100"
+  ],
+  "source": "TradingView Official CAPITALCOM 15m OHLCV and original TradingView CAPITAL MTF alerts; retrospective data may differ",
+  "as_of_closed_bar_open_utc": "2026-10-08T18:30:00Z",
+  "evaluation_grade": "RECONSTRUCTED_NOT_PROMOTION_GRADE",
+  "research_only": true,
+  "live_authorized": false,
+  "execution": "none",
+  "retuned": false,
+  "live_promotion": false,
+  "predecessor_evidence_path": "research_outputs/R10_FORWARD_EVIDENCE_INCREMENT_2026-10-07T2010Z.json",
+  "register_path": "research_outputs/R10_FORWARD_REGISTER_INCREMENT_2026-10-08T1859Z.json",
+  "coverage": {
+    "expected_session_rows": 200,
+    "observed_session_rows": 200,
+    "unexpected_missing_market_rows": 0
+  },
+  "quality": {
+    "canonical_receipt_rows": 160,
+    "missing_receipt_rows": 40,
+    "original_receipt_malformed_messages": 0,
+    "duplicate_receipts": 0,
+    "receipt_conflicts": [],
+    "source_conflict_rows": 105,
+    "source_conflict_fields": {
+      "o": 0,
+      "h": 1,
+      "l": 3,
+      "c": 91,
+      "v": 105
+    },
+    "webhook_http_200": 139,
+    "webhook_fail_or_non_200": 21,
+    "ema20_reconstructed_median_relative_deviation": 0.000001125665170040956,
+    "ema50_reconstructed_median_relative_deviation": 4.6104154088562655e-7,
+    "rsi_reconstructed_median_absolute_deviation": 0.030226271047013142,
+    "atr_reconstructed_median_relative_deviation": 5.8003104068559594e-11
+  },
+  "methodology": {
+    "original_decision_fields": "alert-time OHLC EMA20 EMA50 RSI14 ATR14 when available; otherwise later chart historical",
+    "historically_reconstructed_fields": [
+      "ema200",
+      "adx14",
+      "zscore20"
+    ],
+    "warning": "EMA200/ADX/zscore reconstructed from later OHLCV; not promotion grade; source revision possible",
+    "ema_method": "causal EMA smoothing alpha=2/(n+1), warmup 700 bars, seeded at first close",
+    "adx_method": "Wilder14 smoothed directional movement and true range; first14 DX average then Wilder",
+    "atr_rsi_method": "Wilder14 fallback, canonical receipts preferred",
+    "zscore_method": "(close-SMA20)/population_STD20",
+    "next_bar_entry": true,
+    "stop_atr": 1.5,
+    "target_r": 2,
+    "horizon_bars": 32,
+    "stop_first": true,
+    "open_gap_stop_at_observed_open": true,
+    "cost_bps": [
+      1,
+      2,
+      3,
+      5
+    ],
+    "cost_formula": "net_R=gross_R-bps*entry_price/(10000*1.5*source_ATR)",
+    "cost_limit": "bps ladder is a sensitivity proxy; not verified instrument-specific spread/slippage/commission"
+  },
+  "all_session_rows": [
+    {
+      "symbol": "BTCUSD",
+      "source_open_utc": "2026-10-08T12:00:00Z",
+      "regime": "NEUTRAL",
+      "decision": "WAIT",
+      "original_receipt_available": false,
+      "receipt_fire_id": null,
+      "webhook_http_code": null,
+      "source_conflicting_fields": null,
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 82404.45,
+        "h": 82416.9,
+        "l": 82136.25,
+        "c": 82315.8,
+        "ema20": 82673.62515200785,
+        "ema50": 82855.99625006282,
+        "ema200": 83784.17573034266,
+        "atr14": 234.97823144599914,
+        "adx14": 29.617855791414634,
+        "rsi14": 34.976544526195056,
+        "zscore20": -1.8945914447584515
+      }
+    },
+    {
+      "symbol": "BTCUSD",
+      "source_open_utc": "2026-10-08T12:15:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": false,
+      "receipt_fire_id": null,
+      "webhook_http_code": null,
+      "source_conflicting_fields": null,
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 82316.45,
+        "h": 82408.3,
+        "l": 82251.6,
+        "c": 82388.05,
+        "ema20": 82646.4275184833,
+        "ema50": 82837.64541672701,
+        "ema200": 83770.2839320308,
+        "atr14": 229.38692919985616,
+        "adx14": 31.118952995778304,
+        "rsi14": 38.27009223181145,
+        "zscore20": -1.4299706565770005
+      }
+    },
+    {
+      "symbol": "BTCUSD",
+      "source_open_utc": "2026-10-08T12:30:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": false,
+      "receipt_fire_id": null,
+      "webhook_http_code": null,
+      "source_conflicting_fields": null,
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 82388.2,
+        "h": 82391.55,
+        "l": 82240.1,
+        "c": 82258,
+        "ema20": 82609.43442148488,
+        "ema50": 82814.9142239142,
+        "ema200": 83755.23633071706,
+        "atr14": 223.82000568558053,
+        "adx14": 32.545856173550284,
+        "rsi14": 34.848450212155186,
+        "zscore20": -1.7241237354785293
+      }
+    },
+    {
+      "symbol": "BTCUSD",
+      "source_open_utc": "2026-10-08T12:45:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": false,
+      "receipt_fire_id": null,
+      "webhook_http_code": null,
+      "source_conflicting_fields": null,
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 82257.75,
+        "h": 82340.65,
+        "l": 81937.55,
+        "c": 82228.35,
+        "ema20": 82573.14066705776,
+        "ema50": 82791.91170532932,
+        "ema200": 83740.04343190395,
+        "atr14": 236.62571956518127,
+        "adx14": 34.60341249379051,
+        "rsi14": 34.099889452197615,
+        "zscore20": -1.615691295504264
+      }
+    },
+    {
+      "symbol": "BTCUSD",
+      "source_open_utc": "2026-10-08T13:00:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58079550649,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 82229.1,
+        "h": 82438.45,
+        "l": 82036.25,
+        "c": 82388.15,
+        "ema20": 82555.5225082903,
+        "ema50": 82776.0779129635,
+        "ema200": 83726.5917559646,
+        "atr14": 248.452453882,
+        "adx14": 35.72984598230082,
+        "rsi14": 41.4052111121,
+        "zscore20": -0.9248293105243796
+      }
+    },
+    {
+      "symbol": "BTCUSD",
+      "source_open_utc": "2026-10-08T13:15:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58080224399,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 82388.4,
+        "h": 82551.85,
+        "l": 82271.4,
+        "c": 82272.25,
+        "ema20": 82528.5441741674,
+        "ema50": 82756.3199555924,
+        "ema200": 83712.1206937162,
+        "atr14": 250.7379928904,
+        "adx14": 35.93472578417621,
+        "rsi14": 38.1058056264,
+        "zscore20": -1.2189853166994709
+      }
+    },
+    {
+      "symbol": "BTCUSD",
+      "source_open_utc": "2026-10-08T13:30:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58081626656,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 82272.15,
+        "h": 82410.85,
+        "l": 81684.75,
+        "c": 81938.9,
+        "ema20": 82472.3875861515,
+        "ema50": 82724.2642710594,
+        "ema200": 83694.47670671406,
+        "atr14": 284.6924219696,
+        "adx14": 37.45717405915275,
+        "rsi14": 30.562366708,
+        "zscore20": -2.038201233633308
+      }
+    },
+    {
+      "symbol": "BTCUSD",
+      "source_open_utc": "2026-10-08T13:45:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58082913471,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 81939.75,
+        "h": 82141.7,
+        "l": 81702.25,
+        "c": 82088.4,
+        "ema20": 82435.8173398513,
+        "ema50": 82699.3284172923,
+        "ema200": 83678.4958439607,
+        "atr14": 295.7465346861,
+        "adx14": 38.87087602877382,
+        "rsi14": 36.6219469455,
+        "zscore20": -1.382397685723138
+      }
+    },
+    {
+      "symbol": "BTCUSD",
+      "source_open_utc": "2026-10-08T14:00:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58083945048,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 82088.6,
+        "h": 82527.85,
+        "l": 82033.15,
+        "c": 82454.95,
+        "ema20": 82437.6394979607,
+        "ema50": 82689.7449499475,
+        "ema200": 83666.32125844866,
+        "atr14": 309.9574964942,
+        "adx14": 38.06935688824645,
+        "rsi14": 48.4908088171,
+        "zscore20": -0.1637228109045202
+      }
+    },
+    {
+      "symbol": "BTCUSD",
+      "source_open_utc": "2026-10-08T14:15:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58085089571,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 82455.3,
+        "h": 82663.1,
+        "l": 82348.7,
+        "c": 82644.75,
+        "ema20": 82457.3643076788,
+        "ema50": 82687.9804421065,
+        "ema200": 83656.15637030489,
+        "atr14": 310.2748181732,
+        "adx14": 36.72063595967189,
+        "rsi14": 53.3612139378,
+        "zscore20": 0.5382960056561858
+      }
+    },
+    {
+      "symbol": "BTCUSD",
+      "source_open_utc": "2026-10-08T14:30:00Z",
+      "regime": "TREND",
+      "decision": "SHORT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58086095570,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 82644,
+        "h": 82693.95,
+        "l": 82429.55,
+        "c": 82476.7,
+        "ema20": 82459.2058021855,
+        "ema50": 82679.6949345729,
+        "ema200": 83644.42048602324,
+        "atr14": 306.9980454466,
+        "adx14": 35.33183781433451,
+        "rsi14": 48.9481182006,
+        "zscore20": 0.059475114603823945
+      },
+      "outcome": {
+        "entry_open_utc": "2026-10-08T14:45:00.000Z",
+        "entry_price": 82476.35,
+        "stop_price": 82936.84706816991,
+        "target_price": 81555.35586366021,
+        "status": "TARGET",
+        "gross_R": 2,
+        "net_r_by_bps": {
+          "1": 1.9820897122477292,
+          "2": 1.9641794244954582,
+          "3": 1.9462691367431875,
+          "5": 1.9104485612386457
+        },
+        "observed_outcome_bars": 3,
+        "outcome_open_utc": "2026-10-08T15:15:00.000Z"
+      }
+    },
+    {
+      "symbol": "BTCUSD",
+      "source_open_utc": "2026-10-08T14:45:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58087058488,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 82476.35,
+        "h": 82694.95,
+        "l": 82470.05,
+        "c": 82617.5,
+        "ema20": 82474.2814400726,
+        "ema50": 82677.2559175308,
+        "ema200": 83634.20237173446,
+        "atr14": 301.1338993432,
+        "adx14": 34.037556455557755,
+        "rsi14": 52.4931695155,
+        "zscore20": 0.7775941463957625
+      }
+    },
+    {
+      "symbol": "BTCUSD",
+      "source_open_utc": "2026-10-08T15:00:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58088150973,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 82616.5,
+        "h": 82616.5,
+        "l": 82079.3,
+        "c": 82081.6,
+        "ema20": 82436.8832076848,
+        "ema50": 82653.8968619414,
+        "ema200": 83618.7535919162,
+        "atr14": 318.0671922473,
+        "adx14": 33.961919797561805,
+        "rsi14": 40.8625672374,
+        "zscore20": -1.5498054362147882
+      }
+    },
+    {
+      "symbol": "BTCUSD",
+      "source_open_utc": "2026-10-08T15:15:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58089477966,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 82080.45,
+        "h": 82144.4,
+        "l": 81191.1,
+        "c": 81266.45,
+        "ema20": 82325.4133783814,
+        "ema50": 82599.4871810809,
+        "ema200": 83595.3475860265,
+        "atr14": 363.4409642296,
+        "adx14": 35.41385547034058,
+        "rsi14": 29.9811372797,
+        "zscore20": -3.4340214551681907
+      }
+    },
+    {
+      "symbol": "BTCUSD",
+      "source_open_utc": "2026-10-08T15:30:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58090594769,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 81267.4,
+        "h": 81447.9,
+        "l": 80868.4,
+        "c": 81139.3,
+        "ema20": 82212.450199488,
+        "ema50": 82542.2249386856,
+        "ema200": 83570.90930158844,
+        "atr14": 378.8737524989,
+        "adx14": 37.12334078924459,
+        "rsi14": 28.6974276266,
+        "zscore20": -2.820404387273147
+      }
+    },
+    {
+      "symbol": "BTCUSD",
+      "source_open_utc": "2026-10-08T15:45:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58091545530,
+      "webhook_http_code": null,
+      "source_conflicting_fields": [],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 81140.4,
+        "h": 81439.35,
+        "l": 80898.65,
+        "c": 80945.5,
+        "ema20": 82091.7882757272,
+        "ema50": 82479.6082744234,
+        "ema200": 83544.78582595076,
+        "atr14": 390.4327701776,
+        "adx14": 38.71072001394116,
+        "rsi14": 26.8129726702,
+        "zscore20": -2.5693971670667763
+      }
+    },
+    {
+      "symbol": "BTCUSD",
+      "source_open_utc": "2026-10-08T16:00:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58092711300,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 80942.45,
+        "h": 81184.85,
+        "l": 80715.25,
+        "c": 80929.85,
+        "ema20": 81981.1274875627,
+        "ema50": 82418.8334401323,
+        "ema200": 83518.76656400101,
+        "atr14": 396.0875723078,
+        "adx14": 40.38209080581428,
+        "rsi14": 26.6607217428,
+        "zscore20": -2.144426189471842
+      }
+    },
+    {
+      "symbol": "BTCUSD",
+      "source_open_utc": "2026-10-08T16:15:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58093858746,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 80930.1,
+        "h": 81351.3,
+        "l": 80843.75,
+        "c": 81214.2,
+        "ema20": 81908.0867744615,
+        "ema50": 82371.5929130683,
+        "ema200": 83495.83555341394,
+        "atr14": 404.0491742858,
+        "adx14": 41.212734633837066,
+        "rsi14": 33.9943617868,
+        "zscore20": -1.4379452279177682
+      }
+    },
+    {
+      "symbol": "BTCUSD",
+      "source_open_utc": "2026-10-08T16:30:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58094795876,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 81213.85,
+        "h": 81358.85,
+        "l": 81002.2,
+        "c": 81197.7,
+        "ema20": 81840.4308911795,
+        "ema50": 82325.5578968695,
+        "ema200": 83472.96853298196,
+        "atr14": 400.6635189796,
+        "adx14": 41.95110581627011,
+        "rsi14": 33.7832561358,
+        "zscore20": -1.31401341505526
+      }
+    },
+    {
+      "symbol": "BTCUSD",
+      "source_open_utc": "2026-10-08T16:45:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58095991567,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 81197.35,
+        "h": 81284.3,
+        "l": 80808.35,
+        "c": 80860.6,
+        "ema20": 81747.1136634481,
+        "ema50": 82268.1085675805,
+        "ema200": 83446.97481623587,
+        "atr14": 406.0411247668,
+        "adx14": 42.90457582742014,
+        "rsi14": 29.7222459223,
+        "zscore20": -1.6541316452164494
+      }
+    },
+    {
+      "symbol": "ETHUSD",
+      "source_open_utc": "2026-10-08T12:00:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": false,
+      "receipt_fire_id": null,
+      "webhook_http_code": null,
+      "source_conflicting_fields": null,
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 2534.39,
+        "h": 2535.95,
+        "l": 2527.16,
+        "c": 2533.67,
+        "ema20": 2550.8288872925527,
+        "ema50": 2559.971717256616,
+        "ema200": 2603.573984525498,
+        "atr14": 9.387614680027255,
+        "adx14": 33.27373662251385,
+        "rsi14": 29.725599725434776,
+        "zscore20": -1.7414406191568703
+      }
+    },
+    {
+      "symbol": "ETHUSD",
+      "source_open_utc": "2026-10-08T12:15:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": false,
+      "receipt_fire_id": null,
+      "webhook_http_code": null,
+      "source_conflicting_fields": null,
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 2533.68,
+        "h": 2536.27,
+        "l": 2529.25,
+        "c": 2533.69,
+        "ema20": 2549.1966123123093,
+        "ema50": 2558.9410616779255,
+        "ema200": 2602.8786214953934,
+        "atr14": 9.218499345739591,
+        "adx14": 34.89103683973668,
+        "rsi14": 29.75386136369511,
+        "zscore20": -1.5482547902771984
+      }
+    },
+    {
+      "symbol": "ETHUSD",
+      "source_open_utc": "2026-10-08T12:30:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": false,
+      "receipt_fire_id": null,
+      "webhook_http_code": null,
+      "source_conflicting_fields": null,
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 2533.7,
+        "h": 2533.72,
+        "l": 2527.14,
+        "c": 2530.09,
+        "ema20": 2547.3769349492322,
+        "ema50": 2557.8096474944773,
+        "ema200": 2602.154356604892,
+        "atr14": 9.030035106758186,
+        "adx14": 36.518138625570195,
+        "rsi14": 27.602075209759576,
+        "zscore20": -1.6338206107164976
+      }
+    },
+    {
+      "symbol": "ETHUSD",
+      "source_open_utc": "2026-10-08T12:45:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": false,
+      "receipt_fire_id": null,
+      "webhook_http_code": null,
+      "source_conflicting_fields": null,
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 2530.08,
+        "h": 2532.26,
+        "l": 2516.83,
+        "c": 2527.37,
+        "ema20": 2545.471512573115,
+        "ema50": 2556.615935828027,
+        "ema200": 2601.4102336536,
+        "atr14": 9.48717545627548,
+        "adx14": 38.55258680141994,
+        "rsi14": 26.06810701399037,
+        "zscore20": -1.6289426145897474
+      }
+    },
+    {
+      "symbol": "ETHUSD",
+      "source_open_utc": "2026-10-08T13:00:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58079553243,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 2527.38,
+        "h": 2535.84,
+        "l": 2521.9,
+        "c": 2533.42,
+        "ema20": 2544.3237494709,
+        "ema50": 2555.7062912857,
+        "ema200": 2600.733713915753,
+        "atr14": 9.8052343523,
+        "adx14": 39.724956333746945,
+        "rsi14": 34.7537386351,
+        "zscore20": -1.06692329907049
+      }
+    },
+    {
+      "symbol": "ETHUSD",
+      "source_open_utc": "2026-10-08T13:15:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58080224964,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [
+        "l",
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 2533.39,
+        "h": 2539.62,
+        "l": 2531.62,
+        "c": 2531.62,
+        "ema20": 2543.1138685689,
+        "ema50": 2554.7617308431,
+        "ema200": 2600.0455177573876,
+        "atr14": 9.6762890414,
+        "adx14": 40.09764185140026,
+        "rsi14": 33.4929989338,
+        "zscore20": -1.0915287829652591
+      }
+    },
+    {
+      "symbol": "ETHUSD",
+      "source_open_utc": "2026-10-08T13:30:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58081629111,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 2531.58,
+        "h": 2536.31,
+        "l": 2503.52,
+        "c": 2512.61,
+        "ema20": 2540.204429839,
+        "ema50": 2553.1068378996,
+        "ema200": 2599.171632008558,
+        "atr14": 11.3305847221,
+        "adx14": 41.78378818309517,
+        "rsi14": 23.7116560828,
+        "zscore20": -2.1280109819400232
+      }
+    },
+    {
+      "symbol": "ETHUSD",
+      "source_open_utc": "2026-10-08T13:45:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58082924558,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 2512.18,
+        "h": 2521.88,
+        "l": 2501.76,
+        "c": 2519.32,
+        "ema20": 2538.1818310788,
+        "ema50": 2551.767169516,
+        "ema200": 2598.3773869139454,
+        "atr14": 11.9584000991,
+        "adx14": 43.4078474690785,
+        "rsi14": 31.5629284133,
+        "zscore20": -1.4624755331434003
+      }
+    },
+    {
+      "symbol": "ETHUSD",
+      "source_open_utc": "2026-10-08T14:00:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58083943402,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 2519.37,
+        "h": 2532,
+        "l": 2514.93,
+        "c": 2530.4,
+        "ema20": 2537.4432893434,
+        "ema50": 2550.9303716342,
+        "ema200": 2597.696915402364,
+        "atr14": 12.3235143777,
+        "adx14": 43.47842633715861,
+        "rsi14": 41.7910115845,
+        "zscore20": -0.6891203201007536
+      }
+    },
+    {
+      "symbol": "ETHUSD",
+      "source_open_utc": "2026-10-08T14:15:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58085087807,
+      "webhook_http_code": null,
+      "source_conflicting_fields": [
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 2530.01,
+        "h": 2532.82,
+        "l": 2524.32,
+        "c": 2531.99,
+        "ema20": 2536.8885996554,
+        "ema50": 2550.1721640576,
+        "ema200": 2597.0430157466194,
+        "atr14": 12.0504062079,
+        "adx14": 43.43503516751247,
+        "rsi14": 43.1289811939,
+        "zscore20": -0.4798252307300098
+      }
+    },
+    {
+      "symbol": "ETHUSD",
+      "source_open_utc": "2026-10-08T14:30:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58086095073,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 2532.01,
+        "h": 2533.63,
+        "l": 2524.15,
+        "c": 2525.1,
+        "ema20": 2535.7650142007,
+        "ema50": 2549.1885651595,
+        "ema200": 2596.327264346156,
+        "atr14": 11.8668057645,
+        "adx14": 43.28136375300168,
+        "rsi14": 39.0167963094,
+        "zscore20": -0.8932592399399067
+      }
+    },
+    {
+      "symbol": "ETHUSD",
+      "source_open_utc": "2026-10-08T14:45:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58087059298,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 2525.13,
+        "h": 2532.11,
+        "l": 2524.32,
+        "c": 2528.95,
+        "ema20": 2535.1168269072,
+        "ema50": 2548.3952727158,
+        "ema200": 2595.6568438053982,
+        "atr14": 11.5756053527,
+        "adx14": 43.1386688680988,
+        "rsi14": 42.3222919228,
+        "zscore20": -0.5271303781707062
+      }
+    },
+    {
+      "symbol": "ETHUSD",
+      "source_open_utc": "2026-10-08T15:00:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58088154548,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [
+        "l",
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 2528.93,
+        "h": 2529.2,
+        "l": 2506.86,
+        "c": 2506.86,
+        "ema20": 2532.4257005351,
+        "ema50": 2546.7664384916,
+        "ema200": 2594.7699100361906,
+        "atr14": 12.3444906847,
+        "adx14": 43.93409417274614,
+        "rsi14": 31.6955079586,
+        "zscore20": -2.2814830058511455
+      }
+    },
+    {
+      "symbol": "ETHUSD",
+      "source_open_utc": "2026-10-08T15:15:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58089478832,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 2506.56,
+        "h": 2510.58,
+        "l": 2453.03,
+        "c": 2462.17,
+        "ema20": 2525.7053843843,
+        "ema50": 2543.4361206423,
+        "ema200": 2593.4563785930445,
+        "atr14": 15.599986248,
+        "adx14": 46.03193187948893,
+        "rsi14": 20.4915622777,
+        "zscore20": -3.611034273870066
+      }
+    },
+    {
+      "symbol": "ETHUSD",
+      "source_open_utc": "2026-10-08T15:30:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58090592790,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 2462.74,
+        "h": 2465.57,
+        "l": 2431.09,
+        "c": 2449.99,
+        "ema20": 2518.5452343976,
+        "ema50": 2539.7937968032,
+        "ema200": 2592.0307429851537,
+        "atr14": 16.9485586589,
+        "adx14": 48.276308902728715,
+        "rsi14": 18.5583868867,
+        "zscore20": -3.036932886303656
+      }
+    },
+    {
+      "symbol": "ETHUSD",
+      "source_open_utc": "2026-10-08T15:45:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58091556331,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 2450.2,
+        "h": 2456.34,
+        "l": 2426.62,
+        "c": 2432.58,
+        "ema20": 2510.374441099,
+        "ema50": 2535.5964929685,
+        "ema200": 2590.443471910675,
+        "atr14": 17.8608044689,
+        "adx14": 50.41348416240245,
+        "rsi14": 16.2105475249,
+        "zscore20": -2.798992360436213
+      }
+    },
+    {
+      "symbol": "ETHUSD",
+      "source_open_utc": "2026-10-08T16:00:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58092716067,
+      "webhook_http_code": null,
+      "source_conflicting_fields": [
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 2432.5,
+        "h": 2439.05,
+        "l": 2414.11,
+        "c": 2421.61,
+        "ema20": 2501.9146530578,
+        "ema50": 2531.1237969736,
+        "ema200": 2588.7638353742504,
+        "atr14": 18.3664612926,
+        "adx14": 52.53880343845687,
+        "rsi14": 14.9304116289,
+        "zscore20": -2.47264388628094
+      }
+    },
+    {
+      "symbol": "ETHUSD",
+      "source_open_utc": "2026-10-08T16:15:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58093864519,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 2421.65,
+        "h": 2438.07,
+        "l": 2416.53,
+        "c": 2426.4,
+        "ema20": 2494.725366372,
+        "ema50": 2527.0181117405,
+        "ema200": 2587.149866863064,
+        "atr14": 18.5931426288,
+        "adx14": 54.51231419479312,
+        "rsi14": 17.9629586687,
+        "zscore20": -1.9736036766849363
+      }
+    },
+    {
+      "symbol": "ETHUSD",
+      "source_open_utc": "2026-10-08T16:30:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58094796264,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 2426.54,
+        "h": 2434.93,
+        "l": 2419.42,
+        "c": 2427.37,
+        "ema20": 2488.3243564228,
+        "ema50": 2523.1163711032,
+        "ema200": 2585.5634005261177,
+        "atr14": 18.3729181553,
+        "adx14": 56.344859897105344,
+        "rsi14": 18.5916802487,
+        "zscore20": -1.6950746951076334
+      }
+    },
+    {
+      "symbol": "ETHUSD",
+      "source_open_utc": "2026-10-08T16:45:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58095994903,
+      "webhook_http_code": null,
+      "source_conflicting_fields": [
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 2427.7,
+        "h": 2429.97,
+        "l": 2408.43,
+        "c": 2411.6,
+        "ema20": 2481.0465719109,
+        "ema50": 2518.7559905371,
+        "ema200": 2583.8517248989924,
+        "atr14": 18.5991382871,
+        "adx14": 58.174349217507036,
+        "rsi14": 16.5262525488,
+        "zscore20": -1.7562133554713812
+      }
+    },
+    {
+      "symbol": "DOGEUSD",
+      "source_open_utc": "2026-10-08T12:00:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": false,
+      "receipt_fire_id": null,
+      "webhook_http_code": null,
+      "source_conflicting_fields": null,
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 0.0868694,
+        "h": 0.0869027,
+        "l": 0.0865501,
+        "c": 0.0866325,
+        "ema20": 0.08735419202408731,
+        "ema50": 0.08774127700053923,
+        "ema200": 0.08987536208249369,
+        "atr14": 0.0003884650706884376,
+        "adx14": 35.49068668371849,
+        "rsi14": 33.806437443676685,
+        "zscore20": -2.12868384733465
+      }
+    },
+    {
+      "symbol": "DOGEUSD",
+      "source_open_utc": "2026-10-08T12:15:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": false,
+      "receipt_fire_id": null,
+      "webhook_http_code": null,
+      "source_conflicting_fields": null,
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 0.0866368,
+        "h": 0.0869361,
+        "l": 0.0865925,
+        "c": 0.0867264,
+        "ema20": 0.08729440230750757,
+        "ema50": 0.08770147790247887,
+        "ema200": 0.08984402912644898,
+        "atr14": 0.0003852604227821206,
+        "adx14": 36.05524992749182,
+        "rsi14": 36.16877794855381,
+        "zscore20": -1.6517851268873547
+      }
+    },
+    {
+      "symbol": "DOGEUSD",
+      "source_open_utc": "2026-10-08T12:30:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": false,
+      "receipt_fire_id": null,
+      "webhook_http_code": null,
+      "source_conflicting_fields": null,
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 0.0867289,
+        "h": 0.0867306,
+        "l": 0.0864675,
+        "c": 0.0865638,
+        "ema20": 0.08722482113536399,
+        "ema50": 0.08765686308277382,
+        "ema200": 0.08981139003066343,
+        "atr14": 0.00037653467829768363,
+        "adx14": 36.790772682105036,
+        "rsi14": 33.911849214541306,
+        "zscore20": -1.7621639319767495
+      }
+    },
+    {
+      "symbol": "DOGEUSD",
+      "source_open_utc": "2026-10-08T12:45:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": false,
+      "receipt_fire_id": null,
+      "webhook_http_code": null,
+      "source_conflicting_fields": null,
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 0.086564,
+        "h": 0.0868705,
+        "l": 0.0861857,
+        "c": 0.0866552,
+        "ema20": 0.08717057150342455,
+        "ema50": 0.087617582177567,
+        "ema200": 0.08977998515473644,
+        "atr14": 0.000398553629847849,
+        "adx14": 37.90518052807143,
+        "rsi14": 36.31740322646414,
+        "zscore20": -1.399818645305258
+      }
+    },
+    {
+      "symbol": "DOGEUSD",
+      "source_open_utc": "2026-10-08T13:00:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58079547897,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 0.0866555,
+        "h": 0.0867256,
+        "l": 0.0862485,
+        "c": 0.086656,
+        "ema20": 0.0871215647,
+        "ema50": 0.0875798731,
+        "ema200": 0.08974880818802264,
+        "atr14": 0.0004041641,
+        "adx14": 38.93998781361166,
+        "rsi14": 36.3392451947,
+        "zscore20": -1.2740637638538557
+      }
+    },
+    {
+      "symbol": "DOGEUSD",
+      "source_open_utc": "2026-10-08T13:15:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58080242624,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 0.0866446,
+        "h": 0.0869568,
+        "l": 0.0866049,
+        "c": 0.0866804,
+        "ema20": 0.0870787476,
+        "ema50": 0.0875442492,
+        "ema200": 0.08971825188764432,
+        "atr14": 0.0004004309,
+        "adx14": 38.84761885203772,
+        "rsi14": 37.1600327418,
+        "zscore20": -1.0959071025812492
+      }
+    },
+    {
+      "symbol": "DOGEUSD",
+      "source_open_utc": "2026-10-08T13:30:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58081645472,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 0.0866776,
+        "h": 0.0868716,
+        "l": 0.085873,
+        "c": 0.0863388,
+        "ema20": 0.087008061,
+        "ema50": 0.0874968825,
+        "ema200": 0.08968459166985682,
+        "atr14": 0.0004431573,
+        "adx14": 39.86661047403614,
+        "rsi14": 31.8174248955,
+        "zscore20": -1.5548235041472733
+      }
+    },
+    {
+      "symbol": "DOGEUSD",
+      "source_open_utc": "2026-10-08T13:45:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58082922171,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 0.0863353,
+        "h": 0.0868419,
+        "l": 0.0861307,
+        "c": 0.0867376,
+        "ema20": 0.0869820099,
+        "ema50": 0.0874669786,
+        "ema200": 0.08965526836965924,
+        "atr14": 0.0004623032,
+        "adx14": 40.812816980177544,
+        "rsi14": 42.2426220263,
+        "zscore20": -0.740735191548341
+      }
+    },
+    {
+      "symbol": "DOGEUSD",
+      "source_open_utc": "2026-10-08T14:00:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58083945300,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 0.0867375,
+        "h": 0.0872058,
+        "l": 0.0866908,
+        "c": 0.0871563,
+        "ema20": 0.0869986089,
+        "ema50": 0.0874547951,
+        "ema200": 0.08963035127145368,
+        "atr14": 0.0004660673,
+        "adx14": 40.3228748990834,
+        "rsi14": 50.720988896,
+        "zscore20": 0.06769188359654708
+      }
+    },
+    {
+      "symbol": "DOGEUSD",
+      "source_open_utc": "2026-10-08T14:15:00Z",
+      "regime": "TREND",
+      "decision": "SHORT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58085100265,
+      "webhook_http_code": null,
+      "source_conflicting_fields": [
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 0.0871436,
+        "h": 0.087276,
+        "l": 0.0869063,
+        "c": 0.0871246,
+        "ema20": 0.08701016,
+        "ema50": 0.0874416504,
+        "ema200": 0.08960542041303125,
+        "atr14": 0.0004591839,
+        "adx14": 39.62549142645746,
+        "rsi14": 50.1285159172,
+        "zscore20": 0.08807436174703273
+      },
+      "outcome": {
+        "entry_open_utc": "2026-10-08T14:30:00.000Z",
+        "entry_price": 0.0871262,
+        "stop_price": 0.08781497585,
+        "target_price": 0.08574864830000001,
+        "status": "TARGET",
+        "gross_R": 2,
+        "net_r_by_bps": {
+          "1": 1.9873505727589027,
+          "2": 1.9747011455178052,
+          "3": 1.9620517182767079,
+          "5": 1.936752863794513
+        },
+        "observed_outcome_bars": 3,
+        "outcome_open_utc": "2026-10-08T15:00:00.000Z"
+      }
+    },
+    {
+      "symbol": "DOGEUSD",
+      "source_open_utc": "2026-10-08T14:30:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58086097132,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 0.0871262,
+        "h": 0.087234,
+        "l": 0.0866898,
+        "c": 0.0867273,
+        "ema20": 0.0869832382,
+        "ema50": 0.0874136442,
+        "ema200": 0.08957667493628468,
+        "atr14": 0.0004652565,
+        "adx14": 39.36293095414117,
+        "rsi14": 43.2053630106,
+        "zscore20": -0.6436615513845693
+      }
+    },
+    {
+      "symbol": "DOGEUSD",
+      "source_open_utc": "2026-10-08T14:45:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58087068839,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 0.0867194,
+        "h": 0.0869641,
+        "l": 0.0866425,
+        "c": 0.0868489,
+        "ema20": 0.0869695135,
+        "ema50": 0.0873910904,
+        "ema200": 0.08954953289711767,
+        "atr14": 0.0004549953,
+        "adx14": 39.201180460966484,
+        "rsi14": 45.7238012784,
+        "zscore20": -0.2660369921826509
+      }
+    },
+    {
+      "symbol": "DOGEUSD",
+      "source_open_utc": "2026-10-08T15:00:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58088153231,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 0.0868405,
+        "h": 0.0868981,
+        "l": 0.085584,
+        "c": 0.0855966,
+        "ema20": 0.0868387598,
+        "ema50": 0.0873207183,
+        "ema200": 0.08951020023147471,
+        "atr14": 0.0005163599,
+        "adx14": 40.406940139683506,
+        "rsi14": 30.9091701009,
+        "zscore20": -2.918738531439203
+      }
+    },
+    {
+      "symbol": "DOGEUSD",
+      "source_open_utc": "2026-10-08T15:15:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58089482738,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 0.0855972,
+        "h": 0.0857775,
+        "l": 0.0824798,
+        "c": 0.0831795,
+        "ema20": 0.0864902589,
+        "ema50": 0.0871583175,
+        "ema200": 0.08944720818937049,
+        "atr14": 0.0007150271,
+        "adx14": 43.057447265900805,
+        "rsi14": 18.4700868575,
+        "zscore20": -3.9327943128640452
+      }
+    },
+    {
+      "symbol": "DOGEUSD",
+      "source_open_utc": "2026-10-08T15:30:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58090592541,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 0.083177,
+        "h": 0.0837278,
+        "l": 0.0818369,
+        "c": 0.0831227,
+        "ema20": 0.086169539,
+        "ema50": 0.087000058,
+        "ema200": 0.08938427775962553,
+        "atr14": 0.000799018,
+        "adx14": 45.67628992107536,
+        "rsi14": 18.2838748551,
+        "zscore20": -2.887306440056932
+      }
+    },
+    {
+      "symbol": "DOGEUSD",
+      "source_open_utc": "2026-10-08T15:45:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58091552256,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 0.0831225,
+        "h": 0.0833205,
+        "l": 0.0822016,
+        "c": 0.0824444,
+        "ema20": 0.0858147638,
+        "ema50": 0.0868214048,
+        "ema200": 0.08931479439883323,
+        "atr14": 0.0008218667,
+        "adx14": 48.108072386594586,
+        "rsi14": 16.1853291466,
+        "zscore20": -2.656416372991399
+      }
+    },
+    {
+      "symbol": "DOGEUSD",
+      "source_open_utc": "2026-10-08T16:00:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58092710958,
+      "webhook_http_code": null,
+      "source_conflicting_fields": [
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 0.0824052,
+        "h": 0.0830967,
+        "l": 0.0819464,
+        "c": 0.0825532,
+        "ema20": 0.0855004163,
+        "ema50": 0.0866523965,
+        "ema200": 0.08924713375804882,
+        "atr14": 0.0008453262,
+        "adx14": 50.4287822917445,
+        "rsi14": 18.3140359061,
+        "zscore20": -2.12859566731918
+      }
+    },
+    {
+      "symbol": "DOGEUSD",
+      "source_open_utc": "2026-10-08T16:15:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58093866183,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 0.0825191,
+        "h": 0.0833596,
+        "l": 0.08245,
+        "c": 0.0828794,
+        "ema20": 0.0852474954,
+        "ema50": 0.0865029928,
+        "ema200": 0.08918373740224735,
+        "atr14": 0.0008499172,
+        "adx14": 51.993288433411394,
+        "rsi14": 23.109571965,
+        "zscore20": -1.6625948246410247
+      }
+    },
+    {
+      "symbol": "DOGEUSD",
+      "source_open_utc": "2026-10-08T16:30:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58094793494,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 0.0828813,
+        "h": 0.0831084,
+        "l": 0.0825758,
+        "c": 0.0827106,
+        "ema20": 0.0850055761,
+        "ema50": 0.0863541359,
+        "ema200": 0.0891194425027225,
+        "atr14": 0.0008272517,
+        "adx14": 53.44604413638779,
+        "rsi14": 22.350019302,
+        "zscore20": -1.544977808321666
+      }
+    },
+    {
+      "symbol": "DOGEUSD",
+      "source_open_utc": "2026-10-08T16:45:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58095992656,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 0.0827412,
+        "h": 0.0828438,
+        "l": 0.0818381,
+        "c": 0.0819013,
+        "ema20": 0.0847109217,
+        "ema50": 0.0861799482,
+        "ema200": 0.08904819332359093,
+        "atr14": 0.000839998,
+        "adx14": 55.05124279022454,
+        "rsi14": 19.2237187478,
+        "zscore20": -1.7113091577741786
+      }
+    },
+    {
+      "symbol": "EURUSD",
+      "source_open_utc": "2026-10-08T12:00:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": false,
+      "receipt_fire_id": null,
+      "webhook_http_code": null,
+      "source_conflicting_fields": null,
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 1.11766,
+        "h": 1.11879,
+        "l": 1.11766,
+        "c": 1.11863,
+        "ema20": 1.1185291280401763,
+        "ema50": 1.119147066527992,
+        "ema200": 1.1207810005020487,
+        "atr14": 0.0007090202695254551,
+        "adx14": 38.395534847548376,
+        "rsi14": 48.8231113594023,
+        "zscore20": 0.06282222303385365
+      }
+    },
+    {
+      "symbol": "EURUSD",
+      "source_open_utc": "2026-10-08T12:15:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": false,
+      "receipt_fire_id": null,
+      "webhook_http_code": null,
+      "source_conflicting_fields": null,
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 1.11864,
+        "h": 1.11991,
+        "l": 1.11849,
+        "c": 1.11957,
+        "ema20": 1.1186282587030167,
+        "ema50": 1.119163652154345,
+        "ema200": 1.1207689507458094,
+        "atr14": 0.0007598045359879209,
+        "adx14": 35.72024780788861,
+        "rsi14": 57.86797248426373,
+        "zscore20": 1.4523019795417622
+      }
+    },
+    {
+      "symbol": "EURUSD",
+      "source_open_utc": "2026-10-08T12:30:00Z",
+      "regime": "TREND",
+      "decision": "SHORT",
+      "original_receipt_available": false,
+      "receipt_fire_id": null,
+      "webhook_http_code": null,
+      "source_conflicting_fields": null,
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 1.11991,
+        "h": 1.12,
+        "l": 1.1186,
+        "c": 1.11863,
+        "ema20": 1.1186284245408247,
+        "ema50": 1.1191427246188808,
+        "ema200": 1.1207476676538113,
+        "atr14": 0.00080553278341736,
+        "adx14": 33.3764233399463,
+        "rsi14": 48.61496908971242,
+        "zscore20": 0.1281051836753382
+      },
+      "outcome": {
+        "entry_open_utc": "2026-10-08T12:45:00.000Z",
+        "entry_price": 1.11862,
+        "stop_price": 1.119828299175126,
+        "target_price": 1.116203401649748,
+        "status": "STOP",
+        "gross_R": -1,
+        "net_r_by_bps": {
+          "1": -1.0925780653523425,
+          "2": -1.185156130704685,
+          "3": -1.2777341960570272,
+          "5": -1.4628903267617122
+        },
+        "observed_outcome_bars": 5,
+        "outcome_open_utc": "2026-10-08T13:45:00.000Z"
+      }
+    },
+    {
+      "symbol": "EURUSD",
+      "source_open_utc": "2026-10-08T12:45:00Z",
+      "regime": "TREND",
+      "decision": "SHORT",
+      "original_receipt_available": false,
+      "receipt_fire_id": null,
+      "webhook_http_code": null,
+      "source_conflicting_fields": null,
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 1.11862,
+        "h": 1.11879,
+        "l": 1.11808,
+        "c": 1.11822,
+        "ema20": 1.118589526965508,
+        "ema50": 1.1191065393397088,
+        "ema200": 1.1207225167318828,
+        "atr14": 0.0007987090131732621,
+        "adx14": 31.592422170222594,
+        "rsi14": 45.218691840377396,
+        "zscore20": -0.42912203550072314
+      },
+      "outcome": {
+        "entry_open_utc": "2026-10-08T13:00:00.000Z",
+        "entry_price": 1.11824,
+        "stop_price": 1.1194380635197598,
+        "target_price": 1.11584387296048,
+        "status": "STOP",
+        "gross_R": -1,
+        "net_r_by_bps": {
+          "1": -1.093337288178519,
+          "2": -1.186674576357038,
+          "3": -1.2800118645355572,
+          "5": -1.4666864408925953
+        },
+        "observed_outcome_bars": 3,
+        "outcome_open_utc": "2026-10-08T13:30:00.000Z"
+      }
+    },
+    {
+      "symbol": "EURUSD",
+      "source_open_utc": "2026-10-08T13:00:00Z",
+      "regime": "NEUTRAL",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58079550688,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 1.11824,
+        "h": 1.11941,
+        "l": 1.11795,
+        "c": 1.11887,
+        "ema20": 1.1186162387,
+        "ema50": 1.1190972633,
+        "ema200": 1.1207040837295756,
+        "atr14": 0.0008459441,
+        "adx14": 29.693130871299612,
+        "rsi14": 51.0564100367,
+        "zscore20": 0.7991917216210973
+      }
+    },
+    {
+      "symbol": "EURUSD",
+      "source_open_utc": "2026-10-08T13:15:00Z",
+      "regime": "NEUTRAL",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58080224511,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 1.11886,
+        "h": 1.11914,
+        "l": 1.11851,
+        "c": 1.11908,
+        "ema20": 1.1186604064,
+        "ema50": 1.1190965863,
+        "ema200": 1.1206879236924656,
+        "atr14": 0.0008305195,
+        "adx14": 27.92950323658542,
+        "rsi14": 52.8062014598,
+        "zscore20": 1.3703275010533682
+      }
+    },
+    {
+      "symbol": "EURUSD",
+      "source_open_utc": "2026-10-08T13:30:00Z",
+      "regime": "NEUTRAL",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58081626550,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 1.11909,
+        "h": 1.11966,
+        "l": 1.11903,
+        "c": 1.11938,
+        "ema20": 1.1187289391,
+        "ema50": 1.1191077006,
+        "ema200": 1.1206749095263715,
+        "atr14": 0.0008161967,
+        "adx14": 27.02031222012992,
+        "rsi14": 55.2666190804,
+        "zscore20": 1.7889378951260257
+      }
+    },
+    {
+      "symbol": "EURUSD",
+      "source_open_utc": "2026-10-08T13:45:00Z",
+      "regime": "NEUTRAL",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58082913521,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 1.11937,
+        "h": 1.12004,
+        "l": 1.11926,
+        "c": 1.11949,
+        "ema20": 1.1188014211,
+        "ema50": 1.1191226927,
+        "ema200": 1.1206631193818306,
+        "atr14": 0.0008136112,
+        "adx14": 26.647938560925873,
+        "rsi14": 56.1689419452,
+        "zscore20": 1.8199223176280366
+      }
+    },
+    {
+      "symbol": "EURUSD",
+      "source_open_utc": "2026-10-08T14:00:00Z",
+      "regime": "NEUTRAL",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58083945184,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 1.11948,
+        "h": 1.12011,
+        "l": 1.11923,
+        "c": 1.12,
+        "ema20": 1.1189155715,
+        "ema50": 1.1191570969,
+        "ema200": 1.1206565211790263,
+        "atr14": 0.0008183533,
+        "adx14": 26.38716743076293,
+        "rsi14": 60.1794523071,
+        "zscore20": 2.218705588375478
+      }
+    },
+    {
+      "symbol": "EURUSD",
+      "source_open_utc": "2026-10-08T14:15:00Z",
+      "regime": "NEUTRAL",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58085092810,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 1.12001,
+        "h": 1.12168,
+        "l": 1.11997,
+        "c": 1.12167,
+        "ema20": 1.119177898,
+        "ema50": 1.1192556421,
+        "ema200": 1.1206666055454042,
+        "atr14": 0.0008820423,
+        "adx14": 27.62346592980074,
+        "rsi14": 69.8936472175,
+        "zscore20": 3.154635510670839
+      }
+    },
+    {
+      "symbol": "EURUSD",
+      "source_open_utc": "2026-10-08T14:30:00Z",
+      "regime": "NEUTRAL",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58086095580,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 1.12166,
+        "h": 1.12265,
+        "l": 1.12148,
+        "c": 1.12165,
+        "ema20": 1.1194133363,
+        "ema50": 1.1193495385,
+        "ema200": 1.1206759925549026,
+        "atr14": 0.0009026107,
+        "adx14": 29.38161390957303,
+        "rsi14": 69.6744317333,
+        "zscore20": 2.4310889763907277
+      }
+    },
+    {
+      "symbol": "EURUSD",
+      "source_open_utc": "2026-10-08T14:45:00Z",
+      "regime": "NEUTRAL",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58087058606,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 1.12159,
+        "h": 1.1217,
+        "l": 1.12073,
+        "c": 1.12076,
+        "ema20": 1.1195381433,
+        "ema50": 1.1194033436,
+        "ema200": 1.1206768284498787,
+        "atr14": 0.0009074242,
+        "adx14": 29.79454990969205,
+        "rsi14": 60.5957291801,
+        "zscore20": 1.4870052817996884
+      }
+    },
+    {
+      "symbol": "EURUSD",
+      "source_open_utc": "2026-10-08T15:00:00Z",
+      "regime": "NEUTRAL",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58088151263,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [
+        "l",
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 1.12075,
+        "h": 1.121,
+        "l": 1.12037,
+        "c": 1.12039,
+        "ema20": 1.1196192725,
+        "ema50": 1.119442036,
+        "ema200": 1.1206738749329646,
+        "atr14": 0.0008876082,
+        "adx14": 29.6212233219272,
+        "rsi14": 57.2454268637,
+        "zscore20": 1.0561057654227413
+      }
+    },
+    {
+      "symbol": "EURUSD",
+      "source_open_utc": "2026-10-08T15:15:00Z",
+      "regime": "NEUTRAL",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58089478256,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 1.12036,
+        "h": 1.12049,
+        "l": 1.11966,
+        "c": 1.11986,
+        "ema20": 1.1196413372,
+        "ema50": 1.11945805,
+        "ema200": 1.1206657766749253,
+        "atr14": 0.0008848199,
+        "adx14": 28.538297031062857,
+        "rsi14": 52.7522253328,
+        "zscore20": 0.5592506352805136
+      }
+    },
+    {
+      "symbol": "EURUSD",
+      "source_open_utc": "2026-10-08T15:30:00Z",
+      "regime": "NEUTRAL",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58090596045,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 1.11983,
+        "h": 1.11989,
+        "l": 1.11951,
+        "c": 1.11973,
+        "ema20": 1.1196497813,
+        "ema50": 1.1194687147,
+        "ema200": 1.1206564654642297,
+        "atr14": 0.0008487613,
+        "adx14": 27.343244374755766,
+        "rsi14": 51.6792997909,
+        "zscore20": 0.3916159975114627
+      }
+    },
+    {
+      "symbol": "EURUSD",
+      "source_open_utc": "2026-10-08T15:45:00Z",
+      "regime": "NEUTRAL",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58091545704,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 1.11974,
+        "h": 1.11978,
+        "l": 1.11888,
+        "c": 1.11906,
+        "ema20": 1.1195936117,
+        "ema50": 1.1194526867,
+        "ema200": 1.1206407792407052,
+        "atr14": 0.0008524212,
+        "adx14": 25.475819762880004,
+        "rsi14": 46.4371384559,
+        "zscore20": -0.19221991323832344
+      }
+    },
+    {
+      "symbol": "EURUSD",
+      "source_open_utc": "2026-10-08T16:00:00Z",
+      "regime": "NEUTRAL",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58092711803,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 1.11907,
+        "h": 1.11917,
+        "l": 1.11843,
+        "c": 1.11899,
+        "ema20": 1.1195378482,
+        "ema50": 1.1194352956,
+        "ema200": 1.1206243535766187,
+        "atr14": 0.0008443911,
+        "adx14": 24.062137684078174,
+        "rsi14": 45.902558708,
+        "zscore20": -0.3437121076776629
+      }
+    },
+    {
+      "symbol": "EURUSD",
+      "source_open_utc": "2026-10-08T16:15:00Z",
+      "regime": "NEUTRAL",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58093858949,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 1.11898,
+        "h": 1.12038,
+        "l": 1.11871,
+        "c": 1.11908,
+        "ema20": 1.1194942436,
+        "ema50": 1.1194213625,
+        "ema200": 1.1206089868743638,
+        "atr14": 0.0009033632,
+        "adx14": 23.179600976521574,
+        "rsi14": 46.7346048924,
+        "zscore20": -0.3398623381248043
+      }
+    },
+    {
+      "symbol": "EURUSD",
+      "source_open_utc": "2026-10-08T16:30:00Z",
+      "regime": "NEUTRAL",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58094796215,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 1.11909,
+        "h": 1.11946,
+        "l": 1.11853,
+        "c": 1.11942,
+        "ema20": 1.1194871728,
+        "ema50": 1.1194213091,
+        "ema200": 1.120596459641783,
+        "atr14": 0.0009052658,
+        "adx14": 22.15515937398566,
+        "rsi14": 49.8713403455,
+        "zscore20": -0.15436435865704942
+      }
+    },
+    {
+      "symbol": "EURUSD",
+      "source_open_utc": "2026-10-08T16:45:00Z",
+      "regime": "NEUTRAL",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58095991471,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 1.11936,
+        "h": 1.11981,
+        "l": 1.11921,
+        "c": 1.11952,
+        "ema20": 1.1194842674,
+        "ema50": 1.1194225418,
+        "ema200": 1.1205858481030588,
+        "atr14": 0.0008834611,
+        "adx14": 21.536245007998964,
+        "rsi14": 50.8342607263,
+        "zscore20": -0.07288065936135862
+      }
+    },
+    {
+      "symbol": "AUDUSD",
+      "source_open_utc": "2026-10-08T12:00:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": false,
+      "receipt_fire_id": null,
+      "webhook_http_code": null,
+      "source_conflicting_fields": null,
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 0.69371,
+        "h": 0.69448,
+        "l": 0.69366,
+        "c": 0.69436,
+        "ema20": 0.6947296876811571,
+        "ema50": 0.6952494122050039,
+        "ema200": 0.6960921912259765,
+        "atr14": 0.0004722106561544759,
+        "adx14": 31.09998643963626,
+        "rsi14": 41.57980860882879,
+        "zscore20": -0.8838547056394988
+      }
+    },
+    {
+      "symbol": "AUDUSD",
+      "source_open_utc": "2026-10-08T12:15:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": false,
+      "receipt_fire_id": null,
+      "webhook_http_code": null,
+      "source_conflicting_fields": null,
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 0.69438,
+        "h": 0.69482,
+        "l": 0.69412,
+        "c": 0.69474,
+        "ema20": 0.6947306698067611,
+        "ema50": 0.6952294352557881,
+        "ema200": 0.6960787365869121,
+        "atr14": 0.0004884813235720157,
+        "adx14": 30.250915788107474,
+        "rsi14": 47.81753805697786,
+        "zscore20": -0.2704458265331049
+      }
+    },
+    {
+      "symbol": "AUDUSD",
+      "source_open_utc": "2026-10-08T12:30:00Z",
+      "regime": "NEUTRAL",
+      "decision": "WAIT",
+      "original_receipt_available": false,
+      "receipt_fire_id": null,
+      "webhook_http_code": null,
+      "source_conflicting_fields": null,
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 0.69465,
+        "h": 0.69482,
+        "l": 0.69417,
+        "c": 0.69425,
+        "ema20": 0.6946848917299268,
+        "ema50": 0.6951910260300709,
+        "ema200": 0.6960605402029627,
+        "atr14": 0.0005000183718883031,
+        "adx14": 29.462493040259314,
+        "rsi14": 41.643021512862774,
+        "zscore20": -0.9120632740654029
+      }
+    },
+    {
+      "symbol": "AUDUSD",
+      "source_open_utc": "2026-10-08T12:45:00Z",
+      "regime": "NEUTRAL",
+      "decision": "WAIT",
+      "original_receipt_available": false,
+      "receipt_fire_id": null,
+      "webhook_http_code": null,
+      "source_conflicting_fields": null,
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 0.69424,
+        "h": 0.69443,
+        "l": 0.69411,
+        "c": 0.69418,
+        "ema20": 0.694636806803267,
+        "ema50": 0.6951513779504603,
+        "ema200": 0.6960418283601472,
+        "atr14": 0.0004871599167534235,
+        "adx14": 28.853853752880536,
+        "rsi14": 40.831870591010926,
+        "zscore20": -0.9247632743595383
+      }
+    },
+    {
+      "symbol": "AUDUSD",
+      "source_open_utc": "2026-10-08T13:00:00Z",
+      "regime": "NEUTRAL",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58079554057,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 0.69417,
+        "h": 0.69515,
+        "l": 0.69412,
+        "c": 0.69473,
+        "ema20": 0.6946456823,
+        "ema50": 0.6951348533,
+        "ema200": 0.6960287753416382,
+        "atr14": 0.0005259342,
+        "adx14": 27.168280800899343,
+        "rsi14": 49.2040388508,
+        "zscore20": -0.05774129189574673
+      }
+    },
+    {
+      "symbol": "AUDUSD",
+      "source_open_utc": "2026-10-08T13:15:00Z",
+      "regime": "NEUTRAL",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58080225123,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 0.69472,
+        "h": 0.69485,
+        "l": 0.69457,
+        "c": 0.69468,
+        "ema20": 0.6946489507,
+        "ema50": 0.6951170159,
+        "ema200": 0.6960151556864975,
+        "atr14": 0.0005083675,
+        "adx14": 25.603105916916807,
+        "rsi14": 48.5317314491,
+        "zscore20": -0.0725329747396365
+      }
+    },
+    {
+      "symbol": "AUDUSD",
+      "source_open_utc": "2026-10-08T13:30:00Z",
+      "regime": "NEUTRAL",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58081629446,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 0.69467,
+        "h": 0.69506,
+        "l": 0.69462,
+        "c": 0.69498,
+        "ema20": 0.6946787558,
+        "ema50": 0.6951108892,
+        "ema200": 0.6960048556299155,
+        "atr14": 0.0005034841,
+        "adx14": 24.61174103715795,
+        "rsi14": 52.6983082042,
+        "zscore20": 0.5861993087402932
+      }
+    },
+    {
+      "symbol": "AUDUSD",
+      "source_open_utc": "2026-10-08T13:45:00Z",
+      "regime": "NEUTRAL",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58082925547,
+      "webhook_http_code": null,
+      "source_conflicting_fields": [],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 0.69497,
+        "h": 0.69547,
+        "l": 0.69492,
+        "c": 0.69534,
+        "ema20": 0.6947417315,
+        "ema50": 0.6951198739,
+        "ema200": 0.695998240151011,
+        "atr14": 0.0005068067,
+        "adx14": 24.48266895809717,
+        "rsi14": 57.1448431264,
+        "zscore20": 1.2443768171961742
+      }
+    },
+    {
+      "symbol": "AUDUSD",
+      "source_open_utc": "2026-10-08T14:00:00Z",
+      "regime": "NEUTRAL",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58083943416,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 0.69535,
+        "h": 0.69581,
+        "l": 0.69514,
+        "c": 0.69577,
+        "ema20": 0.6948396618,
+        "ema50": 0.6951453691,
+        "ema200": 0.6959957700997571,
+        "atr14": 0.0005184633,
+        "adx14": 24.918623848051066,
+        "rsi14": 61.7678486132,
+        "zscore20": 1.8447480410542447
+      }
+    },
+    {
+      "symbol": "AUDUSD",
+      "source_open_utc": "2026-10-08T14:15:00Z",
+      "regime": "NEUTRAL",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58085091092,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 0.69574,
+        "h": 0.69699,
+        "l": 0.6957,
+        "c": 0.69695,
+        "ema20": 0.695038923,
+        "ema50": 0.6952153854,
+        "ema200": 0.6960052649246352,
+        "atr14": 0.0005735731,
+        "adx14": 26.68023427341765,
+        "rsi14": 71.0183960456,
+        "zscore20": 2.979263487837911
+      }
+    },
+    {
+      "symbol": "AUDUSD",
+      "source_open_utc": "2026-10-08T14:30:00Z",
+      "regime": "NEUTRAL",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58086095090,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 0.69694,
+        "h": 0.69729,
+        "l": 0.69668,
+        "c": 0.69669,
+        "ema20": 0.6951961685,
+        "ema50": 0.6952732134,
+        "ema200": 0.6960119787064797,
+        "atr14": 0.000576175,
+        "adx14": 28.567034324884624,
+        "rsi14": 67.1667732878,
+        "zscore20": 2.211533412934438
+      }
+    },
+    {
+      "symbol": "AUDUSD",
+      "source_open_utc": "2026-10-08T14:45:00Z",
+      "regime": "NEUTRAL",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58087059392,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 0.69666,
+        "h": 0.69683,
+        "l": 0.69621,
+        "c": 0.69621,
+        "ema20": 0.6952918622,
+        "ema50": 0.6953095733,
+        "ema200": 0.6960139490676093,
+        "atr14": 0.0005793054,
+        "adx14": 29.168391557271264,
+        "rsi14": 60.6381087739,
+        "zscore20": 1.4997504938776334
+      }
+    },
+    {
+      "symbol": "AUDUSD",
+      "source_open_utc": "2026-10-08T15:00:00Z",
+      "regime": "NEUTRAL",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58088154571,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 0.6962,
+        "h": 0.69638,
+        "l": 0.69587,
+        "c": 0.69587,
+        "ema20": 0.6953469229,
+        "ema50": 0.6953315509,
+        "ema200": 0.6960125167385783,
+        "atr14": 0.000574355,
+        "adx14": 28.985460941300264,
+        "rsi14": 56.4465425798,
+        "zscore20": 1.0426224741549646
+      }
+    },
+    {
+      "symbol": "AUDUSD",
+      "source_open_utc": "2026-10-08T15:15:00Z",
+      "regime": "NEUTRAL",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58089478836,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 0.69586,
+        "h": 0.69589,
+        "l": 0.69537,
+        "c": 0.6955,
+        "ema20": 0.6953615017,
+        "ema50": 0.6953381567,
+        "ema200": 0.6960070190595876,
+        "atr14": 0.0005704725,
+        "adx14": 27.8467424929922,
+        "rsi14": 52.2164892694,
+        "zscore20": 0.5625269191425516
+      }
+    },
+    {
+      "symbol": "AUDUSD",
+      "source_open_utc": "2026-10-08T15:30:00Z",
+      "regime": "NEUTRAL",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58090593278,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 0.69545,
+        "h": 0.69546,
+        "l": 0.69494,
+        "c": 0.69496,
+        "ema20": 0.6953198167,
+        "ema50": 0.6953218199,
+        "ema200": 0.6959967004619798,
+        "atr14": 0.0005668673,
+        "adx14": 26.060504275883773,
+        "rsi14": 46.7403642837,
+        "zscore20": 0.01622427702681989
+      }
+    },
+    {
+      "symbol": "AUDUSD",
+      "source_open_utc": "2026-10-08T15:45:00Z",
+      "regime": "NEUTRAL",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58091556538,
+      "webhook_http_code": null,
+      "source_conflicting_fields": [
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 0.69496,
+        "h": 0.69503,
+        "l": 0.69454,
+        "c": 0.6947,
+        "ema20": 0.6952616482,
+        "ema50": 0.6952978116,
+        "ema200": 0.695983996974796,
+        "atr14": 0.0005613768,
+        "adx14": 24.60539123520544,
+        "rsi14": 44.31129537,
+        "zscore20": -0.2630175435814611
+      }
+    },
+    {
+      "symbol": "AUDUSD",
+      "source_open_utc": "2026-10-08T16:00:00Z",
+      "regime": "NEUTRAL",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58092716116,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 0.69473,
+        "h": 0.69484,
+        "l": 0.6944,
+        "c": 0.69474,
+        "ema20": 0.6952136908,
+        "ema50": 0.6952766902,
+        "ema200": 0.6959716188954448,
+        "atr14": 0.000552707,
+        "adx14": 23.45840019249689,
+        "rsi14": 44.7269153061,
+        "zscore20": -0.29524430370619037
+      }
+    },
+    {
+      "symbol": "AUDUSD",
+      "source_open_utc": "2026-10-08T16:15:00Z",
+      "regime": "NEUTRAL",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58093864605,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 0.69475,
+        "h": 0.69583,
+        "l": 0.69461,
+        "c": 0.6952,
+        "ema20": 0.6952123869,
+        "ema50": 0.6952736827,
+        "ema200": 0.6959639410954901,
+        "atr14": 0.0006003708,
+        "adx14": 22.626307125562732,
+        "rsi14": 50.038370732,
+        "zscore20": 0.15263578104361483
+      }
+    },
+    {
+      "symbol": "AUDUSD",
+      "source_open_utc": "2026-10-08T16:30:00Z",
+      "regime": "NEUTRAL",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58094796243,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 0.69519,
+        "h": 0.6955,
+        "l": 0.69494,
+        "c": 0.69548,
+        "ema20": 0.6952378739,
+        "ema50": 0.6952817736,
+        "ema200": 0.6959586282487688,
+        "atr14": 0.0005974872,
+        "adx14": 21.8536492776953,
+        "rsi14": 52.9990499699,
+        "zscore20": 0.34815616816246775
+      }
+    },
+    {
+      "symbol": "AUDUSD",
+      "source_open_utc": "2026-10-08T16:45:00Z",
+      "regime": "NEUTRAL",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58095995478,
+      "webhook_http_code": null,
+      "source_conflicting_fields": [
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 0.69544,
+        "h": 0.6955,
+        "l": 0.69512,
+        "c": 0.69519,
+        "ema20": 0.6952290061,
+        "ema50": 0.6952762908,
+        "ema200": 0.6959513782164427,
+        "atr14": 0.0005819524,
+        "adx14": 21.136181276104114,
+        "rsi14": 49.7461185436,
+        "zscore20": 0.010080438013335741
+      }
+    },
+    {
+      "symbol": "USDZAR",
+      "source_open_utc": "2026-10-08T12:00:00Z",
+      "regime": "NEUTRAL",
+      "decision": "WAIT",
+      "original_receipt_available": false,
+      "receipt_fire_id": null,
+      "webhook_http_code": null,
+      "source_conflicting_fields": null,
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 16.67188,
+        "h": 16.67268,
+        "l": 16.64628,
+        "c": 16.65808,
+        "ema20": 16.670888736878233,
+        "ema50": 16.65711973983188,
+        "ema200": 16.62711586274861,
+        "atr14": 0.018958099000634342,
+        "adx14": 23.413890735344218,
+        "rsi14": 46.07561352988403,
+        "zscore20": -0.8511130231546845
+      }
+    },
+    {
+      "symbol": "USDZAR",
+      "source_open_utc": "2026-10-08T12:15:00Z",
+      "regime": "NEUTRAL",
+      "decision": "WAIT",
+      "original_receipt_available": false,
+      "receipt_fire_id": null,
+      "webhook_http_code": null,
+      "source_conflicting_fields": null,
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 16.65808,
+        "h": 16.67008,
+        "l": 16.59608,
+        "c": 16.63148,
+        "ema20": 16.667135523842212,
+        "ema50": 16.656114259838475,
+        "ema200": 16.62715928699987,
+        "atr14": 0.022889663357731755,
+        "adx14": 24.5308219348239,
+        "rsi14": 37.5523290003456,
+        "zscore20": -2.144109063040299
+      }
+    },
+    {
+      "symbol": "USDZAR",
+      "source_open_utc": "2026-10-08T12:30:00Z",
+      "regime": "NEUTRAL",
+      "decision": "WAIT",
+      "original_receipt_available": false,
+      "receipt_fire_id": null,
+      "webhook_http_code": null,
+      "source_conflicting_fields": null,
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 16.59548,
+        "h": 16.66968,
+        "l": 16.59548,
+        "c": 16.66908,
+        "ema20": 16.667320712047715,
+        "ema50": 16.656622720236967,
+        "ema200": 16.62757640852226,
+        "atr14": 0.026554687403608137,
+        "adx14": 25.58550078375364,
+        "rsi14": 51.2735195236884,
+        "zscore20": 0.03401302982831255
+      }
+    },
+    {
+      "symbol": "USDZAR",
+      "source_open_utc": "2026-10-08T12:45:00Z",
+      "regime": "NEUTRAL",
+      "decision": "WAIT",
+      "original_receipt_available": false,
+      "receipt_fire_id": null,
+      "webhook_http_code": null,
+      "source_conflicting_fields": null,
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 16.66908,
+        "h": 16.67408,
+        "l": 16.66128,
+        "c": 16.66788,
+        "ema20": 16.66737397756698,
+        "ema50": 16.65706418218846,
+        "ema200": 16.627977439283235,
+        "atr14": 0.025572209731921737,
+        "adx14": 26.258220279524345,
+        "rsi14": 50.88921158502596,
+        "zscore20": -0.0011658218977467147
+      }
+    },
+    {
+      "symbol": "USDZAR",
+      "source_open_utc": "2026-10-08T13:00:00Z",
+      "regime": "NEUTRAL",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58079551248,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 16.66768,
+        "h": 16.67188,
+        "l": 16.62048,
+        "c": 16.63788,
+        "ema20": 16.6645650273,
+        "ema50": 16.6563118613,
+        "ema200": 16.62807597222569,
+        "atr14": 0.0274170519,
+        "adx14": 27.97540317154522,
+        "rsi14": 42.3443277834,
+        "zscore20": -1.6434257125396292
+      }
+    },
+    {
+      "symbol": "USDZAR",
+      "source_open_utc": "2026-10-08T13:15:00Z",
+      "regime": "NEUTRAL",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58080228325,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 16.63828,
+        "h": 16.64448,
+        "l": 16.62908,
+        "c": 16.63228,
+        "ema20": 16.6614902628,
+        "ema50": 16.6553694354,
+        "ema200": 16.628117803347823,
+        "atr14": 0.026558691,
+        "adx14": 29.56993014270746,
+        "rsi14": 40.9616858725,
+        "zscore20": -1.8217668180145892
+      }
+    },
+    {
+      "symbol": "USDZAR",
+      "source_open_utc": "2026-10-08T13:30:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58081642030,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 16.63148,
+        "h": 16.63248,
+        "l": 16.61308,
+        "c": 16.62128,
+        "ema20": 16.657660714,
+        "ema50": 16.6540325948,
+        "ema200": 16.628049765503565,
+        "atr14": 0.026047356,
+        "adx14": 31.393784787219122,
+        "rsi14": 38.3151696028,
+        "zscore20": -2.0639750340271665
+      }
+    },
+    {
+      "symbol": "USDZAR",
+      "source_open_utc": "2026-10-08T13:45:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58082916631,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 16.62108,
+        "h": 16.62488,
+        "l": 16.60848,
+        "c": 16.61988,
+        "ema20": 16.6540625507,
+        "ema50": 16.6526932773,
+        "ema200": 16.627968474304524,
+        "atr14": 0.0253582591,
+        "adx14": 33.1805672551733,
+        "rsi14": 37.9788450811,
+        "zscore20": -1.8716352353670263
+      }
+    },
+    {
+      "symbol": "USDZAR",
+      "source_open_utc": "2026-10-08T14:00:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58083945322,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 16.62008,
+        "h": 16.62008,
+        "l": 16.60548,
+        "c": 16.61488,
+        "ema20": 16.6503308792,
+        "ema50": 16.6512104037,
+        "ema200": 16.627838240729357,
+        "atr14": 0.024589812,
+        "adx14": 34.902008868278564,
+        "rsi14": 36.7385184417,
+        "zscore20": -1.8128075832458688
+      }
+    },
+    {
+      "symbol": "USDZAR",
+      "source_open_utc": "2026-10-08T14:15:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58085121378,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 16.61508,
+        "h": 16.61708,
+        "l": 16.58288,
+        "c": 16.58328,
+        "ema20": 16.6439450812,
+        "ema50": 16.6485464663,
+        "ema200": 16.62739487514996,
+        "atr14": 0.025276254,
+        "adx14": 36.926554427792205,
+        "rsi14": 30.057421155,
+        "zscore20": -2.4339528185638875
+      }
+    },
+    {
+      "symbol": "USDZAR",
+      "source_open_utc": "2026-10-08T14:30:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58086093982,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 16.58348,
+        "h": 16.60388,
+        "l": 16.56308,
+        "c": 16.60048,
+        "ema20": 16.6398055497,
+        "ema50": 16.6466615069,
+        "ema200": 16.62713104554648,
+        "atr14": 0.026385093,
+        "adx14": 39.11209038287088,
+        "rsi14": 36.7949969179,
+        "zscore20": -1.626865970955741
+      }
+    },
+    {
+      "symbol": "USDZAR",
+      "source_open_utc": "2026-10-08T14:45:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58087085681,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 16.60108,
+        "h": 16.62608,
+        "l": 16.59368,
+        "c": 16.62428,
+        "ema20": 16.638361393,
+        "ema50": 16.6457988718,
+        "ema200": 16.627100686884326,
+        "atr14": 0.0268147292,
+        "adx14": 39.66690001298975,
+        "rsi14": 44.7206724762,
+        "zscore20": -0.8361484901134735
+      }
+    },
+    {
+      "symbol": "USDZAR",
+      "source_open_utc": "2026-10-08T15:00:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58088149872,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [
+        "h",
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 16.62428,
+        "h": 16.63368,
+        "l": 16.61208,
+        "c": 16.63268,
+        "ema20": 16.6378030744,
+        "ema50": 16.6452768707,
+        "ema200": 16.627164162636724,
+        "atr14": 0.0264422486,
+        "adx14": 39.714672059942586,
+        "rsi14": 47.242501756,
+        "zscore20": -0.4861570927351658
+      }
+    },
+    {
+      "symbol": "USDZAR",
+      "source_open_utc": "2026-10-08T15:15:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58089495220,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 16.63348,
+        "h": 16.65708,
+        "l": 16.63248,
+        "c": 16.64968,
+        "ema20": 16.6390031444,
+        "ema50": 16.6454796847,
+        "ema200": 16.627384220719943,
+        "atr14": 0.0263239247,
+        "adx14": 38.50719618432821,
+        "rsi14": 51.9917302345,
+        "zscore20": 0.06306368491182196
+      }
+    },
+    {
+      "symbol": "USDZAR",
+      "source_open_utc": "2026-10-08T15:30:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58090592218,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 16.64928,
+        "h": 16.66048,
+        "l": 16.64848,
+        "c": 16.65708,
+        "ema20": 16.6406902826,
+        "ema50": 16.6459195279,
+        "ema200": 16.627673730961536,
+        "atr14": 0.0253007872,
+        "adx14": 37.216413080327136,
+        "rsi14": 53.9491322291,
+        "zscore20": 0.36250074016955774
+      }
+    },
+    {
+      "symbol": "USDZAR",
+      "source_open_utc": "2026-10-08T15:45:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58091562971,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 16.65648,
+        "h": 16.66808,
+        "l": 16.65168,
+        "c": 16.65528,
+        "ema20": 16.6420280788,
+        "ema50": 16.6462639985,
+        "ema200": 16.627948420205698,
+        "atr14": 0.0246650167,
+        "adx14": 35.63535355010135,
+        "rsi14": 53.4168464656,
+        "zscore20": 0.3868816108717321
+      }
+    },
+    {
+      "symbol": "USDZAR",
+      "source_open_utc": "2026-10-08T16:00:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58092714512,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 16.65548,
+        "h": 16.66368,
+        "l": 16.63868,
+        "c": 16.63908,
+        "ema20": 16.6417473094,
+        "ema50": 16.6459822731,
+        "ema200": 16.628059182193702,
+        "atr14": 0.0246889441,
+        "adx14": 34.62639843666222,
+        "rsi14": 48.4405627182,
+        "zscore20": -0.08619532507100962
+      }
+    },
+    {
+      "symbol": "USDZAR",
+      "source_open_utc": "2026-10-08T16:15:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58093872373,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 16.63768,
+        "h": 16.64388,
+        "l": 16.59528,
+        "c": 16.61808,
+        "ema20": 16.6394932799,
+        "ema50": 16.6448880663,
+        "ema200": 16.627959886848494,
+        "atr14": 0.0263968767,
+        "adx14": 34.888942265163095,
+        "rsi14": 42.8657954512,
+        "zscore20": -0.8221278586704323
+      }
+    },
+    {
+      "symbol": "USDZAR",
+      "source_open_utc": "2026-10-08T16:30:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58094795103,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 16.61828,
+        "h": 16.62808,
+        "l": 16.60948,
+        "c": 16.61648,
+        "ema20": 16.637301539,
+        "ema50": 16.6437740245,
+        "ema200": 16.62784565911866,
+        "atr14": 0.0258399569,
+        "adx14": 35.13273296305676,
+        "rsi14": 42.4648067962,
+        "zscore20": -0.8040444622119413
+      }
+    },
+    {
+      "symbol": "USDZAR",
+      "source_open_utc": "2026-10-08T16:45:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58096008334,
+      "webhook_http_code": null,
+      "source_conflicting_fields": [
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 16.61648,
+        "h": 16.62748,
+        "l": 16.61028,
+        "c": 16.61888,
+        "ema20": 16.6355471067,
+        "ema50": 16.6427977882,
+        "ema200": 16.627756448580165,
+        "atr14": 0.0252228171,
+        "adx14": 35.35911003967231,
+        "rsi14": 43.321286595,
+        "zscore20": -0.6225448425917354
+      }
+    },
+    {
+      "symbol": "XAUUSD",
+      "source_open_utc": "2026-10-08T12:00:00Z",
+      "regime": "RANGE",
+      "decision": "WAIT",
+      "original_receipt_available": false,
+      "receipt_fire_id": null,
+      "webhook_http_code": null,
+      "source_conflicting_fields": null,
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 4124.4,
+        "h": 4127.73,
+        "l": 4122.47,
+        "c": 4124.09,
+        "ema20": 4122.676735058298,
+        "ema50": 4122.405560268549,
+        "ema200": 4129.141369295285,
+        "atr14": 6.945855567650794,
+        "adx14": 12.93160361364269,
+        "rsi14": 51.48266094730165,
+        "zscore20": 0.4386103215031452
+      }
+    },
+    {
+      "symbol": "XAUUSD",
+      "source_open_utc": "2026-10-08T12:15:00Z",
+      "regime": "RANGE",
+      "decision": "WAIT",
+      "original_receipt_available": false,
+      "receipt_fire_id": null,
+      "webhook_http_code": null,
+      "source_conflicting_fields": null,
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 4124.14,
+        "h": 4131.85,
+        "l": 4121.17,
+        "c": 4131.27,
+        "ema20": 4123.495141243222,
+        "ema50": 4122.753185356058,
+        "ema200": 4129.162549700307,
+        "atr14": 7.212580169961472,
+        "adx14": 13.146015749057751,
+        "rsi14": 58.70057954961611,
+        "zscore20": 2.1416906568215754
+      }
+    },
+    {
+      "symbol": "XAUUSD",
+      "source_open_utc": "2026-10-08T12:30:00Z",
+      "regime": "RANGE",
+      "decision": "WAIT",
+      "original_receipt_available": false,
+      "receipt_fire_id": null,
+      "webhook_http_code": null,
+      "source_conflicting_fields": null,
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 4131.25,
+        "h": 4131.29,
+        "l": 4118.11,
+        "c": 4119.18,
+        "ema20": 4123.084175410534,
+        "ema50": 4122.613060440134,
+        "ema200": 4129.063220847568,
+        "atr14": 7.6388244435356745,
+        "adx14": 12.713813915420134,
+        "rsi14": 46.22912248115993,
+        "zscore20": -0.9570726851956634
+      }
+    },
+    {
+      "symbol": "XAUUSD",
+      "source_open_utc": "2026-10-08T12:45:00Z",
+      "regime": "RANGE",
+      "decision": "WAIT",
+      "original_receipt_available": false,
+      "receipt_fire_id": null,
+      "webhook_http_code": null,
+      "source_conflicting_fields": null,
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 4119.11,
+        "h": 4119.43,
+        "l": 4113.05,
+        "c": 4118.57,
+        "ema20": 4122.654253942864,
+        "ema50": 4122.454509050325,
+        "ema200": 4128.958810689881,
+        "atr14": 7.548908411854563,
+        "adx14": 12.21325953063484,
+        "rsi14": 45.701535804827664,
+        "zscore20": -1.0765115739282065
+      }
+    },
+    {
+      "symbol": "XAUUSD",
+      "source_open_utc": "2026-10-08T13:00:00Z",
+      "regime": "RANGE",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58079550494,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 4118.56,
+        "h": 4129.03,
+        "l": 4115.27,
+        "c": 4126.18,
+        "ema20": 4122.9900392816,
+        "ema50": 4122.6006067352,
+        "ema200": 4128.932951877046,
+        "atr14": 7.992557811,
+        "adx14": 12.415352198768153,
+        "rsi14": 52.9201343487,
+        "zscore20": 0.946300992612885
+      }
+    },
+    {
+      "symbol": "XAUUSD",
+      "source_open_utc": "2026-10-08T13:15:00Z",
+      "regime": "RANGE",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58080242023,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 4126.28,
+        "h": 4127.16,
+        "l": 4120.07,
+        "c": 4123.25,
+        "ema20": 4123.0303076494,
+        "ema50": 4122.6328551447,
+        "ema200": 4128.8757085747875,
+        "atr14": 7.9280893959,
+        "adx14": 12.603009676320514,
+        "rsi14": 50.1430684227,
+        "zscore20": 0.18543713014400376
+      }
+    },
+    {
+      "symbol": "XAUUSD",
+      "source_open_utc": "2026-10-08T13:30:00Z",
+      "regime": "RANGE",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58081639741,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 4123.19,
+        "h": 4129.74,
+        "l": 4120,
+        "c": 4125.51,
+        "ema20": 4123.2604370796,
+        "ema50": 4122.7430469076,
+        "ema200": 4128.842218937228,
+        "atr14": 8.0575115819,
+        "adx14": 13.127120771276195,
+        "rsi14": 52.2036021556,
+        "zscore20": 0.792394406645365
+      }
+    },
+    {
+      "symbol": "XAUUSD",
+      "source_open_utc": "2026-10-08T13:45:00Z",
+      "regime": "RANGE",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58082924974,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 4125.43,
+        "h": 4133.62,
+        "l": 4123.68,
+        "c": 4129.8,
+        "ema20": 4123.8832525958,
+        "ema50": 4123.0197901661,
+        "ema200": 4128.851749097056,
+        "atr14": 8.1919750404,
+        "adx14": 14.102145671092398,
+        "rsi14": 55.920148939,
+        "zscore20": 1.7822532112666238
+      }
+    },
+    {
+      "symbol": "XAUUSD",
+      "source_open_utc": "2026-10-08T14:00:00Z",
+      "regime": "RANGE",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58083949478,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 4129.76,
+        "h": 4129.91,
+        "l": 4121.66,
+        "c": 4123.47,
+        "ema20": 4123.8438952057,
+        "ema50": 4123.0374454537,
+        "ema200": 4128.796209305046,
+        "atr14": 8.1961196803,
+        "adx14": 14.593760763071824,
+        "rsi14": 49.7705350695,
+        "zscore20": 0.15447765730929294
+      }
+    },
+    {
+      "symbol": "XAUUSD",
+      "source_open_utc": "2026-10-08T14:15:00Z",
+      "regime": "RANGE",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58085112803,
+      "webhook_http_code": null,
+      "source_conflicting_fields": [
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 4123.28,
+        "h": 4137.13,
+        "l": 4122.53,
+        "c": 4137.02,
+        "ema20": 4125.0815287689,
+        "ema50": 4123.5782453629,
+        "ema200": 4128.877142545793,
+        "atr14": 8.6535397032,
+        "adx14": 15.89443288844667,
+        "rsi14": 59.8828009931,
+        "zscore20": 2.725132248666018
+      }
+    },
+    {
+      "symbol": "XAUUSD",
+      "source_open_utc": "2026-10-08T14:30:00Z",
+      "regime": "RANGE",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58086092025,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 4136.85,
+        "h": 4140.26,
+        "l": 4124.97,
+        "c": 4126.08,
+        "ema20": 4125.1688661651,
+        "ema50": 4123.6729623844,
+        "ema200": 4128.850404809019,
+        "atr14": 9.1275725815,
+        "adx14": 17.41548964060541,
+        "rsi14": 50.977709718,
+        "zscore20": 0.5172946715396991
+      }
+    },
+    {
+      "symbol": "XAUUSD",
+      "source_open_utc": "2026-10-08T14:45:00Z",
+      "regime": "RANGE",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58087088375,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 4126.27,
+        "h": 4127.71,
+        "l": 4121.99,
+        "c": 4124.24,
+        "ema20": 4125.0898811788,
+        "ema50": 4123.6993437134,
+        "ema200": 4128.803137099477,
+        "atr14": 8.88417454,
+        "adx14": 18.213231534759046,
+        "rsi14": 49.6309897171,
+        "zscore20": 0.08920516704708803
+      }
+    },
+    {
+      "symbol": "XAUUSD",
+      "source_open_utc": "2026-10-08T15:00:00Z",
+      "regime": "RANGE",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58088154400,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 4124.14,
+        "h": 4124.33,
+        "l": 4115.11,
+        "c": 4115.44,
+        "ema20": 4124.158781384,
+        "ema50": 4123.3701729872,
+        "ema200": 4128.670071058686,
+        "atr14": 8.9081620728,
+        "adx14": 17.714846746980427,
+        "rsi14": 43.7149372741,
+        "zscore20": -1.48822174524527
+      }
+    },
+    {
+      "symbol": "XAUUSD",
+      "source_open_utc": "2026-10-08T15:15:00Z",
+      "regime": "RANGE",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58089486242,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 4115.41,
+        "h": 4117.29,
+        "l": 4112.79,
+        "c": 4115.97,
+        "ema20": 4123.3780357647,
+        "ema50": 4123.0795933468,
+        "ema200": 4128.54738378447,
+        "atr14": 8.5932933534,
+        "adx14": 16.880960488113853,
+        "rsi14": 44.1494000688,
+        "zscore20": -1.3006059722655472
+      }
+    },
+    {
+      "symbol": "XAUUSD",
+      "source_open_utc": "2026-10-08T15:30:00Z",
+      "regime": "RANGE",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58090588516,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 4116.22,
+        "h": 4118.2,
+        "l": 4112.55,
+        "c": 4116.23,
+        "ema20": 4122.7291525399,
+        "ema50": 4122.824922635,
+        "ema200": 4128.424424741839,
+        "atr14": 8.3830581138,
+        "adx14": 16.23648718778742,
+        "rsi14": 44.3714450792,
+        "zscore20": -1.3585656152340018
+      }
+    },
+    {
+      "symbol": "XAUUSD",
+      "source_open_utc": "2026-10-08T15:45:00Z",
+      "regime": "RANGE",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58091560569,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 4116.13,
+        "h": 4117.08,
+        "l": 4110.53,
+        "c": 4111.64,
+        "ema20": 4121.6695960622,
+        "ema50": 4122.3847911053,
+        "ema200": 4128.258510067792,
+        "atr14": 8.2521253914,
+        "adx14": 15.297473105458595,
+        "rsi14": 41.2169499882,
+        "zscore20": -1.9026867198751523
+      }
+    },
+    {
+      "symbol": "XAUUSD",
+      "source_open_utc": "2026-10-08T16:00:00Z",
+      "regime": "RANGE",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58092712475,
+      "webhook_http_code": null,
+      "source_conflicting_fields": [
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 4111.76,
+        "h": 4112.85,
+        "l": 4105.17,
+        "c": 4111.87,
+        "ema20": 4120.7457796572,
+        "ema50": 4121.9765909159,
+        "ema200": 4128.095241310898,
+        "atr14": 8.211259292,
+        "adx14": 14.809930507529472,
+        "rsi14": 41.4048952013,
+        "zscore20": -1.719392269457743
+      }
+    },
+    {
+      "symbol": "XAUUSD",
+      "source_open_utc": "2026-10-08T16:15:00Z",
+      "regime": "RANGE",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58093880095,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 4111.75,
+        "h": 4132.55,
+        "l": 4109.02,
+        "c": 4117.6,
+        "ema20": 4120.4444582386,
+        "ema50": 4121.8042063433,
+        "ema200": 4127.990214034173,
+        "atr14": 9.3054550569,
+        "adx14": 15.5290042410525,
+        "rsi14": 46.8760295026,
+        "zscore20": -0.7439397795233852
+      }
+    },
+    {
+      "symbol": "XAUUSD",
+      "source_open_utc": "2026-10-08T16:30:00Z",
+      "regime": "RANGE",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58094795034,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 4117.47,
+        "h": 4122.38,
+        "l": 4114.96,
+        "c": 4119.08,
+        "ema20": 4120.3093397669,
+        "ema50": 4121.695114053,
+        "ema200": 4127.901953198012,
+        "atr14": 9.1707796957,
+        "adx14": 16.19671556503817,
+        "rsi14": 48.2243129944,
+        "zscore20": -0.46380024869627257
+      }
+    },
+    {
+      "symbol": "XAUUSD",
+      "source_open_utc": "2026-10-08T16:45:00Z",
+      "regime": "RANGE",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58096021515,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 4119.13,
+        "h": 4126.04,
+        "l": 4116.47,
+        "c": 4123.7,
+        "ema20": 4120.6357065011,
+        "ema50": 4121.7752441439,
+        "ema200": 4127.86014271843,
+        "atr14": 9.1992954317,
+        "adx14": 17.150110674330254,
+        "rsi14": 52.2814391775,
+        "zscore20": 0.2661722612001255
+      }
+    },
+    {
+      "symbol": "XAGUSD",
+      "source_open_utc": "2026-10-08T12:00:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": false,
+      "receipt_fire_id": null,
+      "webhook_http_code": null,
+      "source_conflicting_fields": null,
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 58.752,
+        "h": 58.971,
+        "l": 58.716,
+        "c": 58.872,
+        "ema20": 58.925762138845855,
+        "ema50": 59.27013693190018,
+        "ema200": 60.055610633984195,
+        "atr14": 0.21777546670446601,
+        "adx14": 44.28356466029426,
+        "rsi14": 44.74816761158405,
+        "zscore20": 0.08708110490597369
+      }
+    },
+    {
+      "symbol": "XAGUSD",
+      "source_open_utc": "2026-10-08T12:15:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": false,
+      "receipt_fire_id": null,
+      "webhook_http_code": null,
+      "source_conflicting_fields": null,
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 58.875,
+        "h": 59.005,
+        "l": 58.782,
+        "c": 58.937,
+        "ema20": 58.926832411336726,
+        "ema50": 59.25707273849234,
+        "ema200": 60.0444801799147,
+        "atr14": 0.21814864765414746,
+        "adx14": 42.38314345850335,
+        "rsi14": 47.17945033755967,
+        "zscore20": 0.7726464993043083
+      }
+    },
+    {
+      "symbol": "XAGUSD",
+      "source_open_utc": "2026-10-08T12:30:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": false,
+      "receipt_fire_id": null,
+      "webhook_http_code": null,
+      "source_conflicting_fields": null,
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 58.94,
+        "h": 58.94,
+        "l": 58.734,
+        "c": 58.746,
+        "ema20": 58.90961027692371,
+        "ema50": 59.23703067031617,
+        "ema200": 60.03155997911953,
+        "atr14": 0.21728088710742235,
+        "adx14": 40.890817115945254,
+        "rsi14": 41.41274814414705,
+        "zscore20": -0.9126650547535823
+      }
+    },
+    {
+      "symbol": "XAGUSD",
+      "source_open_utc": "2026-10-08T12:45:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": false,
+      "receipt_fire_id": null,
+      "webhook_http_code": null,
+      "source_conflicting_fields": null,
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 58.745,
+        "h": 58.906,
+        "l": 58.669,
+        "c": 58.887,
+        "ema20": 58.907456917216685,
+        "ema50": 59.2233039773626,
+        "ema200": 60.02017132261088,
+        "atr14": 0.21868939517117805,
+        "adx14": 39.85990116266408,
+        "rsi14": 46.601622308457316,
+        "zscore20": 0.340403854145152
+      }
+    },
+    {
+      "symbol": "XAGUSD",
+      "source_open_utc": "2026-10-08T13:00:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58079552787,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 58.889,
+        "h": 59.082,
+        "l": 58.81,
+        "c": 58.992,
+        "ema20": 58.9155086394,
+        "ema50": 59.2142332332,
+        "ema200": 60.00991091144062,
+        "atr14": 0.2224972955,
+        "adx14": 37.49567838814702,
+        "rsi14": 50.1428384198,
+        "zscore20": 1.3545781395045067
+      }
+    },
+    {
+      "symbol": "XAGUSD",
+      "source_open_utc": "2026-10-08T13:15:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58080232863,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 58.984,
+        "h": 59.188,
+        "l": 58.946,
+        "c": 59.052,
+        "ema20": 58.9282493132,
+        "ema50": 59.2077581121,
+        "ema200": 60.00033965859047,
+        "atr14": 0.2238903458,
+        "adx14": 35.0342192368347,
+        "rsi14": 52.1044562482,
+        "zscore20": 1.807536340449449
+      }
+    },
+    {
+      "symbol": "XAGUSD",
+      "source_open_utc": "2026-10-08T13:30:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58081643549,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 59.051,
+        "h": 59.235,
+        "l": 59.027,
+        "c": 59.196,
+        "ema20": 58.9534047074,
+        "ema50": 59.2071462984,
+        "ema200": 59.99242583114181,
+        "atr14": 0.2227553211,
+        "adx14": 33.03930051970552,
+        "rsi14": 56.5190832961,
+        "zscore20": 2.6220602373525543
+      }
+    },
+    {
+      "symbol": "XAGUSD",
+      "source_open_utc": "2026-10-08T13:45:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58082928890,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 59.204,
+        "h": 59.328,
+        "l": 59.134,
+        "c": 59.239,
+        "ema20": 58.9813797693,
+        "ema50": 59.2087345635,
+        "ema200": 59.98486935521005,
+        "atr14": 0.2207013696,
+        "adx14": 31.731652756201235,
+        "rsi14": 57.7502340255,
+        "zscore20": 2.3342426118942052
+      }
+    },
+    {
+      "symbol": "XAGUSD",
+      "source_open_utc": "2026-10-08T14:00:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58083947342,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 59.23,
+        "h": 59.24,
+        "l": 59.074,
+        "c": 59.074,
+        "ema20": 58.9896837368,
+        "ema50": 59.2032247883,
+        "ema200": 59.975875630282594,
+        "atr14": 0.2167941289,
+        "adx14": 30.075152824503196,
+        "rsi14": 51.6448312105,
+        "zscore20": 1.2246768758672755
+      }
+    },
+    {
+      "symbol": "XAGUSD",
+      "source_open_utc": "2026-10-08T14:15:00Z",
+      "regime": "NEUTRAL",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58085123881,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 59.082,
+        "h": 59.392,
+        "l": 59.055,
+        "c": 59.392,
+        "ema20": 59.028602746,
+        "ema50": 59.2108914825,
+        "ema200": 59.96993656928476,
+        "atr14": 0.2253802626,
+        "adx14": 29.375358219268144,
+        "rsi14": 60.4966457112,
+        "zscore20": 2.4529490048045357
+      }
+    },
+    {
+      "symbol": "XAGUSD",
+      "source_open_utc": "2026-10-08T14:30:00Z",
+      "regime": "NEUTRAL",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58086094591,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 59.378,
+        "h": 59.385,
+        "l": 58.988,
+        "c": 59.028,
+        "ema20": 59.0274251602,
+        "ema50": 59.2032294559,
+        "ema200": 59.960603867102826,
+        "atr14": 0.2376388153,
+        "adx14": 28.232222420851166,
+        "rsi14": 49.3724299376,
+        "zscore20": 0.5882440317567319
+      }
+    },
+    {
+      "symbol": "XAGUSD",
+      "source_open_utc": "2026-10-08T14:45:00Z",
+      "regime": "NEUTRAL",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58087085832,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 59.029,
+        "h": 59.046,
+        "l": 58.918,
+        "c": 58.96,
+        "ema20": 59.0213483876,
+        "ema50": 59.1938417571,
+        "ema200": 59.95064760971872,
+        "atr14": 0.2298074713,
+        "adx14": 26.679299499126426,
+        "rsi14": 47.5796711461,
+        "zscore20": 0.20047465896070035
+      }
+    },
+    {
+      "symbol": "XAGUSD",
+      "source_open_utc": "2026-10-08T15:00:00Z",
+      "regime": "NEUTRAL",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58088151208,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 58.959,
+        "h": 58.965,
+        "l": 58.801,
+        "c": 58.821,
+        "ema20": 59.0022675888,
+        "ema50": 59.1792205117,
+        "ema200": 59.93940733499515,
+        "atr14": 0.2251069376,
+        "adx14": 25.059052323505284,
+        "rsi14": 44.0716193722,
+        "zscore20": -0.5112918050085611
+      }
+    },
+    {
+      "symbol": "XAGUSD",
+      "source_open_utc": "2026-10-08T15:15:00Z",
+      "regime": "NEUTRAL",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58089490933,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 58.82,
+        "h": 58.906,
+        "l": 58.769,
+        "c": 58.869,
+        "ema20": 58.9895754375,
+        "ema50": 59.1670550014,
+        "ema200": 59.92883611773152,
+        "atr14": 0.218813585,
+        "adx14": 23.74783882627261,
+        "rsi14": 45.5642083224,
+        "zscore20": -0.2634465710993095
+      }
+    },
+    {
+      "symbol": "XAGUSD",
+      "source_open_utc": "2026-10-08T15:30:00Z",
+      "regime": "NEUTRAL",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58090594735,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 58.875,
+        "h": 58.921,
+        "l": 58.778,
+        "c": 58.806,
+        "ema20": 58.9727814049,
+        "ema50": 59.1531974043,
+        "ema200": 59.91766361904763,
+        "atr14": 0.2133983289,
+        "adx14": 22.423351334189693,
+        "rsi14": 43.94533821,
+        "zscore20": -0.7311681177472963
+      }
+    },
+    {
+      "symbol": "XAGUSD",
+      "source_open_utc": "2026-10-08T15:45:00Z",
+      "regime": "NEUTRAL",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58091559579,
+      "webhook_http_code": null,
+      "source_conflicting_fields": [
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 58.807,
+        "h": 58.832,
+        "l": 58.682,
+        "c": 58.726,
+        "ema20": 58.9492784139,
+        "ema50": 59.1364445649,
+        "ema200": 59.90588587159442,
+        "atr14": 0.2088698768,
+        "adx14": 21.7905017127382,
+        "rsi14": 41.8817595442,
+        "zscore20": -1.0796087087321669
+      }
+    },
+    {
+      "symbol": "XAGUSD",
+      "source_open_utc": "2026-10-08T16:00:00Z",
+      "regime": "NEUTRAL",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58092711172,
+      "webhook_http_code": null,
+      "source_conflicting_fields": [
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 58.733,
+        "h": 58.741,
+        "l": 58.51,
+        "c": 58.683,
+        "ema20": 58.9246079074,
+        "ema50": 59.1189638477,
+        "ema200": 59.89378750471289,
+        "atr14": 0.2104505999,
+        "adx14": 22.100526223575,
+        "rsi14": 40.7591472275,
+        "zscore20": -1.3193627303510038
+      }
+    },
+    {
+      "symbol": "XAGUSD",
+      "source_open_utc": "2026-10-08T16:15:00Z",
+      "regime": "NEUTRAL",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58093872377,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 58.691,
+        "h": 59.255,
+        "l": 58.641,
+        "c": 58.901,
+        "ema20": 58.9229627099,
+        "ema50": 59.1106799905,
+        "ema200": 59.88389907183017,
+        "atr14": 0.2392755571,
+        "adx14": 21.527262386724576,
+        "rsi14": 48.2068105976,
+        "zscore20": -0.18714866836676902
+      }
+    },
+    {
+      "symbol": "XAGUSD",
+      "source_open_utc": "2026-10-08T16:30:00Z",
+      "regime": "NEUTRAL",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58094793885,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 58.894,
+        "h": 58.967,
+        "l": 58.785,
+        "c": 58.906,
+        "ema20": 58.9212610459,
+        "ema50": 59.1026156464,
+        "ema200": 59.874168732806986,
+        "atr14": 0.2351844458,
+        "adx14": 20.99494596679204,
+        "rsi14": 48.3713286354,
+        "zscore20": -0.21051067821578084
+      }
+    },
+    {
+      "symbol": "XAGUSD",
+      "source_open_utc": "2026-10-08T16:45:00Z",
+      "regime": "NEUTRAL",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58096010587,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 58.907,
+        "h": 58.938,
+        "l": 58.792,
+        "c": 58.858,
+        "ema20": 58.9152361844,
+        "ema50": 59.0930228759,
+        "ema200": 59.86405760113727,
+        "atr14": 0.2288141283,
+        "adx14": 20.500652148283258,
+        "rsi14": 46.8543265657,
+        "zscore20": -0.5261275714683993
+      }
+    },
+    {
+      "symbol": "SPX500",
+      "source_open_utc": "2026-10-08T12:00:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": false,
+      "receipt_fire_id": null,
+      "webhook_http_code": null,
+      "source_conflicting_fields": null,
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 7765.2,
+        "h": 7772.2,
+        "l": 7763.9,
+        "c": 7768.2,
+        "ema20": 7768.927231081966,
+        "ema50": 7779.520429788191,
+        "ema200": 7789.441831415475,
+        "atr14": 6.507361657786518,
+        "adx14": 41.342877240624865,
+        "rsi14": 45.23556393415035,
+        "zscore20": -0.019730817805543137
+      }
+    },
+    {
+      "symbol": "SPX500",
+      "source_open_utc": "2026-10-08T12:15:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": false,
+      "receipt_fire_id": null,
+      "webhook_http_code": null,
+      "source_conflicting_fields": null,
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 7767.9,
+        "h": 7772.7,
+        "l": 7765.4,
+        "c": 7772.7,
+        "ema20": 7769.2865424074935,
+        "ema50": 7779.252961953361,
+        "ema200": 7789.275246028256,
+        "atr14": 6.563978682230351,
+        "adx14": 39.14630131735213,
+        "rsi14": 50.76597406975669,
+        "zscore20": 0.63275632859755
+      }
+    },
+    {
+      "symbol": "SPX500",
+      "source_open_utc": "2026-10-08T12:30:00Z",
+      "regime": "TREND",
+      "decision": "SHORT",
+      "original_receipt_available": false,
+      "receipt_fire_id": null,
+      "webhook_http_code": null,
+      "source_conflicting_fields": null,
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 7772.5,
+        "h": 7772.8,
+        "l": 7764.9,
+        "c": 7766.9,
+        "ema20": 7769.059252654399,
+        "ema50": 7778.768532072837,
+        "ema200": 7789.052606764294,
+        "atr14": 6.659408776356793,
+        "adx14": 37.19746282404249,
+        "rsi14": 44.52486850353545,
+        "zscore20": -0.11997747573114796
+      },
+      "outcome": {
+        "entry_open_utc": "2026-10-08T12:45:00.000Z",
+        "entry_price": 7766.8,
+        "stop_price": 7776.789113164536,
+        "target_price": 7746.821773670929,
+        "status": "STOP",
+        "gross_R": -1,
+        "net_r_by_bps": {
+          "1": -1.0777526480286042,
+          "2": -1.155505296057208,
+          "3": -1.2332579440858122,
+          "5": -1.3887632401430203
+        },
+        "observed_outcome_bars": 3,
+        "outcome_open_utc": "2026-10-08T13:15:00.000Z"
+      }
+    },
+    {
+      "symbol": "SPX500",
+      "source_open_utc": "2026-10-08T12:45:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": false,
+      "receipt_fire_id": null,
+      "webhook_http_code": null,
+      "source_conflicting_fields": null,
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 7766.8,
+        "h": 7769.9,
+        "l": 7764.4,
+        "c": 7769.2,
+        "ema20": 7769.072657163504,
+        "ema50": 7778.393295520961,
+        "ema200": 7788.85506838853,
+        "atr14": 6.5765938637598795,
+        "adx14": 35.48280746296668,
+        "rsi14": 47.2921215034731,
+        "zscore20": 0.22396508242795893
+      }
+    },
+    {
+      "symbol": "SPX500",
+      "source_open_utc": "2026-10-08T13:00:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58079551255,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 7768.9,
+        "h": 7775.7,
+        "l": 7768.2,
+        "c": 7774.7,
+        "ema20": 7769.6085945765,
+        "ema50": 7778.2484604022,
+        "ema200": 7788.7142219369025,
+        "atr14": 6.6425514449,
+        "adx14": 33.288181574419,
+        "rsi14": 53.2922311368,
+        "zscore20": 1.0882904288012745
+      }
+    },
+    {
+      "symbol": "SPX500",
+      "source_open_utc": "2026-10-08T13:15:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58080228426,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 7774.4,
+        "h": 7779.7,
+        "l": 7773.4,
+        "c": 7775.7,
+        "ema20": 7770.1887284264,
+        "ema50": 7778.1485207786,
+        "ema200": 7788.576766992257,
+        "atr14": 6.6180834846,
+        "adx14": 31.96714471472465,
+        "rsi14": 54.3106366692,
+        "zscore20": 1.25628363049402
+      }
+    },
+    {
+      "symbol": "SPX500",
+      "source_open_utc": "2026-10-08T13:30:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58081642916,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 7774.8,
+        "h": 7780,
+        "l": 7771,
+        "c": 7772.8,
+        "ema20": 7770.3684867168,
+        "ema50": 7777.9086326127,
+        "ema200": 7788.421774285866,
+        "atr14": 6.7882203785,
+        "adx14": 30.21778759949535,
+        "rsi14": 50.9429338533,
+        "zscore20": 0.9909032663491266
+      }
+    },
+    {
+      "symbol": "SPX500",
+      "source_open_utc": "2026-10-08T13:45:00Z",
+      "regime": "NEUTRAL",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58082916619,
+      "webhook_http_code": null,
+      "source_conflicting_fields": [],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 7772.8,
+        "h": 7785.2,
+        "l": 7772.5,
+        "c": 7780.5,
+        "ema20": 7771.3506263039,
+        "ema50": 7778.0177904264,
+        "ema200": 7788.342950661132,
+        "atr14": 7.2104903515,
+        "adx14": 29.449096103511476,
+        "rsi14": 58.7855673744,
+        "zscore20": 1.939761358028413
+      }
+    },
+    {
+      "symbol": "SPX500",
+      "source_open_utc": "2026-10-08T14:00:00Z",
+      "regime": "NEUTRAL",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58083945502,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 7780.2,
+        "h": 7788.6,
+        "l": 7779,
+        "c": 7786.6,
+        "ema20": 7772.8029476083,
+        "ema50": 7778.3543476646,
+        "ema200": 7788.325607868484,
+        "atr14": 7.3811696121,
+        "adx14": 29.21601022409047,
+        "rsi14": 63.7362001311,
+        "zscore20": 2.3464184833109067
+      }
+    },
+    {
+      "symbol": "SPX500",
+      "source_open_utc": "2026-10-08T14:15:00Z",
+      "regime": "NEUTRAL",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58085110258,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 7786.3,
+        "h": 7793.6,
+        "l": 7785.1,
+        "c": 7792.8,
+        "ema20": 7774.7074287884,
+        "ema50": 7778.9208438346,
+        "ema200": 7788.368139133475,
+        "atr14": 7.4610860684,
+        "adx14": 29.61572044086079,
+        "rsi14": 67.9501033492,
+        "zscore20": 2.465777288487505
+      }
+    },
+    {
+      "symbol": "SPX500",
+      "source_open_utc": "2026-10-08T14:30:00Z",
+      "regime": "NEUTRAL",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58086093979,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 7792.5,
+        "h": 7793.5,
+        "l": 7786.1,
+        "c": 7787.3,
+        "ema20": 7775.8894877247,
+        "ema50": 7779.2419026308,
+        "ema200": 7788.357510883391,
+        "atr14": 7.4567227778,
+        "adx14": 29.9868799278618,
+        "rsi14": 61.2524164035,
+        "zscore20": 1.675766866839385
+      }
+    },
+    {
+      "symbol": "SPX500",
+      "source_open_utc": "2026-10-08T14:45:00Z",
+      "regime": "NEUTRAL",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58087088676,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 7787.1,
+        "h": 7788.6,
+        "l": 7776.1,
+        "c": 7781.4,
+        "ema20": 7776.4142984176,
+        "ema50": 7779.3265339002,
+        "ema200": 7788.288281919378,
+        "atr14": 7.8169568651,
+        "adx14": 28.277978108789817,
+        "rsi14": 54.8736028067,
+        "zscore20": 1.0087625210232183
+      }
+    },
+    {
+      "symbol": "SPX500",
+      "source_open_utc": "2026-10-08T15:00:00Z",
+      "regime": "NEUTRAL",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58088149933,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 7781.5,
+        "h": 7781.7,
+        "l": 7772.6,
+        "c": 7772.6,
+        "ema20": 7776.0510319016,
+        "ema50": 7779.062748257,
+        "ema200": 7788.132179611723,
+        "atr14": 7.9086028033,
+        "adx14": 26.388759131171522,
+        "rsi14": 47.0099889699,
+        "zscore20": 0.1559196022946289
+      }
+    },
+    {
+      "symbol": "SPX500",
+      "source_open_utc": "2026-10-08T15:15:00Z",
+      "regime": "NEUTRAL",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58089498547,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 7772.4,
+        "h": 7776.4,
+        "l": 7770.4,
+        "c": 7774.4,
+        "ema20": 7775.8937907681,
+        "ema50": 7778.8798953842,
+        "ema200": 7787.997531058373,
+        "atr14": 7.7722740316,
+        "adx14": 24.97071358910616,
+        "rsi14": 48.6315369043,
+        "zscore20": 0.27175092926277106
+      }
+    },
+    {
+      "symbol": "SPX500",
+      "source_open_utc": "2026-10-08T15:30:00Z",
+      "regime": "NEUTRAL",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58090593158,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 7774.3,
+        "h": 7775.3,
+        "l": 7769.3,
+        "c": 7772.7,
+        "ema20": 7775.6068537789,
+        "ema50": 7778.6450821089,
+        "ema200": 7787.848301893613,
+        "atr14": 7.6456830294,
+        "adx14": 23.821984266115322,
+        "rsi14": 47.1703085181,
+        "zscore20": 0.033632417542725696
+      }
+    },
+    {
+      "symbol": "SPX500",
+      "source_open_utc": "2026-10-08T15:45:00Z",
+      "regime": "NEUTRAL",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58091563745,
+      "webhook_http_code": null,
+      "source_conflicting_fields": [],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 7772.7,
+        "h": 7774.9,
+        "l": 7769.2,
+        "c": 7771.4,
+        "ema20": 7775.2320513782,
+        "ema50": 7778.3722645867,
+        "ema200": 7787.684637198155,
+        "atr14": 7.5067056701,
+        "adx14": 22.771303806961896,
+        "rsi14": 46.0155119694,
+        "zscore20": -0.22104275836022474
+      }
+    },
+    {
+      "symbol": "SPX500",
+      "source_open_utc": "2026-10-08T16:00:00Z",
+      "regime": "NEUTRAL",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58092714677,
+      "webhook_http_code": null,
+      "source_conflicting_fields": [
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 7771.2,
+        "h": 7776.9,
+        "l": 7769,
+        "c": 7774.4,
+        "ema20": 7775.1528083898,
+        "ema50": 7778.2164895049,
+        "ema200": 7787.555436828024,
+        "atr14": 7.5347981223,
+        "adx14": 21.403800528026018,
+        "rsi14": 49.0642606166,
+        "zscore20": 0.05264207646868492
+      }
+    },
+    {
+      "symbol": "SPX500",
+      "source_open_utc": "2026-10-08T16:15:00Z",
+      "regime": "NEUTRAL",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58093880187,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 7774.9,
+        "h": 7798.7,
+        "l": 7773.9,
+        "c": 7781.5,
+        "ema20": 7775.783153169,
+        "ema50": 7778.3565579672,
+        "ema200": 7787.498168799884,
+        "atr14": 8.7680268278,
+        "adx14": 22.363169488124782,
+        "rsi14": 55.4564097604,
+        "zscore20": 0.8781063131333087
+      }
+    },
+    {
+      "symbol": "SPX500",
+      "source_open_utc": "2026-10-08T16:30:00Z",
+      "regime": "NEUTRAL",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58094795815,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 7781.7,
+        "h": 7784.9,
+        "l": 7774,
+        "c": 7775.4,
+        "ema20": 7775.7725127311,
+        "ema50": 7778.2519178624,
+        "ema200": 7787.379779060583,
+        "atr14": 8.9203106258,
+        "adx14": 23.254012093930776,
+        "rsi14": 49.6565297684,
+        "zscore20": -0.03663835647877497
+      }
+    },
+    {
+      "symbol": "SPX500",
+      "source_open_utc": "2026-10-08T16:45:00Z",
+      "regime": "NEUTRAL",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58096011306,
+      "webhook_http_code": null,
+      "source_conflicting_fields": [
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 7775.4,
+        "h": 7777.1,
+        "l": 7751.7,
+        "c": 7757.7,
+        "ema20": 7774.0685546025,
+        "ema50": 7777.4534958624,
+        "ema200": 7787.089433000279,
+        "atr14": 10.0974312954,
+        "adx14": 22.04912423647628,
+        "rsi14": 37.5322579374,
+        "zscore20": -2.2625639229484764
+      }
+    },
+    {
+      "symbol": "NAS100",
+      "source_open_utc": "2026-10-08T12:00:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": false,
+      "receipt_fire_id": null,
+      "webhook_http_code": null,
+      "source_conflicting_fields": null,
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 30940.2,
+        "h": 30965.7,
+        "l": 30929.5,
+        "c": 30941.7,
+        "ema20": 30969.303170332067,
+        "ema50": 31032.3015760739,
+        "ema200": 31086.70289925441,
+        "atr14": 38.232952150246675,
+        "adx14": 41.448513052668275,
+        "rsi14": 39.39992432121748,
+        "zscore20": -0.6039498736417326
+      }
+    },
+    {
+      "symbol": "NAS100",
+      "source_open_utc": "2026-10-08T12:15:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": false,
+      "receipt_fire_id": null,
+      "webhook_http_code": null,
+      "source_conflicting_fields": null,
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 30941.9,
+        "h": 30972.4,
+        "l": 30924.4,
+        "c": 30972,
+        "ema20": 30969.560011252823,
+        "ema50": 31029.93680838473,
+        "ema200": 31085.56157687377,
+        "atr14": 38.93059842522906,
+        "adx14": 39.83651467622402,
+        "rsi14": 46.725266727619264,
+        "zscore20": 0.184632600384297
+      }
+    },
+    {
+      "symbol": "NAS100",
+      "source_open_utc": "2026-10-08T12:30:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": false,
+      "receipt_fire_id": null,
+      "webhook_http_code": null,
+      "source_conflicting_fields": null,
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 30971.5,
+        "h": 30972.4,
+        "l": 30931,
+        "c": 30940.4,
+        "ema20": 30966.782867323982,
+        "ema50": 31026.425560997093,
+        "ema200": 31084.11718307403,
+        "atr14": 39.10698425199852,
+        "adx14": 38.33965904095436,
+        "rsi14": 41.139951649455476,
+        "zscore20": -0.5351815135418544
+      }
+    },
+    {
+      "symbol": "NAS100",
+      "source_open_utc": "2026-10-08T12:45:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": false,
+      "receipt_fire_id": null,
+      "webhook_http_code": null,
+      "source_conflicting_fields": null,
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 30940.7,
+        "h": 30954.2,
+        "l": 30922.2,
+        "c": 30953,
+        "ema20": 30965.470213293127,
+        "ema50": 31023.5461272325,
+        "ema200": 31082.81253448623,
+        "atr14": 38.59934251971291,
+        "adx14": 37.225488097606046,
+        "rsi14": 44.01368153445809,
+        "zscore20": -0.1825861522635478
+      }
+    },
+    {
+      "symbol": "NAS100",
+      "source_open_utc": "2026-10-08T13:00:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58079550511,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 30952.7,
+        "h": 30984.6,
+        "l": 30947.5,
+        "c": 30977.4,
+        "ema20": 30966.6063834557,
+        "ema50": 31021.7364751811,
+        "ema200": 31081.750718222687,
+        "atr14": 38.4922466254,
+        "adx14": 34.87208544158492,
+        "rsi14": 49.1873775085,
+        "zscore20": 0.4844948577719117
+      }
+    },
+    {
+      "symbol": "NAS100",
+      "source_open_utc": "2026-10-08T13:15:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58080244346,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 30976.4,
+        "h": 31007.7,
+        "l": 30971.9,
+        "c": 30989.5,
+        "ema20": 30968.6747097479,
+        "ema50": 31020.4233185227,
+        "ema200": 31080.818870280174,
+        "atr14": 38.2999432951,
+        "adx14": 32.89204000280175,
+        "rsi14": 51.5945837231,
+        "zscore20": 0.9236172034948709
+      }
+    },
+    {
+      "symbol": "NAS100",
+      "source_open_utc": "2026-10-08T13:30:00Z",
+      "regime": "TREND",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58081640249,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 30991.9,
+        "h": 31028.6,
+        "l": 30951.9,
+        "c": 30969.2,
+        "ema20": 30968.6041024703,
+        "ema50": 31018.3618119909,
+        "ema200": 31079.703259630624,
+        "atr14": 41.0428044883,
+        "adx14": 31.693348149133392,
+        "rsi14": 47.5489621526,
+        "zscore20": 0.44434891948464056
+      }
+    },
+    {
+      "symbol": "NAS100",
+      "source_open_utc": "2026-10-08T13:45:00Z",
+      "regime": "NEUTRAL",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58082925015,
+      "webhook_http_code": null,
+      "source_conflicting_fields": [],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 30969.8,
+        "h": 31000.5,
+        "l": 30912.8,
+        "c": 30950.4,
+        "ema20": 30966.8272945253,
+        "ema50": 31015.6778039851,
+        "ema200": 31078.41666003231,
+        "atr14": 44.3754613105,
+        "adx14": 29.62865659266392,
+        "rsi14": 44.0776327489,
+        "zscore20": -0.08867647758378512
+      }
+    },
+    {
+      "symbol": "NAS100",
+      "source_open_utc": "2026-10-08T14:00:00Z",
+      "regime": "NEUTRAL",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58083949539,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 30951.1,
+        "h": 31021.6,
+        "l": 30949.5,
+        "c": 31014.3,
+        "ema20": 30971.3485045705,
+        "ema50": 31015.6237724562,
+        "ema200": 31077.79559873846,
+        "atr14": 46.3557855026,
+        "adx14": 27.94765591368656,
+        "rsi14": 55.8880350857,
+        "zscore20": 1.8392261612217873
+      }
+    },
+    {
+      "symbol": "NAS100",
+      "source_open_utc": "2026-10-08T14:15:00Z",
+      "regime": "NEUTRAL",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58085114974,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 31015.6,
+        "h": 31132,
+        "l": 31011.6,
+        "c": 31121,
+        "ema20": 30985.7475132055,
+        "ema50": 31019.820225824,
+        "ema200": 31078.222508203748,
+        "atr14": 51.6446579667,
+        "adx14": 28.583228196499665,
+        "rsi14": 68.0195985899,
+        "zscore20": 3.293926915714135
+      }
+    },
+    {
+      "symbol": "NAS100",
+      "source_open_utc": "2026-10-08T14:30:00Z",
+      "regime": "NEUTRAL",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58086091975,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 31121,
+        "h": 31121,
+        "l": 31052.9,
+        "c": 31054.9,
+        "ema20": 30992.3076139887,
+        "ema50": 31021.1845998978,
+        "ema200": 31078.001388719138,
+        "atr14": 52.8200395405,
+        "adx14": 29.17340245911183,
+        "rsi14": 57.4768846045,
+        "zscore20": 1.7646005388595092
+      }
+    },
+    {
+      "symbol": "NAS100",
+      "source_open_utc": "2026-10-08T14:45:00Z",
+      "regime": "NEUTRAL",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58087096731,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 31055.9,
+        "h": 31060.2,
+        "l": 31004.2,
+        "c": 31030.2,
+        "ema20": 30996.0111972369,
+        "ema50": 31021.5795905977,
+        "ema200": 31077.52077788611,
+        "atr14": 53.0471795734,
+        "adx14": 28.318825496832222,
+        "rsi14": 54.0840769793,
+        "zscore20": 1.1766118474288292
+      }
+    },
+    {
+      "symbol": "NAS100",
+      "source_open_utc": "2026-10-08T15:00:00Z",
+      "regime": "NEUTRAL",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58088154681,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 31029.5,
+        "h": 31032.3,
+        "l": 30982.9,
+        "c": 30982.9,
+        "ema20": 30994.7194278855,
+        "ema50": 31020.0439049994,
+        "ema200": 31076.585247757896,
+        "atr14": 52.7866667467,
+        "adx14": 26.995265638711945,
+        "rsi14": 48.235210447,
+        "zscore20": 0.3197980027417115
+      }
+    },
+    {
+      "symbol": "NAS100",
+      "source_open_utc": "2026-10-08T15:15:00Z",
+      "regime": "NEUTRAL",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58089488837,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 30983.2,
+        "h": 31010,
+        "l": 30976.1,
+        "c": 30997.5,
+        "ema20": 30995.0359449577,
+        "ema50": 31019.1824369833,
+        "ema200": 31075.80728509364,
+        "atr14": 51.4376191219,
+        "adx14": 25.599192550636626,
+        "rsi14": 50.0277844938,
+        "zscore20": 0.5211996623438211
+      }
+    },
+    {
+      "symbol": "NAS100",
+      "source_open_utc": "2026-10-08T15:30:00Z",
+      "regime": "NEUTRAL",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58090588550,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 30997.1,
+        "h": 31001.4,
+        "l": 30947.4,
+        "c": 30968.9,
+        "ema20": 30992.6243583631,
+        "ema50": 31017.2444867441,
+        "ema200": 31074.745521062858,
+        "atr14": 51.6206463275,
+        "adx14": 23.916042031071708,
+        "rsi14": 46.6106145522,
+        "zscore20": -0.10200246880693627
+      }
+    },
+    {
+      "symbol": "NAS100",
+      "source_open_utc": "2026-10-08T15:45:00Z",
+      "regime": "NEUTRAL",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58091562942,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 30968.6,
+        "h": 30980.5,
+        "l": 30927.2,
+        "c": 30949.2,
+        "ema20": 30988.5059387457,
+        "ema50": 31014.5836110625,
+        "ema200": 31073.48437159955,
+        "atr14": 51.7406001613,
+        "adx14": 22.79196374964966,
+        "rsi14": 44.3661261855,
+        "zscore20": -0.579270244216909
+      }
+    },
+    {
+      "symbol": "NAS100",
+      "source_open_utc": "2026-10-08T16:00:00Z",
+      "regime": "NEUTRAL",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58092712407,
+      "webhook_http_code": null,
+      "source_conflicting_fields": [
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 30948.6,
+        "h": 30963.1,
+        "l": 30923.3,
+        "c": 30948.3,
+        "ema20": 30984.5734003618,
+        "ema50": 31011.9390403864,
+        "ema200": 31072.2487062105,
+        "atr14": 50.8877001497,
+        "adx14": 21.832598938467203,
+        "rsi14": 44.2803065328,
+        "zscore20": -0.6384388675378492
+      }
+    },
+    {
+      "symbol": "NAS100",
+      "source_open_utc": "2026-10-08T16:15:00Z",
+      "regime": "NEUTRAL",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58093876447,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 30949.2,
+        "h": 31057.3,
+        "l": 30940.4,
+        "c": 30997.2,
+        "ema20": 30985.8621014611,
+        "ema50": 31011.3987166189,
+        "ema200": 31071.510908138753,
+        "atr14": 55.6028644248,
+        "adx14": 21.563898696680344,
+        "rsi14": 51.0290197748,
+        "zscore20": 0.3591504980533067
+      }
+    },
+    {
+      "symbol": "NAS100",
+      "source_open_utc": "2026-10-08T16:30:00Z",
+      "regime": "NEUTRAL",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58094798060,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 30998.5,
+        "h": 31012.5,
+        "l": 30938.2,
+        "c": 30949.7,
+        "ema20": 30982.4956428186,
+        "ema50": 31009.013069139,
+        "ema200": 31070.31577472444,
+        "atr14": 56.9383741087,
+        "adx14": 21.26151884639741,
+        "rsi14": 45.2949204448,
+        "zscore20": -0.7012701688448134
+      }
+    },
+    {
+      "symbol": "NAS100",
+      "source_open_utc": "2026-10-08T16:45:00Z",
+      "regime": "NEUTRAL",
+      "decision": "WAIT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58096024618,
+      "webhook_http_code": null,
+      "source_conflicting_fields": [
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 30949.9,
+        "h": 30953.6,
+        "l": 30724.3,
+        "c": 30753.7,
+        "ema20": 30960.8520668585,
+        "ema50": 30999.0648442054,
+        "ema200": 31067.21313019982,
+        "atr14": 69.2499188152,
+        "adx14": 21.82616521756974,
+        "rsi14": 30.2244339213,
+        "zscore20": -3.277299719067435
+      }
+    }
+  ],
+  "signals": [
+    {
+      "symbol": "BTCUSD",
+      "source_open_utc": "2026-10-08T14:30:00Z",
+      "regime": "TREND",
+      "decision": "SHORT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58086095570,
+      "webhook_http_code": 200,
+      "source_conflicting_fields": [],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 82644,
+        "h": 82693.95,
+        "l": 82429.55,
+        "c": 82476.7,
+        "ema20": 82459.2058021855,
+        "ema50": 82679.6949345729,
+        "ema200": 83644.42048602324,
+        "atr14": 306.9980454466,
+        "adx14": 35.33183781433451,
+        "rsi14": 48.9481182006,
+        "zscore20": 0.059475114603823945
+      },
+      "outcome": {
+        "entry_open_utc": "2026-10-08T14:45:00.000Z",
+        "entry_price": 82476.35,
+        "stop_price": 82936.84706816991,
+        "target_price": 81555.35586366021,
+        "status": "TARGET",
+        "gross_R": 2,
+        "net_r_by_bps": {
+          "1": 1.9820897122477292,
+          "2": 1.9641794244954582,
+          "3": 1.9462691367431875,
+          "5": 1.9104485612386457
+        },
+        "observed_outcome_bars": 3,
+        "outcome_open_utc": "2026-10-08T15:15:00.000Z"
+      }
+    },
+    {
+      "symbol": "DOGEUSD",
+      "source_open_utc": "2026-10-08T14:15:00Z",
+      "regime": "TREND",
+      "decision": "SHORT",
+      "original_receipt_available": true,
+      "receipt_fire_id": 58085100265,
+      "webhook_http_code": null,
+      "source_conflicting_fields": [
+        "c",
+        "v"
+      ],
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 0.0871436,
+        "h": 0.087276,
+        "l": 0.0869063,
+        "c": 0.0871246,
+        "ema20": 0.08701016,
+        "ema50": 0.0874416504,
+        "ema200": 0.08960542041303125,
+        "atr14": 0.0004591839,
+        "adx14": 39.62549142645746,
+        "rsi14": 50.1285159172,
+        "zscore20": 0.08807436174703273
+      },
+      "outcome": {
+        "entry_open_utc": "2026-10-08T14:30:00.000Z",
+        "entry_price": 0.0871262,
+        "stop_price": 0.08781497585,
+        "target_price": 0.08574864830000001,
+        "status": "TARGET",
+        "gross_R": 2,
+        "net_r_by_bps": {
+          "1": 1.9873505727589027,
+          "2": 1.9747011455178052,
+          "3": 1.9620517182767079,
+          "5": 1.936752863794513
+        },
+        "observed_outcome_bars": 3,
+        "outcome_open_utc": "2026-10-08T15:00:00.000Z"
+      }
+    },
+    {
+      "symbol": "EURUSD",
+      "source_open_utc": "2026-10-08T12:30:00Z",
+      "regime": "TREND",
+      "decision": "SHORT",
+      "original_receipt_available": false,
+      "receipt_fire_id": null,
+      "webhook_http_code": null,
+      "source_conflicting_fields": null,
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 1.11991,
+        "h": 1.12,
+        "l": 1.1186,
+        "c": 1.11863,
+        "ema20": 1.1186284245408247,
+        "ema50": 1.1191427246188808,
+        "ema200": 1.1207476676538113,
+        "atr14": 0.00080553278341736,
+        "adx14": 33.3764233399463,
+        "rsi14": 48.61496908971242,
+        "zscore20": 0.1281051836753382
+      },
+      "outcome": {
+        "entry_open_utc": "2026-10-08T12:45:00.000Z",
+        "entry_price": 1.11862,
+        "stop_price": 1.119828299175126,
+        "target_price": 1.116203401649748,
+        "status": "STOP",
+        "gross_R": -1,
+        "net_r_by_bps": {
+          "1": -1.0925780653523425,
+          "2": -1.185156130704685,
+          "3": -1.2777341960570272,
+          "5": -1.4628903267617122
+        },
+        "observed_outcome_bars": 5,
+        "outcome_open_utc": "2026-10-08T13:45:00.000Z"
+      }
+    },
+    {
+      "symbol": "EURUSD",
+      "source_open_utc": "2026-10-08T12:45:00Z",
+      "regime": "TREND",
+      "decision": "SHORT",
+      "original_receipt_available": false,
+      "receipt_fire_id": null,
+      "webhook_http_code": null,
+      "source_conflicting_fields": null,
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 1.11862,
+        "h": 1.11879,
+        "l": 1.11808,
+        "c": 1.11822,
+        "ema20": 1.118589526965508,
+        "ema50": 1.1191065393397088,
+        "ema200": 1.1207225167318828,
+        "atr14": 0.0007987090131732621,
+        "adx14": 31.592422170222594,
+        "rsi14": 45.218691840377396,
+        "zscore20": -0.42912203550072314
+      },
+      "outcome": {
+        "entry_open_utc": "2026-10-08T13:00:00.000Z",
+        "entry_price": 1.11824,
+        "stop_price": 1.1194380635197598,
+        "target_price": 1.11584387296048,
+        "status": "STOP",
+        "gross_R": -1,
+        "net_r_by_bps": {
+          "1": -1.093337288178519,
+          "2": -1.186674576357038,
+          "3": -1.2800118645355572,
+          "5": -1.4666864408925953
+        },
+        "observed_outcome_bars": 3,
+        "outcome_open_utc": "2026-10-08T13:30:00.000Z"
+      }
+    },
+    {
+      "symbol": "SPX500",
+      "source_open_utc": "2026-10-08T12:30:00Z",
+      "regime": "TREND",
+      "decision": "SHORT",
+      "original_receipt_available": false,
+      "receipt_fire_id": null,
+      "webhook_http_code": null,
+      "source_conflicting_fields": null,
+      "reconstruction": "EMA200_ADX14_ZSCORE20_FROM_LATER_OHLCV",
+      "source_snapshot": {
+        "o": 7772.5,
+        "h": 7772.8,
+        "l": 7764.9,
+        "c": 7766.9,
+        "ema20": 7769.059252654399,
+        "ema50": 7778.768532072837,
+        "ema200": 7789.052606764294,
+        "atr14": 6.659408776356793,
+        "adx14": 37.19746282404249,
+        "rsi14": 44.52486850353545,
+        "zscore20": -0.11997747573114796
+      },
+      "outcome": {
+        "entry_open_utc": "2026-10-08T12:45:00.000Z",
+        "entry_price": 7766.8,
+        "stop_price": 7776.789113164536,
+        "target_price": 7746.821773670929,
+        "status": "STOP",
+        "gross_R": -1,
+        "net_r_by_bps": {
+          "1": -1.0777526480286042,
+          "2": -1.155505296057208,
+          "3": -1.2332579440858122,
+          "5": -1.3887632401430203
+        },
+        "observed_outcome_bars": 3,
+        "outcome_open_utc": "2026-10-08T13:15:00.000Z"
+      }
+    }
+  ]
+}
