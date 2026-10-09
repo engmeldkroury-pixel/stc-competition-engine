@@ -10,6 +10,7 @@ def test_claim_and_ack_contract():
 
     def handler(request: httpx.Request) -> httpx.Response:
         assert request.headers.get("authorization") == "Bearer secret"
+        assert request.headers.get("user-agent") == "STC-Competition-Worker/1.0"
         if request.url.path.endswith("/claim.php"):
             body = json.loads(request.content)
             assert body["worker_id"] == "worker-1"
