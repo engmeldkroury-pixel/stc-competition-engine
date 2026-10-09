@@ -1,0 +1,138 @@
+//@version=6
+indicator("STC AMP Community Shadow Parity Candidate v0.1", overlay=false, max_bars_back=5000)
+
+// RESEARCH / PARITY ONLY.
+// NO webhook, NO order, NO live quality-gate/risk/approval authority.
+// This script exists only to compare Pine confirmed-bar component events
+// against the frozen Python community adapters already stored by STC.
+
+profile = input.string(
+    "CBOT:ZB1!",
+    "Frozen AMP profile",
+    options=[
+        "CBOT:ZB1!",
+        "NYMEX:MCL1!",
+        "CME_MINI:MJY1!"
+    ]
+)
+
+rangeFilterEvent() =>
+    samplingPeriod = 100
+    rangeMultiplier = 3.0
+    change = math.abs(close - close[1])
+    first = ta.ema(change, samplingPeriod)
+    second = ta.ema(first, samplingPeriod * 2 - 1)
+    float filt = na
+    previousFilter = filt[1]
+    if not na(second)
+        smoothRange = second * rangeMultiplier
+        if na(previousFilter)
+            filt := close
+        else if close > previousFilter
+            filt := math.max(previousFilter, close - smoothRange)
+        else if close < previousFilter
+            filt := math.min(previousFilter, close + smoothRange)
+        else
+            filt := previousFilter
+    int direction = 0
+    previousDirection = nz(direction[1], 0)
+    if not na(filt) and not na(previousFilter)
+        rising = filt > previousFilter
+        falling = filt < previousFilter
+        direction := close > filt and rising ? 1 : close < filt and falling ? -1 : previousDirection
+    else
+        direction := previousDirection
+    direction != 0 and direction != previousDirection ? float(direction) : 0.0
+
+sslHybridEvent() =>
+    baselineLength = 100
+    sslLength = 20
+    baseline = ta.ema(close, baselineLength)
+    highMa = ta.ema(high, sslLength)
+    lowMa = ta.ema(low, sslLength)
+    int state = 0
+    previousState = nz(state[1], 0)
+    state := not na(baseline) and not na(highMa) and not na(lowMa) ?
+         (close > highMa and close > baseline ? 1 :
+          close < lowMa and close < baseline ? -1 :
+          previousState) :
+         previousState
+    state != 0 and state != previousState ? float(state) : 0.0
+
+trendiloEvent() =>
+    smoothing = 1
+    lookback = 50
+    almaOffset = 0.85
+    almaSigma = 6.0
+    bandMultiplier = 1.25
+    pch = math.abs(close) > 1e-15 ? (close - close[smoothing]) / close * 100.0 : 0.0
+    avpch = ta.alma(pch, lookback, almaOffset, almaSigma)
+    rms = bandMultiplier * math.sqrt(ta.sma(avpch * avpch, lookback))
+    currentState = not na(avpch) and not na(rms) ? (avpch > rms ? 1 : avpch < -rms ? -1 : 0) : 0
+    previousState = nz(currentState[1], 0)
+    currentState != 0 and currentState != previousState ? float(currentState) : 0.0
+
+alphaTrendEvent() =>
+    period = 20
+    coefficient = 1.0
+    atr = ta.rma(ta.tr(true), period)
+    // Futures have usable volume; use MFI, matching the Python adapter's
+    // volume-present path.
+    momentum = ta.mfi(hlc3, period)
+    up = low - atr * coefficient
+    down = high + atr * coefficient
+    float line = na
+    previousLine = line[1]
+    line := momentum >= 50.0 ? (na(previousLine) ? up : math.max(up, previousLine)) :
+        (na(previousLine) ? down : math.min(down, previousLine))
+    nowDiff = line - line[2]
+    prevDiff = line[1] - line[3]
+    not na(nowDiff) and not na(prevDiff) ?
+        (prevDiff <= 0 and nowDiff > 0 ? 1.0 :
+         prevDiff >= 0 and nowDiff < 0 ? -1.0 : 0.0) : 0.0
+
+waddahEvent() =>
+    fastLength = 12
+    slowLength = 26
+    bbLength = 20
+    bbMult = 2.0
+    sensitivity = 100.0
+    deadZoneAtrPeriod = 100
+    deadZoneMult = 3.0
+    fast = ta.ema(close, fastLength)
+    slow = ta.ema(close, slowLength)
+    macd = fast - slow
+    powerSigned = (macd - macd[1]) * sensitivity
+    power = math.abs(powerSigned)
+    basis = ta.sma(close, bbLength)
+    dev = ta.stdev(close, bbLength)
+    explosion = 2.0 * bbMult * dev
+    deadZone = ta.rma(ta.tr(true), deadZoneAtrPeriod) * deadZoneMult
+    direction = power > explosion and explosion > deadZone ? (powerSigned > 0 ? 1 : powerSigned < 0 ? -1 : 0) : 0
+    int state = 0
+    previousState = nz(state[1], 0)
+    strengthening = power > power[1] and explosion >= explosion[1]
+    state := strengthening and direction != 0 ? direction : previousState
+    strengthening and direction != 0 and direction != previousState ? float(direction) : 0.0
+
+zbRange = request.security("CBOT:ZB1!", "15", rangeFilterEvent(), gaps=barmerge.gaps_off, lookahead=barmerge.lookahead_off)
+mclSsl = request.security("NYMEX:MCL1!", "15", sslHybridEvent(), gaps=barmerge.gaps_off, lookahead=barmerge.lookahead_off)
+mjyTrendilo = request.security("CME_MINI:MJY1!", "15", trendiloEvent(), gaps=barmerge.gaps_off, lookahead=barmerge.lookahead_off)
+mjyAlpha = request.security("CME_MINI:MJY1!", "15", alphaTrendEvent(), gaps=barmerge.gaps_off, lookahead=barmerge.lookahead_off)
+mjyWae = request.security("CME_MINI:MJY1!", "15", waddahEvent(), gaps=barmerge.gaps_off, lookahead=barmerge.lookahead_off)
+
+selected =
+    profile == "CBOT:ZB1!" ? zbRange :
+    profile == "NYMEX:MCL1!" ? mclSsl :
+    profile == "CME_MINI:MJY1!" ? mjyTrendilo :
+    0.0
+
+plot(selected, "Selected frozen/candidate event", style=plot.style_columns)
+plot(profile == "CBOT:ZB1!" ? zbRange : na, "ZB Range Filter event", display=display.data_window)
+plot(profile == "NYMEX:MCL1!" ? mclSsl : na, "MCL SSL Hybrid event", display=display.data_window)
+plot(profile == "CME_MINI:MJY1!" ? mjyTrendilo : na, "MJY Trendilo event", display=display.data_window)
+plot(profile == "CME_MINI:MJY1!" ? mjyAlpha : na, "MJY AlphaTrend event", display=display.data_window)
+plot(profile == "CME_MINI:MJY1!" ? mjyWae : na, "MJY WAE event", display=display.data_window)
+
+plotshape(selected > 0, title="Shadow LONG event", style=shape.triangleup, location=location.bottom, size=size.tiny, text="S+")
+plotshape(selected < 0, title="Shadow SHORT event", style=shape.triangledown, location=location.top, size=size.tiny, text="S-")
