@@ -1,0 +1,65 @@
+name: STC Host Scheduler Capability Readonly
+on:
+  push:
+    branches: [main]
+    paths: ["ops/STC_HOST_CAPABILITY_TRIGGER"]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  host-capability:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Secure SSH for read-only host inspection
+        shell: bash
+        env:
+          SSH_KEY: ${{ secrets.HOSTINGER_SSH_PRIVATE_KEY }}
+          SSH_HOST: ${{ secrets.HOSTINGER_SSH_HOST }}
+          SSH_USER: ${{ secrets.HOSTINGER_SSH_USER }}
+        run: |
+          set -euo pipefail
+          test -n "$SSH_KEY" && test -n "$SSH_HOST" && test -n "$SSH_USER"
+          mkdir -p "$HOME/.ssh"
+          chmod 700 "$HOME/.ssh"
+          printf '%s\n' "$SSH_KEY" | tr -d '\r' > "$HOME/.ssh/id_ed25519"
+          chmod 600 "$HOME/.ssh/id_ed25519"
+          ssh-keygen -y -f "$HOME/.ssh/id_ed25519" >/dev/null
+          ssh-keyscan -p 65002 "$SSH_HOST" >> "$HOME/.ssh/known_hosts"
+          chmod 600 "$HOME/.ssh/known_hosts"
+      - name: Read hosting schedule capabilities without disclosing commands or secrets
+        shell: bash
+        env:
+          SSH_HOST: ${{ secrets.HOSTINGER_SSH_HOST }}
+          SSH_USER: ${{ secrets.HOSTINGER_SSH_USER }}
+        run: |
+          set -euo pipefail
+          ssh -p 65002 "$SSH_USER@$SSH_HOST" bash -s <<'REMOTE'
+          set -euo pipefail
+          echo "STC_HOST_READONLY_PROBE_STARTED"
+          echo "SERVER_UTC_TIME=$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+          if command -v php >/dev/null 2>&1; then
+            echo "PHP_CLI_PRESENT=true"
+            php -r 'echo "PHP_CLI_MAX_EXECUTION_TIME=".ini_get("max_execution_time")."\n";echo "PHP_CLI_MEMORY_LIMIT=".ini_get("memory_limit")."\n";'
+          else
+            echo "PHP_CLI_PRESENT=false"
+          fi
+          if command -v crontab >/dev/null 2>&1; then
+            echo "SHELL_CRONTAB_BINARY_PRESENT=true"
+            if crontab -l >/dev/null 2>&1; then
+              echo "SHELL_CRONTAB_LIST_ACCESSIBLE=true"
+              crontab -l 2>/dev/null | awk 'NF>=6 && $1 !~ /^#/ {printf "SCHEDULE_ONLY=%s %s %s %s %s\n",$1,$2,$3,$4,$5}'
+            else
+              echo "SHELL_CRONTAB_LIST_ACCESSIBLE=false"
+            fi
+          else
+            echo "SHELL_CRONTAB_BINARY_PRESENT=false"
+          fi
+          if test -f "$HOME/domains/stc.feama.site/cron_kick.php"; then
+            echo "KNOWN_STC_HOURLY_OR_FIVE_MINUTE_KICK_FILE_PRESENT=true"
+          else
+            echo "KNOWN_STC_HOURLY_OR_FIVE_MINUTE_KICK_FILE_PRESENT=unverified"
+          fi
+          echo "NATIVE_60_SECOND_CRON_SUPPORT=UNVERIFIED_UNTIL_HPLAN_SCHEDULE_OR_REAL_TICK_PROOF"
+          echo "READONLY_PROBE_DONE_NO_CRON_CHANGE"
+          REMOTE
