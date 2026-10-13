@@ -1,0 +1,84 @@
+name: STC Expired-Contest Notification Hotfix
+on:
+  push:
+    branches: [main]
+    paths: ["ops/HOSTINGER_ALERT_HOTFIX_TRIGGER"]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: stc-hostinger-deploy
+  cancel-in-progress: false
+jobs:
+  targeted-notification-deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate notification patch
+        shell: bash
+        run: |
+          set -euo pipefail
+          php -l hostinger_patch/notification_control.php
+          python -m pytest -q tests/test_expired_competition_notifications.py tests/test_notification_suppression_runtime.py
+          grep -Fq "'email_configured' => false" hostinger_patch/notification_control.php
+          if grep -Fq "@mail(" hostinger_patch/notification_control.php; then
+            echo "::error::STC email must remain disabled"; exit 1
+          fi
+      - name: Setup Hostinger SSH
+        shell: bash
+        env:
+          SSH_KEY: ${{ secrets.HOSTINGER_SSH_PRIVATE_KEY }}
+          SSH_HOST: ${{ secrets.HOSTINGER_SSH_HOST }}
+          SSH_USER: ${{ secrets.HOSTINGER_SSH_USER }}
+          TARGET: ${{ secrets.HOSTINGER_STC_PUBLIC_HTML }}
+        run: |
+          set -euo pipefail
+          test -n "$SSH_KEY" && test -n "$SSH_HOST" && test -n "$SSH_USER"
+          case "$TARGET" in
+            /home/*/domains/stc.feama.site/public_html) ;;
+            *) echo "::error::Unexpected target"; exit 1 ;;
+          esac
+          mkdir -p "$HOME/.ssh"
+          chmod 700 "$HOME/.ssh"
+          printf '%s\n' "$SSH_KEY" | tr -d '\r' > "$HOME/.ssh/id_ed25519"
+          chmod 600 "$HOME/.ssh/id_ed25519"
+          ssh-keygen -y -f "$HOME/.ssh/id_ed25519" >/dev/null
+          ssh-keyscan -p 65002 "$SSH_HOST" >> "$HOME/.ssh/known_hosts"
+          chmod 600 "$HOME/.ssh/known_hosts"
+      - name: Deploy single PHP file with rollback
+        shell: bash
+        env:
+          SSH_HOST: ${{ secrets.HOSTINGER_SSH_HOST }}
+          SSH_USER: ${{ secrets.HOSTINGER_SSH_USER }}
+          TARGET: ${{ secrets.HOSTINGER_STC_PUBLIC_HTML }}
+        run: |
+          set -euo pipefail
+          sha="$(sha256sum hostinger_patch/notification_control.php | awk '{print $1}')"
+          scp -P 65002 hostinger_patch/notification_control.php "$SSH_USER@$SSH_HOST:stc-notification-$GITHUB_RUN_ID.php"
+          ssh -p 65002 "$SSH_USER@$SSH_HOST" bash -s -- "$TARGET" "$GITHUB_RUN_ID" "$sha" <<'REMOTE'
+          set -euo pipefail
+          target="$1"; run_id="$2"; expected_sha="$3"
+          case "$target" in
+            /home/*/domains/stc.feama.site/public_html) ;;
+            *) echo "Target refused"; exit 1 ;;
+          esac
+          old="$target/notification_control.php"
+          stage="$HOME/stc-notification-$run_id.php"
+          backup="$HOME/stc-notification-$run_id.backup.php"
+          test -f "$old" && test -f "$stage" && test -f "$target/portfolio_control.php"
+          grep -Fq 'function stc_competition_rule_summary(' "$target/portfolio_control.php"
+          printf '%s  %s\n' "$expected_sha" "$stage" | sha256sum -c -
+          php -l "$stage"
+          cp -p "$old" "$backup"
+          restore() {
+            if test -f "$backup"; then cp -p "$backup" "$old"; fi
+          }
+          trap restore ERR
+          cp "$stage" "$old"
+          php -l "$old"
+          printf '%s  %s\n' "$expected_sha" "$old" | sha256sum -c -
+          trap - ERR
+          rm -f "$stage"
+          echo "STC single-file notification hotfix verified; backup retained."
+          REMOTE
