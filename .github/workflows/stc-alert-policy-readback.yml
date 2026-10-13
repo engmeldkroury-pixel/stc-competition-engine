@@ -1,0 +1,66 @@
+name: STC Read-only Notification Policy Verification
+on:
+  push:
+    branches: [main]
+    paths: ["ops/HOSTINGER_ALERT_VERIFY_TRIGGER"]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  notification-readback:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      STC_OWNER_TOKEN: ${{ secrets.STC_OWNER_TOKEN }}
+    steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Verify deployed notification policy without sending messages
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$STC_OWNER_TOKEN"
+          curl -fsS --retry 1 --max-time 20 \
+            -H "Authorization: Bearer $STC_OWNER_TOKEN" \
+            "https://stc.feama.site/notification.php" > /tmp/stc-notification-readback.json
+          python - <<'PY'
+          import json
+          from datetime import datetime, timezone
+          data=json.load(open("/tmp/stc-notification-readback.json",encoding="utf-8"))
+          if data.get("ok") is not True:
+              raise SystemExit("Production notification policy endpoint failed")
+          config=data.get("config") or {}
+          if config.get("email_configured") is not False:
+              raise SystemExit("PRODUCTION_EMAIL_STILL_ENABLED")
+          events=data.get("events") or []
+          deliveries=data.get("deliveries") or []
+          since=datetime(2026,10,13,20,8,10,tzinfo=timezone.utc)
+          old_ids={"amp-futures-sep-2026","capital-africa-sep-2026"}
+          event_owner={str(x.get("notification_id")):str(x.get("competition_id")) for x in events}
+          def utc_parse(text):
+              if not text: return None
+              try:
+                  parsed=datetime.fromisoformat(str(text).replace("Z","+00:00"))
+                  return parsed.replace(tzinfo=timezone.utc) if parsed.tzinfo is None else parsed.astimezone(timezone.utc)
+              except ValueError:
+                  return None
+          old_new_events=sum(
+              x.get("competition_id") in old_ids
+              and (utc_parse(x.get("created_at_utc")) or datetime(1970,1,1,tzinfo=timezone.utc)) >= since
+              for x in events
+          )
+          old_new_deliveries=sum(
+              event_owner.get(str(x.get("notification_id"))) in old_ids
+              and (utc_parse(x.get("attempted_at_utc")) or datetime(1970,1,1,tzinfo=timezone.utc)) >= since
+              for x in deliveries
+          )
+          print("PRODUCTION_STC_EMAIL_CONFIGURED=false")
+          print("PRODUCTION_STC_TELEGRAM_CONFIGURED="+str(bool(config.get("telegram_configured"))).lower())
+          print("OLD_CONTEST_EVENTS_IN_RETURNED_WINDOW_AFTER_DEPLOY="+str(old_new_events))
+          print("OLD_CONTEST_DELIVERIES_IN_RETURNED_WINDOW_AFTER_DEPLOY="+str(old_new_deliveries))
+          print("READBACK_WINDOW_EVENTS="+str(len(events))+" DELIVERIES="+str(len(deliveries)))
+          if old_new_events or old_new_deliveries:
+              raise SystemExit("POST_DEPLOY_EXPIRED_CONTEST_ACTIVITY_DETECTED")
+          print("READONLY_STC_NOTIFICATION_POLICY_VERIFY_SUCCESS")
+          PY
