@@ -1,0 +1,82 @@
+{
+  "schema_version": 1,
+  "competition_id": "tradingview-commodities-oct-2026",
+  "display_name": "TradingView The Leap - Commodities October 2026",
+  "status": "DISCOVERED_RESEARCH_ONLY_NOT_REGISTERED",
+  "official_landing_page": "https://www.tradingview.com/the-leap/commodities-october-2026/",
+  "official_rules_url": "https://www.tradingview.com/the-leap/commodities-october-2026/rules/",
+  "rules_evidence_observed_utc": "2026-10-13T21:10:00Z",
+  "registration_close_utc": "2026-10-14T08:00:00Z",
+  "contest_start_utc": "2026-10-07T12:00:00Z",
+  "contest_end_utc": "2026-10-20T08:00:00Z",
+  "paper_only": true,
+  "trading_authority": "NONE",
+  "strategy_promoted": false,
+  "owner_registration_confirmed": false,
+  "no_email": true,
+  "notification_route_enabled": false,
+  "score_policy": {
+    "formula": "profit_pct / max(max_drawdown_pct, 5) for positive profit; profit_pct / 5 for nonpositive profit",
+    "profit_basis": "realized_pnl_pct_of_initial_balance",
+    "drawdown_basis": "maximum_equity_drawdown_pct_from_recorded_equity_peaks_including_open_positions",
+    "drawdown_floor_pct": 5,
+    "official_equity_observation_frequency": "VARIABLE_SET_BY_TRADINGVIEW",
+    "open_positions_auto_closed_at_end": true,
+    "tie_break": "lower_max_drawdown_pct"
+  },
+  "initial_paper_balance_usd": 100000,
+  "min_distinct_utc_trading_days": 3,
+  "commission_rate": 0.0001,
+  "leverage_other_assets": 10,
+  "forbidden_high_frequency_actions_per_minute": 60,
+  "simulated_only": true,
+  "allowed_symbols_and_max_open_position": [
+    {
+      "symbol": "OANDA:XAUUSD",
+      "maximum_quantity": 75
+    },
+    {
+      "symbol": "OANDA:XAGUSD",
+      "maximum_quantity": 5000
+    },
+    {
+      "symbol": "OANDA:XCUUSD",
+      "maximum_quantity": 50000
+    },
+    {
+      "symbol": "OANDA:WTICOUSD",
+      "maximum_quantity": 3500
+    },
+    {
+      "symbol": "OANDA:NATGASUSD",
+      "maximum_quantity": 100000
+    },
+    {
+      "symbol": "OANDA:CORNUSD",
+      "maximum_quantity": 62500
+    },
+    {
+      "symbol": "OANDA:WHEATUSD",
+      "maximum_quantity": 45000
+    },
+    {
+      "symbol": "OANDA:SOYBNUSD",
+      "maximum_quantity": 25000
+    }
+  ],
+  "prize_description": "TradingView subscriptions (top 250), not a cash prize",
+  "evidence_and_activation_gates": [
+    "Owner personally registers by the official deadline and confirms acceptance of rules",
+    "The user verifies the competition account The Leap Commodities and its allowed instruments",
+    "Exact OANDA symbol and source history are independently validated; do not substitute CAPITALCOM or Binance",
+    "Contest-specific strategy has independent QA and paper-forward validation",
+    "Only fresh manually revalidated owner-approved paper trade instructions are allowed",
+    "No automated orders, live trading, old competition alerts, or email"
+  ],
+  "notes": [
+    "Official rules and account status may change. Verify again before activation.",
+    "Official eligibility depends on all terms and the user's actual residence/account; do not infer sign-up.",
+    "All strategy and score computations based on public records are projections, not official leaderboard scores.",
+    "Not a replacement for the continuously running Crypto Spot Lab."
+  ]
+}
