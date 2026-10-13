@@ -6,3 +6,5 @@ Owner restriction: ZERO STC emails and NO old competition Telegram or emails.
 Safety: remote file backup, PHP lint and exact SHA verification; no paper/live order or position mutations.
 
 Retry 2: corrected hotfix test dependency installation; first attempt stopped before remote SSH/deployment.
+
+2026-10-13 21:15Z: promote PR #201 generic registered-contest UTC start/end fail-closed guard, retaining STC email disabled. Backup/one-file atomic verify. No order or messaging test.
