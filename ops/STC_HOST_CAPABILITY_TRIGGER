@@ -1,0 +1,3 @@
+STC read-only Hostinger scheduler capability probe.
+Do not modify cron settings, jobs, account state, credentials, notification rules or broker/paper trades.
+Determine whether 60-second backend scheduling is feasible with the current hosting plan; do not assume.
