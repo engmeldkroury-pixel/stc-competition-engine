@@ -1,0 +1,6 @@
+STC expired-competition notification containment deployment trigger
+UTC date: 2026-10-13
+Source: main after PR #200 (P0 Spot quality) and PR #199 (notifications), all full+critical CI checks passed.
+Deployment scope: Hostinger site stc.feama.site notification_control.php ONLY.
+Owner restriction: ZERO STC emails and NO old competition Telegram or emails.
+Safety: remote file backup, PHP lint and exact SHA verification; no paper/live order or position mutations.
