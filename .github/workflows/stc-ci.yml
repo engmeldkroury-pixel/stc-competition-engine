@@ -45,6 +45,8 @@ jobs:
           tests/test_execution_context.py
           tests/test_hostinger_patch_contract.py
           tests/test_notification_contract.py
+          tests/test_expired_competition_notifications.py
+          tests/test_notification_suppression_runtime.py
           tests/test_operator_console_contract.py
           tests/test_pine_community_shadow_contract.py
           tests/test_portfolio.py
