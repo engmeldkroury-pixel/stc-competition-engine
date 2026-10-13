@@ -109,24 +109,55 @@ function stc_send_email(array $config, string $title, string $body): array {
 // Do not disable the shared processing cron or Telegram for a future contest.
 // Competition end times come from the same registered rules used for scoreboard scoring.
 function stc_notification_suppression_reason(array $event, ?DateTimeImmutable $now = null): ?string {
-    if ((string)($event['event_type'] ?? '') === 'SYSTEM_HEARTBEAT') {
+    // Notification policy must be checked BEFORE writing an event or contacting Telegram.
+    // Contest registration is the allowlist; unknown future IDs are NOT automatically active.
+    $eventType = (string)($event['event_type'] ?? '');
+    if ($eventType === 'SYSTEM_HEARTBEAT') {
         return 'routine_heartbeat_disabled';
     }
+    if ($eventType === 'OWNER_TEST') {
+        return 'unsolicited_test_messages_disabled';
+    }
+
     $competitionId = trim((string)($event['competition_id'] ?? ''));
-    if (!in_array($competitionId, ['amp-futures-sep-2026', 'capital-africa-sep-2026'], true)) {
-        return null; // Future competitions and the independent Spot lab keep their own policies.
+    if ($competitionId === '') {
+        return 'competition_id_missing';
     }
+    if ($competitionId === 'crypto-spot-lab') {
+        // Spot is a separate research/paper mode: no promotion or production
+        // notification channel has been authorized for this mode yet.
+        return 'spot_lab_research_only';
+    }
+
     try {
+        // Same centrally registered rules used by the official contest scoring logic.
+        // New contests must be registered there BEFORE any Telegram event can pass.
         $rules = stc_competition_rule_summary($competitionId);
-        $endRaw = trim((string)($rules['end_utc'] ?? ''));
-        if ($endRaw === '') {
-            return 'competition_end_unverified';
+        if (!is_array($rules) || (string)($rules['competition_id'] ?? '') !== $competitionId) {
+            return 'competition_identity_mismatch';
         }
-        $endUtc = new DateTimeImmutable($endRaw, new DateTimeZone('UTC'));
+        if (isset($rules['status']) && (string)$rules['status'] !== 'ACTIVE') {
+            return 'competition_not_active';
+        }
+        $startRaw = trim((string)($rules['start_utc'] ?? ''));
+        $endRaw = trim((string)($rules['end_utc'] ?? ''));
+        $timePattern = '/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/';
+        if (preg_match($timePattern, $startRaw) !== 1 || preg_match($timePattern, $endRaw) !== 1) {
+            return 'competition_schedule_unverified';
+        }
+        $startUtc = new DateTimeImmutable($startRaw);
+        $endUtc = new DateTimeImmutable($endRaw);
+        if ($endUtc <= $startUtc) {
+            return 'competition_schedule_invalid';
+        }
     } catch (Throwable $e) {
-        return 'competition_end_unverified';
+        return 'competition_unregistered';
     }
+
     $now = $now ?? new DateTimeImmutable('now', new DateTimeZone('UTC'));
+    if ($now < $startUtc) {
+        return 'competition_not_started';
+    }
     return $now >= $endUtc ? 'competition_ended' : null;
 }
 
@@ -246,8 +277,12 @@ function stc_notify_signal_event(PDO $pdo, array $config, string $eventId): arra
     }
 
     $competitionId = (string)($payload['competition_id'] ?? '');
-    if (stc_notification_suppression_reason(['competition_id' => $competitionId, 'event_type' => 'SIGNAL']) !== null) {
-        return ['ok' => true, 'skipped' => true, 'reason' => 'competition_ended'];
+    $suppressionReason = stc_notification_suppression_reason([
+        'competition_id' => $competitionId,
+        'event_type' => 'SIGNAL',
+    ]);
+    if ($suppressionReason !== null) {
+        return ['ok' => true, 'skipped' => true, 'reason' => $suppressionReason];
     }
 
     $symbol = (string)($payload['symbol'] ?? '');
