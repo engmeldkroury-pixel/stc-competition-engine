@@ -1,0 +1,4 @@
+2026-10-13 STC notification-only production readback.
+Deployed workflow run: 38460362533, successful backup, lint and SHA validation.
+Read-only GET to notification.php; print only channel booleans and aggregate postdeployment counts.
+No broker trades, no messages, no Gmail, no desktop browser interaction.
