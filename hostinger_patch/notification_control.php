@@ -4,6 +4,9 @@ require_once __DIR__ . '/portfolio_control.php';
 
 const STC_MONITOR_VISIBILITY_FLOOR = 78;
 
+// The owner explicitly opted out of ALL STC email notifications (2026-10-13).
+const STC_OWNER_EMAIL_NOTIFICATIONS_DISABLED = true;
+
 function stc_notification_id(string $eventKey): string {
     return 'notify-' . substr(hash('sha256', $eventKey), 0, 40);
 }
@@ -17,8 +20,7 @@ function stc_notification_config_status(array $config): array {
         'telegram_configured' => $bot !== '' && $chat !== ''
             && $bot !== 'CHANGE_ME_TELEGRAM_BOT_TOKEN'
             && $chat !== 'CHANGE_ME_TELEGRAM_CHAT_ID',
-        'email_configured' => filter_var($email, FILTER_VALIDATE_EMAIL) !== false
-            && filter_var($from, FILTER_VALIDATE_EMAIL) !== false,
+        'email_configured' => false, // Owner disabled email: no STC mail route may be used.
     ];
 }
 
@@ -99,27 +101,50 @@ function stc_send_telegram(array $config, string $title, string $body): array {
 }
 
 function stc_send_email(array $config, string $title, string $body): array {
-    $to = trim((string)($config['notification_email'] ?? ''));
-    $from = trim((string)($config['notification_from_email'] ?? ''));
-    if (filter_var($to, FILTER_VALIDATE_EMAIL) === false || filter_var($from, FILTER_VALIDATE_EMAIL) === false) {
-        return ['attempted' => false, 'ok' => false, 'http_code' => null, 'error' => 'email_not_configured'];
+    // Defensive second gate: even direct callers cannot send an email.
+    return ['attempted' => false, 'ok' => false, 'http_code' => null, 'error' => 'email_disabled_by_owner'];
+}
+
+// This applies before notification logging AND at every outbound delivery boundary.
+// Do not disable the shared processing cron or Telegram for a future contest.
+// Competition end times come from the same registered rules used for scoreboard scoring.
+function stc_notification_suppression_reason(array $event, ?DateTimeImmutable $now = null): ?string {
+    if ((string)($event['event_type'] ?? '') === 'SYSTEM_HEARTBEAT') {
+        return 'routine_heartbeat_disabled';
     }
-    $headers = [
-        'From: STC <' . $from . '>',
-        'Reply-To: ' . $from,
-        'Content-Type: text/plain; charset=UTF-8',
-        'X-Mailer: STC-Competition-Engine',
-    ];
-    $ok = @mail($to, $title, $body, implode("\r\n", $headers));
-    return [
-        'attempted' => true,
-        'ok' => $ok,
-        'http_code' => null,
-        'error' => $ok ? null : 'mail_function_failed',
-    ];
+    $competitionId = trim((string)($event['competition_id'] ?? ''));
+    if (!in_array($competitionId, ['amp-futures-sep-2026', 'capital-africa-sep-2026'], true)) {
+        return null; // Future competitions and the independent Spot lab keep their own policies.
+    }
+    try {
+        $rules = stc_competition_rule_summary($competitionId);
+        $endRaw = trim((string)($rules['end_utc'] ?? ''));
+        if ($endRaw === '') {
+            return 'competition_end_unverified';
+        }
+        $endUtc = new DateTimeImmutable($endRaw, new DateTimeZone('UTC'));
+    } catch (Throwable $e) {
+        return 'competition_end_unverified';
+    }
+    $now = $now ?? new DateTimeImmutable('now', new DateTimeZone('UTC'));
+    return $now >= $endUtc ? 'competition_ended' : null;
 }
 
 function stc_dispatch_notification(PDO $pdo, array $config, array $event): array {
+    $suppression = stc_notification_suppression_reason($event);
+    if ($suppression !== null) {
+        return [
+            'notification_id' => stc_notification_id((string)($event['event_key'] ?? '')),
+            'event_key' => (string)($event['event_key'] ?? ''),
+            'new_event' => false,
+            'delivered_any' => false,
+            'channels' => [],
+            'config' => ['telegram_configured' => false, 'email_configured' => false],
+            'skipped' => true,
+            'reason' => $suppression,
+        ];
+    }
+
     $eventKey = (string)$event['event_key'];
     $notificationId = stc_notification_id($eventKey);
     $stmt = $pdo->prepare(
@@ -221,6 +246,10 @@ function stc_notify_signal_event(PDO $pdo, array $config, string $eventId): arra
     }
 
     $competitionId = (string)($payload['competition_id'] ?? '');
+    if (stc_notification_suppression_reason(['competition_id' => $competitionId, 'event_type' => 'SIGNAL']) !== null) {
+        return ['ok' => true, 'skipped' => true, 'reason' => 'competition_ended'];
+    }
+
     $symbol = (string)($payload['symbol'] ?? '');
     $direction = (string)($signal['recommendation'] ?? 'WAIT');
     $preGateDirection = (string)($signal['pre_gate_recommendation'] ?? 'WAIT');
@@ -542,6 +571,9 @@ function stc_set_state_hash(PDO $pdo, string $stateKey, string $hash): void {
 }
 
 function stc_maybe_notify_system_heartbeat(PDO $pdo, array $config): ?array {
+    // Owner wants relevant actionable Telegram only, no six-hour status spam.
+    return null;
+
     $lastStmt = $pdo->query(
         "SELECT MAX(created_at_utc) FROM stc_notification_events WHERE event_type = 'SYSTEM_HEARTBEAT'"
     );
@@ -604,6 +636,13 @@ function stc_notify_portfolio(PDO $pdo, array $config): array {
     $notifications = [];
     $stmt = $pdo->query("SELECT * FROM stc_positions WHERE status = 'OPEN' ORDER BY id ASC");
     while (($position = $stmt->fetch()) !== false) {
+        if (stc_notification_suppression_reason([
+            'competition_id' => (string)$position['competition_id'],
+            'event_type' => 'POSITION_MANAGEMENT',
+        ]) !== null) {
+            continue; // Keep position in the ledger; only old outbound messages are suppressed.
+        }
+
         $history = stc_recent_signal_states(
             $pdo,
             (string)$position['competition_id'],
