@@ -1,0 +1,1 @@
+Run read-only SQL compatibility diagnosis after bootstrap run 38643018970 failed with PDOException at --dry-run. No updates, no secrets, no account records, no messages or trades.
