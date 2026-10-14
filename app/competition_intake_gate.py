@@ -131,12 +131,12 @@ def evaluate_contest_intake(
     ):
         result = "INELIGIBLE_TERRITORY"
         reason = "Official contest restrictions exclude this legal residence"
+    elif now >= end:
+        result = "CONTEST_ENDED"
+        reason = "Competition period ended"
     elif now >= deadline:
         result = "REGISTRATION_CLOSED"
         reason = "Official registration period ended; owner entry was not confirmed"
-    elif now >= end:
-        result = "CONTEST_ENDED"
-        reason = "Competition deadline passed"
     else:
         result = "OWNER_ELIGIBILITY_CONFIRMATION_REQUIRED"
         reason = (
