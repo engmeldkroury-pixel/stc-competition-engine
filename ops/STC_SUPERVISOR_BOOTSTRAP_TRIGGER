@@ -3,3 +3,5 @@ STC Phase 1 read-only supervisor bootstrap, 2026-10-14.
 Approved scope: add three MySQL audit tables, three additive PHP observer files, run one DB read-only dry-run and at most one idempotent audit tick. No emails, Telegram, broker orders, TradingView position mutation, desktop browser, or cron scheduling. Keep every existing production file unchanged. PHP lint + tests + rollback controls mandatory. Cadence remains not scheduled until separately proven.
 
 Retry 2: repair bootstrap test dependencies; the first job failed before any remote SSH or database changes. Continue with three-file additive and one safe audit tick.
+
+Retry 3: PR #205 merged; correct the production webhook window to analysis_completed_at_utc and bound VARCHAR(32) manual action. Production diagnostic 38643455043 verified the other SQL queries, and first rollback removed PHP files. Only additive schema and one fail-closed audited tick allowed.
