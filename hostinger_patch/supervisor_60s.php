@@ -29,6 +29,22 @@ function stc_supervisor_watch_key(string $kind, string $ref): string {
 
 function stc_supervisor_read_watches(PDO $pdo, DateTimeImmutable $now): array {
     $watches = [];
+    // Bounded state lookup prevents re-writing already terminal plan receipts.
+    // A completed position's ledger remains stored separately.
+    $priorRows = $pdo->query(
+        "SELECT watch_key, state FROM stc_supervisor_watches "
+        . "WHERE watch_type = 'POSITION' OR "
+        . "(watch_type = 'SIGNAL' AND last_checked_utc >= "
+        . "UTC_TIMESTAMP() - INTERVAL 1 DAY) "
+        . "ORDER BY last_checked_utc DESC LIMIT 2501"
+    )->fetchAll(PDO::FETCH_ASSOC);
+    if (count($priorRows) > 2500) {
+        throw new RuntimeException('watch_state_capacity_exceeded');
+    }
+    $priorStates = [];
+    foreach ($priorRows as $priorRow) {
+        $priorStates[(string)$priorRow['watch_key']] = (string)$priorRow['state'];
+    }
     $positions = $pdo->query(
         "SELECT position_id, competition_id, symbol, status, current_stop, "
         . "opened_at_utc, source_plan_id FROM stc_positions "
@@ -56,6 +72,12 @@ function stc_supervisor_read_watches(PDO $pdo, DateTimeImmutable $now): array {
         $state = stc_supervisor_position_state($position, $history, $now);
         $ref = (string)$position['position_id'];
         $key = stc_supervisor_watch_key('POSITION', $ref);
+        if ($state['state'] === 'ENDED_RECONCILIATION'
+            && ($priorStates[$key] ?? '') === 'ENDED_RECONCILIATION') {
+            // The owner can still reconcile via the durable OPEN position
+            // ledger. Avoid pointless repeated 60-second archived receipts.
+            continue;
+        }
         $watches[$key] = [
             'watch_key' => $key, 'watch_type' => 'POSITION',
             'competition_id' => $cid, 'symbol' => $symbol, 'source_ref' => $ref,
@@ -73,7 +95,7 @@ function stc_supervisor_read_watches(PDO $pdo, DateTimeImmutable $now): array {
     $stmt = $pdo->query(
         "SELECT payload_json, result_json FROM stc_webhook_events "
         . "WHERE status = 'ingested' "
-        . "AND created_at_utc >= UTC_TIMESTAMP() - INTERVAL 1 DAY "
+        . "AND created_at_utc >= UTC_TIMESTAMP() - INTERVAL 2 HOUR "
         . "ORDER BY id DESC LIMIT 2001"
     );
     $recent = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -97,7 +119,7 @@ function stc_supervisor_read_watches(PDO $pdo, DateTimeImmutable $now): array {
         if ($cid === '' || $symbol === '' || $planId === '') {
             continue;
         }
-        $key = stc_supervisor_watch_key('SIGNAL', $planId);
+        $key = stc_supervisor_watch_key('SIGNAL', $cid . '|' . $planId);
         if (isset($watches[$key])) {
             continue;
         }
@@ -107,6 +129,18 @@ function stc_supervisor_read_watches(PDO $pdo, DateTimeImmutable $now): array {
             'valid_until' => $plan['valid_until'] ?? null,
             'owner_recorded_open' => isset($openPlans[$planId]),
         ], $now);
+        $previousState = $priorStates[$key] ?? null;
+        if ($previousState !== null && in_array($previousState, [
+            'EXPIRED_SIGNAL', 'OWNER_RECORDED_OPEN',
+            'SIGNAL_TTL_UNVERIFIED', 'CONTEST_UNVERIFIED',
+            'SIGNAL_DATA_INVALID',
+        ], true)) {
+            continue; // Already terminal: no resurrection or minute replay.
+        }
+        if ($status['state'] !== 'PENDING_MANUAL_CONFIRMATION'
+            && $previousState === $status['state']) {
+            continue; // Write terminal transition once, then stop polling.
+        }
         $watches[$key] = [
             'watch_key' => $key, 'watch_type' => 'SIGNAL',
             'competition_id' => $cid, 'symbol' => $symbol, 'source_ref' => $planId,
@@ -124,7 +158,9 @@ function stc_supervisor_read_watches(PDO $pdo, DateTimeImmutable $now): array {
         "SELECT watch_key, watch_type, competition_id, symbol, source_ref, state, "
         . "last_valid_until_utc FROM stc_supervisor_watches "
         . "WHERE state IN ('PENDING_MANUAL_CONFIRMATION', 'EXTERNAL_FILL_UNVERIFIED', "
-        . "'DATA_STALE', 'SOURCE_UNVERIFIED', 'CONTEST_UNVERIFIED', 'ENDED_RECONCILIATION') "
+        . "'DATA_STALE', 'SOURCE_UNVERIFIED') "
+        . "OR (watch_type = 'POSITION' AND state = 'ENDED_RECONCILIATION' "
+        . "AND last_checked_utc <= UTC_TIMESTAMP() - INTERVAL 1 HOUR) "
         . "ORDER BY last_checked_utc ASC LIMIT 501"
     )->fetchAll(PDO::FETCH_ASSOC);
     if (count($tracked) > 500) {
