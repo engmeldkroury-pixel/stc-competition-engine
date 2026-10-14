@@ -200,3 +200,12 @@ def test_time_parser_rejects_relative_and_invalid_calendar_dates():
         "valid": "2026-10-14 12:00:00",
         "mysql_valid": "2026-10-14 12:00:00",
     }
+
+
+def test_ingested_event_window_uses_production_analysis_completion_column():
+    """Production has analysis_completed_at_utc, not webhook created_at_utc."""
+    source = RUNNER.read_text(encoding="utf-8")
+    assert "AND analysis_completed_at_utc >= UTC_TIMESTAMP() - INTERVAL 2 HOUR" in source
+    assert "AND created_at_utc >= UTC_TIMESTAMP()" not in source
+    cloud = (ROOT / "hostinger_patch" / "cloud_control.php").read_text(encoding="utf-8")
+    assert "analysis_completed_at_utc" in cloud
