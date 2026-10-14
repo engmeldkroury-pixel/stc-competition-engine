@@ -1,0 +1,56 @@
+name: STC Supervisor Safe Readback
+on:
+  push:
+    branches: [main]
+    paths:
+      - "ops/STC_SUPERVISOR_READBACK_TRIGGER"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  owner-safe-readback:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      STC_OWNER_TOKEN: ${{ secrets.STC_OWNER_TOKEN }}
+    steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Check production supervisor status (GET only)
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$STC_OWNER_TOKEN"
+          code="$(curl --silent --show-error -m 20 -o /tmp/stc-supervisor-status.json \
+            -w '%{http_code}' -H "Authorization: Bearer $STC_OWNER_TOKEN" \
+            "https://stc.feama.site/supervisor_status.php")"
+          echo "STC_SUPERVISOR_STATUS_HTTP=$code"
+          test "$code" = "200"
+          python - <<'PY'
+          import json
+          src=json.load(open('/tmp/stc-supervisor-status.json',encoding='utf-8'))
+          if src.get('ok') is not True:
+              raise SystemExit('Supervisor response is not a successful owner-only readback')
+          if src.get('email_enabled') is not False:
+              raise SystemExit('Owner email policy violated')
+          if src.get('execution') != 'manual_only':
+              raise SystemExit('Automatic position execution must not be claimed')
+          if src.get('automatic_execution_available') is not False:
+              raise SystemExit('Automated execution unexpectedly enabled')
+          if src.get('live_market_quote_connected') is not False:
+              raise SystemExit('Live quote feed cannot be certified by this deployment')
+          if src.get('external_tradingview_paper_fills_connected') is not False:
+              raise SystemExit('No external fill readback was connected')
+          tick=src.get('last_tick') or {}
+          print('STC_SUPERVISOR_HEALTH='+str(src.get('monitor_health')))
+          print('STC_SUPERVISOR_TICK_STATUS='+str(tick.get('status','none')))
+          print('STC_SUPERVISOR_LAST_SUCCESS_AGE_SECONDS='+str(src.get('last_success_age_seconds')))
+          print('STC_SUPERVISOR_CADENCE_PROVEN='+str(src.get('poll_interval_proven')).lower())
+          print('STC_SUPERVISOR_POLL_TARGET_SECONDS='+str(src.get('poll_interval_target_seconds')))
+          print('STC_SUPERVISOR_CADENCE_SAMPLE_MINUTES='+str(src.get('cadence_sample_minutes')))
+          print('STC_SUPERVISOR_AGGREGATE_WATCH_COUNTS='+str(src.get('watch_state_counts',[])))
+          print('STC_SUPERVISOR_EMAIL_DISABLED=true')
+          print('STC_SUPERVISOR_EXECUTION=manual_only')
+          print('STC_SUPERVISOR_OWNER_SAFE_READBACK_SUCCESS=true')
+          PY
