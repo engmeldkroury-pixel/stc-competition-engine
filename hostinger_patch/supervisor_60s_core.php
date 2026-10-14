@@ -18,8 +18,18 @@ function stc_supervisor_parse_time(mixed $raw): ?DateTimeImmutable {
     if (!is_string($raw) || trim($raw) === '') {
         return null;
     }
+    $value = trim($raw);
+    // Do not accept relative timestamps ('tomorrow') or silently normalized
+    // invalid calendar dates such as February 30.
+    if (preg_match('/^\\d{4}-\\d{2}-\\d{2}[T ]\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:?\\d{2})?$/', $value) !== 1) {
+        return null;
+    }
     try {
-        $timestamp = new DateTimeImmutable(trim($raw), new DateTimeZone('UTC'));
+        $timestamp = new DateTimeImmutable($value, new DateTimeZone('UTC'));
+        $errors = DateTimeImmutable::getLastErrors();
+        if (is_array($errors) && ($errors['warning_count'] > 0 || $errors['error_count'] > 0)) {
+            return null;
+        }
         return $timestamp->setTimezone(new DateTimeZone('UTC'));
     } catch (Throwable $e) {
         return null;
