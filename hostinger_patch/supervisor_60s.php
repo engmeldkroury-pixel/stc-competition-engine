@@ -95,7 +95,7 @@ function stc_supervisor_read_watches(PDO $pdo, DateTimeImmutable $now): array {
     $stmt = $pdo->query(
         "SELECT payload_json, result_json FROM stc_webhook_events "
         . "WHERE status = 'ingested' "
-        . "AND created_at_utc >= UTC_TIMESTAMP() - INTERVAL 2 HOUR "
+        . "AND analysis_completed_at_utc >= UTC_TIMESTAMP() - INTERVAL 2 HOUR "
         . "ORDER BY id DESC LIMIT 2001"
     );
     $recent = $stmt->fetchAll(PDO::FETCH_ASSOC);
