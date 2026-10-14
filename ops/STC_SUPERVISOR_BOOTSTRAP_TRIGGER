@@ -1,0 +1,3 @@
+STC Phase 1 read-only supervisor bootstrap, 2026-10-14.
+
+Approved scope: add three MySQL audit tables, three additive PHP observer files, run one DB read-only dry-run and at most one idempotent audit tick. No emails, Telegram, broker orders, TradingView position mutation, desktop browser, or cron scheduling. Keep every existing production file unchanged. PHP lint + tests + rollback controls mandatory. Cadence remains not scheduled until separately proven.
