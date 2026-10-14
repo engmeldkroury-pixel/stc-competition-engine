@@ -135,8 +135,12 @@ function stc_supervisor_signal_state(
             'valid_until_utc' => null,
         ];
     }
-    $valid = stc_supervisor_parse_time($record['valid_until'] ?? null);
-    if ($valid === null || (string)($record['valid_until'] ?? '') === '') {
+    $validRaw = trim((string)($record['valid_until'] ?? ''));
+    // Never interpret a locale-dependent expiry as UTC. The original locked
+    // plan must have an explicit Z or numeric timezone offset.
+    $expiryHasTimezone = preg_match('/(?:Z|[+-]\\d{2}:?\\d{2})$/', $validRaw) === 1;
+    $valid = $expiryHasTimezone ? stc_supervisor_parse_time($validRaw) : null;
+    if ($valid === null) {
         return [
             'state' => 'SIGNAL_TTL_UNVERIFIED',
             'reason' => 'missing_or_invalid_server_locked_plan_expiry',
