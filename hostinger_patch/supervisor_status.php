@@ -56,6 +56,9 @@ if (is_array($latest)) {
             && $lastAge >= 0 && $lastAge <= 150;
     }
 }
+// Thirty old consecutive ticks do not prove the monitor works NOW.
+$minuteCadenceProven = $minuteCadenceProven && $healthy;
+
 stc_json([
     'ok' => true,
     'monitor_health' => $healthy ? 'TICK_RECEIPTS_RECENT' : 'MONITOR_UNHEALTHY_OR_NOT_SCHEDULED',
