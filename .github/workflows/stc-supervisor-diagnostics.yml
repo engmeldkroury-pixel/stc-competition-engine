@@ -45,7 +45,7 @@ jobs:
           declare(strict_types=1);
           $target = getenv('STC_PRIVATE_SITE_PATH');
           require $target . '/notification_control.php';
-          require $target . '/supervisor_60s_core.php';
+          // Files were correctly rolled back; diagnose schema without the undeployed core.
           $pdo = stc_pdo($config);
           $checks = [
             'position_schema' => "SELECT position_id,competition_id,symbol,status,current_stop,opened_at_utc,source_plan_id FROM stc_positions LIMIT 0",
@@ -66,13 +66,7 @@ jobs:
               echo "STC_DIAG_".$label."=FAILED_SQLSTATE_".$e->getCode()."_MYSQL_".$driver."\n";
             }
           }
-          try {
-            $w = stc_supervisor_read_watches($pdo,new DateTimeImmutable('now',new DateTimeZone('UTC')));
-            echo "STC_DIAG_READ_WATCHES=PASS_COUNT_".count($w)."\n";
-          } catch (Throwable $e) {
-            $driver = $e instanceof PDOException ? (int)($e->errorInfo[1] ?? 0) : 0;
-            echo "STC_DIAG_READ_WATCHES=FAILED_SQLSTATE_".$e->getCode()."_MYSQL_".$driver."\n";
-          }
+          echo "STC_DIAG_SCHEMA_CHECKS_FINISHED=true\n";
           ?>
           PHP
           echo "STC_SQL_DIAGNOSIS_READONLY_NO_MESSAGES_OR_TRADES=true"
