@@ -159,3 +159,44 @@ def test_old_finished_contests_are_only_readonly_reconciliation():
     assert "'EXPIRED_SIGNAL'" in source
     assert "'NO_ENTRY'" in source
     assert "stc_notification_suppression_reason(" in source
+
+
+def test_terminal_signals_are_not_written_each_minute_and_backlog_is_bounded():
+    source = RUNNER.read_text(encoding="utf-8")
+    assert "INTERVAL 2 HOUR" in source
+    assert "INTERVAL 1 HOUR" in source
+    assert "watch_state_capacity_exceeded" in source
+    assert "priorStates" in source
+    assert "'EXPIRED_SIGNAL', 'OWNER_RECORDED_OPEN'" in source
+    assert "Already terminal: no resurrection or minute replay" in source
+    assert "status['state'] !== 'PENDING_MANUAL_CONFIRMATION'" in source
+    assert "incomplete_supervisor_tick_receipts" in source
+    # Competition identity is part of signal idempotency, so two contests
+    # can never dedupe one another when an upstream plan_id repeats.
+    assert "stc_supervisor_watch_key('SIGNAL', $cid . '|' . $planId)" in source
+
+
+def test_cadence_cannot_be_proven_using_stale_historical_tick_rows():
+    source = STATUS.read_text(encoding="utf-8")
+    assert "lastAge <= 150" in source
+    assert "$minuteCadenceProven = $minuteCadenceProven && $healthy;" in source
+    assert "count($recentTicks) === 30" in source
+    assert "!== 60" in source
+
+
+def test_time_parser_rejects_relative_and_invalid_calendar_dates():
+    script = r"""
+    require 'hostinger_patch/supervisor_60s_core.php';
+    echo json_encode([
+      'relative' => stc_supervisor_parse_time('tomorrow') === null,
+      'wrong_calendar' => stc_supervisor_parse_time('2026-02-30T12:00:00Z') === null,
+      'valid' => stc_supervisor_parse_time('2026-10-14T12:00:00Z')?->format('Y-m-d H:i:s'),
+      'mysql_valid' => stc_supervisor_parse_time('2026-10-14 12:00:00')?->format('Y-m-d H:i:s'),
+    ], JSON_THROW_ON_ERROR);
+    """
+    got = php_eval(script)
+    assert got == {
+        "relative": True, "wrong_calendar": True,
+        "valid": "2026-10-14 12:00:00",
+        "mysql_valid": "2026-10-14 12:00:00",
+    }
