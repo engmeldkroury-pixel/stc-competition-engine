@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "reviewed_at_utc": "2026-10-14T20:40:00Z",
+  "purpose": "RESEARCH_DISCOVERY_ONLY_NOT_REGISTRATION_OR_TRADE_AUTHORITY",
+  "registered_owner_accounts_verified": false,
+  "contests": [
+    {
+      "competition_id": "tradingview-commodities-oct-2026",
+      "title": "TradingView The Leap Commodities October 2026",
+      "rules_url": "https://www.tradingview.com/the-leap/commodities-october-2026/rules/",
+      "start_utc": "2026-10-07T12:00:00Z",
+      "end_utc": "2026-10-20T08:00:00Z",
+      "registration_close_utc": "2026-10-14T08:00:00Z",
+      "residence_rule": {
+        "type": "EXCLUSION_LIST_REQUIRES_LEGAL_CONFIRMATION",
+        "iso_country_codes": [
+          "IR",
+          "KP",
+          "CU",
+          "BY",
+          "RU"
+        ],
+        "additional_excluded_regions": [
+          "Crimea",
+          "Donetsk",
+          "Luhansk"
+        ]
+      },
+      "scoring_basis": "REALIZED_PROFIT_PCT_DIVIDED_BY_MAX_DRAWDOWN_WITH_5PCT_FLOOR",
+      "min_trading_days": 3,
+      "owner_registration_confirmed": false,
+      "strategy_research_only": true
+    },
+    {
+      "competition_id": "phillip-nova-oct-2026",
+      "title": "The Leap by Phillip Nova October 2026",
+      "rules_url": "https://www.tradingview.com/the-leap/phillip-nova-october-2026/rules/",
+      "start_utc": "2026-10-05T08:00:00Z",
+      "end_utc": "2026-10-23T12:00:00Z",
+      "registration_close_utc": "2026-10-20T08:00:00Z",
+      "residence_rule": {
+        "type": "ALLOWLIST_ONLY",
+        "iso_country_codes": [
+          "MY",
+          "SG",
+          "ID"
+        ]
+      },
+      "scoring_basis": "REALIZED_CLOSED_POSITION_PNL",
+      "min_trading_days": 3,
+      "owner_registration_confirmed": false,
+      "strategy_research_only": true
+    }
+  ],
+  "safety": [
+    "Never infer entrant legal residence or account status from a device IP, VPN or profile name",
+    "Never assume an account is registered based on the landing page",
+    "A future eligible contest is research-only until owner registration, fresh rules, paper-account readback and strategy are verified",
+    "Never send Gmail or old contest notifications; no automated execution"
+  ]
+}
