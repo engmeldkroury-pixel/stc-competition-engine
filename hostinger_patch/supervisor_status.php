@@ -13,6 +13,24 @@ $latest = $pdo->query(
     . 'errors_count FROM stc_supervisor_ticks ORDER BY id DESC LIMIT 1'
 )->fetch(PDO::FETCH_ASSOC);
 
+// The target is not considered proven until 30 consecutive minute buckets
+// have actually committed successfully on the server, irrespective of browser.
+$recentTicks = $pdo->query(
+    'SELECT minute_bucket_utc, started_at_utc, status '
+    . 'FROM stc_supervisor_ticks ORDER BY id DESC LIMIT 30'
+)->fetchAll(PDO::FETCH_ASSOC);
+$minuteCadenceProven = count($recentTicks) === 30;
+$previous = null;
+foreach ($recentTicks as $tickRow) {
+    $bucket = new DateTimeImmutable((string)$tickRow['minute_bucket_utc'], new DateTimeZone('UTC'));
+    if ($tickRow['status'] !== 'SUCCEEDED'
+        || ($previous !== null && $previous - $bucket->getTimestamp() !== 60)) {
+        $minuteCadenceProven = false;
+        break;
+    }
+    $previous = $bucket->getTimestamp();
+}
+
 $summary = [];
 $stateRows = $pdo->query(
     'SELECT watch_type, state, COUNT(*) AS count FROM stc_supervisor_watches '
@@ -45,7 +63,8 @@ stc_json([
     'last_tick' => $latest === false ? null : $latest,
     'watch_state_counts' => $summary,
     'poll_interval_target_seconds' => 60,
-    'poll_interval_proven' => false, // A GET cannot prove continuous scheduling.
+    'poll_interval_proven' => $minuteCadenceProven,
+    'cadence_sample_minutes' => count($recentTicks),
     'live_market_quote_connected' => false,
     'external_tradingview_paper_fills_connected' => false,
     'email_enabled' => false,
