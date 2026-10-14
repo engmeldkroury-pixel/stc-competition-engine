@@ -100,7 +100,8 @@ def test_manual_signal_ttl_never_extends_for_sleeping_owner_or_unverified_fill()
     assert got["before"]["state"]=="EXPIRED_SIGNAL"
     assert got["before"]["manual_action"]=="NO_ENTRY"
     assert got["active"]["state"]=="PENDING_MANUAL_CONFIRMATION"
-    assert got["active"]["manual_action"]=="REVALIDATE_LIVE_PRICE_AND_ACCOUNT"
+    assert got["active"]["manual_action"]=="REVALIDATE_PRICE_AND_ACCOUNT"
+    assert all(len(item["manual_action"]) <= 32 for item in got.values())
     assert got["duplicate"]["manual_action"]=="NO_DUPLICATE_ENTRY"
     assert got["invalid"]["state"]=="SIGNAL_TTL_UNVERIFIED"
     assert got["invalid"]["manual_action"]=="NO_ENTRY"
