@@ -1,0 +1,74 @@
+name: STC Supervisor Live Idempotency Smoke
+on:
+  push:
+    branches: [main]
+    paths: ["ops/STC_SUPERVISOR_SMOKE_TRIGGER"]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: stc-supervisor-idempotency-check
+  cancel-in-progress: false
+jobs:
+  production-audit-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Authenticate production server safely
+        shell: bash
+        env:
+          SSH_KEY: ${{ secrets.HOSTINGER_SSH_PRIVATE_KEY }}
+          SSH_HOST: ${{ secrets.HOSTINGER_SSH_HOST }}
+          SSH_USER: ${{ secrets.HOSTINGER_SSH_USER }}
+          TARGET: ${{ secrets.HOSTINGER_STC_PUBLIC_HTML }}
+        run: |
+          set -euo pipefail
+          test -n "$SSH_KEY" && test -n "$SSH_HOST" && test -n "$SSH_USER"
+          case "$TARGET" in /home/*/domains/stc.feama.site/public_html) ;; *) exit 1;; esac
+          mkdir -p "$HOME/.ssh"; chmod 700 "$HOME/.ssh"
+          printf '%s\n' "$SSH_KEY" | tr -d '\r' > "$HOME/.ssh/id_ed25519"
+          chmod 600 "$HOME/.ssh/id_ed25519"
+          ssh-keygen -y -f "$HOME/.ssh/id_ed25519" >/dev/null
+          ssh-keyscan -p 65002 "$SSH_HOST" >> "$HOME/.ssh/known_hosts"
+      - name: Prove duplicate-minute tick is idempotent, no trade or message
+        shell: bash
+        env:
+          SSH_HOST: ${{ secrets.HOSTINGER_SSH_HOST }}
+          SSH_USER: ${{ secrets.HOSTINGER_SSH_USER }}
+          TARGET: ${{ secrets.HOSTINGER_STC_PUBLIC_HTML }}
+        run: |
+          set -euo pipefail
+          ssh -p 65002 "$SSH_USER@$SSH_HOST" bash -s -- "$TARGET" <<'REMOTE'
+          set -euo pipefail
+          target="$1"
+          case "$target" in /home/*/domains/stc.feama.site/public_html) ;; *) exit 1;; esac
+          test -f "$target/supervisor_60s.php"
+          tmp="$(mktemp -d "$HOME/stc-supervisor-smoke.XXXXXX")"
+          cleanup() { rm -f "$tmp/first.json" "$tmp/second.json" "$tmp/dry.json"; rmdir "$tmp"; }
+          trap cleanup EXIT
+          php "$target/supervisor_60s.php" --dry-run > "$tmp/dry.json"
+          php "$target/supervisor_60s.php" --tick > "$tmp/first.json"
+          php "$target/supervisor_60s.php" --tick > "$tmp/second.json"
+          php -r '
+            foreach(array_slice($argv,1) as $path){
+              $v=json_decode(file_get_contents($path),true,512,JSON_THROW_ON_ERROR);
+              if(($v["ok"]??false)!==true || ($v["no_messages_sent"]??false)!==true
+                || ($v["no_trades_executed"]??false)!==true){
+                  throw new RuntimeException("NO_TRADE_POLICY_OR_RUN_FAILURE");
+              }
+            }
+            $first=json_decode(file_get_contents($argv[2]),true,512,JSON_THROW_ON_ERROR);
+            $second=json_decode(file_get_contents($argv[3]),true,512,JSON_THROW_ON_ERROR);
+            if(($first["minute_bucket"]??"")===($second["minute_bucket"]??"")){
+              if(($second["status"]??"")!=="ALREADY_RECORDED"){
+                throw new RuntimeException("DUPLICATE_MINUTE_NOT_IDEMPOTENT");
+              }
+              echo "STC_DUPLICATE_MINUTE_IDEMPOTENCY=PASS\n";
+            }else{
+              echo "STC_DUPLICATE_MINUTE_IDEMPOTENCY=INCONCLUSIVE_BOUNDARY_CROSSED\n";
+            }
+            echo "STC_PRODUCTION_SUPERVISOR_DRY_RUN=PASS\n";
+            echo "STC_PRODUCTION_NO_TRADE_OR_MESSAGES=PASS\n";
+          ' "$tmp/dry.json" "$tmp/first.json" "$tmp/second.json"
+          echo "STC_PERIODIC_60S_CRON_PROVEN=false"
+          REMOTE
