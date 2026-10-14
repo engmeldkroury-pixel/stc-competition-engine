@@ -1,0 +1,169 @@
+name: STC Manual Supervisor Bootstrap
+on:
+  push:
+    branches: [main]
+    paths:
+      - "ops/STC_SUPERVISOR_BOOTSTRAP_TRIGGER"
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: stc-hostinger-deploy
+  cancel-in-progress: false
+jobs:
+  supervisor-bootstrap:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install focused test runner and verify security contracts
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install "pytest>=8,<9"
+          php -l hostinger_patch/supervisor_60s_core.php
+          php -l hostinger_patch/supervisor_60s.php
+          php -l hostinger_patch/supervisor_status.php
+          python -m pytest -q tests/test_supervisor_60s_contract.py
+          echo "STC_SUPERVISOR_NO_TRADE_POLICY_TESTED=true"
+      - name: Establish Hostinger deployment identity
+        shell: bash
+        env:
+          SSH_KEY: ${{ secrets.HOSTINGER_SSH_PRIVATE_KEY }}
+          SSH_HOST: ${{ secrets.HOSTINGER_SSH_HOST }}
+          SSH_USER: ${{ secrets.HOSTINGER_SSH_USER }}
+          TARGET: ${{ secrets.HOSTINGER_STC_PUBLIC_HTML }}
+        run: |
+          set -euo pipefail
+          test -n "$SSH_KEY" && test -n "$SSH_HOST" && test -n "$SSH_USER"
+          case "$TARGET" in
+            /home/*/domains/stc.feama.site/public_html) ;;
+            *) echo "::error::Hostinger destination not allowlisted"; exit 1 ;;
+          esac
+          mkdir -p "$HOME/.ssh"
+          chmod 700 "$HOME/.ssh"
+          printf '%s\n' "$SSH_KEY" | tr -d '\r' > "$HOME/.ssh/id_ed25519"
+          chmod 600 "$HOME/.ssh/id_ed25519"
+          ssh-keygen -y -f "$HOME/.ssh/id_ed25519" >/dev/null
+          ssh-keyscan -p 65002 "$SSH_HOST" >> "$HOME/.ssh/known_hosts"
+          chmod 600 "$HOME/.ssh/known_hosts"
+      - name: Deploy additive observer and create append-only audit tables
+        shell: bash
+        env:
+          SSH_HOST: ${{ secrets.HOSTINGER_SSH_HOST }}
+          SSH_USER: ${{ secrets.HOSTINGER_SSH_USER }}
+          TARGET: ${{ secrets.HOSTINGER_STC_PUBLIC_HTML }}
+        run: |
+          set -euo pipefail
+          folder="stc-supervisor-stage-$GITHUB_RUN_ID"
+          ssh -p 65002 "$SSH_USER@$SSH_HOST" "mkdir -m 700 -p ~/$folder"
+          scp -P 65002 \
+            hostinger_patch/supervisor_60s_core.php \
+            hostinger_patch/supervisor_60s.php \
+            hostinger_patch/supervisor_status.php \
+            hostinger_patch/migrations/005_manual_supervisor_audit.sql \
+            "$SSH_USER@$SSH_HOST:$folder/"
+          ssh -p 65002 "$SSH_USER@$SSH_HOST" bash -s -- "$TARGET" "$folder" <<'REMOTE'
+          set -euo pipefail
+          target="$1"; folder="$2"
+          case "$target" in
+            /home/*/domains/stc.feama.site/public_html) ;;
+            *) echo "::error::Unsafe destination"; exit 1 ;;
+          esac
+          stage="$HOME/$folder"
+          test -f "$target/cloud_control.php"
+          test -f "$target/notification_control.php"
+          test -f "$target/portfolio_control.php"
+          test -f "$stage/005_manual_supervisor_audit.sql"
+          for name in supervisor_60s_core.php supervisor_60s.php supervisor_status.php; do
+            php -l "$stage/$name"
+          done
+
+          # Before touching the DB, prove the existing site DB bridge is live.
+          php -r '
+            require $argv[1]."/cloud_control.php";
+            $pdo=stc_pdo($config);
+            $d=$pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
+            if($d!=="mysql")throw new RuntimeException("not_mysql");
+            $pdo->query("SELECT COUNT(*) FROM stc_positions")->fetchColumn();
+            echo "STC_SUPERVISOR_DB_PREFLIGHT=true\n";
+          ' "$target"
+
+          # Additive CREATE TABLE IF NOT EXISTS only; no deletes or position edits.
+          php -r '
+            require $argv[1]."/cloud_control.php";
+            $pdo=stc_pdo($config);
+            $sql=file_get_contents($argv[2]);
+            if(!is_string($sql) || stripos($sql,"DROP TABLE")!==false
+               || stripos($sql,"DELETE FROM")!==false
+               || stripos($sql,"ALTER TABLE")!==false) {
+               throw new RuntimeException("unsafe_migration");
+            }
+            $commands=preg_split("/;\s*(?:\r?\n|$)/",$sql);
+            $executed=0;
+            foreach($commands as $statement) {
+              $statement=trim($statement);
+              if($statement==="")continue;
+              if($pdo->exec($statement)===false)throw new RuntimeException("sql_failed");
+              $executed++;
+            }
+            if($executed!==3)throw new RuntimeException("wrong_table_count");
+            echo "STC_SUPERVISOR_ADDITIVE_TABLES_VERIFIED=true\n";
+          ' "$target" "$stage/005_manual_supervisor_audit.sql"
+
+          # Per-file backups are kept even when deployment succeeds.
+          for name in supervisor_60s_core.php supervisor_60s.php supervisor_status.php; do
+            if test -f "$target/$name"; then
+              cp -p "$target/$name" "$stage/backup.$name"
+            fi
+          done
+          restore_supervisor() {
+            for name in supervisor_60s_core.php supervisor_60s.php supervisor_status.php; do
+              if test -f "$stage/backup.$name"; then
+                cp -p "$stage/backup.$name" "$target/$name"
+              else
+                rm -f "$target/$name"
+              fi
+            done
+          }
+          trap restore_supervisor ERR
+          for name in supervisor_60s_core.php supervisor_60s.php supervisor_status.php; do
+            cp "$stage/$name" "$target/$name"
+            php -l "$target/$name"
+            cmp -s "$stage/$name" "$target/$name"
+          done
+
+          # Dry-run only uses SELECT; first --tick only inserts audit evidence.
+          php "$target/supervisor_60s.php" --dry-run > "$stage/supervisor-dryrun.json"
+          php -r '
+            $v=json_decode(file_get_contents($argv[1]),true,512,JSON_THROW_ON_ERROR);
+            if(($v["ok"]??false)!==true
+               || ($v["mode"]??"")!=="READ_ONLY_DRY_RUN"
+               || ($v["no_messages_sent"]??false)!==true
+               || ($v["no_trades_executed"]??false)!==true) {
+               throw new RuntimeException("dry_run_contract_failed");
+            }
+            echo "STC_SUPERVISOR_PRODUCTION_DRY_RUN=true\n";
+          ' "$stage/supervisor-dryrun.json"
+          php "$target/supervisor_60s.php" --tick > "$stage/supervisor-first-tick.json"
+          php -r '
+            $v=json_decode(file_get_contents($argv[1]),true,512,JSON_THROW_ON_ERROR);
+            if(($v["ok"]??false)!==true
+               || ($v["mode"]??"")!=="DURABLE_AUDIT_TICK"
+               || !in_array($v["status"]??"",["RECORDED","ALREADY_RECORDED"],true)
+               || ($v["no_messages_sent"]??false)!==true
+               || ($v["no_trades_executed"]??false)!==true) {
+               throw new RuntimeException("audit_tick_failed");
+            }
+            echo "STC_SUPERVISOR_FIRST_SAFE_AUDIT_TICK=true\n";
+          ' "$stage/supervisor-first-tick.json"
+          trap - ERR
+
+          echo "STC_SUPERVISOR_CODE_DEPLOYED=true"
+          echo "STC_SUPERVISOR_RUNNING_ON_60S_SCHEDULE=false"
+          echo "STC_SUPERVISOR_NO_TELEGRAM_NO_EMAIL=true"
+          echo "STC_SUPERVISOR_EXECUTION_MANUAL_ONLY=true"
+          REMOTE
