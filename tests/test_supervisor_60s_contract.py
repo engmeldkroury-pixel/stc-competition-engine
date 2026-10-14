@@ -144,7 +144,9 @@ def test_health_endpoint_requires_owner_and_never_claims_live_quotes():
     text=STATUS.read_text(encoding="utf-8")
     assert "stc_require_owner_auth($config)" in text
     assert "TICK_RECEIPTS_RECENT" in text
-    assert "'poll_interval_proven' => false" in text
+    assert "'poll_interval_proven' => $minuteCadenceProven" in text
+    assert "count($recentTicks) === 30" in text
+    assert "!== 60" in text
     assert "'external_tradingview_paper_fills_connected' => false" in text
     assert "'live_market_quote_connected' => false" in text
     assert "'email_enabled' => false" in text
