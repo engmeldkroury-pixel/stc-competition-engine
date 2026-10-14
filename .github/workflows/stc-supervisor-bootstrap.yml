@@ -23,7 +23,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          python -m pip install "pytest>=8,<9"
+          python -m pip install -r requirements.txt
           php -l hostinger_patch/supervisor_60s_core.php
           php -l hostinger_patch/supervisor_60s.php
           php -l hostinger_patch/supervisor_status.php
