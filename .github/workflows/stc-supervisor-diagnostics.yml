@@ -1,0 +1,79 @@
+name: STC Supervisor SQL Readonly Diagnosis
+on:
+  push:
+    branches: [main]
+    paths: ["ops/STC_SUPERVISOR_DIAG_TRIGGER"]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  safe-db-diagnostics:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: SSH authentication with private secret
+        shell: bash
+        env:
+          SSH_KEY: ${{ secrets.HOSTINGER_SSH_PRIVATE_KEY }}
+          SSH_HOST: ${{ secrets.HOSTINGER_SSH_HOST }}
+          SSH_USER: ${{ secrets.HOSTINGER_SSH_USER }}
+          TARGET: ${{ secrets.HOSTINGER_STC_PUBLIC_HTML }}
+        run: |
+          set -euo pipefail
+          test -n "$SSH_KEY" && test -n "$SSH_HOST" && test -n "$SSH_USER"
+          case "$TARGET" in /home/*/domains/stc.feama.site/public_html) ;; *) exit 1;; esac
+          mkdir -p "$HOME/.ssh"
+          chmod 700 "$HOME/.ssh"
+          printf '%s\n' "$SSH_KEY" | tr -d '\r' > "$HOME/.ssh/id_ed25519"
+          chmod 600 "$HOME/.ssh/id_ed25519"
+          ssh-keygen -y -f "$HOME/.ssh/id_ed25519" >/dev/null
+          ssh-keyscan -p 65002 "$SSH_HOST" >> "$HOME/.ssh/known_hosts"
+      - name: Diagnose SQL compatibility without inspecting account rows
+        shell: bash
+        env:
+          SSH_HOST: ${{ secrets.HOSTINGER_SSH_HOST }}
+          SSH_USER: ${{ secrets.HOSTINGER_SSH_USER }}
+          TARGET: ${{ secrets.HOSTINGER_STC_PUBLIC_HTML }}
+        run: |
+          set -euo pipefail
+          ssh -p 65002 "$SSH_USER@$SSH_HOST" bash -s -- "$TARGET" <<'REMOTE'
+          set -euo pipefail
+          case "$1" in /home/*/domains/stc.feama.site/public_html) ;; *) exit 1;; esac
+          export STC_PRIVATE_SITE_PATH="$1"
+          php <<'PHP'
+          <?php
+          declare(strict_types=1);
+          $target = getenv('STC_PRIVATE_SITE_PATH');
+          require $target . '/notification_control.php';
+          require $target . '/supervisor_60s_core.php';
+          $pdo = stc_pdo($config);
+          $checks = [
+            'position_schema' => "SELECT position_id,competition_id,symbol,status,current_stop,opened_at_utc,source_plan_id FROM stc_positions LIMIT 0",
+            'open_positions' => "SELECT position_id,competition_id,symbol,status,current_stop,opened_at_utc,source_plan_id FROM stc_positions WHERE status='OPEN' ORDER BY id ASC LIMIT 501",
+            'webhooks_recent' => "SELECT payload_json,result_json FROM stc_webhook_events WHERE status='ingested' AND created_at_utc >= UTC_TIMESTAMP() - INTERVAL 2 HOUR ORDER BY id DESC LIMIT 2001",
+            'watch_state_schema' => "SELECT watch_key,state,watch_type,last_checked_utc,source_ref,last_valid_until_utc FROM stc_supervisor_watches LIMIT 0",
+            'prior_watches' => "SELECT watch_key,state FROM stc_supervisor_watches WHERE watch_type='POSITION' OR (watch_type='SIGNAL' AND last_checked_utc >= UTC_TIMESTAMP() - INTERVAL 1 DAY) ORDER BY last_checked_utc DESC LIMIT 2501",
+            'pending_watches' => "SELECT watch_key,watch_type,competition_id,symbol,source_ref,state,last_valid_until_utc FROM stc_supervisor_watches WHERE state IN ('PENDING_MANUAL_CONFIRMATION','EXTERNAL_FILL_UNVERIFIED','DATA_STALE','SOURCE_UNVERIFIED') OR (watch_type='POSITION' AND state='ENDED_RECONCILIATION' AND last_checked_utc <= UTC_TIMESTAMP() - INTERVAL 1 HOUR) ORDER BY last_checked_utc ASC LIMIT 501",
+            'ticks_schema' => "SELECT id,minute_bucket_utc,status FROM stc_supervisor_ticks LIMIT 0",
+            'receipts_schema' => "SELECT tick_id,watch_key FROM stc_supervisor_watch_receipts LIMIT 0",
+          ];
+          foreach ($checks as $label => $sql) {
+            try {
+              $pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC);
+              echo "STC_DIAG_".$label."=PASS\n";
+            } catch (Throwable $e) {
+              $driver = $e instanceof PDOException ? (int)($e->errorInfo[1] ?? 0) : 0;
+              echo "STC_DIAG_".$label."=FAILED_SQLSTATE_".$e->getCode()."_MYSQL_".$driver."\n";
+            }
+          }
+          try {
+            $w = stc_supervisor_read_watches($pdo,new DateTimeImmutable('now',new DateTimeZone('UTC')));
+            echo "STC_DIAG_READ_WATCHES=PASS_COUNT_".count($w)."\n";
+          } catch (Throwable $e) {
+            $driver = $e instanceof PDOException ? (int)($e->errorInfo[1] ?? 0) : 0;
+            echo "STC_DIAG_READ_WATCHES=FAILED_SQLSTATE_".$e->getCode()."_MYSQL_".$driver."\n";
+          }
+          ?>
+          PHP
+          echo "STC_SQL_DIAGNOSIS_READONLY_NO_MESSAGES_OR_TRADES=true"
+          REMOTE
