@@ -1,1 +1,3 @@
 Read-only owner-token GET of supervisor_status.php after additive schema installation. Do not send notifications or orders. Bootstrap dry-run failed; inspect status only.
+
+Verified deploy run 38643949521 has PHP lint, DB schema, production dry-run and one safe audit tick. Execute new read-only owner GET to prove deployed status and that minute cadence is not yet claimed.
