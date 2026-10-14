@@ -176,7 +176,7 @@ function stc_supervisor_signal_state(
     return [
         'state' => 'PENDING_MANUAL_CONFIRMATION',
         'reason' => 'quote_and_external_execution_reconfirmation_required',
-        'manual_action' => 'REVALIDATE_LIVE_PRICE_AND_ACCOUNT',
+        'manual_action' => 'REVALIDATE_PRICE_AND_ACCOUNT',
         'valid_until_utc' => $valid->format(DateTimeInterface::ATOM),
     ];
 }
