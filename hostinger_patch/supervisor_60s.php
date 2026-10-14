@@ -45,7 +45,14 @@ function stc_supervisor_read_watches(PDO $pdo, DateTimeImmutable $now): array {
         }
         $cid = (string)$position['competition_id'];
         $symbol = (string)$position['symbol'];
-        $history = stc_recent_signal_states($pdo, $cid, $symbol, 200);
+        // Expired/unregistered contests need only reconciliation, not 200
+        // extra signal lookups every minute. No old-contest market polling.
+        $isEligible = stc_notification_suppression_reason([
+            'competition_id' => $cid, 'event_type' => 'POSITION_MANAGEMENT',
+        ], $now) === null;
+        $history = $isEligible
+            ? stc_recent_signal_states($pdo, $cid, $symbol, 200)
+            : [];
         $state = stc_supervisor_position_state($position, $history, $now);
         $ref = (string)$position['position_id'];
         $key = stc_supervisor_watch_key('POSITION', $ref);
@@ -259,6 +266,15 @@ function stc_supervisor_write_receipts(
             $counts['signals'], $counts['positions'], $counts['stale'],
             $counts['reconciliation'], $tickId,
         ]);
+        // INSERT IGNORE is for replay idempotency only; never silently accept
+        // a skipped receipt in a supposedly successful minute.
+        $audit = $pdo->prepare(
+            'SELECT COUNT(*) FROM stc_supervisor_watch_receipts WHERE tick_id = ?'
+        );
+        $audit->execute([$tickId]);
+        if ((int)$audit->fetchColumn() !== count($watches)) {
+            throw new RuntimeException('incomplete_supervisor_tick_receipts');
+        }
         $pdo->commit();
         return ['status' => 'RECORDED', 'minute_bucket' => $bucket] + $counts;
     } catch (Throwable $e) {
