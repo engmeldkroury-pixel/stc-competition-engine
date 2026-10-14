@@ -63,3 +63,37 @@ jobs:
           echo "NATIVE_60_SECOND_CRON_SUPPORT=UNVERIFIED_UNTIL_HPLAN_SCHEDULE_OR_REAL_TICK_PROOF"
           echo "READONLY_PROBE_DONE_NO_CRON_CHANGE"
           REMOTE
+      - name: Check official Hostinger Cron API availability read-only
+        shell: bash
+        env:
+          HOSTINGER_API_TOKEN: ${{ secrets.HOSTINGER_API_TOKEN }}
+          SSH_USER: ${{ secrets.HOSTINGER_SSH_USER }}
+        run: |
+          set -euo pipefail
+          if test -z "$HOSTINGER_API_TOKEN"; then
+            echo "HOSTINGER_CRON_API_TOKEN=NOT_CONFIGURED"
+            echo "HOSTINGER_CRON_API_ACCESS=BLOCKED_NO_TOKEN"
+            exit 0
+          fi
+          if ! [[ "$SSH_USER" =~ ^u[0-9]+$ ]]; then
+            echo "HOSTINGER_CRON_API_ACCESS=BLOCKED_INVALID_ACCOUNT_IDENTIFIER"
+            exit 0
+          fi
+          code="$(curl -sS -m 15 -o /tmp/stc-cron-readonly.json -w '%{http_code}' \
+            -H "Authorization: Bearer $HOSTINGER_API_TOKEN" \
+            "https://developers.hostinger.com/api/hosting/v1/accounts/$SSH_USER/cron-jobs" || true)"
+          echo "HOSTINGER_CRON_API_HTTP_STATUS=$code"
+          if test "$code" = "200"; then
+            python - <<'PY'
+          import json
+          data=json.load(open("/tmp/stc-cron-readonly.json",encoding="utf-8"))
+          if not isinstance(data,list):
+              raise ValueError("Cron API response not a list")
+          print("HOSTINGER_CRON_API_ACCESS=AVAILABLE")
+          print("HOSTINGER_CRON_JOB_COUNT="+str(len(data)))
+          print("HOSTINGER_CRON_JOB_SCHEDULES="+str([v.get("time") for v in data if isinstance(v,dict)]))
+          print("HOSTINGER_CRON_COMMANDS_REDACTED=true")
+          PY
+          else
+            echo "HOSTINGER_CRON_API_ACCESS=UNAVAILABLE"
+          fi
