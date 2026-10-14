@@ -6,3 +6,5 @@ No broker trades, no messages, no Gmail, no desktop browser interaction.
 Follow-up: verify post-cron quiet time on production notifications (read-only; no messages, no desktop browser).
 
 Follow-up read-only verification after one or more completed Hostinger cron intervals. Do not send test messages or modify files.
+
+2026-10-14 follow-up: verify the newly deployed generic contest lifecycle notifier (deployment run 38469342284), no emails or old competition notifications. Read-only authenticated GET only.
