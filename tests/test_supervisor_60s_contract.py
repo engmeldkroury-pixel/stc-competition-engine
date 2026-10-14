@@ -100,7 +100,8 @@ def test_manual_signal_ttl_never_extends_for_sleeping_owner_or_unverified_fill()
     assert got["before"]["state"]=="EXPIRED_SIGNAL"
     assert got["before"]["manual_action"]=="NO_ENTRY"
     assert got["active"]["state"]=="PENDING_MANUAL_CONFIRMATION"
-    assert got["active"]["manual_action"]=="REVALIDATE_LIVE_PRICE_AND_ACCOUNT"
+    assert got["active"]["manual_action"]=="REVALIDATE_PRICE_AND_ACCOUNT"
+    assert all(len(item["manual_action"]) <= 32 for item in got.values())
     assert got["duplicate"]["manual_action"]=="NO_DUPLICATE_ENTRY"
     assert got["invalid"]["state"]=="SIGNAL_TTL_UNVERIFIED"
     assert got["invalid"]["manual_action"]=="NO_ENTRY"
@@ -200,3 +201,12 @@ def test_time_parser_rejects_relative_and_invalid_calendar_dates():
         "valid": "2026-10-14 12:00:00",
         "mysql_valid": "2026-10-14 12:00:00",
     }
+
+
+def test_ingested_event_window_uses_production_analysis_completion_column():
+    """Production has analysis_completed_at_utc, not webhook created_at_utc."""
+    source = RUNNER.read_text(encoding="utf-8")
+    assert "AND analysis_completed_at_utc >= UTC_TIMESTAMP() - INTERVAL 2 HOUR" in source
+    assert "AND created_at_utc >= UTC_TIMESTAMP()" not in source
+    cloud = (ROOT / "hostinger_patch" / "cloud_control.php").read_text(encoding="utf-8")
+    assert "analysis_completed_at_utc" in cloud
