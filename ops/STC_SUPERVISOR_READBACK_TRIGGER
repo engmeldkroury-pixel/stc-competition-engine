@@ -3,3 +3,5 @@ Read-only owner-token GET of supervisor_status.php after additive schema install
 Verified deploy run 38643949521 has PHP lint, DB schema, production dry-run and one safe audit tick. Execute new read-only owner GET to prove deployed status and that minute cadence is not yet claimed.
 
 2026-10-15 verification requested after Hostinger hPanel screenshot confirms one-minute Custom job saved for supervisor_60s.php --tick; authenticated GET status only, no browser focus, email, Telegram or trades.
+
+2026-10-15 11:16 UTC — second independent production verification >100 minutes after hPanel creation; read-only owner GET, inspect 30-minute cadence and actual health, no messages/trades/browser.
