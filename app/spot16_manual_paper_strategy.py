@@ -13,7 +13,7 @@ import math
 import statistics
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Mapping
+from typing import Any
 
 PERIOD_MS={"15m":900000,"1h":3600000,"4h":14400000,"1d":86400000}
 FAMILIES=("MTF_TREND_PULLBACK","MTF_BOUNDED_BREAKOUT","MTF_RANGE_RECOVERY")
@@ -139,12 +139,16 @@ def signal_family(
 )->bool:
     if family not in FAMILIES:raise ValueError("UNREGISTERED_STRATEGY")
     s=bars["15m"]
-    if i<max(WARMUP_15M,21) or i>=len(s)-1:return False
-    if s[i+1].open_ms-s[i].open_ms!=PERIOD_MS["15m"]:
-        return False
+    if i<max(WARMUP_15M,21) or i>=len(s):return False
     indexes={x:closed_asof_index(bars[x],s[i].close_ms) for x in ("1d","4h","1h")}
     if indexes["1d"]<210 or indexes["4h"]<60 or indexes["1h"]<60:
         return False
+    # As-of alone may silently substitute days-old missing hourly/daily bars.
+    # SPOT trades 24/7. Missing most-recent completed HTF candle => fail closed.
+    for frame,last_index in indexes.items():
+        elapsed_ms=s[i].close_ms-bars[frame][last_index].close_ms
+        if elapsed_ms<0 or elapsed_ms>=PERIOD_MS[frame]:
+            return False
     d=bars["1d"][indexes["1d"]]
     fd=f["1d"];i_d=indexes["1d"]
     fh=f["4h"];i4=indexes["4h"];four=bars["4h"][i4]
@@ -207,7 +211,13 @@ def backtest_family(bars:dict[str,list[Bar]],family:str,lo:int,hi:int)->list[dic
     while i<hi-1:
         if not signal_family(family,bars,f,i):
             i+=1;continue
-        entry_i=i+1;entry=s[entry_i].o
+        entry_i=i+1
+        # Continuity is checked when simulating the hypothetical next-open fill,
+        # NOT by peeking at the bar from inside the signal-time predicate.
+        if s[entry_i].open_ms-s[i].open_ms!=PERIOD_MS["15m"]:
+            i+=1
+            continue
+        entry=s[entry_i].o
         risk=STOP_ATR*f["15m"]["atr"][i]
         stop=entry-risk
         target=entry+(1.5 if family=="MTF_RANGE_RECOVERY" else 2)*risk
@@ -254,6 +264,15 @@ def paper_manual_intent(
     base={"pair":pair,"mode":"SPOT_ONLY","side":"LONG_ONLY",
           "broker_order_sent":False,"paper_order_sent":False,
           "automatic_execution":False,"no_email":True}
+    # A caller-chosen text pair can never authorize new symbols outside owner registry.
+    # This is still a PURE paper preview, not an authenticated order approval.
+    from app.crypto_spot_registry import load_crypto_spot_registry
+    try:
+        registered=load_crypto_spot_registry().by_pair(pair)
+    except (KeyError,ValueError,OSError):
+        return {**base,"decision":"HOLD","reason":"UNREGISTERED_OWNER_SPOT_PAIR"}
+    if registered.pair!=pair:
+        return {**base,"decision":"HOLD","reason":"UNREGISTERED_OWNER_SPOT_PAIR"}
     if strategy_review_state!="APPROVED_FOR_MANUAL_PAPER":
         return {**base,"decision":"HOLD","reason":"STRATEGY_NOT_PROMOTED"}
     if not paper_account_identity_verified:
@@ -281,21 +300,34 @@ def paper_manual_intent(
     if remaining_risk<=0:
         return {**base,"decision":"HOLD","reason":"PORTFOLIO_RISK_CAP_REACHED"}
     single_trade_stop_risk=min(0.005*equity_usdt,remaining_risk)
+    # Conservative modeled 30 bps EACH side, in addition to price-to-stop risk.
+    # Even this cannot bound slippage past SL / gaps; no guaranteed stop execution.
+    fee_bps_per_side=max(COST_BPS)
+    modeled_roundtrip_cost_per_unit=(fee_bps_per_side/10_000)*(quote+stop)
+    stop_risk_per_unit=(quote-stop)+modeled_roundtrip_cost_per_unit
     cap=min(0.05*equity_usdt/quote,
             verified_available_cash_usdt/quote,
-            single_trade_stop_risk/(quote-stop))
+            single_trade_stop_risk/stop_risk_per_unit)
     steps=math.floor((cap+1e-15)/spot_step_size)
     qty=steps*spot_step_size
     if qty<=0 or qty*quote<minimum_notional:
         return {**base,"decision":"HOLD","reason":"BELOW_VENUE_MIN_NOTIONAL"}
+    # Budget check after venue step-size rounding; never round risk upward.
+    if (qty*stop_risk_per_unit>single_trade_stop_risk+1e-9
+        or verified_existing_open_stop_risk_usdt+qty*stop_risk_per_unit>0.02*equity_usdt+1e-9):
+        return {**base,"decision":"HOLD","reason":"FEE_INCLUSIVE_RISK_BUDGET_EXCEEDED"}
     return {**base,"decision":"OWNER_MANUAL_PAPER_RECHECK_ONLY",
             "hypothetical_max_quantity":qty,
             "quoted_reference_price":quote,
-            "estimated_max_stop_risk_usdt":qty*(quote-stop),
+            "estimated_max_stop_risk_usdt":qty*stop_risk_per_unit,
+            "stop_price_only_risk_usdt":qty*(quote-stop),
+            "modeled_friction_bps_per_side":fee_bps_per_side,
+            "modeled_roundtrip_cost_buffer_usdt":qty*modeled_roundtrip_cost_per_unit,
+            "fee_inclusive_verified_open_stop_risk_required":True,
             "max_notional_usdt":qty*quote,
             "expires_at_ms":signal_ms+300_000,
             "stop_reference":stop,
-            "note":"OWNER paper execution, SL/TP and fill must be checked on exact platform. NO ORDER SENT."}
+            "note":"Only a hypothetical OWNER manual Paper preview. Fills, fee tier, gaps, account identity and protection must be verified externally; NOT A GUARANTEED LOSS CAP. NO ORDER SENT."}
 
 def summary(trades:list[dict],bps:int)->dict:
     amounts=[r["cost_net_R"][str(bps)] for r in trades if r["cost_net_R"][str(bps)] is not None]
