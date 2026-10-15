@@ -10,3 +10,5 @@ Follow-up read-only verification after one or more completed Hostinger cron inte
 2026-10-14 follow-up: verify the newly deployed generic contest lifecycle notifier (deployment run 38469342284), no emails or old competition notifications. Read-only authenticated GET only.
 
 2026-10-14 21:56Z: recheck all STC email disabled and old Sep contests not generating alerts after supervisor bootstrap; read-only and no messages.
+
+2026-10-15 independent safety readback after owner saved Hostinger Cron * * * * * for the manual supervisor. GET only, no emails, no Telegram, no trades.
