@@ -1,0 +1,298 @@
+{
+  "schema_version": 1,
+  "frozen_protocol_id": "R10-REGIME-SESSION-SHADOW-V1",
+  "frozen_protocol_sha256": "96e94a305c0a6eb22f92f495560f1e0c66dc60d7395608c140da1e5b6e0def97",
+  "frozen_protocol_path": "research_inputs/R10_REGIME_SESSION_FROZEN_PROTOCOL.json",
+  "frozen_code_path": "app/r10_regime_session_shadow.py",
+  "forward_boundary_utc": "2026-09-28T12:00:00Z",
+  "evaluated_day_utc": "2026-10-15",
+  "session_utc": "12:00-17:00",
+  "timeframe": "15m",
+  "as_of_utc": "2026-10-15T19:09:29Z",
+  "last_closed_bar_open_utc": "2026-10-15T18:45:00Z",
+  "symbols": [
+    "BTCUSD",
+    "ETHUSD",
+    "DOGEUSD",
+    "EURUSD",
+    "AUDUSD",
+    "USDZAR",
+    "XAUUSD",
+    "XAGUSD",
+    "SPX500",
+    "NAS100"
+  ],
+  "research_only": true,
+  "live_authorized": false,
+  "broker_trades": "none",
+  "retuned": false,
+  "live_promotion": false,
+  "grade": "RECONSTRUCTED_NOT_PROMOTION_GRADE",
+  "increment_id": "R10_FORWARD_REGISTER_INCREMENT_2026-10-15T1909Z",
+  "evidence_file": "research_outputs/R10_FORWARD_EVIDENCE_INCREMENT_2026-10-15T1909Z.json",
+  "previous_persisted_evidence": "research_outputs/R10_FORWARD_EVIDENCE_INCREMENT_2026-10-12T1925Z.json",
+  "status": "COLLECTING_RESEARCH_ONLY",
+  "coverage": {
+    "expected_session_rows": 200,
+    "observed_session_rows": 200,
+    "market_rows_missing": 0,
+    "canonical_original_receipts": 0,
+    "unavailable_original_receipts": 200
+  },
+  "quality": {
+    "capital_prod_alerts_active": 0,
+    "last_capital_prod_fire_utc": "2026-10-13T11:00:00Z",
+    "all_tradingview_alert_fires_last_one_day": 0,
+    "source_conflict_rows": null,
+    "source_conflict_status": "UNVERIFIABLE_WITHOUT_CANONICAL_RECEIPTS",
+    "webhook_status": "UNVERIFIABLE_NOT_ZERO",
+    "missing_reason": "Capital STC alerts inactive; no original alert-time receipts; retrospective reconstruction only"
+  },
+  "aggregate": {
+    "regimes": {
+      "TREND": 37,
+      "RANGE": 75,
+      "NEUTRAL": 88
+    },
+    "decisions": {
+      "WAIT": 196,
+      "LONG": 0,
+      "SHORT": 4
+    },
+    "completed": 0,
+    "pending": 4,
+    "stops": 0,
+    "targets": 0,
+    "gross_r": 0,
+    "net_r_by_bps": null,
+    "pending_cost_penalty_r_by_bps": {
+      "1": 0.25111765072887704,
+      "2": 0.5022353014577541,
+      "3": 0.7533529521866311,
+      "5": 1.2555882536443852
+    }
+  },
+  "by_symbol_day": {
+    "BTCUSD": {
+      "regimes": {
+        "TREND": 0,
+        "RANGE": 7,
+        "NEUTRAL": 13
+      },
+      "decisions": {
+        "WAIT": 20,
+        "LONG": 0,
+        "SHORT": 0
+      },
+      "signal_statuses": [],
+      "source_bars": 1500,
+      "warmup_first_open_utc": "2026-09-29T23:15:00Z",
+      "last_seen_bar_open_utc": "2026-10-15T19:15:00Z"
+    },
+    "ETHUSD": {
+      "regimes": {
+        "TREND": 9,
+        "RANGE": 0,
+        "NEUTRAL": 11
+      },
+      "decisions": {
+        "WAIT": 20,
+        "LONG": 0,
+        "SHORT": 0
+      },
+      "signal_statuses": [],
+      "source_bars": 1500,
+      "warmup_first_open_utc": "2026-09-29T23:15:00Z",
+      "last_seen_bar_open_utc": "2026-10-15T19:15:00Z"
+    },
+    "DOGEUSD": {
+      "regimes": {
+        "TREND": 1,
+        "RANGE": 5,
+        "NEUTRAL": 14
+      },
+      "decisions": {
+        "WAIT": 20,
+        "LONG": 0,
+        "SHORT": 0
+      },
+      "signal_statuses": [],
+      "source_bars": 1500,
+      "warmup_first_open_utc": "2026-09-29T23:15:00Z",
+      "last_seen_bar_open_utc": "2026-10-15T19:15:00Z"
+    },
+    "EURUSD": {
+      "regimes": {
+        "TREND": 0,
+        "RANGE": 5,
+        "NEUTRAL": 15
+      },
+      "decisions": {
+        "WAIT": 20,
+        "LONG": 0,
+        "SHORT": 0
+      },
+      "signal_statuses": [],
+      "source_bars": 1500,
+      "warmup_first_open_utc": "2026-09-24T04:15:00Z",
+      "last_seen_bar_open_utc": "2026-10-15T19:15:00Z"
+    },
+    "AUDUSD": {
+      "regimes": {
+        "TREND": 20,
+        "RANGE": 0,
+        "NEUTRAL": 0
+      },
+      "decisions": {
+        "WAIT": 17,
+        "LONG": 0,
+        "SHORT": 3
+      },
+      "signal_statuses": [
+        {
+          "time": "2026-10-15T15:15:00Z",
+          "regime": "TREND",
+          "side": "SHORT",
+          "status": "PENDING"
+        },
+        {
+          "time": "2026-10-15T15:30:00Z",
+          "regime": "TREND",
+          "side": "SHORT",
+          "status": "PENDING"
+        },
+        {
+          "time": "2026-10-15T15:45:00Z",
+          "regime": "TREND",
+          "side": "SHORT",
+          "status": "PENDING"
+        }
+      ],
+      "source_bars": 1500,
+      "warmup_first_open_utc": "2026-09-24T04:30:00Z",
+      "last_seen_bar_open_utc": "2026-10-15T19:15:00Z"
+    },
+    "USDZAR": {
+      "regimes": {
+        "TREND": 1,
+        "RANGE": 13,
+        "NEUTRAL": 6
+      },
+      "decisions": {
+        "WAIT": 20,
+        "LONG": 0,
+        "SHORT": 0
+      },
+      "signal_statuses": [],
+      "source_bars": 1500,
+      "warmup_first_open_utc": "2026-09-24T04:00:00Z",
+      "last_seen_bar_open_utc": "2026-10-15T19:15:00Z"
+    },
+    "XAUUSD": {
+      "regimes": {
+        "TREND": 0,
+        "RANGE": 13,
+        "NEUTRAL": 7
+      },
+      "decisions": {
+        "WAIT": 20,
+        "LONG": 0,
+        "SHORT": 0
+      },
+      "signal_statuses": [],
+      "source_bars": 1500,
+      "warmup_first_open_utc": "2026-09-23T12:30:00Z",
+      "last_seen_bar_open_utc": "2026-10-15T19:15:00Z"
+    },
+    "XAGUSD": {
+      "regimes": {
+        "TREND": 6,
+        "RANGE": 0,
+        "NEUTRAL": 14
+      },
+      "decisions": {
+        "WAIT": 20,
+        "LONG": 0,
+        "SHORT": 0
+      },
+      "signal_statuses": [],
+      "source_bars": 1500,
+      "warmup_first_open_utc": "2026-09-23T12:30:00Z",
+      "last_seen_bar_open_utc": "2026-10-15T19:15:00Z"
+    },
+    "SPX500": {
+      "regimes": {
+        "TREND": 0,
+        "RANGE": 20,
+        "NEUTRAL": 0
+      },
+      "decisions": {
+        "WAIT": 19,
+        "LONG": 0,
+        "SHORT": 1
+      },
+      "signal_statuses": [
+        {
+          "time": "2026-10-15T15:00:00Z",
+          "regime": "RANGE",
+          "side": "SHORT",
+          "status": "PENDING"
+        }
+      ],
+      "source_bars": 1500,
+      "warmup_first_open_utc": "2026-09-24T01:30:00Z",
+      "last_seen_bar_open_utc": "2026-10-15T19:15:00Z"
+    },
+    "NAS100": {
+      "regimes": {
+        "TREND": 0,
+        "RANGE": 12,
+        "NEUTRAL": 8
+      },
+      "decisions": {
+        "WAIT": 20,
+        "LONG": 0,
+        "SHORT": 0
+      },
+      "signal_statuses": [],
+      "source_bars": 1500,
+      "warmup_first_open_utc": "2026-09-24T01:30:00Z",
+      "last_seen_bar_open_utc": "2026-10-15T19:15:00Z"
+    }
+  },
+  "by_regime": {
+    "TREND": {
+      "bars": 37,
+      "WAIT": 34,
+      "LONG": 0,
+      "SHORT": 3,
+      "completed": 0,
+      "pending": 3
+    },
+    "RANGE": {
+      "bars": 75,
+      "WAIT": 74,
+      "LONG": 0,
+      "SHORT": 1,
+      "completed": 0,
+      "pending": 1
+    },
+    "NEUTRAL": {
+      "bars": 88,
+      "WAIT": 88,
+      "LONG": 0,
+      "SHORT": 0,
+      "completed": 0,
+      "pending": 0
+    }
+  },
+  "prior_register_gaps_preserved": [
+    "2026-10-08 separate register",
+    "2026-10-09 evidence/register",
+    "2026-10-10 evidence/register",
+    "2026-10-11 evidence/register",
+    "2026-10-12 separate register",
+    "2026-10-13 evidence/register",
+    "2026-10-14 evidence/register"
+  ]
+}
