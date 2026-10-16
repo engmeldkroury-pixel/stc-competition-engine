@@ -1,0 +1,555 @@
+{
+  "schema_version": 1,
+  "increment_id": "R10_FORWARD_REGISTER_INCREMENT_2026-10-16T1906Z",
+  "frozen_protocol_id": "R10-REGIME-SESSION-SHADOW-V1",
+  "frozen_protocol_sha256": "96e94a305c0a6eb22f92f495560f1e0c66dc60d7395608c140da1e5b6e0def97",
+  "frozen_protocol_path": "research_inputs/R10_REGIME_SESSION_FROZEN_PROTOCOL.json",
+  "frozen_code_path": "app/r10_regime_session_shadow.py",
+  "forward_boundary_utc": "2026-09-28T12:00:00Z",
+  "evaluated_day_utc": "2026-10-16",
+  "session_utc": "12:00-17:00",
+  "timeframe": "15m",
+  "as_of_utc": "2026-10-16T19:06:32Z",
+  "last_closed_bar_open_utc": "2026-10-16T18:45:00Z",
+  "symbols": [
+    "BTCUSD",
+    "ETHUSD",
+    "DOGEUSD",
+    "EURUSD",
+    "AUDUSD",
+    "USDZAR",
+    "XAUUSD",
+    "XAGUSD",
+    "SPX500",
+    "NAS100"
+  ],
+  "research_only": true,
+  "live_authorized": false,
+  "execution": "none",
+  "retuned": false,
+  "live_promotion": false,
+  "evaluation_grade": "RECONSTRUCTED_NOT_PROMOTION_GRADE",
+  "status": "COLLECTING_RESEARCH_ONLY",
+  "previous_persisted_register": "research_outputs/R10_FORWARD_REGISTER_INCREMENT_2026-10-15T1909Z.json",
+  "previous_persisted_evidence": "research_outputs/R10_FORWARD_EVIDENCE_INCREMENT_2026-10-12T1925Z.json",
+  "prior_register_gaps_preserved": [
+    "2026-10-08 separate register",
+    "2026-10-09 evidence/register",
+    "2026-10-10 evidence/register",
+    "2026-10-11 evidence/register",
+    "2026-10-12 separate register",
+    "2026-10-13 evidence/register",
+    "2026-10-14 evidence/register",
+    "2026-10-15 evidence detail"
+  ],
+  "quality": {
+    "market_bars_expected": 200,
+    "market_bars_observed": 200,
+    "missing_market_rows": [],
+    "source_request_errors": [],
+    "canonical_original_alert_receipts": 0,
+    "unavailable_original_receipts": 200,
+    "source_conflicts_count": null,
+    "source_conflicts_status": "NOT_COMPARABLE_WITHOUT_ORIGINAL_ALERT_RECEIPTS",
+    "webhook_http_200": null,
+    "webhook_failures": null,
+    "webhook_status": "NOT_OBSERVABLE_NO_FIRES_IN_LAST_THREE_DAYS",
+    "alert_outer_metadata_mismatch": null,
+    "production_alerts_state": "INACTIVE_AS_OF_AUDIT",
+    "last_capital_prod_alert_fire_utc": "2026-10-13T11:00:00Z",
+    "historical_bar_source": "TradingView Official MCP CAPITALCOM 15m",
+    "historical_bars_are_as_retrieved_not_immutable_alert_time": true
+  },
+  "methodology": {
+    "ema": "causal EMA20/50/200 alpha 2/(N+1), seeded from first close of requested 1600 bars",
+    "atr14_rsi14": "Wilder smoothing",
+    "adx14": "Wilder14 first 14 DX average then recursive",
+    "zscore20": "population standard deviation of last 20 closes",
+    "signal_conditions": "unaltered frozen protocol",
+    "entry": "next 15m bar open",
+    "stop": "1.5 times source ATR14",
+    "target": "2R",
+    "horizon_bars": 32,
+    "missing_bars": "censored; never interpolated",
+    "simultaneous_stop_target": "stop first",
+    "gap_stop": "observed open",
+    "unresolved_full_horizon": "censored/no artificial mark-to-market",
+    "cost_bps": [
+      1,
+      2,
+      3,
+      5
+    ],
+    "cost_formula": "bps*entry_price/(10000*1.5*source_ATR14) as net-R drag",
+    "cost_limitation": "not independently verified per-symbol live CFD spread/slippage/commission; directional observations may overlap",
+    "reconstructed_note": "NO ORIGINAL DECISION-TIME FEATURE ENVELOPE HASH; this run is retrospective revised-history reconstruction, not original forward receipt"
+  },
+  "coverage": {
+    "expected": 200,
+    "observed": 200,
+    "missing": 0
+  },
+  "regimes": {
+    "TREND": 35,
+    "RANGE": 96,
+    "NEUTRAL": 69
+  },
+  "decisions": {
+    "WAIT": 195,
+    "LONG": 5,
+    "SHORT": 0,
+    "UNSCORABLE": 0
+  },
+  "daily_stats": {
+    "signal_count": 5,
+    "completed": 5,
+    "pending": 0,
+    "horizon_unresolved": 0,
+    "censored_missing": 0,
+    "stops": 5,
+    "targets": 0,
+    "gross_r": -5,
+    "net_r_by_bps": {
+      "1": -5.4251123865816115,
+      "2": -5.850224773163223,
+      "3": -6.2753371597448355,
+      "5": -7.125561932908059
+    }
+  },
+  "by_regime": {
+    "TREND": {
+      "bars": 35,
+      "WAIT": 33,
+      "LONG": 2,
+      "SHORT": 0,
+      "signal_count": 2,
+      "completed": 2,
+      "pending": 0,
+      "horizon_unresolved": 0,
+      "censored_missing": 0,
+      "stops": 2,
+      "targets": 0,
+      "gross_r": -2,
+      "net_r_by_bps": {
+        "1": -2.2457092387535242,
+        "2": -2.4914184775070476,
+        "3": -2.737127716260572,
+        "5": -3.2285461937676194
+      }
+    },
+    "RANGE": {
+      "bars": 96,
+      "WAIT": 93,
+      "LONG": 3,
+      "SHORT": 0,
+      "signal_count": 3,
+      "completed": 3,
+      "pending": 0,
+      "horizon_unresolved": 0,
+      "censored_missing": 0,
+      "stops": 3,
+      "targets": 0,
+      "gross_r": -3,
+      "net_r_by_bps": {
+        "1": -3.1794031478280878,
+        "2": -3.3588062956561755,
+        "3": -3.5382094434842637,
+        "5": -3.897015739140439
+      }
+    },
+    "NEUTRAL": {
+      "bars": 69,
+      "WAIT": 69,
+      "LONG": 0,
+      "SHORT": 0,
+      "signal_count": 0,
+      "completed": 0,
+      "pending": 0,
+      "horizon_unresolved": 0,
+      "censored_missing": 0,
+      "stops": 0,
+      "targets": 0,
+      "gross_r": null,
+      "net_r_by_bps": null
+    }
+  },
+  "by_symbol_day": {
+    "BTCUSD": {
+      "observed_session_rows": 20,
+      "missing_session_rows": [],
+      "regimes": {
+        "TREND": 0,
+        "RANGE": 15,
+        "NEUTRAL": 5
+      },
+      "decisions": {
+        "WAIT": 20,
+        "LONG": 0,
+        "SHORT": 0,
+        "UNSCORABLE": 0
+      },
+      "signals": [],
+      "warmup_bars": 1599,
+      "first_loaded_open_utc": "2026-09-29T22:00:00Z",
+      "last_closed_open_utc": "2026-10-16T18:45:00Z",
+      "provider": "CAPITALCOM:BTCUSD"
+    },
+    "ETHUSD": {
+      "observed_session_rows": 20,
+      "missing_session_rows": [],
+      "regimes": {
+        "TREND": 0,
+        "RANGE": 4,
+        "NEUTRAL": 16
+      },
+      "decisions": {
+        "WAIT": 20,
+        "LONG": 0,
+        "SHORT": 0,
+        "UNSCORABLE": 0
+      },
+      "signals": [],
+      "warmup_bars": 1599,
+      "first_loaded_open_utc": "2026-09-29T22:00:00Z",
+      "last_closed_open_utc": "2026-10-16T18:45:00Z",
+      "provider": "CAPITALCOM:ETHUSD"
+    },
+    "DOGEUSD": {
+      "observed_session_rows": 20,
+      "missing_session_rows": [],
+      "regimes": {
+        "TREND": 4,
+        "RANGE": 6,
+        "NEUTRAL": 10
+      },
+      "decisions": {
+        "WAIT": 20,
+        "LONG": 0,
+        "SHORT": 0,
+        "UNSCORABLE": 0
+      },
+      "signals": [],
+      "warmup_bars": 1599,
+      "first_loaded_open_utc": "2026-09-29T22:00:00Z",
+      "last_closed_open_utc": "2026-10-16T18:45:00Z",
+      "provider": "CAPITALCOM:DOGEUSD"
+    },
+    "EURUSD": {
+      "observed_session_rows": 20,
+      "missing_session_rows": [],
+      "regimes": {
+        "TREND": 15,
+        "RANGE": 0,
+        "NEUTRAL": 5
+      },
+      "decisions": {
+        "WAIT": 19,
+        "LONG": 1,
+        "SHORT": 0,
+        "UNSCORABLE": 0
+      },
+      "signals": [
+        {
+          "source_open_utc": "2026-10-16T13:30:00Z",
+          "side": "LONG",
+          "regime": "TREND",
+          "status": "STOP",
+          "gross_r": -1
+        }
+      ],
+      "warmup_bars": 1599,
+      "first_loaded_open_utc": "2026-09-24T03:00:00Z",
+      "last_closed_open_utc": "2026-10-16T18:45:00Z",
+      "provider": "CAPITALCOM:EURUSD"
+    },
+    "AUDUSD": {
+      "observed_session_rows": 20,
+      "missing_session_rows": [],
+      "regimes": {
+        "TREND": 2,
+        "RANGE": 5,
+        "NEUTRAL": 13
+      },
+      "decisions": {
+        "WAIT": 19,
+        "LONG": 1,
+        "SHORT": 0,
+        "UNSCORABLE": 0
+      },
+      "signals": [
+        {
+          "source_open_utc": "2026-10-16T12:00:00Z",
+          "side": "LONG",
+          "regime": "TREND",
+          "status": "STOP",
+          "gross_r": -1
+        }
+      ],
+      "warmup_bars": 1599,
+      "first_loaded_open_utc": "2026-09-24T03:15:00Z",
+      "last_closed_open_utc": "2026-10-16T18:45:00Z",
+      "provider": "CAPITALCOM:AUDUSD"
+    },
+    "USDZAR": {
+      "observed_session_rows": 20,
+      "missing_session_rows": [],
+      "regimes": {
+        "TREND": 0,
+        "RANGE": 14,
+        "NEUTRAL": 6
+      },
+      "decisions": {
+        "WAIT": 20,
+        "LONG": 0,
+        "SHORT": 0,
+        "UNSCORABLE": 0
+      },
+      "signals": [],
+      "warmup_bars": 1599,
+      "first_loaded_open_utc": "2026-09-24T02:45:00Z",
+      "last_closed_open_utc": "2026-10-16T18:45:00Z",
+      "provider": "CAPITALCOM:USDZAR"
+    },
+    "XAUUSD": {
+      "observed_session_rows": 20,
+      "missing_session_rows": [],
+      "regimes": {
+        "TREND": 0,
+        "RANGE": 20,
+        "NEUTRAL": 0
+      },
+      "decisions": {
+        "WAIT": 20,
+        "LONG": 0,
+        "SHORT": 0,
+        "UNSCORABLE": 0
+      },
+      "signals": [],
+      "warmup_bars": 1599,
+      "first_loaded_open_utc": "2026-09-23T10:15:00Z",
+      "last_closed_open_utc": "2026-10-16T18:45:00Z",
+      "provider": "CAPITALCOM:XAUUSD"
+    },
+    "XAGUSD": {
+      "observed_session_rows": 20,
+      "missing_session_rows": [],
+      "regimes": {
+        "TREND": 0,
+        "RANGE": 19,
+        "NEUTRAL": 1
+      },
+      "decisions": {
+        "WAIT": 20,
+        "LONG": 0,
+        "SHORT": 0,
+        "UNSCORABLE": 0
+      },
+      "signals": [],
+      "warmup_bars": 1599,
+      "first_loaded_open_utc": "2026-09-23T10:15:00Z",
+      "last_closed_open_utc": "2026-10-16T18:45:00Z",
+      "provider": "CAPITALCOM:XAGUSD"
+    },
+    "SPX500": {
+      "observed_session_rows": 20,
+      "missing_session_rows": [],
+      "regimes": {
+        "TREND": 2,
+        "RANGE": 13,
+        "NEUTRAL": 5
+      },
+      "decisions": {
+        "WAIT": 17,
+        "LONG": 3,
+        "SHORT": 0,
+        "UNSCORABLE": 0
+      },
+      "signals": [
+        {
+          "source_open_utc": "2026-10-16T14:00:00Z",
+          "side": "LONG",
+          "regime": "RANGE",
+          "status": "STOP",
+          "gross_r": -1
+        },
+        {
+          "source_open_utc": "2026-10-16T14:15:00Z",
+          "side": "LONG",
+          "regime": "RANGE",
+          "status": "STOP",
+          "gross_r": -1
+        },
+        {
+          "source_open_utc": "2026-10-16T15:00:00Z",
+          "side": "LONG",
+          "regime": "RANGE",
+          "status": "STOP",
+          "gross_r": -1
+        }
+      ],
+      "warmup_bars": 1599,
+      "first_loaded_open_utc": "2026-09-24T00:15:00Z",
+      "last_closed_open_utc": "2026-10-16T18:45:00Z",
+      "provider": "CAPITALCOM:SPX500"
+    },
+    "NAS100": {
+      "observed_session_rows": 20,
+      "missing_session_rows": [],
+      "regimes": {
+        "TREND": 12,
+        "RANGE": 0,
+        "NEUTRAL": 8
+      },
+      "decisions": {
+        "WAIT": 20,
+        "LONG": 0,
+        "SHORT": 0,
+        "UNSCORABLE": 0
+      },
+      "signals": [],
+      "warmup_bars": 1599,
+      "first_loaded_open_utc": "2026-09-24T00:15:00Z",
+      "last_closed_open_utc": "2026-10-16T18:45:00Z",
+      "provider": "CAPITALCOM:NAS100"
+    }
+  },
+  "prior_pending_reconciliation": {
+    "original_pending_count": 4,
+    "signal_count": 4,
+    "completed": 2,
+    "pending": 0,
+    "horizon_unresolved": 2,
+    "censored_missing": 0,
+    "stops": 2,
+    "targets": 0,
+    "gross_r": -2,
+    "net_r_by_bps": {
+      "1": -2.11275664898741,
+      "2": -2.2255132979748202,
+      "3": -2.33826994696223,
+      "5": -2.56378324493705
+    }
+  },
+  "parity_replay": {
+    "oct12_oct15_previous_counts_match": true,
+    "conflicts": []
+  },
+  "evidence_path": null,
+  "evidence_persistence_status": "BLOCKED",
+  "signal_summaries": [
+    {
+      "symbol": "EURUSD",
+      "source_open_utc": "2026-10-16T13:30:00Z",
+      "side": "LONG",
+      "regime": "TREND",
+      "status": "STOP",
+      "gross_r": -1,
+      "net_r_by_bps": {
+        "1": -1.1160116550460994,
+        "2": -1.2320233100921987,
+        "3": -1.3480349651382981,
+        "5": -1.5800582752304968
+      }
+    },
+    {
+      "symbol": "AUDUSD",
+      "source_open_utc": "2026-10-16T12:00:00Z",
+      "side": "LONG",
+      "regime": "TREND",
+      "status": "STOP",
+      "gross_r": -1,
+      "net_r_by_bps": {
+        "1": -1.1296975837074246,
+        "2": -1.2593951674148491,
+        "3": -1.3890927511222735,
+        "5": -1.6484879185371226
+      }
+    },
+    {
+      "symbol": "SPX500",
+      "source_open_utc": "2026-10-16T14:00:00Z",
+      "side": "LONG",
+      "regime": "RANGE",
+      "status": "STOP",
+      "gross_r": -1,
+      "net_r_by_bps": {
+        "1": -1.0640525029630592,
+        "2": -1.1281050059261186,
+        "3": -1.1921575088891778,
+        "5": -1.3202625148152964
+      }
+    },
+    {
+      "symbol": "SPX500",
+      "source_open_utc": "2026-10-16T14:15:00Z",
+      "side": "LONG",
+      "regime": "RANGE",
+      "status": "STOP",
+      "gross_r": -1,
+      "net_r_by_bps": {
+        "1": -1.0633971937007305,
+        "2": -1.126794387401461,
+        "3": -1.1901915811021915,
+        "5": -1.3169859685036525
+      }
+    },
+    {
+      "symbol": "SPX500",
+      "source_open_utc": "2026-10-16T15:00:00Z",
+      "side": "LONG",
+      "regime": "RANGE",
+      "status": "STOP",
+      "gross_r": -1,
+      "net_r_by_bps": {
+        "1": -1.051953451164298,
+        "2": -1.1039069023285961,
+        "3": -1.155860353492894,
+        "5": -1.25976725582149
+      }
+    }
+  ],
+  "carried_signal_summaries": [
+    {
+      "symbol": "AUDUSD",
+      "source_open_utc": "2026-10-15T15:15:00Z",
+      "side": "SHORT",
+      "status": "HORIZON_UNRESOLVED",
+      "gross_r": null,
+      "net_r_by_bps": null
+    },
+    {
+      "symbol": "AUDUSD",
+      "source_open_utc": "2026-10-15T15:30:00Z",
+      "side": "SHORT",
+      "status": "HORIZON_UNRESOLVED",
+      "gross_r": null,
+      "net_r_by_bps": null
+    },
+    {
+      "symbol": "AUDUSD",
+      "source_open_utc": "2026-10-15T15:45:00Z",
+      "side": "SHORT",
+      "status": "STOP",
+      "gross_r": -1,
+      "net_r_by_bps": {
+        "1": -1.0727408897975597,
+        "2": -1.1454817795951193,
+        "3": -1.2182226693926788,
+        "5": -1.363704448987798
+      }
+    },
+    {
+      "symbol": "SPX500",
+      "source_open_utc": "2026-10-15T15:00:00Z",
+      "side": "SHORT",
+      "status": "STOP",
+      "gross_r": -1,
+      "net_r_by_bps": {
+        "1": -1.0400157591898505,
+        "2": -1.080031518379701,
+        "3": -1.1200472775695514,
+        "5": -1.2000787959492523
+      }
+    }
+  ]
+}
