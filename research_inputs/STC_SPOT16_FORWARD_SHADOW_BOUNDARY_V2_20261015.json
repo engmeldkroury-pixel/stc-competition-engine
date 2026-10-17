@@ -1,0 +1,132 @@
+{
+  "version": 2,
+  "purpose": "FUTURE_UNSEEN_SHADOW_VALIDATION_NO_TRADING",
+  "created_from_historical_research_date": "2026-10-15",
+  "forward_start_closed_bar_utc": "2026-10-16T00:00:00Z",
+  "source_provider": "BINANCE_SPOT_PUBLIC",
+  "historical_snapshot_asof_utc": "2026-10-15T14:44:31.913000+00:00",
+  "historical_manifest_sha256": "73bfc15e71ab2654cb5a72d5a34900e0cc1080abb331dc6589b22ddeb09064e3",
+  "strategy_protocol_path": "docs/STC_CRYPTO_SPOT16_RESEARCH_PROTOCOL_V2_20261015.md",
+  "strategy_source_path": "app/spot16_manual_paper_strategy.py",
+  "allowed_families": [
+    "MTF_TREND_PULLBACK",
+    "MTF_BOUNDED_BREAKOUT",
+    "MTF_RANGE_RECOVERY"
+  ],
+  "approved_for_actionable_trade_alerts": false,
+  "approved_for_paper_orders": false,
+  "approved_for_real_orders": false,
+  "no_leverage": true,
+  "no_short": true,
+  "spot_only": true,
+  "owner_paper_account_fills_verified": false,
+  "fresh_venue_quotes_connected": false,
+  "backend_forward_scanner_scheduled": false,
+  "future_validation_policy": {
+    "only_collect_when_source_bar_close_after_utc": "2026-10-16T00:00:00Z",
+    "exactly_closed_timeframes": [
+      "15m",
+      "1h",
+      "4h",
+      "1d"
+    ],
+    "no_retroactive_refresh_of_observed_source_bars": true,
+    "no_owner_trade_inference_from_hypothetical_signal": true,
+    "no_promoting_on_prior_negative_retrospective_cohort": true,
+    "preserve_gap_and_receipt_failures": true,
+    "no_live_action_until_independent_paper_fill_and_positive_prospective_evidence": true,
+    "no_email_or_old_competition_notifications": true
+  },
+  "owner_priority_first": [
+    "BTCUSDT",
+    "ETHUSDT",
+    "SOLUSDT",
+    "TRBUSDT",
+    "GALAUSDT",
+    "YGGUSDT",
+    "NOTUSDT"
+  ],
+  "pairs": [
+    {
+      "pair": "BTCUSDT",
+      "current_history_gate": "HISTORY_QUALITY_PASS",
+      "forward_action": "COLLECT_RESEARCH_ONLY"
+    },
+    {
+      "pair": "ETHUSDT",
+      "current_history_gate": "HISTORY_QUALITY_PASS",
+      "forward_action": "COLLECT_RESEARCH_ONLY"
+    },
+    {
+      "pair": "SOLUSDT",
+      "current_history_gate": "HISTORY_QUALITY_PASS",
+      "forward_action": "COLLECT_RESEARCH_ONLY"
+    },
+    {
+      "pair": "BNBUSDT",
+      "current_history_gate": "HISTORY_QUALITY_PASS",
+      "forward_action": "COLLECT_RESEARCH_ONLY"
+    },
+    {
+      "pair": "XRPUSDT",
+      "current_history_gate": "HISTORY_QUALITY_PASS",
+      "forward_action": "COLLECT_RESEARCH_ONLY"
+    },
+    {
+      "pair": "ADAUSDT",
+      "current_history_gate": "HISTORY_QUALITY_PASS",
+      "forward_action": "COLLECT_RESEARCH_ONLY"
+    },
+    {
+      "pair": "AVAXUSDT",
+      "current_history_gate": "HISTORY_QUALITY_PASS",
+      "forward_action": "COLLECT_RESEARCH_ONLY"
+    },
+    {
+      "pair": "TRBUSDT",
+      "current_history_gate": "HISTORY_QUALITY_PASS",
+      "forward_action": "COLLECT_RESEARCH_ONLY"
+    },
+    {
+      "pair": "GALAUSDT",
+      "current_history_gate": "HISTORY_QUALITY_PASS",
+      "forward_action": "COLLECT_RESEARCH_ONLY"
+    },
+    {
+      "pair": "YGGUSDT",
+      "current_history_gate": "HISTORY_QUALITY_PASS",
+      "forward_action": "COLLECT_RESEARCH_ONLY"
+    },
+    {
+      "pair": "NOTUSDT",
+      "current_history_gate": "BLOCKED_882_DAILY_BELOW_900",
+      "forward_action": "COLLECT_RESEARCH_ONLY"
+    },
+    {
+      "pair": "NEOUSDT",
+      "current_history_gate": "HISTORY_QUALITY_PASS",
+      "forward_action": "COLLECT_RESEARCH_ONLY"
+    },
+    {
+      "pair": "OPUSDT",
+      "current_history_gate": "HISTORY_QUALITY_PASS",
+      "forward_action": "COLLECT_RESEARCH_ONLY"
+    },
+    {
+      "pair": "ARBUSDT",
+      "current_history_gate": "HISTORY_QUALITY_PASS",
+      "forward_action": "COLLECT_RESEARCH_ONLY"
+    },
+    {
+      "pair": "SUIUSDT",
+      "current_history_gate": "HISTORY_QUALITY_PASS",
+      "forward_action": "COLLECT_RESEARCH_ONLY"
+    },
+    {
+      "pair": "INJUSDT",
+      "current_history_gate": "HISTORY_QUALITY_PASS",
+      "forward_action": "COLLECT_RESEARCH_ONLY"
+    }
+  ],
+  "outcome": "NOT_STARTED_FUTURE_WINDOW"
+}
