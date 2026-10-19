@@ -1,0 +1,144 @@
+{
+  "day_utc": "2026-10-19",
+  "protocol": "R10-REGIME-SESSION-SHADOW-V1",
+  "boundary_utc": "2026-09-28T12:00:00Z",
+  "timeframe": "15m",
+  "session_utc": "12:00-17:00",
+  "as_of_utc": "2026-10-19T18:54:30Z",
+  "grade": "RECONSTRUCTED_NOT_PROMOTION_GRADE",
+  "research_only": true,
+  "retuned": false,
+  "live_promotion": false,
+  "by_symbol": {
+    "BTCUSD": [
+      1,
+      5,
+      14,
+      1,
+      0
+    ],
+    "ETHUSD": [
+      1,
+      0,
+      19,
+      0,
+      0
+    ],
+    "DOGEUSD": [
+      0,
+      14,
+      6,
+      0,
+      0
+    ],
+    "EURUSD": [
+      0,
+      19,
+      1,
+      0,
+      0
+    ],
+    "AUDUSD": [
+      3,
+      2,
+      15,
+      0,
+      0
+    ],
+    "USDZAR": [
+      0,
+      0,
+      20,
+      0,
+      0
+    ],
+    "XAUUSD": [
+      12,
+      1,
+      7,
+      0,
+      0
+    ],
+    "XAGUSD": [
+      11,
+      6,
+      3,
+      0,
+      1
+    ],
+    "SPX500": [
+      0,
+      19,
+      1,
+      0,
+      0
+    ],
+    "NAS100": [
+      0,
+      20,
+      0,
+      0,
+      2
+    ]
+  },
+  "by_symbol_columns": [
+    "trend_bars",
+    "range_bars",
+    "neutral_bars",
+    "long_signals",
+    "short_signals"
+  ],
+  "session_bars_observed": 200,
+  "session_bars_expected": 200,
+  "regimes": {
+    "TREND": 28,
+    "RANGE": 86,
+    "NEUTRAL": 86
+  },
+  "decisions": {
+    "WAIT": 196,
+    "LONG": 1,
+    "SHORT": 3
+  },
+  "outcomes": {
+    "completed": 3,
+    "pending": 1,
+    "stops": 1,
+    "targets": 2,
+    "gross_r": 3,
+    "net_r_1bps": 2.9051889632590076,
+    "net_r_2bps": 2.810377926518015,
+    "net_r_3bps": 2.715566889777022,
+    "net_r_5bps": 2.525944816295037
+  },
+  "by_regime": {
+    "TREND": {
+      "signals": 2,
+      "completed": 1,
+      "pending": 1,
+      "gross_r": -1,
+      "net_r_2bps": -1.0562012333534265
+    },
+    "RANGE": {
+      "signals": 2,
+      "completed": 2,
+      "pending": 0,
+      "gross_r": 4,
+      "net_r_2bps": 3.866579159871441
+    },
+    "NEUTRAL": {
+      "signals": 0,
+      "gross_r": null
+    }
+  },
+  "original_alert_receipts": 0,
+  "original_receipts_unavailable": 200,
+  "source_conflicts": "NOT_COMPARABLE",
+  "webhook_status": "NOT_OBSERVABLE",
+  "pending_symbol": "XAGUSD",
+  "clustered_outcomes": "NAS100 target hits share same bar and are not independent",
+  "cost_grid": "Estimated not verified CFD all-in costs",
+  "no_live_actions": true,
+  "evidence_file": "research_outputs/R10_FORWARD_EVIDENCE_INCREMENT_2026-10-19T1854Z.json",
+  "prior_gap": "2026-10-18 remains local-only and earlier registry gaps stay unresolved"
+}
