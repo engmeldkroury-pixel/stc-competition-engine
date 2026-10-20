@@ -21,6 +21,7 @@ jobs:
       STC_WORKER_TOKEN: ${{ secrets.STC_WORKER_TOKEN }}
       STC_WORKER_ID: stc-github-worker
       STC_WORKER_BATCH_LIMIT: "20"
+      STC_WORKER_MAX_BATCHES: "3"
     steps:
       - name: Checkout
         uses: actions/checkout@v4
