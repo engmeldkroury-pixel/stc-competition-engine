@@ -1,0 +1,485 @@
+{
+  "schema_version": 1,
+  "day_utc": "2026-10-21",
+  "as_of_utc": "2026-10-21T19:20:08Z",
+  "protocol": "R10-REGIME-SESSION-SHADOW-V1",
+  "protocol_sha256": "96e94a305c0a6eb22f92f495560f1e0c66dc60d7395608c140da1e5b6e0def97",
+  "forward_boundary_utc": "2026-09-28T12:00:00Z",
+  "timeframe": "15m",
+  "session_utc": "12:00-17:00",
+  "authority": {
+    "research_only": true,
+    "live_authorized": false,
+    "broker_writes": 0,
+    "stop_changes": 0,
+    "retuned": false,
+    "live_promotion": false
+  },
+  "evidence_grade": "RECONSTRUCTED_NOT_PROMOTION_GRADE",
+  "coverage": {
+    "expected": 200,
+    "observed": 200,
+    "missing": 0,
+    "source_errors": []
+  },
+  "by_symbol": {
+    "BTCUSD": {
+      "regimes": {
+        "TREND": 20,
+        "RANGE": 0,
+        "NEUTRAL": 0
+      },
+      "decisions": {
+        "WAIT": 20,
+        "LONG": 0,
+        "SHORT": 0,
+        "UNSCORABLE": 0
+      },
+      "completed": 0,
+      "gross_r": null,
+      "net_r_2bps": null,
+      "missing": 0
+    },
+    "ETHUSD": {
+      "regimes": {
+        "TREND": 8,
+        "RANGE": 0,
+        "NEUTRAL": 12
+      },
+      "decisions": {
+        "WAIT": 20,
+        "LONG": 0,
+        "SHORT": 0,
+        "UNSCORABLE": 0
+      },
+      "completed": 0,
+      "gross_r": null,
+      "net_r_2bps": null,
+      "missing": 0
+    },
+    "DOGEUSD": {
+      "regimes": {
+        "TREND": 0,
+        "RANGE": 10,
+        "NEUTRAL": 10
+      },
+      "decisions": {
+        "WAIT": 20,
+        "LONG": 0,
+        "SHORT": 0,
+        "UNSCORABLE": 0
+      },
+      "completed": 0,
+      "gross_r": null,
+      "net_r_2bps": null,
+      "missing": 0
+    },
+    "EURUSD": {
+      "regimes": {
+        "TREND": 0,
+        "RANGE": 20,
+        "NEUTRAL": 0
+      },
+      "decisions": {
+        "WAIT": 20,
+        "LONG": 0,
+        "SHORT": 0,
+        "UNSCORABLE": 0
+      },
+      "completed": 0,
+      "gross_r": null,
+      "net_r_2bps": null,
+      "missing": 0
+    },
+    "AUDUSD": {
+      "regimes": {
+        "TREND": 9,
+        "RANGE": 3,
+        "NEUTRAL": 8
+      },
+      "decisions": {
+        "WAIT": 20,
+        "LONG": 0,
+        "SHORT": 0,
+        "UNSCORABLE": 0
+      },
+      "completed": 0,
+      "gross_r": null,
+      "net_r_2bps": null,
+      "missing": 0
+    },
+    "USDZAR": {
+      "regimes": {
+        "TREND": 3,
+        "RANGE": 0,
+        "NEUTRAL": 17
+      },
+      "decisions": {
+        "WAIT": 20,
+        "LONG": 0,
+        "SHORT": 0,
+        "UNSCORABLE": 0
+      },
+      "completed": 0,
+      "gross_r": null,
+      "net_r_2bps": null,
+      "missing": 0
+    },
+    "XAUUSD": {
+      "regimes": {
+        "TREND": 0,
+        "RANGE": 18,
+        "NEUTRAL": 2
+      },
+      "decisions": {
+        "WAIT": 20,
+        "LONG": 0,
+        "SHORT": 0,
+        "UNSCORABLE": 0
+      },
+      "completed": 0,
+      "gross_r": null,
+      "net_r_2bps": null,
+      "missing": 0
+    },
+    "XAGUSD": {
+      "regimes": {
+        "TREND": 0,
+        "RANGE": 20,
+        "NEUTRAL": 0
+      },
+      "decisions": {
+        "WAIT": 20,
+        "LONG": 0,
+        "SHORT": 0,
+        "UNSCORABLE": 0
+      },
+      "completed": 0,
+      "gross_r": null,
+      "net_r_2bps": null,
+      "missing": 0
+    },
+    "SPX500": {
+      "regimes": {
+        "TREND": 0,
+        "RANGE": 20,
+        "NEUTRAL": 0
+      },
+      "decisions": {
+        "WAIT": 20,
+        "LONG": 0,
+        "SHORT": 0,
+        "UNSCORABLE": 0
+      },
+      "completed": 0,
+      "gross_r": null,
+      "net_r_2bps": null,
+      "missing": 0
+    },
+    "NAS100": {
+      "regimes": {
+        "TREND": 0,
+        "RANGE": 17,
+        "NEUTRAL": 3
+      },
+      "decisions": {
+        "WAIT": 20,
+        "LONG": 0,
+        "SHORT": 0,
+        "UNSCORABLE": 0
+      },
+      "completed": 0,
+      "gross_r": null,
+      "net_r_2bps": null,
+      "missing": 0
+    }
+  },
+  "aggregate": {
+    "bars": 200,
+    "regimes": {
+      "TREND": 40,
+      "RANGE": 108,
+      "NEUTRAL": 52
+    },
+    "decisions": {
+      "WAIT": 200,
+      "LONG": 0,
+      "SHORT": 0,
+      "UNSCORABLE": 0
+    },
+    "signals": 0,
+    "completed": 0,
+    "pending": 0,
+    "censored": 0,
+    "horizon_unresolved": 0,
+    "stops": 0,
+    "targets": 0,
+    "gross_r": null,
+    "net_r_by_bps": {
+      "1": null,
+      "2": null,
+      "3": null,
+      "5": null
+    }
+  },
+  "by_regime": {
+    "TREND": {
+      "bars": 40,
+      "regimes": {
+        "TREND": 0,
+        "RANGE": 0,
+        "NEUTRAL": 0
+      },
+      "decisions": {
+        "WAIT": 40,
+        "LONG": 0,
+        "SHORT": 0,
+        "UNSCORABLE": 0
+      },
+      "signals": 0,
+      "completed": 0,
+      "pending": 0,
+      "censored": 0,
+      "horizon_unresolved": 0,
+      "stops": 0,
+      "targets": 0,
+      "gross_r": null,
+      "net_r_by_bps": {
+        "1": null,
+        "2": null,
+        "3": null,
+        "5": null
+      }
+    },
+    "RANGE": {
+      "bars": 108,
+      "regimes": {
+        "TREND": 0,
+        "RANGE": 0,
+        "NEUTRAL": 0
+      },
+      "decisions": {
+        "WAIT": 108,
+        "LONG": 0,
+        "SHORT": 0,
+        "UNSCORABLE": 0
+      },
+      "signals": 0,
+      "completed": 0,
+      "pending": 0,
+      "censored": 0,
+      "horizon_unresolved": 0,
+      "stops": 0,
+      "targets": 0,
+      "gross_r": null,
+      "net_r_by_bps": {
+        "1": null,
+        "2": null,
+        "3": null,
+        "5": null
+      }
+    },
+    "NEUTRAL": {
+      "bars": 52,
+      "regimes": {
+        "TREND": 0,
+        "RANGE": 0,
+        "NEUTRAL": 0
+      },
+      "decisions": {
+        "WAIT": 52,
+        "LONG": 0,
+        "SHORT": 0,
+        "UNSCORABLE": 0
+      },
+      "signals": 0,
+      "completed": 0,
+      "pending": 0,
+      "censored": 0,
+      "horizon_unresolved": 0,
+      "stops": 0,
+      "targets": 0,
+      "gross_r": null,
+      "net_r_by_bps": {
+        "1": null,
+        "2": null,
+        "3": null,
+        "5": null
+      }
+    }
+  },
+  "signals": [],
+  "prior_day_parity": {
+    "day_utc": "2026-10-20",
+    "all_match": true,
+    "by_symbol": {
+      "BTCUSD": {
+        "ok": true,
+        "expected": [
+          0,
+          9,
+          11,
+          20
+        ],
+        "observed": [
+          0,
+          9,
+          11,
+          20
+        ]
+      },
+      "ETHUSD": {
+        "ok": true,
+        "expected": [
+          6,
+          0,
+          14,
+          20
+        ],
+        "observed": [
+          6,
+          0,
+          14,
+          20
+        ]
+      },
+      "DOGEUSD": {
+        "ok": true,
+        "expected": [
+          5,
+          5,
+          10,
+          20
+        ],
+        "observed": [
+          5,
+          5,
+          10,
+          20
+        ]
+      },
+      "EURUSD": {
+        "ok": true,
+        "expected": [
+          1,
+          0,
+          19,
+          20
+        ],
+        "observed": [
+          1,
+          0,
+          19,
+          20
+        ]
+      },
+      "AUDUSD": {
+        "ok": true,
+        "expected": [
+          0,
+          11,
+          9,
+          20
+        ],
+        "observed": [
+          0,
+          11,
+          9,
+          20
+        ]
+      },
+      "USDZAR": {
+        "ok": true,
+        "expected": [
+          5,
+          0,
+          15,
+          20
+        ],
+        "observed": [
+          5,
+          0,
+          15,
+          20
+        ]
+      },
+      "XAUUSD": {
+        "ok": true,
+        "expected": [
+          0,
+          16,
+          4,
+          20
+        ],
+        "observed": [
+          0,
+          16,
+          4,
+          20
+        ]
+      },
+      "XAGUSD": {
+        "ok": true,
+        "expected": [
+          0,
+          4,
+          16,
+          20
+        ],
+        "observed": [
+          0,
+          4,
+          16,
+          20
+        ]
+      },
+      "SPX500": {
+        "ok": true,
+        "expected": [
+          0,
+          3,
+          17,
+          20
+        ],
+        "observed": [
+          0,
+          3,
+          17,
+          20
+        ]
+      },
+      "NAS100": {
+        "ok": true,
+        "expected": [
+          0,
+          8,
+          12,
+          20
+        ],
+        "observed": [
+          0,
+          8,
+          12,
+          20
+        ]
+      }
+    }
+  },
+  "quality": {
+    "historical_ohlcv": "retrospective",
+    "original_receipts": 0,
+    "source_conflicts": null,
+    "source_conflicts_state": "NOT_COMPARABLE",
+    "webhook": "NOT_OBSERVABLE",
+    "production_alerts_active": false,
+    "last_alert_fire_utc": "2026-10-13T11:00:00Z"
+  },
+  "cost_sensitivity": "no completed signals means N/A not realized zero",
+  "unresolved_historical_gaps": [
+    "2026-10-18 local-only",
+    "2026-10-20 local-only",
+    "older unpersisted increments remain"
+  ],
+  "evidence_file": "research_outputs/R10_FORWARD_EVIDENCE_INCREMENT_2026-10-21T1920Z.json",
+  "previously_censored_XAGUSD": "NOT_SCORED"
+}
